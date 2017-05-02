@@ -38,26 +38,33 @@ $app
     });
 
 $app
-    ->post('/harvest', function (Request $r) {
+    ->post('/harvest', function (Request $r) use ($app) {
         $client = new GuzzleHttp\Client();
+        $authHeader = 'Basic ' . base64_encode("{$r->request->get('username')}:{$r->request->get('password')}");
         $response = $client->get("https://{$r->request->get('domain', 'a')}.harvestapp.com/account/who_am_i", [
             'http_errors' => false,
             'auth' => [$r->request->get('username'), $r->request->get('password')],
             'headers' => [
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
+                'Authorization' => $authHeader,
             ],
         ]);
-        $account = json_decode($response->getBody(), true);
+        $json = json_decode($response->getBody(), true);
         if ($response->getStatusCode() != 200) {
             return new JsonResponse([], $response->getStatusCode());
         }
-        return new JsonResponse([
-            'company_name' => $account['company']['name'],
-            'company_url' => $account['company']['base_uri'],
-            'user_name' => "{$account['user']['first_name']} {$account['user']['last_name']}",
-            'user_avatar' => $account['user']['avatar_url'],
+        $account = [
+            'company_name' => $json['company']['name'],
+            'company_url' => $json['company']['base_uri'],
+            'user_name' => "{$json['user']['first_name']} {$json['user']['last_name']}",
+            'user_avatar' => $json['user']['avatar_url'],
+        ];
+        $app['session']->set('harvest', [
+            'account' => $account,
+            'auth' => $authHeader,
         ]);
+        return new JsonResponse($account);
     });
 
 $app->error(function (Exception $e) {

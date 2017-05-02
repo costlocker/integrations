@@ -28,6 +28,10 @@ class HarvestTest extends \Silex\WebTestCase
             hasKeyInArray('user_name'),
             hasKeyInArray('user_avatar')
         ));
+        assertThat($this->app['session']->get('harvest'), allOf(
+            hasKeyInArray('account'),
+            hasKeyInArray('auth')
+        ));
     }
 
     public function testFailedLogin()
