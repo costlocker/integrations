@@ -9,3 +9,10 @@
 cd backend
 composer install
 ```
+
+### Frontend
+
+```
+cd frontend
+yarn install
+```
