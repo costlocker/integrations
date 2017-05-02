@@ -4,6 +4,8 @@ import { Visualizer } from 'ui-router-visualizer';
 import { Map } from 'immutable';
 
 import LoginForm from './harvest/LoginForm';
+import Projects from './harvest/Projects';
+import Project from './harvest/Project';
 import WizardLayout from './wizard/WizardLayout';
 import { appState, isNotLoggedIn } from './state';
 import { pushToApi, fetchFromApi } from './api';
@@ -35,7 +37,8 @@ const states = [
     name: 'wizard.2',
     url: '/2',
     component: ({ resolves }) => {
-      return <pre>{JSON.stringify(resolves.projects, null, 2)}</pre>;
+      const goTo = id => Router.stateService.go('wizard.3', { project: id }, { location: true });
+      return <Projects projects={resolves.projects} goToProject={goTo} />;
     },
     resolve: [
       {
@@ -43,6 +46,11 @@ const states = [
         resolveFn: () => fetchFromApi('/harvest')
       }
     ]
+  },
+  {
+    name: 'wizard.3',
+    url: '/3?project',
+    component: (props) => <Project project={props.transition.params().project} />,
   },
 ];
 
