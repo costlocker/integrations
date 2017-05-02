@@ -1,0 +1,8 @@
+{
+    "name": "costlocker/harvest-importer",
+    "require": {
+        "vlucas/phpdotenv": "^2.4",
+        "silex/silex": "^2.0",
+        "monolog/monolog": "^1.22"
+    }
+}
