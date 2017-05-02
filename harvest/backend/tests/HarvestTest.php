@@ -32,6 +32,11 @@ class HarvestTest extends \Silex\WebTestCase
             hasKeyInArray('account'),
             hasKeyInArray('auth')
         ));
+        $projectsResponse = $this->request([
+            'method' => 'GET',
+            'url' => '/harvest',
+        ]);
+        assertThat($projectsResponse->getStatusCode(), is(200));
     }
 
     public function testFailedLogin()
@@ -47,6 +52,15 @@ class HarvestTest extends \Silex\WebTestCase
         assertThat($response->getStatusCode(), is(401));
     }
 
+    public function testUnauthorizedRequest()
+    {
+        $response = $this->request([
+            'method' => 'GET',
+            'url' => '/harvest',
+        ]);
+        assertThat($response->getStatusCode(), is(401));
+    }
+
     private function request(array $config)
     {
         $client = $this->createClient();
@@ -56,7 +70,7 @@ class HarvestTest extends \Silex\WebTestCase
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
-            json_encode($config['json'])
+            json_encode($config['json'] ?? [])
         );
         return $client->getResponse();
     }

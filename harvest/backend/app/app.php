@@ -30,12 +30,18 @@ $app->before(function (Request $request) {
     }
 });
 
+$authorizeHarvest = function () use ($app) {
+    if (!$app['session']->get('harvest')) {
+        return new JsonResponse(null, 401);
+    }
+};
+
 $app
-    ->get('/harvest', function (){
+    ->get('/harvest', function () {
         return new JsonResponse([
             'data' => [],
         ]);
-    });
+    })->before($authorizeHarvest);
 
 $app
     ->post('/harvest', function (Request $r) use ($app) {
