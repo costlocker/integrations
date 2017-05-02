@@ -21,6 +21,13 @@ class HarvestTest extends \Silex\WebTestCase
             ],
         ]);
         assertThat($response->getStatusCode(), is(200));
+        $json = json_decode($response->getContent(), true);
+        assertThat($json, allOf(
+            hasKeyInArray('company_name'),
+            hasKeyInArray('company_url'),
+            hasKeyInArray('user_name'),
+            hasKeyInArray('user_avatar')
+        ));
     }
 
     public function testFailedLogin()

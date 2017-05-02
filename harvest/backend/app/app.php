@@ -48,14 +48,16 @@ $app
                 'Content-Type' => 'application/json',
             ],
         ]);
-        return new JsonResponse(
-            [
-                $r->request->all(),
-                json_decode($response->getBody()),
-                $response->getStatusCode(),
-            ],
-            $response->getStatusCode()
-        );
+        $account = json_decode($response->getBody(), true);
+        if ($response->getStatusCode() != 200) {
+            return new JsonResponse([], $response->getStatusCode());
+        }
+        return new JsonResponse([
+            'company_name' => $account['company']['name'],
+            'company_url' => $account['company']['base_uri'],
+            'user_name' => "{$account['user']['first_name']} {$account['user']['last_name']}",
+            'user_avatar' => $account['user']['avatar_url'],
+        ]);
     });
 
 $app->error(function (Exception $e) {
