@@ -5,8 +5,10 @@
   "dependencies": {
     "immstruct": "^2.0.0",
     "immutable": "^3.8.1",
-    "react": "^15.5.4",
-    "react-dom": "^15.5.4"
+    "react": "15.4.2",
+    "react-dom": "15.4.2",
+    "ui-router-react": "^0.4.0",
+    "ui-router-visualizer": "^4.0.0"
   },
   "devDependencies": {
     "react-scripts": "0.9.5"

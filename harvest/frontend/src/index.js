@@ -1,28 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import immstruct from 'immstruct';
-import { Map } from 'immutable';
+import { UIRouter, UIView } from 'ui-router-react';
 
-import Login from './Login';
-import { pushToApi } from './api';
-
-const appState = immstruct({
-  user: {
-    harvest: {
-      company_name: '',
-      company_url: '',
-      user_name: '',
-      user_avatar: '',
-    },
-  },
-});
-
-const handleHarvestLogin = (props) => pushToApi('/harvest', props)
-  .then(user => appState.cursor(['user']).set('harvest', Map(user)));
+import { appState } from './state';
+import { Router } from './Router';
 
 const render = () =>
   ReactDOM.render(
-    <Login harvestUser={appState.cursor(['user', 'harvest'])} handleHarvestLogin={handleHarvestLogin} />,
+    <UIRouter router={Router}>
+      <UIView />
+    </UIRouter>,
     document.getElementById('root')
   );
 

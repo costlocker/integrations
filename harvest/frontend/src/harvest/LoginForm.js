@@ -1,16 +1,6 @@
 import React, { Component } from 'react';
 
-const HarvestUser = ({ harvestUser }) => {
-  return (
-    <ul>
-      <li><img src={harvestUser.get('user_avatar')} alt="" /></li>
-      <li>User: <strong>{harvestUser.get('user_name')}</strong></li>
-      <li>Company: <a href={harvestUser.get('company_url')}>{harvestUser.get('company_name')}</a></li>
-    </ul>
-  );
-};
-
-class HarvestLoginForm extends Component {
+export default class extends Component {
   handleSubmit = (e) => {
       e.preventDefault();
       const formData = {};
@@ -48,12 +38,4 @@ class HarvestLoginForm extends Component {
       </div>
     );
   }
-}
-
-export default function ({ harvestUser, handleHarvestLogin }) {
-  const user = harvestUser.deref();
-  if (user.get('company_name')) {
-    return <HarvestUser harvestUser={user} />
-  }
-  return <HarvestLoginForm handleHarvestLogin={handleHarvestLogin} />
 }
