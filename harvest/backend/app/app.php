@@ -37,10 +37,26 @@ $authorizeHarvest = function () use ($app) {
 };
 
 $app
-    ->get('/harvest', function () {
-        return new JsonResponse([
-            'data' => [],
+    ->get('/harvest', function () use ($app) {
+        $harvest = $app['session']->get('harvest');
+        $client = new GuzzleHttp\Client();
+        $response = $client->get("{$harvest['account']['company_url']}/projects", [
+            'http_errors' => false,
+            'headers' => [
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'Authorization' => $harvest['auth'],
+            ],
         ]);
+        return new JsonResponse(array_map(
+            function (array $project) {
+                return [
+                    'id' => $project['project']['id'],
+                    'name' => $project['project']['name'],
+                ];
+            },
+            json_decode($response->getBody(), true)
+        ));
     })->before($authorizeHarvest);
 
 $app
@@ -49,7 +65,6 @@ $app
         $authHeader = 'Basic ' . base64_encode("{$r->request->get('username')}:{$r->request->get('password')}");
         $response = $client->get("https://{$r->request->get('domain', 'a')}.harvestapp.com/account/who_am_i", [
             'http_errors' => false,
-            'auth' => [$r->request->get('username'), $r->request->get('password')],
             'headers' => [
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
