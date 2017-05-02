@@ -37,6 +37,26 @@ $app
         ]);
     });
 
+$app
+    ->post('/harvest', function (Request $r) {
+        $client = new GuzzleHttp\Client();
+        $response = $client->get("https://{$r->request->get('domain', 'a')}.harvestapp.com/account/who_am_i", [
+            'http_errors' => false,
+            'auth' => [$r->request->get('username'), $r->request->get('password')],
+            'headers' => [
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ],
+        ]);
+        return new JsonResponse(
+            [
+                $r->request->all(),
+                json_decode($response->getBody()),
+                $response->getStatusCode(),
+            ],
+            $response->getStatusCode()
+        );
+    });
 
 $app->error(function (Exception $e) {
     if ($e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
