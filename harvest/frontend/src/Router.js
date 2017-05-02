@@ -36,21 +36,31 @@ const states = [
   {
     name: 'wizard.2',
     url: '/2',
-    component: ({ resolves }) => {
-      const goTo = id => Router.stateService.go('wizard.3', { project: id }, { location: true });
-      return <Projects projects={resolves.projects} goToProject={goTo} />;
+    component: () => {
+      const goTo = (project) => {
+        appState.cursor(['harvest']).set('selectedProject', project);
+        Router.stateService.go('wizard.3', null, { location: true })
+      };
+      return <Projects projects={appState.cursor(['harvest', 'projects']).deref()} goToProject={goTo} />;
     },
     resolve: [
       {
-        token: 'projects',
-        resolveFn: () => fetchFromApi('/harvest')
+        token: 'loadProjects',
+        resolveFn: () => {
+          if (!appState.cursor(['harvest', 'projects']).deref().length) {
+            fetchFromApi('/harvest')
+              .then(projects => appState.cursor(['harvest']).set('projects', projects));
+          }
+        }
       }
     ]
   },
   {
     name: 'wizard.3',
-    url: '/3?project',
-    component: (props) => <Project project={props.transition.params().project} />,
+    url: '/3',
+    component: (props) => {
+      return <Project project={appState.cursor(['harvest', 'selectedProject']).deref()} />;
+    },
   },
 ];
 
@@ -71,6 +81,20 @@ const hooks = [
     callback: (transition: any) =>
       transition.router.stateService.target('wizard', undefined, { location: true }),
     priority: 10,
+  },
+  {
+    event: 'onBefore',
+    criteria: {
+      to: state => {
+        const projectStates = ['wizard.3'];
+        const isProjectRequired = projectStates.indexOf(state.name) !== -1;
+        const noProjectIsLoaded = appState.cursor(['harvest', 'selectedProject']).deref() === null;
+        return isProjectRequired && noProjectIsLoaded;
+      }
+    },
+    callback: (transition: any) =>
+      transition.router.stateService.target('wizard.2', undefined, { location: true }),
+    priority: 8,
   },
 ];
 

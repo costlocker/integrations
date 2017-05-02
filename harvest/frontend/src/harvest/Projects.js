@@ -3,8 +3,12 @@ import React from 'react';
 export default function Projects({ projects, goToProject }) {
   const goTo = (e, project) => {
     e.preventDefault();
-    goToProject(project.id);
+    goToProject(project);
   };
+
+  if (!projects.length) {
+    return <span>Loading....</span>;
+  }
 
   return <ul>
     {projects.map(project => (

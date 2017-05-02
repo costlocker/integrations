@@ -9,6 +9,10 @@ const appState = immstruct({
       user_avatar: '',
     },
   },
+  harvest: {
+    projects: [],
+    selectedProject: null,
+  }
 });
 
 const isNotLoggedIn = () => appState.cursor(['user', 'harvest', 'company_name']).deref() === '';

@@ -14,7 +14,7 @@ const render = () =>
   );
 
 appState.on('next-animation-frame', function (newStructure, oldStructure, keyPath) {
-  console.log('Subpart of structure swapped.', keyPath, newStructure.toJSON());
+  console.log('Subpart of structure swapped.', keyPath, JSON.stringify(newStructure.getIn(keyPath), null, 2));
   render();
 });
 
