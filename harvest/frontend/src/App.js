@@ -1,18 +1,31 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <div className="App-header">
-          <h2>Welcome to Harvest - Costlocker</h2>
-        </div>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+export default function () {
+  return (
+    <div className="row">
+      <div className="col-sm-6 col-sm-offset-3">
+        <form>
+          <h2>Harvest</h2>
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
+            <input type="email" className="form-control" id="username" placeholder="Username" />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input type="password" className="form-control" id="username" placeholder="Password" />
+          </div>
+          <div className="form-group">
+            <label htmlFor="harvest">Harvest domain</label>
+            <div className="input-group">
+              <input type="text" className="form-control" placeholder="mycompany" id="harvest" />
+              <span className="input-group-addon">.harvestapp.com</span>
+            </div>
+          </div>
+          <div className="text-center">
+            <button className="btn btn-primary">Login to Harvest</button>
+          </div>
+        </form>
       </div>
-    );
-  }
+    </div>
+  );
 }
-
-export default App;
