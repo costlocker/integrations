@@ -4,6 +4,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 $dotenv = new Dotenv\Dotenv(__DIR__ . '/../');
 $dotenv->load();
@@ -36,16 +37,61 @@ $authorizeHarvest = function () use ($app) {
     }
 };
 
-$getHarvestUser = function () use ($app) {
-    return new JsonResponse($app['session']->get('harvest')['account']);
+$getLoggedUser = function () use ($app) {
+    return new JsonResponse([
+        'harvest' => $app['session']->get('harvest')['account'] ?? null,
+        'costlocker' => $app['session']->get('costlocker')['accessToken'] ?? null,
+    ]);
 };
 
 $app
-    ->get('/user', function () use ($app, $getHarvestUser) {
-        if ($app['session']->get('harvest')) {
-            return $getHarvestUser();
+    ->get('/costlocker/login', function (Request $r) use ($app) {
+        $appUrl = getenv('CL_FRONTED_URL');
+        $costlockerHost = getenv('CL_HOST');
+        $provider = new \League\OAuth2\Client\Provider\GenericProvider([
+            'clientId' => getenv('CL_CLIENT_ID'),
+            'clientSecret' => getenv('CL_CLIENT_SECRET'),
+            'redirectUri' => null,
+            'urlAuthorize' => "{$costlockerHost}/api-public/oauth2/authorize",
+            'urlAccessToken' => "{$costlockerHost}/api-public/oauth2/access_token",
+            'urlResourceOwnerDetails' => "{$costlockerHost}/api-public/v2/",
+        ]);
+        $sendError = function ($error) use ($appUrl, $app) {
+            $app['session']->remove('costlocker');
+            $app['session']->remove('costlockerLogin');
+            return new RedirectResponse("{$appUrl}?clLoginError={$error}");
+        };
+        if (!$r->query->get('code') && !$r->query->get('error')) {
+            // getState must be called after getAuthorizationUrl
+            $url = $provider->getAuthorizationUrl();
+            $app['session']->set('costlockerLogin', [
+                'oauthState' => $provider->getState(),
+                'redirectUrl' => $appUrl,
+            ]);
+            return new RedirectResponse($url);
+        } elseif ($r->query->get('state') != $app['session']->get('costlockerLogin')['oauthState']) {
+            return $sendError('Invalid state');
+        } elseif ($r->query->get('error')) {
+            return $sendError($r->query->get('error'));
+        } else {
+            try {
+                $accessToken = $provider->getAccessToken('authorization_code', [
+                    'code' => $r->query->get('code')
+                ]);
+                $app['session']->remove('costlockerLogin');
+                $app['session']->set('costlocker', [
+                    'accessToken' => $accessToken->jsonSerialize(),
+                ]);
+                return new RedirectResponse($appUrl);
+            } catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
+                return $sendError($e->getMessage());
+            }
         }
-        return new JsonResponse([], 404);
+    });
+
+$app
+    ->get('/user', function () use ($getLoggedUser) {
+        return $getLoggedUser();
     });
 
 $app
@@ -239,7 +285,7 @@ $app
     })->before($authorizeHarvest);
 
 $app
-    ->post('/harvest', function (Request $r) use ($app, $getHarvestUser) {
+    ->post('/harvest', function (Request $r) use ($app, $getLoggedUser) {
         $authHeader = 'Basic ' . base64_encode("{$r->request->get('username')}:{$r->request->get('password')}");
         $client = new Costlocker\Integrations\HarvestClient("https://{$r->request->get('domain', 'a')}.harvestapp.com", $authHeader);
         list($statusCode, $json) = $client("/account/who_am_i", true);
@@ -255,7 +301,7 @@ $app
             ],
             'auth' => $authHeader,
         ]);
-        return $getHarvestUser();
+        return $getLoggedUser();
     });
 
 $app->error(function (Exception $e) {

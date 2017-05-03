@@ -2,30 +2,36 @@ import React from 'react';
 
 import LoginForm from './harvest/LoginForm';
 
-export default function Login({ harvestUser, goToNextStep, handleHarvestLogin, loginUrl }) {
-  let navigation = 'Login to Harvest and Costlocker before importing projects';
-  if (harvestUser) {
+const anonymousUser = <em>Not logged in</em>;
+
+export default function Login({ isLoggedIn, auth, goToNextStep, handleHarvestLogin, loginUrl, clLoginError }) {
+  let navigation = <hr />;
+  if (isLoggedIn) {
       navigation =
-        <button className="btn btn-success" onClick={goToNextStep}>
-          Continue to Projects
-        </button>;
+        <div className="bg-success">
+          <hr />
+          <button className="btn btn-success btn-lg" onClick={goToNextStep}>
+            Continue to Projects
+          </button>
+          <hr />
+        </div>;
   }
   const costlockerLogin = <a href={loginUrl} className="btn btn-primary">Login to Costlocker</a>;
   return (
     <div>
       <div className="row">
-        <div className="col-sm-12 text-right">
-          {navigation}
-        </div>
-      </div>
-      <div className="row">
         <div className="col-sm-6">
           <h2>Harvest User</h2>
-          {harvestUser ? <strong>{harvestUser.user_name}</strong> : <em>Not logged in</em>}
+          {auth.harvest ? <strong>{auth.harvest.user_name}</strong> : anonymousUser}
         </div>
         <div className="col-sm-6">
           <h2>Costlocker User</h2>
-          costlocker user...
+          {auth.costlocker ? <strong>{auth.costlocker.access_token}</strong> : anonymousUser}
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-sm-12 text-center">
+          {navigation}
         </div>
       </div>
       <div className="row">
@@ -34,6 +40,7 @@ export default function Login({ harvestUser, goToNextStep, handleHarvestLogin, l
         </div>
         <div className="col-sm-6">
           <h2>Change Costlocker Account</h2>
+          {clLoginError ? <p className="bg-danger"><strong>Login error</strong>:<br />{decodeURIComponent(clLoginError)}</p> : ''}
           {costlockerLogin}
         </div>
       </div>

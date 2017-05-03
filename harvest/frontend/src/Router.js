@@ -25,7 +25,7 @@ const steps = new Steps(Router, [
 ]);
 
 const handleHarvestLogin = (props) => pushToApi('/harvest', props)
-  .then(user => appState.cursor(['harvest']).set('user', user))
+  .then(user => appState.cursor(['auth']).set('harvest', user.harvest))
   .catch(() => alert('Invalid credentials'));
 
 const states = [
@@ -39,24 +39,28 @@ const states = [
     url: '/step',
     redirectTo: 'wizard.1',
     component: () => <WizardLayout
-      user={isNotLoggedIn() ? <em>Not logged in</em> : <User harvestUser={appState.cursor(['harvest', 'user']).deref()} />}
+      user={steps.getCurrentStep() === 1 ? null : <User harvestUser={appState.cursor(['auth', 'harvest']).deref()} />}
       steps={steps} />,
   },
   {
     name: 'wizard.1',
-    url: '/1',
-    component: () => <Login
-      harvestUser={appState.cursor(['harvest', 'user']).deref()}
+    url: '/1?clLoginError',
+    component: (props) => <Login
+      isLoggedIn={!isNotLoggedIn()}
+      auth={appState.cursor(['auth']).deref().toJS()}
       handleHarvestLogin={handleHarvestLogin}
       goToNextStep={steps.goToNextStep}
-      loginUrl={loginUrl} />,
+      loginUrl={loginUrl}
+      clLoginError={props.transition.params().clLoginError} />,
     resolve: [
       {
         token: 'loadUser',
         resolveFn: () => {
           if (isNotLoggedIn()) {
             fetchFromApi('/user')
-              .then(user => appState.cursor(['harvest']).set('user', user))
+              .then(user => appState.cursor(['auth']).update(
+                auth => auth.set('harvest', user.harvest).set('costlocker', user.costlocker)
+              ))
               .catch(e => console.log('Anonymous user'));
           }
         }

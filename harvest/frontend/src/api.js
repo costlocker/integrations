@@ -1,6 +1,6 @@
 
 const apiUrl = 'http://harvest-costlocker.dev/api';
-const loginUrl = `${apiUrl}/costlocker/login`;
+const loginUrl = `${apiUrl}/costlocker/login?redirectUrl=http://localhost:3000/step/1`;
 
 const handleErrors = (response) => {
   if (!response.ok) {
