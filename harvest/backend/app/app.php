@@ -39,28 +39,12 @@ $authorizeHarvest = function () use ($app) {
 $app
     ->get('/harvest', function (Request $r) use ($app) {
         $harvest = $app['session']->get('harvest');
-        $client = new GuzzleHttp\Client();
+        $apiClient = new Costlocker\Integrations\HarvestClient($harvest['account']['company_url'], $harvest['auth']);
         if ($r->query->get('peoplecosts')) {
-            $response = $client->get("{$harvest['account']['company_url']}/projects/{$r->query->get('peoplecosts')}/analysis?period=lifespan", [
-                'http_errors' => false,
-                'headers' => [
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                    'Authorization' => $harvest['auth'],
-                ],
-            ]);
-            $rawProject = json_decode($response->getBody(), true);
+            $rawProject = $apiClient("/projects/{$r->query->get('peoplecosts')}/analysis?period=lifespan");
             $taskPersons = [];
             foreach ($rawProject['tasks'] as $task) {
-                $taskResponse = $client->get("{$harvest['account']['company_url']}/projects/{$r->query->get('peoplecosts')}/team_analysis?task_id={$task['task_id']}&period=lifespan", [
-                    'http_errors' => false,
-                    'headers' => [
-                        'Accept' => 'application/json',
-                        'Content-Type' => 'application/json',
-                        'Authorization' => $harvest['auth'],
-                    ],
-                ]);
-                $taskPersons[$task['task_id']] = json_decode($taskResponse->getBody(), true);
+                $taskPersons[$task['task_id']] = $apiClient("/projects/{$r->query->get('peoplecosts')}/team_analysis?task_id={$task['task_id']}&period=lifespan");
             }
             return new JsonResponse([
                 'tasks' => array_map(
@@ -101,24 +85,8 @@ $app
                 ),
             ]);
         }
-        $response = $client->get("{$harvest['account']['company_url']}/projects", [
-            'http_errors' => false,
-            'headers' => [
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'Authorization' => $harvest['auth'],
-            ],
-        ]);
-        $clientsResponse = $client->get("{$harvest['account']['company_url']}/clients", [
-            'http_errors' => false,
-            'headers' => [
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'Authorization' => $harvest['auth'],
-            ],
-        ]);
         $clients = [];
-        foreach (json_decode($clientsResponse->getBody(), true) as $client) {
+        foreach ($apiClient("/clients") as $client) {
             $clients[$client['client']['id']] = $client['client']['name'];
         }
         return new JsonResponse(array_map(
@@ -146,25 +114,20 @@ $app
                     ],
                 ];
             },
-            json_decode($response->getBody(), true)
+            $apiClient("/projects")
         ));
     })->before($authorizeHarvest);
 
 $app
     ->post('/harvest', function (Request $r) use ($app) {
-        $client = new GuzzleHttp\Client();
+        if ($app['session']->get('harvest')) {
+            return new JsonResponse($app['session']->get('harvest')['account']);
+        }
         $authHeader = 'Basic ' . base64_encode("{$r->request->get('username')}:{$r->request->get('password')}");
-        $response = $client->get("https://{$r->request->get('domain', 'a')}.harvestapp.com/account/who_am_i", [
-            'http_errors' => false,
-            'headers' => [
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'Authorization' => $authHeader,
-            ],
-        ]);
-        $json = json_decode($response->getBody(), true);
-        if ($response->getStatusCode() != 200) {
-            return new JsonResponse([], $response->getStatusCode());
+        $client = new Costlocker\Integrations\HarvestClient("https://{$r->request->get('domain', 'a')}.harvestapp.com", $authHeader);
+        list($statusCode, $json) = $client("/account/who_am_i", true);
+        if ($statusCode != 200) {
+            return new JsonResponse([], $statusCode);
         }
         $account = [
             'company_name' => $json['company']['name'],

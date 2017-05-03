@@ -1,5 +1,10 @@
 {
     "name": "costlocker/harvest-importer",
+    "autoload": {
+        "psr-4": {
+            "Costlocker\\Integrations\\": "src/"
+        }
+    },
     "autoload-dev": {
         "files": [
             "vendor/hamcrest/hamcrest-php/hamcrest/Hamcrest.php"
