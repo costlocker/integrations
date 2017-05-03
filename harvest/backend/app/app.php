@@ -52,6 +52,26 @@ $app
     ->get('/harvest', function (Request $r) use ($app) {
         $harvest = $app['session']->get('harvest');
         $apiClient = new Costlocker\Integrations\HarvestClient($harvest['account']['company_url'], $harvest['auth']);
+        if ($r->query->get('billing')) {
+            $dateStart = $r->query->get('from', date('Y0101'));
+            $dateEnd = $r->query->get('to', date('Ymd'));
+            $client = $r->query->get('client', '');
+            $invoices = $apiClient("/invoices?from={$dateStart}&to={$dateEnd}&client={$client}&page=1");
+            return new JsonResponse(array_map(
+                function (array $invoice) {
+                    return [
+                        'id' => $invoice['invoices']['id'],
+                        'description' =>
+                            "#{$invoice['invoices']['number']}" .
+                            ($invoice['invoices']['subject'] ? " {$invoice['invoices']['subject']}" : ''),
+                        'total_amount' => $invoice['invoices']['amount'],
+                        'date' => $invoice['invoices']['issued_at'],
+                        'is_invoiced' => $invoice['invoices']['state'] == 'paid',
+                    ];
+                },
+                $invoices
+            ));
+        }
         if ($r->query->get('expenses')) {
             $dateStart = $r->query->get('from', date('Y0101'));
             $dateEnd = $r->query->get('to', date('Ymd'));
@@ -134,6 +154,11 @@ $app
         };
         return new JsonResponse(array_map(
             function (array $project) use ($clients, $formatDate) {
+                $latestRecordPlusOneMonth = date(
+                    'Y-m-d',
+                    strtotime($project['project']['hint_latest_record_at'])
+                    + 30 * 24 * 3600 // add one month to latest tracking
+                );
                 return [
                     'id' => $project['project']['id'],
                     'name' => $project['project']['name'],
@@ -160,7 +185,13 @@ $app
                         'expenses' => "/harvest?" . http_build_query([
                             'expenses' => $project['project']['id'],
                             'from' => $formatDate($project['project']['hint_earliest_record_at']),
-                            'to' => $formatDate($project['project']['hint_latest_record_at']),
+                            'to' => $formatDate($latestRecordPlusOneMonth),
+                        ]),
+                        'billing' => "/harvest?" . http_build_query([
+                            'billing' => $project['project']['id'],
+                            'client' => $project['project']['client_id'],
+                            'from' => $formatDate($project['project']['hint_earliest_record_at']),
+                            'to' => $formatDate($latestRecordPlusOneMonth),
                         ]),
                     ],
                 ];

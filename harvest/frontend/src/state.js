@@ -7,6 +7,7 @@ const appState = immstruct({
     selectedProject: null,
     peopleCosts: null,
     expenses: null,
+    billing: null,
   }
 });
 

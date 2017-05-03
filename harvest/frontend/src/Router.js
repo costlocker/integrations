@@ -7,6 +7,7 @@ import Projects from './harvest/Projects';
 import Project from './harvest/Project';
 import PeopleCosts from './harvest/PeopleCosts';
 import Expenses from './harvest/Expenses';
+import Billing from './harvest/Billing';
 import User from './harvest/User';
 import WizardLayout from './wizard/WizardLayout';
 import { appState, isNotLoggedIn } from './state';
@@ -132,6 +133,29 @@ const states = [
           if (!appState.cursor(['harvest', 'expenses']).deref()) {
             const url = appState.cursor(['harvest', 'selectedProject']).deref().links.expenses;
             fetchFromApi(url).then(data => appState.cursor(['harvest']).set('expenses', data));
+          }
+        }
+      }
+    ]
+  },
+  {
+    name: 'wizard.5',
+    url: '/5',
+    component: (props) => {
+      const data = appState.cursor(['harvest', 'billing']).deref();
+      return <Project
+        project={appState.cursor(['harvest', 'selectedProject']).deref()}
+        data={data}
+        detailComponent={<Billing billing={data} />}
+        goToNextStep={goToNextStep} />;
+    },
+    resolve: [
+      {
+        token: 'loadBilling',
+        resolveFn: () => {
+          if (!appState.cursor(['harvest', 'billing']).deref()) {
+            const url = appState.cursor(['harvest', 'selectedProject']).deref().links.billing;
+            fetchFromApi(url).then(data => appState.cursor(['harvest']).set('billing', data));
           }
         }
       }
