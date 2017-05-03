@@ -36,6 +36,18 @@ $authorizeHarvest = function () use ($app) {
     }
 };
 
+$getHarvestUser = function () use ($app) {
+    return new JsonResponse($app['session']->get('harvest')['account']);
+};
+
+$app
+    ->get('/user', function () use ($app, $getHarvestUser) {
+        if ($app['session']->get('harvest')) {
+            return $getHarvestUser();
+        }
+        return new JsonResponse([], 404);
+    });
+
 $app
     ->get('/harvest', function (Request $r) use ($app) {
         $harvest = $app['session']->get('harvest');
@@ -119,27 +131,23 @@ $app
     })->before($authorizeHarvest);
 
 $app
-    ->post('/harvest', function (Request $r) use ($app) {
-        if ($app['session']->get('harvest')) {
-            return new JsonResponse($app['session']->get('harvest')['account']);
-        }
+    ->post('/harvest', function (Request $r) use ($app, $getHarvestUser) {
         $authHeader = 'Basic ' . base64_encode("{$r->request->get('username')}:{$r->request->get('password')}");
         $client = new Costlocker\Integrations\HarvestClient("https://{$r->request->get('domain', 'a')}.harvestapp.com", $authHeader);
         list($statusCode, $json) = $client("/account/who_am_i", true);
         if ($statusCode != 200) {
             return new JsonResponse([], $statusCode);
         }
-        $account = [
-            'company_name' => $json['company']['name'],
-            'company_url' => $json['company']['base_uri'],
-            'user_name' => "{$json['user']['first_name']} {$json['user']['last_name']}",
-            'user_avatar' => $json['user']['avatar_url'],
-        ];
         $app['session']->set('harvest', [
-            'account' => $account,
+            'account' => [
+                'company_name' => $json['company']['name'],
+                'company_url' => $json['company']['base_uri'],
+                'user_name' => "{$json['user']['first_name']} {$json['user']['last_name']}",
+                'user_avatar' => $json['user']['avatar_url'],
+            ],
             'auth' => $authHeader,
         ]);
-        return new JsonResponse($account);
+        return $getHarvestUser();
     });
 
 $app->error(function (Exception $e) {

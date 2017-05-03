@@ -21,9 +21,12 @@ let goToStep = (step, e) => {
   Router.stateService.go(`wizard.${step}`, undefined, { location: true });
 };
 
+let goToNextStep = (e) => goToStep(currentStep + 1, e);
+
 const handleHarvestLogin = (props) => pushToApi('/harvest', props)
   .then(user => appState.cursor(['user']).set('harvest', Map(user)))
-  .then(() => goToStep(2));
+  .then(() => goToStep(2))
+  .catch(() => alert('Invalid credentials'));
 
 const states = [
   {
@@ -44,7 +47,22 @@ const states = [
   {
     name: 'wizard.1',
     url: '/1',
-    component: () => <LoginForm harvestUser={appState.cursor(['user', 'harvest'])} handleHarvestLogin={handleHarvestLogin} />,
+    component: () => <LoginForm
+      harvestUser={appState.cursor(['user', 'harvest']).deref()}
+      handleHarvestLogin={handleHarvestLogin}
+      goToNextStep={goToNextStep} />,
+    resolve: [
+      {
+        token: 'loadUser',
+        resolveFn: () => {
+          if (isNotLoggedIn()) {
+            fetchFromApi('/user')
+              .then(user => appState.cursor(['user']).set('harvest', Map(user)))
+              .catch(e => console.log('Anonymous user'));
+          }
+        }
+      }
+    ]
   },
   {
     name: 'wizard.2',
