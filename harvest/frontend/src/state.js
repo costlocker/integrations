@@ -1,21 +1,14 @@
 import immstruct from 'immstruct';
 
 const appState = immstruct({
-  user: {
-    harvest: {
-      company_name: '',
-      company_url: '',
-      user_name: '',
-      user_avatar: '',
-    },
-  },
   harvest: {
+    user: null,
     projects: [],
     selectedProject: null,
     peopleCosts: null,
   }
 });
 
-const isNotLoggedIn = () => appState.cursor(['user', 'harvest', 'company_name']).deref() === '';
+const isNotLoggedIn = () => appState.cursor(['harvest', 'user']).deref() === null;
 
 export { appState, isNotLoggedIn };

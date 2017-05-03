@@ -11,9 +11,9 @@ export default class extends Component {
   }
   render() {
     let user = null;
-    if (this.props.harvestUser.get('company_name')) {
+    if (this.props.harvestUser) {
         user = <button className="btn btn-success" onClick={this.props.goToNextStep}>
-          Continue as <strong>{this.props.harvestUser.get('user_name')}</strong>
+          Continue as <strong>{this.props.harvestUser.user_name}</strong>
         </button>
     }
     return (

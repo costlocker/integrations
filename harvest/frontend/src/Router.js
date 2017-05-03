@@ -1,11 +1,11 @@
 import React from 'react';
 import { UIRouterReact, servicesPlugin, pushStateLocationPlugin } from 'ui-router-react';
 import { Visualizer } from 'ui-router-visualizer';
-import { Map } from 'immutable';
 
 import LoginForm from './harvest/LoginForm';
 import Projects from './harvest/Projects';
 import Project from './harvest/Project';
+import User from './harvest/User';
 import WizardLayout from './wizard/WizardLayout';
 import { appState, isNotLoggedIn } from './state';
 import { pushToApi, fetchFromApi } from './api';
@@ -24,7 +24,7 @@ let goToStep = (step, e) => {
 let goToNextStep = (e) => goToStep(currentStep + 1, e);
 
 const handleHarvestLogin = (props) => pushToApi('/harvest', props)
-  .then(user => appState.cursor(['user']).set('harvest', Map(user)))
+  .then(user => appState.cursor(['harvest']).set('user', user))
   .then(() => goToStep(2))
   .catch(() => alert('Invalid credentials'));
 
@@ -39,8 +39,7 @@ const states = [
     url: '/step',
     redirectTo: 'wizard.1',
     component: () => <WizardLayout
-      harvestUser={appState.cursor(['user', 'harvest'])}
-      isNotLoggedIn={isNotLoggedIn()}
+      user={isNotLoggedIn() ? <em>Not logged in</em> : <User harvestUser={appState.cursor(['harvest', 'user']).deref()} />}
       currentStep={currentStep}
       goToStep={goToStep} />,
   },
@@ -48,7 +47,7 @@ const states = [
     name: 'wizard.1',
     url: '/1',
     component: () => <LoginForm
-      harvestUser={appState.cursor(['user', 'harvest']).deref()}
+      harvestUser={appState.cursor(['harvest', 'user']).deref()}
       handleHarvestLogin={handleHarvestLogin}
       goToNextStep={goToNextStep} />,
     resolve: [
@@ -57,7 +56,7 @@ const states = [
         resolveFn: () => {
           if (isNotLoggedIn()) {
             fetchFromApi('/user')
-              .then(user => appState.cursor(['user']).set('harvest', Map(user)))
+              .then(user => appState.cursor(['harvest']).set('user', user))
               .catch(e => console.log('Anonymous user'));
           }
         }
@@ -113,8 +112,6 @@ const states = [
 ];
 
 let plugins = [servicesPlugin, pushStateLocationPlugin, Visualizer];
-
-console.log(appState.cursor(['user', 'harvest', 'company_name']).deref());
 
 const hooks = [
   {

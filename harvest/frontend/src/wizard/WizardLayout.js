@@ -1,12 +1,7 @@
 import React from 'react';
 import { UIView } from 'ui-router-react';
 
-import User from '../harvest/User';
-
-const anonymousUser = <em>Not logged in</em>;
-
-export default function WizardLayout({ isNotLoggedIn, harvestUser, currentStep, goToStep }) {
-  const user = isNotLoggedIn ? anonymousUser : <User harvestUser={harvestUser} />;
+export default function WizardLayout({ user, currentStep, goToStep }) {
   const steps = [];
   for (let i = 1; i <= currentStep; i++) {
     if (i === currentStep) {
