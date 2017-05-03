@@ -52,6 +52,34 @@ $app
     ->get('/harvest', function (Request $r) use ($app) {
         $harvest = $app['session']->get('harvest');
         $apiClient = new Costlocker\Integrations\HarvestClient($harvest['account']['company_url'], $harvest['auth']);
+        if ($r->query->get('expenses')) {
+            $dateStart = $r->query->get('from', date('Y0101'));
+            $dateEnd = $r->query->get('to', date('Ymd'));
+            $expenses = $apiClient("/projects/{$r->query->get('expenses')}/expenses?from={$dateStart}&to={$dateEnd}");
+            $categories = [];
+            foreach ($apiClient("/expense_categories") as $client) {
+                $categories[$client['expense_category']['id']] = $client['expense_category']['name'];
+            }
+            return new JsonResponse(array_map(
+                function (array $expense) use ($categories) {
+                    return [
+                        'id' => $expense['expense']['id'],
+                        'description' =>
+                            "{$expense['expense']['units']}x " .
+                            $categories[$expense['expense']['expense_category_id']] .
+                            ($expense['expense']['notes'] ? " ({$expense['expense']['notes']})" : ''),
+                        'purchased' => [
+                            'total_amount' => $expense['expense']['total_cost'],
+                            'date' => $expense['expense']['spent_at'],
+                        ],
+                        'billed' => [
+                            'total_amount' => $expense['expense']['total_cost'],
+                        ],
+                    ];
+                },
+                $expenses
+            ));
+        }
         if ($r->query->get('peoplecosts')) {
             $rawProject = $apiClient("/projects/{$r->query->get('peoplecosts')}/analysis?period=lifespan");
             $taskPersons = [];
@@ -101,8 +129,11 @@ $app
         foreach ($apiClient("/clients") as $client) {
             $clients[$client['client']['id']] = $client['client']['name'];
         }
+        $formatDate = function ($date) {
+            return date('Ymd', strtotime($date));
+        };
         return new JsonResponse(array_map(
-            function (array $project) use ($clients) {
+            function (array $project) use ($clients, $formatDate) {
                 return [
                     'id' => $project['project']['id'],
                     'name' => $project['project']['name'],
@@ -123,6 +154,14 @@ $app
                         'hourly_rate' => $project['project']['hourly_rate'],
                         'cost_budget' => $project['project']['cost_budget'],
                         'cost_budget_include_expenses' => $project['project']['cost_budget_include_expenses'],
+                    ],
+                    'links' => [
+                        'peoplecosts' => "/harvest?peoplecosts={$project['project']['id']}",
+                        'expenses' => "/harvest?" . http_build_query([
+                            'expenses' => $project['project']['id'],
+                            'from' => $formatDate($project['project']['hint_earliest_record_at']),
+                            'to' => $formatDate($project['project']['hint_latest_record_at']),
+                        ]),
                     ],
                 ];
             },

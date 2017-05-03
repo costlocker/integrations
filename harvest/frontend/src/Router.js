@@ -107,8 +107,8 @@ const states = [
         token: 'loadPeopleCosts',
         resolveFn: () => {
           if (!appState.cursor(['harvest', 'peopleCosts']).deref()) {
-            fetchFromApi(`/harvest?peoplecosts=${appState.cursor(['harvest', 'selectedProject']).deref().id}`)
-              .then(peopleCosts => appState.cursor(['harvest']).set('peopleCosts', peopleCosts));
+            const url = appState.cursor(['harvest', 'selectedProject']).deref().links.peoplecosts;
+            fetchFromApi(url).then(data => appState.cursor(['harvest']).set('peopleCosts', data));
           }
         }
       }
@@ -118,18 +118,20 @@ const states = [
     name: 'wizard.4',
     url: '/4',
     component: (props) => {
+      const data = appState.cursor(['harvest', 'expenses']).deref();
       return <Project
         project={appState.cursor(['harvest', 'selectedProject']).deref()}
-        data={[1, 2, 3]}
-        detailComponent={<Expenses expenses={appState.cursor(['harvest', 'expense']).deref()} />}
+        data={data}
+        detailComponent={<Expenses expenses={data} />}
         goToNextStep={goToNextStep} />;
     },
     resolve: [
       {
         token: 'loadExpenses',
         resolveFn: () => {
-          if (!appState.cursor(['harvest', 'expense']).deref()) {
-            console.log('should load expenses');
+          if (!appState.cursor(['harvest', 'expenses']).deref()) {
+            const url = appState.cursor(['harvest', 'selectedProject']).deref().links.expenses;
+            fetchFromApi(url).then(data => appState.cursor(['harvest']).set('expenses', data));
           }
         }
       }
