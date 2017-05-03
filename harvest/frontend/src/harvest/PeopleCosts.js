@@ -5,19 +5,19 @@ const taskToPeopleCosts = (tasks) => {
   tasks.forEach(task => {
     rows.push(
       <tr key={task.id}>
-        <th>{task.name}</th>
+        <th>{task.activity.name}</th>
         <td></td>
-        <td>{task.total_hours}</td>
-        <td>{task.billed_rate}</td>
+        <td>{task.hours.tracked}</td>
+        <td>{task.activity.hourly_rate}</td>
       </tr>
     );
     task.people.forEach(person => {
       const key = `${task.id}-${person.id}`
       rows.push(
         <tr key={key}>
-          <td>- <em>{person.user_name}</em></td>
-          <td>{person.projected_hours}</td>
-          <td>{person.total_hours}</td>
+          <td>- <em>{person.person.full_name}</em></td>
+          <td>{person.hours.budget}</td>
+          <td>{person.hours.tracked}</td>
           <td>-</td>
         </tr>
       );
@@ -44,9 +44,9 @@ export default function PeopleCosts({ peopleCosts }) {
             <tbody>
               {peopleCosts.tasks.map(task => (
                 <tr key={task.id}>
-                  <th>{task.name}</th>
-                  <td>{task.total_hours}</td>
-                  <td>{task.billed_rate}</td>
+                  <th>{task.activity.name}</th>
+                  <td>{task.hours.tracked}</td>
+                  <td>{task.activity.hourly_rate}</td>
                 </tr>
               ))}
             </tbody>
@@ -58,14 +58,16 @@ export default function PeopleCosts({ peopleCosts }) {
                 <th>Task</th>
                 <th>Total hours</th>
                 <th>Billed rate</th>
+                <th>Cost rate</th>
               </tr>
             </thead>
             <tbody>
               {peopleCosts.people.map(person => (
                 <tr key={person.id}>
-                  <th>{person.user_name}</th>
-                  <td>{person.total_hours}</td>
-                  <td>{person.billed_rate}</td>
+                  <th title={person.person.email}>{person.person.full_name}</th>
+                  <td>{person.hours.tracked}</td>
+                  <td>{person.finance.billed_rate}</td>
+                  <td>{person.person.salary.hourly_rate}</td>
                 </tr>
               ))}
             </tbody>

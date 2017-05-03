@@ -120,23 +120,43 @@ $app
             foreach ($rawProject['tasks'] as $task) {
                 $taskPersons[$task['task_id']] = $apiClient("/projects/{$r->query->get('peoplecosts')}/team_analysis?task_id={$task['task_id']}&period=lifespan");
             }
+            $users = [];
+            foreach ($apiClient('/people') as $person) {
+                $users[$person['user']['id']] = [
+                    'email' => $person['user']['email'],
+                    'first_name' => $person['user']['first_name'],
+                    'last_name' => $person['user']['last_name'],
+                    'full_name' => "{$person['user']['first_name']} {$person['user']['last_name']}",
+                    'role' => $person['user']['is_admin'] ? 'ADMIN' : 'EMPLOYEE',
+                    'salary' => [
+                        'payment' => 'hourly',
+                        'hourly_rate' => $person['user']['cost_rate'],
+                    ],
+                ];
+            }
             return new JsonResponse([
                 'tasks' => array_map(
-                    function (array $task) use ($taskPersons) {
+                    function (array $task) use ($taskPersons, $users) {
                         return [
                             'id' => $task['task_id'],
-                            'name' => $task['name'],
-                            'total_hours' => $task['total_hours'],
-                            'billed_rate' => $task['billed_rate'],
+                            'activity' => [
+                                'name' => $task['name'],
+                                'hourly_rate' => $task['billed_rate'],
+                            ],
+                            'hours' => [
+                                'tracked' => $task['total_hours'],
+                            ],
                             'people' => array_map(
-                                function (array $person) {
+                                function (array $person) use ($users) {
                                     return [
-                                        'id' => $person['user_id'],
-                                        'user_name' => $person['full_name'],
-                                        'total_hours' => $person['total_hours'],
-                                        'cost_rate' => $person['cost_rate'],
-                                        'billed_rate' => $person['billed_rate'],
-                                        'projected_hours' => $person['projected_hours'],
+                                        'finance' => [
+                                            'billed_rate' => $person['billed_rate'],
+                                        ],
+                                        'hours' => [
+                                            'budget' => $person['projected_hours'],
+                                            'tracked' => $person['total_hours'],
+                                        ],
+                                        'person' => $users[$person['user_id']],
                                     ];
                                 },
                                 $taskPersons[$task['task_id']]
@@ -146,13 +166,17 @@ $app
                     $rawProject['tasks']
                 ),
                 'people' => array_map(
-                    function (array $person) {
+                    function (array $person) use ($users) {
                         return [
                             'id' => $person['user_id'],
-                            'user_name' => $person['full_name'],
-                            'total_hours' => $person['total_hours'],
-                            'billed_rate' => $person['billed_rate'],
-                            'cost_rate' => $person['cost_rate'],
+                            'finance' => [
+                                'billed_rate' => $person['billed_rate'],
+                            ],
+                            'hours' => [
+                                'budget' => $person['projected_hours'],
+                                'tracked' => $person['total_hours'],
+                            ],
+                            'person' => $users[$person['user_id']],
                         ];
                     },
                     $rawProject['team_members']
