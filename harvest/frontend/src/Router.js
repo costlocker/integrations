@@ -11,10 +11,19 @@ import { appState, isNotLoggedIn } from './state';
 import { pushToApi, fetchFromApi } from './api';
 
 const Router = new UIRouterReact();
+let currentStep = 1;
+
+let goToStep = (step, e) => {
+  if (e) {
+    e.preventDefault();
+  }
+  currentStep = step;
+  Router.stateService.go(`wizard.${step}`, undefined, { location: true });
+};
 
 const handleHarvestLogin = (props) => pushToApi('/harvest', props)
   .then(user => appState.cursor(['user']).set('harvest', Map(user)))
-  .then(() => Router.stateService.go('wizard.2', undefined, { location: true }));
+  .then(() => goToStep(2));
 
 const states = [
   {
@@ -26,7 +35,11 @@ const states = [
     name: 'wizard',
     url: '/step',
     redirectTo: 'wizard.1',
-    component: () => <WizardLayout harvestUser={appState.cursor(['user', 'harvest'])} isNotLoggedIn={isNotLoggedIn()} />,
+    component: () => <WizardLayout
+      harvestUser={appState.cursor(['user', 'harvest'])}
+      isNotLoggedIn={isNotLoggedIn()}
+      currentStep={currentStep}
+      goToStep={goToStep} />,
   },
   {
     name: 'wizard.1',
@@ -43,7 +56,7 @@ const states = [
             .set('selectedProject', project)
             .set('peopleCosts', null)
         );
-        Router.stateService.go('wizard.3', null, { location: true })
+        goToStep(3);
       };
       return <Projects projects={appState.cursor(['harvest', 'projects']).deref()} goToProject={goTo} />;
     },
@@ -103,14 +116,16 @@ const hooks = [
     event: 'onBefore',
     criteria: {
       to: state => {
-        const projectStates = ['wizard.3'];
-        const isProjectRequired = projectStates.indexOf(state.name) !== -1;
-        const noProjectIsLoaded = appState.cursor(['harvest', 'selectedProject']).deref() === null;
-        return isProjectRequired && noProjectIsLoaded;
+        const isWizardStep = state.name.substr(0, 7) === 'wizard.';
+        if (isWizardStep) {
+          const selectedStep = parseInt(state.name.replace('wizard.', ''), 0);
+          return selectedStep > currentStep;
+        }
+        return false;
       }
     },
     callback: (transition: any) =>
-      transition.router.stateService.target('wizard.2', undefined, { location: true }),
+      transition.router.stateService.target(`wizard.${currentStep}`, undefined, { location: true }),
     priority: 8,
   },
 ];
