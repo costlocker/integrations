@@ -1,15 +1,18 @@
 import React from 'react';
 import { UIView } from 'ui-router-react';
 
-export default function WizardLayout({ user, currentStep, goToStep }) {
+export default function WizardLayout({ user, currentStep, goToStep, stepTitles }) {
   const steps = [];
-  for (let i = 1; i <= currentStep; i++) {
-    if (i === currentStep) {
-      steps.push(<li key={i} className="active">Step #{i}</li>);
+  stepTitles.forEach((title, index) => {
+    const i = index + 1;
+    if (i > currentStep) {
+      steps.push(<li key={i} className="text-muted">{title}</li>);
+    } else if (i === currentStep) {
+      steps.push(<li key={i} className="active"><strong>{title}</strong></li>);
     } else {
-      steps.push(<li key={i}><a onClick={(e) => goToStep(i, e)}>Step #{i}</a></li>);
+      steps.push(<li key={i}><a onClick={(e) => goToStep(i, e)}>{title}</a></li>);
     }
-  }
+  });
   return (
     <div>
       <div className="row bg-info">

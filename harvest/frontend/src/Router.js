@@ -15,6 +15,13 @@ import { pushToApi, fetchFromApi } from './api';
 
 const Router = new UIRouterReact();
 let currentStep = 1;
+const stepTitles = [
+  'Login',
+  'Projects',
+  'People costs',
+  'Expenses',
+  'Billing',
+];
 
 let goToStep = (step, e) => {
   if (e) {
@@ -44,6 +51,7 @@ const states = [
     component: () => <WizardLayout
       user={isNotLoggedIn() ? <em>Not logged in</em> : <User harvestUser={appState.cursor(['harvest', 'user']).deref()} />}
       currentStep={currentStep}
+      stepTitles={stepTitles}
       goToStep={goToStep} />,
   },
   {
@@ -75,6 +83,8 @@ const states = [
           harvest => harvest
             .set('selectedProject', project)
             .set('peopleCosts', null)
+            .set('expenses', null)
+            .set('billing', null)
         );
         goToStep(3);
       };

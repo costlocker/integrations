@@ -14,14 +14,11 @@ export default function Project({ project, data, detailComponent, goToNextStep }
     <div>
       <h1>
         {project.name}
-        <span className="label label-default" title="ID">{project.id}</span>
         <span className="label label-primary" title="Client">{project.client.name}</span>
         <span className="label label-info" title="Dates">{project.dates.date_start} - {project.dates.date_end}</span>
+        <span className="label label-default" title="ID">{project.id}</span>
       </h1>
       {detail}
-      <hr />
-      <h2>Debug</h2>
-      <pre>{JSON.stringify([project, data], null, 2)}</pre>
     </div>
   );
 };
