@@ -5,6 +5,8 @@ import { Visualizer } from 'ui-router-visualizer';
 import LoginForm from './harvest/LoginForm';
 import Projects from './harvest/Projects';
 import Project from './harvest/Project';
+import PeopleCosts from './harvest/PeopleCosts';
+import Expenses from './harvest/Expenses';
 import User from './harvest/User';
 import WizardLayout from './wizard/WizardLayout';
 import { appState, isNotLoggedIn } from './state';
@@ -93,9 +95,11 @@ const states = [
     name: 'wizard.3',
     url: '/3',
     component: (props) => {
+      const data = appState.cursor(['harvest', 'peopleCosts']).deref();
       return <Project
         project={appState.cursor(['harvest', 'selectedProject']).deref()}
-        peopleCosts={appState.cursor(['harvest', 'peopleCosts']).deref()}
+        data={data}
+        detailComponent={<PeopleCosts peopleCosts={data} />}
         goToNextStep={goToNextStep} />;
     },
     resolve: [
@@ -116,7 +120,8 @@ const states = [
     component: (props) => {
       return <Project
         project={appState.cursor(['harvest', 'selectedProject']).deref()}
-        peopleCosts={null}
+        data={[1, 2, 3]}
+        detailComponent={<Expenses expenses={appState.cursor(['harvest', 'expense']).deref()} />}
         goToNextStep={goToNextStep} />;
     },
     resolve: [

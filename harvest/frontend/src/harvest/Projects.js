@@ -10,9 +10,12 @@ export default function Projects({ projects, goToProject }) {
     return <span>Loading....</span>;
   }
 
-  return <ul>
-    {projects.map(project => (
-      <li key={project.id}><a href="" onClick={(e) => goTo(e, project)}>{project.name}</a></li>
-    ))}
-  </ul>;
+  return <div>
+    <h2>Projects</h2>
+    <ul>
+      {projects.map(project => (
+        <li key={project.id}><a href="" onClick={(e) => goTo(e, project)}>{project.name}</a></li>
+      ))}
+    </ul>
+  </div>;
 };
