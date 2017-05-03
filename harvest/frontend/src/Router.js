@@ -38,7 +38,11 @@ const states = [
     url: '/2',
     component: () => {
       const goTo = (project) => {
-        appState.cursor(['harvest']).set('selectedProject', project);
+        appState.cursor(['harvest']).update(
+          harvest => harvest
+            .set('selectedProject', project)
+            .set('peopleCosts', null)
+        );
         Router.stateService.go('wizard.3', null, { location: true })
       };
       return <Projects projects={appState.cursor(['harvest', 'projects']).deref()} goToProject={goTo} />;
@@ -59,8 +63,21 @@ const states = [
     name: 'wizard.3',
     url: '/3',
     component: (props) => {
-      return <Project project={appState.cursor(['harvest', 'selectedProject']).deref()} />;
+      return <Project
+        project={appState.cursor(['harvest', 'selectedProject']).deref()}
+        peopleCosts={appState.cursor(['harvest', 'peopleCosts']).deref()} />;
     },
+    resolve: [
+      {
+        token: 'loadPeopleCosts',
+        resolveFn: () => {
+          if (!appState.cursor(['harvest', 'peopleCosts']).deref()) {
+            fetchFromApi(`/harvest?peoplecosts=${appState.cursor(['harvest', 'selectedProject']).deref().id}`)
+              .then(peopleCosts => appState.cursor(['harvest']).set('peopleCosts', peopleCosts));
+          }
+        }
+      }
+    ]
   },
 ];
 

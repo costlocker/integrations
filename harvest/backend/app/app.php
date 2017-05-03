@@ -37,9 +37,70 @@ $authorizeHarvest = function () use ($app) {
 };
 
 $app
-    ->get('/harvest', function () use ($app) {
+    ->get('/harvest', function (Request $r) use ($app) {
         $harvest = $app['session']->get('harvest');
         $client = new GuzzleHttp\Client();
+        if ($r->query->get('peoplecosts')) {
+            $response = $client->get("{$harvest['account']['company_url']}/projects/{$r->query->get('peoplecosts')}/analysis?period=lifespan", [
+                'http_errors' => false,
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                    'Authorization' => $harvest['auth'],
+                ],
+            ]);
+            $rawProject = json_decode($response->getBody(), true);
+            $taskPersons = [];
+            foreach ($rawProject['tasks'] as $task) {
+                $taskResponse = $client->get("{$harvest['account']['company_url']}/projects/{$r->query->get('peoplecosts')}/team_analysis?task_id={$task['task_id']}&period=lifespan", [
+                    'http_errors' => false,
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json',
+                        'Authorization' => $harvest['auth'],
+                    ],
+                ]);
+                $taskPersons[$task['task_id']] = json_decode($taskResponse->getBody(), true);
+            }
+            return new JsonResponse([
+                'tasks' => array_map(
+                    function (array $task) use ($taskPersons) {
+                        return [
+                            'id' => $task['task_id'],
+                            'name' => $task['name'],
+                            'total_hours' => $task['total_hours'],
+                            'billed_rate' => $task['billed_rate'],
+                            'people' => array_map(
+                                function (array $person) {
+                                    return [
+                                        'id' => $person['user_id'],
+                                        'user_name' => $person['full_name'],
+                                        'total_hours' => $person['total_hours'],
+                                        'cost_rate' => $person['cost_rate'],
+                                        'billed_rate' => $person['billed_rate'],
+                                        'projected_hours' => $person['projected_hours'],
+                                    ];
+                                },
+                                $taskPersons[$task['task_id']]
+                            ),
+                        ];
+                    },
+                    $rawProject['tasks']
+                ),
+                'people' => array_map(
+                    function (array $person) {
+                        return [
+                            'id' => $person['user_id'],
+                            'user_name' => $person['full_name'],
+                            'total_hours' => $person['total_hours'],
+                            'billed_rate' => $person['billed_rate'],
+                            'cost_rate' => $person['cost_rate'],
+                        ];
+                    },
+                    $rawProject['team_members']
+                ),
+            ]);
+        }
         $response = $client->get("{$harvest['account']['company_url']}/projects", [
             'http_errors' => false,
             'headers' => [
@@ -48,11 +109,41 @@ $app
                 'Authorization' => $harvest['auth'],
             ],
         ]);
+        $clientsResponse = $client->get("{$harvest['account']['company_url']}/clients", [
+            'http_errors' => false,
+            'headers' => [
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'Authorization' => $harvest['auth'],
+            ],
+        ]);
+        $clients = [];
+        foreach (json_decode($clientsResponse->getBody(), true) as $client) {
+            $clients[$client['client']['id']] = $client['client']['name'];
+        }
         return new JsonResponse(array_map(
-            function (array $project) {
+            function (array $project) use ($clients) {
                 return [
                     'id' => $project['project']['id'],
                     'name' => $project['project']['name'],
+                    'client' => [
+                        'id' => $project['project']['client_id'],
+                        'name' => $clients[$project['project']['client_id']],
+                    ],
+                    'dates' => [
+                        'date_start' => $project['project']['starts_on'],
+                        'date_end' => $project['project']['ends_on'],
+                    ],
+                    'finance' => [
+                        'bill_by' => $project['project']['bill_by'],
+                        'budget' => $project['project']['budget'],
+                        'budget_by' => $project['project']['budget_by'],
+                        'estimate' => $project['project']['estimate'],
+                        'estimate_by' => $project['project']['estimate_by'],
+                        'hourly_rate' => $project['project']['hourly_rate'],
+                        'cost_budget' => $project['project']['cost_budget'],
+                        'cost_budget_include_expenses' => $project['project']['cost_budget_include_expenses'],
+                    ],
                 ];
             },
             json_decode($response->getBody(), true)
