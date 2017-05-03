@@ -26,17 +26,12 @@ const taskToPeopleCosts = (tasks) => {
   return rows;
 }
 
-export default function Project({ project, peopleCosts }) {
-  const tasks = peopleCosts ? peopleCosts.tasks : [];
-  const people = peopleCosts ? peopleCosts.people : [];
+const PeopleCosts = ({ peopleCosts }) => {
+  if (!peopleCosts) {
+    return <div>Loading people costs...</div>;
+  }
   return (
     <div>
-      <ul>
-        <li>ID: <strong>{project.id}</strong></li>
-        <li>Name: <strong>{project.name}</strong></li>
-        <li>Client: <strong>{project.client.name}</strong></li>
-        <li>Dates: <strong>{project.dates.date_start}</strong> - <strong>{project.dates.date_end}</strong></li>
-      </ul>
       <h2>Tasks, Team &rarr; Activities, People</h2>
       <div className="row">
         <div className="col-sm-6">
@@ -50,7 +45,7 @@ export default function Project({ project, peopleCosts }) {
               </tr>
             </thead>
             <tbody>
-              {tasks.map(task => (
+              {peopleCosts.tasks.map(task => (
                 <tr key={task.id}>
                   <th>{task.name}</th>
                   <td>{task.total_hours}</td>
@@ -69,7 +64,7 @@ export default function Project({ project, peopleCosts }) {
               </tr>
             </thead>
             <tbody>
-              {people.map(person => (
+              {peopleCosts.people.map(person => (
                 <tr key={person.id}>
                   <th>{person.user_name}</th>
                   <td>{person.total_hours}</td>
@@ -91,11 +86,25 @@ export default function Project({ project, peopleCosts }) {
               </tr>
             </thead>
             <tbody>
-              {taskToPeopleCosts(tasks)}
+              {taskToPeopleCosts(peopleCosts.tasks)}
             </tbody>
           </table>
         </div>
       </div>
+    </div>
+  );
+}
+
+export default function Project({ project, peopleCosts }) {
+  return (
+    <div>
+      <ul>
+        <li>ID: <strong>{project.id}</strong></li>
+        <li>Name: <strong>{project.name}</strong></li>
+        <li>Client: <strong>{project.client.name}</strong></li>
+        <li>Dates: <strong>{project.dates.date_start}</strong> - <strong>{project.dates.date_end}</strong></li>
+      </ul>
+      <PeopleCosts peopleCosts={peopleCosts} />
       <hr />
       <h2>Debug</h2>
       <pre>{JSON.stringify([project, peopleCosts], null, 2)}</pre>
