@@ -3,14 +3,17 @@ import React from 'react';
 export default function Project({ project, data, detailComponent, steps }) {
   let detail = <div>Loading...</div>;
   if (data !== null) {
-    const navigation = <div className="row">
-      <div className="col-sm-6 text-left">
-        <button className="btn btn-default" onClick={steps.goToPreviousStep}>Back to {steps.getPreviousTitle()}</button>
+    let navigation = null;
+    if (steps.getCurrentTitle() !== 'Summary') {
+      navigation = <div className="row">
+        <div className="col-sm-6 text-left">
+          <button className="btn btn-default" onClick={steps.goToPreviousStep}>Back to {steps.getPreviousTitle()}</button>
+        </div>
+        <div className="col-sm-6 text-right">
+          <button className="btn btn-success" onClick={steps.goToNextStep}>Continue to {steps.getNextTitle()}</button>
+        </div>
       </div>
-      <div className="col-sm-6 text-right">
-        <button className="btn btn-success" onClick={steps.goToNextStep}>Continue to {steps.getNextTitle()}</button>
-      </div>
-    </div>;
+    };
     detail = <div>
       {navigation}
       {detailComponent}

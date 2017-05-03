@@ -18,6 +18,10 @@ export default class Steps {
     return this.titles[this.currentStep - 2];
   }
 
+  getCurrentTitle() {
+    return this.titles[this.currentStep - 1];
+  }
+
   getNextTitle() {
     return this.titles[this.currentStep];
   }

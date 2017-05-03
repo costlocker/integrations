@@ -21,6 +21,7 @@ const steps = new Steps(Router, [
   'People costs',
   'Expenses',
   'Billing',
+  'Summary',
 ]);
 
 const handleHarvestLogin = (props) => pushToApi('/harvest', props)
@@ -158,6 +159,17 @@ const states = [
         }
       }
     ]
+  },
+  {
+    name: 'wizard.6',
+    url: '/6',
+    component: (props) => {
+      return <Project
+        project={appState.cursor(['harvest', 'selectedProject']).deref()}
+        data={[]}
+        detailComponent={<div>Import summary...</div>}
+        steps={steps} />;
+    },
   },
 ];
 
