@@ -4,7 +4,27 @@ export default function Billing({ billing }) {
   return (
     <div>
       <h2>Billing</h2>
-      <p></p>
+      <p>
+        Project invoices can't be loaded from <a href="http://help.getharvest.com/api-v1/invoices-api/">API</a>.
+        So we load client invoices and aggregate them to issued/invoiced number.
+        Numbers could be wrong, take it as guess. You should check that the numbers are OK before starting import to Costlocker.
+      </p>
+      <table className="table table-striped table-hover table-condensed">
+        <thead>
+          <tr>
+            <th>Issued Amount [$]</th>
+            <th>Invoiced Amount [$]</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{billing.stats.issued}</td>
+            <td>{billing.stats.invoiced}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Invoices</h3>
       <table className="table table-striped table-hover table-condensed">
         <thead>
           <tr>
@@ -15,7 +35,7 @@ export default function Billing({ billing }) {
           </tr>
         </thead>
         <tbody>
-          {billing.map(bill => (
+          {billing.invoices.map(bill => (
             <tr key={bill.id}>
               <th title={bill.id}>{bill.description}</th>
               <td>{bill.date}</td>
