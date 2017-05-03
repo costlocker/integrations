@@ -10,7 +10,7 @@ export default function WizardLayout({ user, steps }) {
     } else if (i === steps.getCurrentStep()) {
       stepsItems.push(<li key={i} className="active"><strong>{title}</strong></li>);
     } else {
-      stepsItems.push(<li key={i}><a onClick={(e) => steps.goToStep(i, e)}>{title}</a></li>);
+      stepsItems.push(<li key={i}><a href="" onClick={(e) => steps.goToStep(i, e)}>{title}</a></li>);
     }
   });
   return (
