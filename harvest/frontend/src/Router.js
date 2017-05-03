@@ -2,7 +2,7 @@ import React from 'react';
 import { UIRouterReact, servicesPlugin, pushStateLocationPlugin } from 'ui-router-react';
 import { Visualizer } from 'ui-router-visualizer';
 
-import LoginForm from './harvest/LoginForm';
+import Login from './Login';
 import Projects from './harvest/Projects';
 import Project from './harvest/Project';
 import PeopleCosts from './harvest/PeopleCosts';
@@ -12,7 +12,7 @@ import User from './harvest/User';
 import WizardLayout from './wizard/WizardLayout';
 import Steps from './wizard/Steps';
 import { appState, isNotLoggedIn } from './state';
-import { pushToApi, fetchFromApi } from './api';
+import { pushToApi, fetchFromApi, loginUrl } from './api';
 
 const Router = new UIRouterReact();
 const steps = new Steps(Router, [
@@ -26,7 +26,6 @@ const steps = new Steps(Router, [
 
 const handleHarvestLogin = (props) => pushToApi('/harvest', props)
   .then(user => appState.cursor(['harvest']).set('user', user))
-  .then(() => steps.goToNextStep())
   .catch(() => alert('Invalid credentials'));
 
 const states = [
@@ -46,10 +45,11 @@ const states = [
   {
     name: 'wizard.1',
     url: '/1',
-    component: () => <LoginForm
+    component: () => <Login
       harvestUser={appState.cursor(['harvest', 'user']).deref()}
       handleHarvestLogin={handleHarvestLogin}
-      goToNextStep={steps.goToNextStep} />,
+      goToNextStep={steps.goToNextStep}
+      loginUrl={loginUrl} />,
     resolve: [
       {
         token: 'loadUser',
