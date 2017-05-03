@@ -10,32 +10,22 @@ import Expenses from './harvest/Expenses';
 import Billing from './harvest/Billing';
 import User from './harvest/User';
 import WizardLayout from './wizard/WizardLayout';
+import Steps from './wizard/Steps';
 import { appState, isNotLoggedIn } from './state';
 import { pushToApi, fetchFromApi } from './api';
 
 const Router = new UIRouterReact();
-let currentStep = 1;
-const stepTitles = [
+const steps = new Steps(Router, [
   'Login',
   'Projects',
   'People costs',
   'Expenses',
   'Billing',
-];
-
-let goToStep = (step, e) => {
-  if (e) {
-    e.preventDefault();
-  }
-  currentStep = step;
-  Router.stateService.go(`wizard.${step}`, undefined, { location: true });
-};
-
-let goToNextStep = (e) => goToStep(currentStep + 1, e);
+]);
 
 const handleHarvestLogin = (props) => pushToApi('/harvest', props)
   .then(user => appState.cursor(['harvest']).set('user', user))
-  .then(() => goToStep(2))
+  .then(() => steps.goToNextStep())
   .catch(() => alert('Invalid credentials'));
 
 const states = [
@@ -50,9 +40,7 @@ const states = [
     redirectTo: 'wizard.1',
     component: () => <WizardLayout
       user={isNotLoggedIn() ? <em>Not logged in</em> : <User harvestUser={appState.cursor(['harvest', 'user']).deref()} />}
-      currentStep={currentStep}
-      stepTitles={stepTitles}
-      goToStep={goToStep} />,
+      steps={steps} />,
   },
   {
     name: 'wizard.1',
@@ -60,7 +48,7 @@ const states = [
     component: () => <LoginForm
       harvestUser={appState.cursor(['harvest', 'user']).deref()}
       handleHarvestLogin={handleHarvestLogin}
-      goToNextStep={goToNextStep} />,
+      goToNextStep={steps.goToNextStep} />,
     resolve: [
       {
         token: 'loadUser',
@@ -86,7 +74,7 @@ const states = [
             .set('expenses', null)
             .set('billing', null)
         );
-        goToStep(3);
+        steps.goToNextStep();
       };
       return <Projects projects={appState.cursor(['harvest', 'projects']).deref()} goToProject={goTo} />;
     },
@@ -111,7 +99,7 @@ const states = [
         project={appState.cursor(['harvest', 'selectedProject']).deref()}
         data={data}
         detailComponent={<PeopleCosts peopleCosts={data} />}
-        goToNextStep={goToNextStep} />;
+        steps={steps} />;
     },
     resolve: [
       {
@@ -134,7 +122,7 @@ const states = [
         project={appState.cursor(['harvest', 'selectedProject']).deref()}
         data={data}
         detailComponent={<Expenses expenses={data} />}
-        goToNextStep={goToNextStep} />;
+        steps={steps} />;
     },
     resolve: [
       {
@@ -157,7 +145,7 @@ const states = [
         project={appState.cursor(['harvest', 'selectedProject']).deref()}
         data={data}
         detailComponent={<Billing billing={data} />}
-        goToNextStep={goToNextStep} />;
+        steps={steps} />;
     },
     resolve: [
       {
@@ -196,13 +184,13 @@ const hooks = [
         const isWizardStep = state.name.substr(0, 7) === 'wizard.';
         if (isWizardStep) {
           const selectedStep = parseInt(state.name.replace('wizard.', ''), 0);
-          return selectedStep > currentStep;
+          return steps.isInvalidStep(selectedStep);
         }
         return false;
       }
     },
     callback: (transition: any) =>
-      transition.router.stateService.target(`wizard.${currentStep}`, undefined, { location: true }),
+      transition.router.stateService.target(`wizard.${steps.getCurrentStep()}`, undefined, { location: true }),
     priority: 8,
   },
 ];

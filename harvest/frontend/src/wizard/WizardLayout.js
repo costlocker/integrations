@@ -1,16 +1,16 @@
 import React from 'react';
 import { UIView } from 'ui-router-react';
 
-export default function WizardLayout({ user, currentStep, goToStep, stepTitles }) {
-  const steps = [];
-  stepTitles.forEach((title, index) => {
+export default function WizardLayout({ user, steps }) {
+  const stepsItems = [];
+  steps.titles.forEach((title, index) => {
     const i = index + 1;
-    if (i > currentStep) {
-      steps.push(<li key={i} className="text-muted">{title}</li>);
-    } else if (i === currentStep) {
-      steps.push(<li key={i} className="active"><strong>{title}</strong></li>);
+    if (steps.isInvalidStep(i)) {
+      stepsItems.push(<li key={i} className="text-muted">{title}</li>);
+    } else if (i === steps.getCurrentStep()) {
+      stepsItems.push(<li key={i} className="active"><strong>{title}</strong></li>);
     } else {
-      steps.push(<li key={i}><a onClick={(e) => goToStep(i, e)}>{title}</a></li>);
+      stepsItems.push(<li key={i}><a onClick={(e) => steps.goToStep(i, e)}>{title}</a></li>);
     }
   });
   return (
@@ -25,7 +25,7 @@ export default function WizardLayout({ user, currentStep, goToStep, stepTitles }
       </div>
       <div className="row">
         <div className="col-sm-12">
-          <ol className="breadcrumb">{steps}</ol>
+          <ol className="breadcrumb">{stepsItems}</ol>
         </div>
       </div>
       <div className="row">
