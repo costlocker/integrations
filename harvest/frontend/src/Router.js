@@ -95,7 +95,8 @@ const states = [
     component: (props) => {
       return <Project
         project={appState.cursor(['harvest', 'selectedProject']).deref()}
-        peopleCosts={appState.cursor(['harvest', 'peopleCosts']).deref()} />;
+        peopleCosts={appState.cursor(['harvest', 'peopleCosts']).deref()}
+        goToNextStep={goToNextStep} />;
     },
     resolve: [
       {
@@ -104,6 +105,26 @@ const states = [
           if (!appState.cursor(['harvest', 'peopleCosts']).deref()) {
             fetchFromApi(`/harvest?peoplecosts=${appState.cursor(['harvest', 'selectedProject']).deref().id}`)
               .then(peopleCosts => appState.cursor(['harvest']).set('peopleCosts', peopleCosts));
+          }
+        }
+      }
+    ]
+  },
+  {
+    name: 'wizard.4',
+    url: '/4',
+    component: (props) => {
+      return <Project
+        project={appState.cursor(['harvest', 'selectedProject']).deref()}
+        peopleCosts={null}
+        goToNextStep={goToNextStep} />;
+    },
+    resolve: [
+      {
+        token: 'loadExpenses',
+        resolveFn: () => {
+          if (!appState.cursor(['harvest', 'expense']).deref()) {
+            console.log('should load expenses');
           }
         }
       }

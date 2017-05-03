@@ -26,12 +26,15 @@ const taskToPeopleCosts = (tasks) => {
   return rows;
 }
 
-const PeopleCosts = ({ peopleCosts }) => {
+const PeopleCosts = ({ peopleCosts, goToNextStep }) => {
   if (!peopleCosts) {
     return <div>Loading people costs...</div>;
   }
   return (
     <div>
+      <button className="btn btn-success" onClick={goToNextStep}>
+          Go to expenses
+      </button>
       <h2>Tasks, Team &rarr; Activities, People</h2>
       <div className="row">
         <div className="col-sm-6">
@@ -95,7 +98,7 @@ const PeopleCosts = ({ peopleCosts }) => {
   );
 }
 
-export default function Project({ project, peopleCosts }) {
+export default function Project({ project, peopleCosts, goToNextStep }) {
   return (
     <div>
       <ul>
@@ -104,7 +107,7 @@ export default function Project({ project, peopleCosts }) {
         <li>Client: <strong>{project.client.name}</strong></li>
         <li>Dates: <strong>{project.dates.date_start}</strong> - <strong>{project.dates.date_end}</strong></li>
       </ul>
-      <PeopleCosts peopleCosts={peopleCosts} />
+      <PeopleCosts peopleCosts={peopleCosts} goToNextStep={goToNextStep} />
       <hr />
       <h2>Debug</h2>
       <pre>{JSON.stringify([project, peopleCosts], null, 2)}</pre>
