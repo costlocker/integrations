@@ -3,18 +3,12 @@ import React from 'react';
 import HarvestLogin from './HarvestLogin';
 import CostlockerLogin from './CostlockerLogin';
 import { HarvestUser, CostlockerUser } from './User';
+import { FullButton } from '../Helpers';
 
 export default function Login({ isLoggedIn, auth, goToNextStep, handleHarvestLogin, loginUrl, clLoginError }) {
   let navigation = <hr />;
   if (isLoggedIn) {
-      navigation =
-        <div className="bg-success">
-          <hr />
-          <button className="btn btn-success btn-lg" onClick={goToNextStep}>
-            Continue to Projects
-          </button>
-          <hr />
-        </div>;
+      navigation = <FullButton text="Continue to Projects" onClick={goToNextStep} />;
   }
   return (
     <div>
@@ -29,7 +23,7 @@ export default function Login({ isLoggedIn, auth, goToNextStep, handleHarvestLog
         </div>
       </div>
       <div className="row">
-        <div className="col-sm-12 text-center">
+        <div className="col-sm-12">
           {navigation}
         </div>
       </div>
