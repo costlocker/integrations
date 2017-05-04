@@ -40,7 +40,7 @@ $authorizeHarvest = function () use ($app) {
 $getLoggedUser = function () use ($app) {
     return new JsonResponse([
         'harvest' => $app['session']->get('harvest')['account'] ?? null,
-        'costlocker' => $app['session']->get('costlocker')['accessToken'] ?? null,
+        'costlocker' => $app['session']->get('costlocker')['account'] ?? null,
     ]);
 };
 
@@ -54,7 +54,7 @@ $app
             'redirectUri' => null,
             'urlAuthorize' => "{$costlockerHost}/api-public/oauth2/authorize",
             'urlAccessToken' => "{$costlockerHost}/api-public/oauth2/access_token",
-            'urlResourceOwnerDetails' => "{$costlockerHost}/api-public/v2/",
+            'urlResourceOwnerDetails' => "{$costlockerHost}/api-public/v2/me",
         ]);
         $sendError = function ($error) use ($appUrl, $app) {
             $app['session']->remove('costlocker');
@@ -78,8 +78,10 @@ $app
                 $accessToken = $provider->getAccessToken('authorization_code', [
                     'code' => $r->query->get('code')
                 ]);
+                $resourceOwner = $provider->getResourceOwner($accessToken);
                 $app['session']->remove('costlockerLogin');
                 $app['session']->set('costlocker', [
+                    'account' => $resourceOwner->toArray()['data'],
                     'accessToken' => $accessToken->jsonSerialize(),
                 ]);
                 return new RedirectResponse($appUrl);

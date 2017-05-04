@@ -20,9 +20,11 @@ const CostlockerUser = ({ user }) => {
     return <AnonymousUser />
   }
   return (
-    <strong>
-      {user.access_token}
-    </strong>
+    <div>
+      <strong>
+        {user.person.first_name} {user.person.last_name}
+      </strong> ({user.company.name})
+    </div>
   );
 };
 

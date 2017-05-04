@@ -13,7 +13,7 @@ $provider = new \League\OAuth2\Client\Provider\GenericProvider([
     'redirectUri' => null,
     'urlAuthorize' => "{$costlockerHost}/api-public/oauth2/authorize",
     'urlAccessToken' => "{$costlockerHost}/api-public/oauth2/access_token",
-    'urlResourceOwnerDetails' => "{$costlockerHost}/api-public/v2/",
+    'urlResourceOwnerDetails' => "{$costlockerHost}/api-public/v2/me",
 ]);
     
 session_start();
