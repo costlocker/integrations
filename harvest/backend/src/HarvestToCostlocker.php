@@ -122,11 +122,12 @@ class HarvestToCostlocker
 
     private function call($path, array $json)
     {
+        $accessToken = $this->session->get('costlocker')['accessToken']['access_token'];
         return $this->client->post("{$this->domain}/api-public/v2{$path}", [
             'http_errors' => false,
             'headers' => [
                 'Content-Type' => 'application/json',
-                'Authorization' => $this->session->get('costlocker')['accessToken']['access_token'],
+                'Authorization' => "Bearer {$accessToken}",
             ],
             'json' => $json,
         ]);
