@@ -8,9 +8,9 @@ const HarvestUser = ({ user }) => {
   }
   return (
     <div>
-      <img src={user.user_avatar} alt="" width="25px" />
-      <strong>{user.user_name}</strong>
-      (<a href={user.company_url}>{user.company_name}</a>)
+      <strong>
+        {user.user_name}
+      </strong> (<a href={user.company_url}>{user.company_name}</a>)
     </div>
   );
 };
