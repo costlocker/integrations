@@ -35,7 +35,7 @@ class HarvestToCostlocker
                 'projectUrl' => "{$this->domain}/projects/detail/{$createdProject['id']}/overview"
             ]);
         } else {
-            $response = new JsonResponse([], 400);
+            $response = new JsonResponse(['errors' => ['Project creation has failed']], 400);
         }
         $this->log($r, $response, $projectResponse, $timeentriesResponse);
         return $response;

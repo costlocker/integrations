@@ -144,7 +144,13 @@ const states = [
             delete project.projects;
             pushToApi('/costlocker', project)
               .then((result) => appState.cursor().set('importResult', {hasSucceed:true, projectUrl: result.projectUrl}))
-              .catch(() => appState.cursor().set('importResult', {hasSucceed: false, projectUrl: null}));
+              .catch(
+                error =>
+                  error.response.json().then(response => appState.cursor().set(
+                    'importResult',
+                    {hasSucceed: false, projectUrl: null, errors: response.errors}
+                  ))
+              );
           }
         }
       }

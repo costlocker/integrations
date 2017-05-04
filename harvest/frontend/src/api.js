@@ -6,6 +6,7 @@ const handleErrors = (response) => {
   if (!response.ok) {
     const error = new Error('Invalid API response');
     error.stack = `${response.url}\n${response.status} ${response.statusText}`;
+    error.response = response;
     throw error;
   }
   return response;

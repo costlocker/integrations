@@ -66,6 +66,9 @@ $app
 
 $app
     ->post('/costlocker', function (Request $r) use ($app) {
+        if (getenv('CL_IMPORT_DISABLED') == 'true') {
+            return new JsonResponse(['errors' => ['Import is disabled']], 400);
+        }
         $strategy = new \Costlocker\Integrations\HarvestToCostlocker(
             $app['guzzle'],
             $app['session'],

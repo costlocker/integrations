@@ -15,7 +15,10 @@ export default function Results({ importResult }) {
   } else {
     return <div className="bg-danger text-center">
         <hr />
-        <strong>Import has failed</strong>
+        <strong>Import has failed</strong><br />
+        {importResult.errors.map((error, id) => (
+          <span key={id}>{error}<br /></span>
+        ))}
         <hr />
       </div>;
   }
