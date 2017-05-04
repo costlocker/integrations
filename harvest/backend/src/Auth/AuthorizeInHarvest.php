@@ -3,17 +3,20 @@
 namespace Costlocker\Integrations\Auth;
 
 use Costlocker\Integrations\HarvestClient;
+use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class AuthorizeInHarvest
 {
+    private $client;
     private $session;
     private $getUser;
 
-    public function __construct(SessionInterface $s, GetUser $u)
+    public function __construct(Client $c, SessionInterface $s, GetUser $u)
     {
+        $this->client = $c;
         $this->session = $s;
         $this->getUser = $u;
     }
@@ -21,7 +24,11 @@ class AuthorizeInHarvest
     public function __invoke(Request $r)
     {
         $authHeader = 'Basic ' . base64_encode("{$r->request->get('username')}:{$r->request->get('password')}");
-        $client = new HarvestClient("https://{$r->request->get('domain', 'a')}.harvestapp.com", $authHeader);
+        $client = new HarvestClient(
+            $this->client, 
+            "https://{$r->request->get('domain', 'a')}.harvestapp.com",
+            $authHeader
+        );
         list($statusCode, $json) = $client("/account/who_am_i", true);
         if ($statusCode != 200) {
             return new JsonResponse([], $statusCode);
