@@ -18,17 +18,21 @@ class CostlockerClient
         $this->domain = $domain;
     }
 
-    public function __invoke($path, array $json)
+    public function __invoke($path, array $json = null)
     {
         $accessToken = $this->session->get('costlocker')['accessToken']['access_token'];
-        return $this->client->post($this->getUrl("/api-public/v2{$path}"), [
-            'http_errors' => false,
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Authorization' => "Bearer {$accessToken}",
-            ],
-            'json' => $json,
-        ]);
+        return $this->client->request(
+            is_array($json) ? 'post' : 'get',
+            $this->getUrl("/api-public/v2{$path}"),
+            [
+                'http_errors' => false,
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => "Bearer {$accessToken}",
+                ],
+                'json' => $json,
+            ]
+        );
     }
 
     public function getUrl($path)

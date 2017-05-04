@@ -23,7 +23,7 @@ class CostlockerTest extends GivenApi
     public function testCreateProjectAndTimesheet()
     {
         $this->givenLoggedUser();
-        $this->client->shouldReceive('post')->twice()->andReturn($this->givenValidResponse());
+        $this->whenApiIsCalled()->twice()->andReturn($this->givenValidResponse());
         $response = $this->importProject();
         assertThat($response->getStatusCode(), is(200));
     }
@@ -52,7 +52,7 @@ class CostlockerTest extends GivenApi
     public function testFailedImport()
     {
         $this->givenLoggedUser();
-        $this->client->shouldReceive('post')->andReturn(new Response(500));
+        $this->whenApiIsCalled()->andReturn(new Response(500));
         $response = $this->importProject();
         assertThat($response->getStatusCode(), is(400));
     }
@@ -66,8 +66,8 @@ class CostlockerTest extends GivenApi
     private function spyApiCalls()
     {
         $this->givenLoggedUser();
-        $this->client->shouldReceive('post')
-            ->andReturnUsing(function ($url, array $data) {
+        $this->whenApiIsCalled()
+            ->andReturnUsing(function ($method, $url, array $data) {
                 $versionPosition = strpos($url, 'v2');
                 $path = trim(substr($url, $versionPosition + 2), '/');
                 $this->requests[$path] = $data['json'];
@@ -93,6 +93,11 @@ class CostlockerTest extends GivenApi
                 'access_token' => 'irrelevant access token',
             ],
         ]);
+    }
+
+    private function whenApiIsCalled()
+    {
+        return $this->client->shouldReceive('request');
     }
 
     private function importProject()
