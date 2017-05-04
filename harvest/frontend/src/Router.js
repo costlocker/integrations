@@ -9,6 +9,7 @@ import { PeopleCosts } from './harvest/PeopleCosts';
 import Expenses from './harvest/Expenses';
 import { Billing } from './harvest/Billing';
 import Summary from './harvest/Summary';
+import Results from './harvest/Results';
 import WizardLayout from './wizard/WizardLayout';
 import Steps from './wizard/Steps';
 import { appState, isNotLoggedIn } from './state';
@@ -22,6 +23,7 @@ const steps = new Steps(Router, [
   'Expenses',
   'Billing',
   'Summary',
+  'Results',
 ]);
 
 const handleHarvestLogin = (props) => pushToApi('/harvest', props)
@@ -126,7 +128,28 @@ const states = [
   buildHarvestProjectStep(3, 'peoplecosts', data => <PeopleCosts peopleCosts={data} />),
   buildHarvestProjectStep(4, 'expenses', data => <Expenses expenses={data} />),
   buildHarvestProjectStep(5, 'billing', data => <Billing billing={data} />),
-  buildHarvestProjectStep(6, null, data => <Summary project={data} />),
+  buildHarvestProjectStep(6, null, data => <Summary project={data} goToNextStep={steps.goToNextStep} />),
+  {
+    name: 'wizard.7',
+    url: '/7',
+    component: () => {
+      return <Results importResult={appState.cursor(['importResult']).deref()} />;
+    },
+    resolve: [
+      {
+        token: 'importProject',
+        resolveFn: () => {
+          if (appState.cursor(['importResult']).deref() === null) {
+            const project = appState.cursor(['harvest']).deref().toJS();
+            delete project.projects;
+            pushToApi('/costlocker', project)
+              .then((result) => appState.cursor().set('importResult', {hasSucceed:true, projectUrl: result.projectUrl}))
+              .catch(() => appState.cursor().set('importResult', {hasSucceed: false, projectUrl: null}));
+          }
+        }
+      }
+    ],
+  },
 ];
 
 let plugins = [servicesPlugin, pushStateLocationPlugin, Visualizer];

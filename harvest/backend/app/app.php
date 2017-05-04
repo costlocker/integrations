@@ -59,10 +59,19 @@ $app
     });
 
 $app
-    ->get('/costlocker/login', function (Request $r) use ($app) {
+    ->get('/costlocker', function (Request $r) use ($app) {
         $strategy = Costlocker\Integrations\Auth\AuthorizeInCostlocker::buildFromEnv($app['session']);
         return $strategy($r);
     });
+
+$app
+    ->post('/costlocker', function (Request $r) {
+        sleep(3);
+        $projectId = 1;
+        return new JsonResponse([
+            'projectUrl' => "http://costlocker.php5:8080/projects/detail/{$projectId}/overview"
+        ]);
+    })->before(\Costlocker\Integrations\Auth\CheckAuthorization::costlocker($app['session']));
 
 $app
     ->post('/harvest', function (Request $r) use ($app, $getLoggedUser) {

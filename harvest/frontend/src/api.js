@@ -1,6 +1,6 @@
 
 const apiUrl = 'http://harvest-costlocker.dev/api';
-const loginUrl = `${apiUrl}/costlocker/login`;
+const loginUrl = `${apiUrl}/costlocker`;
 
 const handleErrors = (response) => {
   if (!response.ok) {

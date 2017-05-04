@@ -12,6 +12,7 @@ const appState = immstruct({
     expenses: null,
     billing: null,
   },
+  importResult: null,
 });
 
 const isNotLoggedIn = () =>
