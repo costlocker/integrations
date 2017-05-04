@@ -10,7 +10,7 @@ class CostlockerTest extends GivenApi
 {
     private $client;
     private $requests = [];
-    private $createdId = 123456;
+    private $createdId = 2367; // id in costlocker.json
 
     public function createApplication()
     {
@@ -70,11 +70,7 @@ class CostlockerTest extends GivenApi
                 $versionPosition = strpos($url, 'v2');
                 $path = trim(substr($url, $versionPosition + 2), '/');
                 $this->requests[$path] = $data['json'];
-                return new Response(200, [], json_encode([
-                    'data' => [
-                        ['id' => $this->createdId],
-                    ],
-                ]));
+                return new Response(200, [], json_encode($this->givenJsonResponse('costlocker.json')));
             });
         $this->importProject();
     }
@@ -98,8 +94,13 @@ class CostlockerTest extends GivenApi
         return $this->request([
             'method' => 'POST',
             'url' => '/costlocker',
-            'json' => json_decode(file_get_contents(__DIR__ . '/fixtures/import.json')),
+            'json' => $this->givenJsonResponse('harvest.json'),
         ]);
+    }
+
+    private function givenJsonResponse($file)
+    {
+        return json_decode(file_get_contents(__DIR__ . "/fixtures/{$file}"));
     }
 
     public function tearDown()

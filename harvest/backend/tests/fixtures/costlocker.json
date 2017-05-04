@@ -1,0 +1,64 @@
+{
+    "meta": {
+        "created": 1,
+        "updated": 0
+    },
+    "data": [
+        {
+            "id": "2367",
+            "items": [
+                {
+                    "action": "upsert",
+                    "item": {
+                        "type": "person",
+                        "activity_id": 462,
+                        "person_id": 502
+                    }
+                },
+                {
+                    "action": "upsert",
+                    "item": {
+                        "type": "person",
+                        "activity_id": 463,
+                        "person_id": 502
+                    }
+                },
+                {
+                    "action": "upsert",
+                    "item": {
+                        "type": "expense",
+                        "expense_id": 174
+                    }
+                },
+                {
+                    "action": "upsert",
+                    "item": {
+                        "type": "expense",
+                        "expense_id": 175
+                    }
+                },
+                {
+                    "action": "upsert",
+                    "item": {
+                        "type": "billing",
+                        "billing_id": 154
+                    }
+                },
+                {
+                    "action": "upsert",
+                    "item": {
+                        "type": "billing",
+                        "billing_id": 155
+                    }
+                }
+            ],
+            "links": {
+                "project": "http://costlocker.php5:8080/api-public/v2/projects/2367",
+                "peoplecosts": "http://costlocker.php5:8080/api-public/v2/projects/2367?types=peoplecosts",
+                "billing": "http://costlocker.php5:8080/api-public/v2/projects/2367?types=billing",
+                "expenses": "http://costlocker.php5:8080/api-public/v2/projects/2367?types=expenses",
+                "discounts": "http://costlocker.php5:8080/api-public/v2/projects/2367?types=discounts"
+            }
+        }
+    ]
+}
