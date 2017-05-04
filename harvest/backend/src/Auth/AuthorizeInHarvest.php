@@ -5,8 +5,8 @@ namespace Costlocker\Integrations\Auth;
 use Costlocker\Integrations\HarvestClient;
 use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Costlocker\Integrations\Api\ResponseHelper;
 
 class AuthorizeInHarvest
 {
@@ -31,7 +31,7 @@ class AuthorizeInHarvest
         );
         list($statusCode, $json) = $client("/account/who_am_i", true);
         if ($statusCode != 200) {
-            return new JsonResponse([], $statusCode);
+            return ResponseHelper::error('Not logged in', $statusCode);
         }
         $this->session->set('harvest', [
             'account' => [

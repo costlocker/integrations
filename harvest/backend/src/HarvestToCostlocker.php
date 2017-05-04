@@ -8,6 +8,7 @@ use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Costlocker\Integrations\Api\ResponseHelper;
 
 class HarvestToCostlocker
 {
@@ -37,7 +38,7 @@ class HarvestToCostlocker
                 'projectUrl' => "{$this->domain}/projects/detail/{$createdProject['id']}/overview"
             ]);
         } else {
-            $response = new JsonResponse(['errors' => ['Project creation has failed']], 400);
+            $response = ResponseHelper::error('Project creation has failed');
         }
         $this->log($r, $response, $projectResponse, $timeentriesResponse);
         return $response;

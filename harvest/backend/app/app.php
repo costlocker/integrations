@@ -4,6 +4,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Costlocker\Integrations\Api\ResponseHelper;
 
 $dotenv = new Dotenv\Dotenv(__DIR__ . '/../');
 $dotenv->load();
@@ -67,7 +68,7 @@ $app
 $app
     ->post('/costlocker', function (Request $r) use ($app) {
         if (getenv('CL_IMPORT_DISABLED') == 'true') {
-            return new JsonResponse(['errors' => ['Import is disabled']], 400);
+            return ResponseHelper::error('Import is disabled');
         }
         $strategy = new \Costlocker\Integrations\HarvestToCostlocker(
             $app['guzzle'],
@@ -98,9 +99,9 @@ $app
 
 $app->error(function (Exception $e) {
     if ($e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
-        return new JsonResponse(['errors' => [$e->getMessage()]], $e->getStatusCode());
+        return ResponseHelper::error($e->getMessage(), $e->getStatusCode());
     }
-    return new JsonResponse(null, 500);
+    return ResponseHelper::error('Internal Server Error', 500);
 });
  
 return $app;

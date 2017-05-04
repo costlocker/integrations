@@ -3,7 +3,7 @@
 namespace Costlocker\Integrations\Auth;
 
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Costlocker\Integrations\Api\ResponseHelper;
 
 class CheckAuthorization
 {
@@ -29,7 +29,7 @@ class CheckAuthorization
     public function __invoke()
     {
         if (!$this->session->get($this->service)) {
-            return new JsonResponse(null, 401);
+            return ResponseHelper::error("Unathorized in {$this->service}", 401);
         }
     }
 }
