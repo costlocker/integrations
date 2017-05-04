@@ -2,13 +2,8 @@
 
 namespace Costlocker\Integrations;
 
-class HarvestTest extends \Silex\WebTestCase
+class HarvestTest extends GivenApi
 {
-    public function createApplication()
-    {
-        return require __DIR__ . '/../app/app.php';
-    }
-
     public function testSuccessfulLogin()
     {
         $response = $this->request([
@@ -60,19 +55,5 @@ class HarvestTest extends \Silex\WebTestCase
             'url' => '/harvest',
         ]);
         assertThat($response->getStatusCode(), is(401));
-    }
-
-    private function request(array $config)
-    {
-        $client = $this->createClient();
-        $client->request(
-            $config['method'],
-            $config['url'],
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            json_encode($config['json'] ?? [])
-        );
-        return $client->getResponse();
     }
 }
