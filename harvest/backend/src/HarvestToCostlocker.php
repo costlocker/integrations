@@ -29,10 +29,10 @@ class HarvestToCostlocker
         $projectResponse = $this->call("/projects/", $this->transformProject($r));
         $timeentriesResponse = null;
         if ($projectResponse->getStatusCode() == 200) {
+            $createdProject = json_decode($projectResponse->getBody(), true)['data'][0];
             $timeentriesResponse = $this->call("/timeentries/", $this->transformTimeentries($r));
-            $projectId = 1;
             $response = new JsonResponse([
-                'projectUrl' => "{$this->domain}/projects/detail/{$projectId}/overview"
+                'projectUrl' => "{$this->domain}/projects/detail/{$createdProject['id']}/overview"
             ]);
         } else {
             $response = new JsonResponse([], 400);

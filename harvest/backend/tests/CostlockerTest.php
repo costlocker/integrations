@@ -10,6 +10,7 @@ class CostlockerTest extends GivenApi
 {
     private $client;
     private $requests = [];
+    private $createdId = 123456;
 
     public function createApplication()
     {
@@ -38,6 +39,15 @@ class CostlockerTest extends GivenApi
         assertThat($this->requests['timeentries'], is(arrayWithSize(2)));
     }
 
+    public function testReturnUrlToCreatedProjectInCostlocker()
+    {
+        $this->spyApiCalls();
+        $response = $this->importProject();
+        $json = json_decode($response->getContent(), true);
+        assertThat($json['projectUrl'], containsString('/projects/'));
+        assertThat($json['projectUrl'], containsString("/{$this->createdId}/"));
+    }
+
     public function testFailedImport()
     {
         $this->givenLoggedUser();
@@ -60,7 +70,11 @@ class CostlockerTest extends GivenApi
                 $versionPosition = strpos($url, 'v2');
                 $path = trim(substr($url, $versionPosition + 2), '/');
                 $this->requests[$path] = $data['json'];
-                return new Response(200);
+                return new Response(200, [], json_encode([
+                    'data' => [
+                        ['id' => $this->createdId],
+                    ],
+                ]));
             });
         $this->importProject();
     }
