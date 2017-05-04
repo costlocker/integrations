@@ -26,11 +26,13 @@ class HarvestToCostlocker
 
     public function __invoke(Request $r)
     {
-        $projectResponse = $this->call("/projects/", $this->transformProject($r));
+        $project = $this->transformProject($r);
+        $projectResponse = $this->call("/projects/", $project);
         $timeentriesResponse = null;
         if ($projectResponse->getStatusCode() == 200) {
             $createdProject = json_decode($projectResponse->getBody(), true)['data'][0];
-            $timeentriesResponse = $this->call("/timeentries/", $this->transformTimeentries($r));
+            $timeentries = $this->transformTimeentries($project, $createdProject);
+            $timeentriesResponse = $this->call("/timeentries/", $timeentries);
             $response = new JsonResponse([
                 'projectUrl' => "{$this->domain}/projects/detail/{$createdProject['id']}/overview"
             ]);
@@ -104,18 +106,19 @@ class HarvestToCostlocker
         return $items;
     }
 
-    private function transformTimeentries(Request $r)
+    private function transformTimeentries(array $projectRequest, array $createdProject)
     {
         $items = [];
-        foreach ($r->request->get('peoplecosts')['tasks'] as $task) {
-            foreach ($task['people'] as $person) {
-                $items[] = [
-                    'description' => "Harvest import",
-                    'date' => date('Y-m-d'),
-                    'duration' => $person['hours']['tracked'],
-                    'assignment' => null, // ids from created project
-                ];
+        foreach ($projectRequest['items'] as $index => $item) {
+            if (in_array($item['item'], ['billing', 'expense'])) {
+                continue;
             }
+            $items[] = [
+                'description' => "Harvest import",
+                'date' => date('Y-m-d 00:00:00'),
+                'duration' => round($item['hours']['tracked'] * 3600),
+                'assignment' => ['project_id' => $createdProject['id']] + $createdProject['items'][$index]['item'],
+            ];
         }
         return $items;
     }

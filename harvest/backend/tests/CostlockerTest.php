@@ -23,7 +23,7 @@ class CostlockerTest extends GivenApi
     public function testCreateProjectAndTimesheet()
     {
         $this->givenLoggedUser();
-        $this->client->shouldReceive('post')->twice()->andReturn(new Response(200));
+        $this->client->shouldReceive('post')->twice()->andReturn($this->givenValidResponse());
         $response = $this->importProject();
         assertThat($response->getStatusCode(), is(200));
     }
@@ -37,6 +37,7 @@ class CostlockerTest extends GivenApi
         assertThat($this->requests['projects']['responsible_people'], is(arrayWithSize(1)));
         assertThat($this->requests['projects']['items'], is(arrayWithSize(6)));
         assertThat($this->requests['timeentries'], is(arrayWithSize(2)));
+        assertThat($this->requests['timeentries'][0]['assignment'], is(notNullValue()));
     }
 
     public function testReturnUrlToCreatedProjectInCostlocker()
@@ -70,9 +71,14 @@ class CostlockerTest extends GivenApi
                 $versionPosition = strpos($url, 'v2');
                 $path = trim(substr($url, $versionPosition + 2), '/');
                 $this->requests[$path] = $data['json'];
-                return new Response(200, [], json_encode($this->givenJsonResponse('costlocker.json')));
+                return $this->givenValidResponse();
             });
         $this->importProject();
+    }
+
+    private function givenValidResponse()
+    {
+        return new Response(200, [], json_encode($this->givenJsonResponse('costlocker.json')));
     }
 
     private function givenLoggedUser()
