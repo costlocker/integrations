@@ -27,6 +27,34 @@ const handleHarvestLogin = (props) => pushToApi('/harvest', props)
   .then(user => appState.cursor(['auth']).set('harvest', user.harvest))
   .catch(() => alert('Invalid credentials'));
 
+const loadHarvestData = (type) => ([
+  {
+    token: `load-${type}`,
+    resolveFn: () => {
+      if (!appState.cursor(['harvest', type]).deref()) {
+        const url = appState.cursor(['harvest', 'selectedProject']).deref().links[type];
+        fetchFromApi(url).then(data => appState.cursor(['harvest']).set(type, data));
+      }
+    }
+  }
+]);
+
+const buildHarvestProjectStep = (step, type, component) => ({
+  name: `wizard.${step}`,
+  url: `/${step}`,
+  component: (props) => {
+    const data = type
+      ? appState.cursor(['harvest', type]).deref()
+      : appState.cursor(['harvest']).deref().toJS();
+    return <Project
+      project={appState.cursor(['harvest', 'selectedProject']).deref()}
+      data={data}
+      detailComponent={component(data)}
+      steps={steps} />;
+  },
+  resolve: type ? loadHarvestData(type) : [],
+});
+
 const states = [
   {
     name: 'homepage',
@@ -74,7 +102,7 @@ const states = [
         appState.cursor(['harvest']).update(
           harvest => harvest
             .set('selectedProject', project)
-            .set('peopleCosts', null)
+            .set('peoplecosts', null)
             .set('expenses', null)
             .set('billing', null)
         );
@@ -94,86 +122,10 @@ const states = [
       }
     ]
   },
-  {
-    name: 'wizard.3',
-    url: '/3',
-    component: (props) => {
-      const data = appState.cursor(['harvest', 'peopleCosts']).deref();
-      return <Project
-        project={appState.cursor(['harvest', 'selectedProject']).deref()}
-        data={data}
-        detailComponent={<PeopleCosts peopleCosts={data} />}
-        steps={steps} />;
-    },
-    resolve: [
-      {
-        token: 'loadPeopleCosts',
-        resolveFn: () => {
-          if (!appState.cursor(['harvest', 'peopleCosts']).deref()) {
-            const url = appState.cursor(['harvest', 'selectedProject']).deref().links.peoplecosts;
-            fetchFromApi(url).then(data => appState.cursor(['harvest']).set('peopleCosts', data));
-          }
-        }
-      }
-    ]
-  },
-  {
-    name: 'wizard.4',
-    url: '/4',
-    component: (props) => {
-      const data = appState.cursor(['harvest', 'expenses']).deref();
-      return <Project
-        project={appState.cursor(['harvest', 'selectedProject']).deref()}
-        data={data}
-        detailComponent={<Expenses expenses={data} />}
-        steps={steps} />;
-    },
-    resolve: [
-      {
-        token: 'loadExpenses',
-        resolveFn: () => {
-          if (!appState.cursor(['harvest', 'expenses']).deref()) {
-            const url = appState.cursor(['harvest', 'selectedProject']).deref().links.expenses;
-            fetchFromApi(url).then(data => appState.cursor(['harvest']).set('expenses', data));
-          }
-        }
-      }
-    ]
-  },
-  {
-    name: 'wizard.5',
-    url: '/5',
-    component: (props) => {
-      const data = appState.cursor(['harvest', 'billing']).deref();
-      return <Project
-        project={appState.cursor(['harvest', 'selectedProject']).deref()}
-        data={data}
-        detailComponent={<Billing billing={data} />}
-        steps={steps} />;
-    },
-    resolve: [
-      {
-        token: 'loadBilling',
-        resolveFn: () => {
-          if (!appState.cursor(['harvest', 'billing']).deref()) {
-            const url = appState.cursor(['harvest', 'selectedProject']).deref().links.billing;
-            fetchFromApi(url).then(data => appState.cursor(['harvest']).set('billing', data));
-          }
-        }
-      }
-    ]
-  },
-  {
-    name: 'wizard.6',
-    url: '/6',
-    component: (props) => {
-      return <Project
-        project={appState.cursor(['harvest', 'selectedProject']).deref()}
-        data={[]}
-        detailComponent={<div>Import summary...</div>}
-        steps={steps} />;
-    },
-  },
+  buildHarvestProjectStep(3, 'peoplecosts', data => <PeopleCosts peopleCosts={data} />),
+  buildHarvestProjectStep(4, 'expenses', data => <Expenses expenses={data} />),
+  buildHarvestProjectStep(5, 'billing', data => <Billing billing={data} />),
+  buildHarvestProjectStep(6, null, data => <div>Import summary...<pre>{JSON.stringify(data, null, 2)}</pre></div>),
 ];
 
 let plugins = [servicesPlugin, pushStateLocationPlugin, Visualizer];

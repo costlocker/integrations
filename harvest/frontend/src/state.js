@@ -8,7 +8,7 @@ const appState = immstruct({
   harvest: {
     projects: [],
     selectedProject: null,
-    peopleCosts: null,
+    peoplecosts: null,
     expenses: null,
     billing: null,
   },
