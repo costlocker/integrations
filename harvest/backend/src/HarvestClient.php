@@ -6,19 +6,20 @@ use GuzzleHttp\Client;
 
 class HarvestClient
 {
+    private $client;
     private $domain;
     private $authHeader;
 
-    public function __construct($domain, $authHeader)
+    public function __construct(Client $client, $domain, $authHeader)
     {
+        $this->client = $client;
         $this->domain = $domain;
         $this->authHeader = $authHeader;
     }
 
     public function __invoke($path, $returnStatusCode = false)
     {
-        $client = new Client();
-        $response = $client->get("{$this->domain}{$path}", [
+        $response = $this->client->get("{$this->domain}{$path}", [
             'http_errors' => false,
             'headers' => [
                 'Accept' => 'application/json',

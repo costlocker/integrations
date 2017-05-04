@@ -1,0 +1,13 @@
+#!/bin/sh
+
+clear() {
+    clear_guzzle_cache
+}
+
+clear_guzzle_cache() {
+    rm -rf var/cache
+    mkdir var/cache
+    touch var/cache/.gitkeep
+}
+
+clear

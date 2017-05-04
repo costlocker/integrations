@@ -30,6 +30,27 @@ $app->before(function (Request $request) {
     }
 });
 
+$app['guzzle'] = function () {
+    return new \GuzzleHttp\Client();
+};
+
+$app['guzzle.cached'] = function ($app) {
+    // cache response only in local environment
+    if ($app['debug']) {
+        $ttl = 24 * 60 * 60;
+        $cache = new \Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy(
+            new \Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage(
+                new \Doctrine\Common\Cache\FilesystemCache(__DIR__ . '/../var/cache')
+            ),
+            $ttl
+        );
+        $stack = \GuzzleHttp\HandlerStack::create();
+        $stack->push(new \Kevinrob\GuzzleCache\CacheMiddleware($cache), 'cache');
+        return new \GuzzleHttp\Client(['handler' => $stack]);
+    }
+    return $app['guzzle'];
+};
+
 $getLoggedUser = new Costlocker\Integrations\Auth\GetUser($app['session']);
 
 $app
@@ -45,14 +66,14 @@ $app
 
 $app
     ->post('/harvest', function (Request $r) use ($app, $getLoggedUser) {
-        $strategy = new \Costlocker\Integrations\Auth\AuthorizeInHarvest($app['session'], $getLoggedUser);
+        $strategy = new \Costlocker\Integrations\Auth\AuthorizeInHarvest($app['guzzle'], $app['session'], $getLoggedUser);
         return $strategy($r);
     });
 
 $app
     ->get('/harvest', function (Request $r) use ($app) {
         $harvest = $app['session']->get('harvest');
-        $apiClient = new Costlocker\Integrations\HarvestClient($harvest['account']['company_url'], $harvest['auth']);
+        $apiClient = new Costlocker\Integrations\HarvestClient($app['guzzle.cached'], $harvest['account']['company_url'], $harvest['auth']);
         $strategy = new Costlocker\Integrations\Harvest\GetDataFromHarvest();
         $data = $strategy($r, $apiClient);
         return new JsonResponse($data);
