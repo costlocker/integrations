@@ -12,7 +12,6 @@ export default class extends Component {
   render() {
     return (
       <form onSubmit={this.handleSubmit}>
-        <h2>Change Harvest Account</h2>
         <div className="form-group">
           <label htmlFor="username">Username</label>
           <input ref="username" type="email" className="form-control" id="username" placeholder="Username" />

@@ -2,13 +2,12 @@ import React from 'react';
 import { UIRouterReact, servicesPlugin, pushStateLocationPlugin } from 'ui-router-react';
 import { Visualizer } from 'ui-router-visualizer';
 
-import Login from './Login';
+import Login from './auth/Login';
 import Projects from './harvest/Projects';
 import Project from './harvest/Project';
 import PeopleCosts from './harvest/PeopleCosts';
 import Expenses from './harvest/Expenses';
 import Billing from './harvest/Billing';
-import User from './harvest/User';
 import WizardLayout from './wizard/WizardLayout';
 import Steps from './wizard/Steps';
 import { appState, isNotLoggedIn } from './state';
@@ -39,7 +38,7 @@ const states = [
     url: '/step',
     redirectTo: 'wizard.1',
     component: () => <WizardLayout
-      user={steps.getCurrentStep() === 1 ? null : <User harvestUser={appState.cursor(['auth', 'harvest']).deref()} />}
+      auth={appState.cursor(['auth']).deref().toJS()}
       steps={steps} />,
   },
   {

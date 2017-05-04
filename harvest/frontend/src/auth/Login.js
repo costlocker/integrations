@@ -1,8 +1,8 @@
 import React from 'react';
 
-import LoginForm from './harvest/LoginForm';
-
-const anonymousUser = <em>Not logged in</em>;
+import HarvestLogin from './HarvestLogin';
+import CostlockerLogin from './CostlockerLogin';
+import { HarvestUser, CostlockerUser } from './User';
 
 export default function Login({ isLoggedIn, auth, goToNextStep, handleHarvestLogin, loginUrl, clLoginError }) {
   let navigation = <hr />;
@@ -16,17 +16,16 @@ export default function Login({ isLoggedIn, auth, goToNextStep, handleHarvestLog
           <hr />
         </div>;
   }
-  const costlockerLogin = <a href={loginUrl} className="btn btn-primary">Login to Costlocker</a>;
   return (
     <div>
       <div className="row">
         <div className="col-sm-6">
           <h2>Harvest User</h2>
-          {auth.harvest ? <strong>{auth.harvest.user_name}</strong> : anonymousUser}
+          <HarvestUser user={auth.harvest} />
         </div>
         <div className="col-sm-6">
           <h2>Costlocker User</h2>
-          {auth.costlocker ? <strong>{auth.costlocker.access_token}</strong> : anonymousUser}
+          <CostlockerUser user={auth.costlocker} />
         </div>
       </div>
       <div className="row">
@@ -36,12 +35,12 @@ export default function Login({ isLoggedIn, auth, goToNextStep, handleHarvestLog
       </div>
       <div className="row">
         <div className="col-sm-6">
-          <LoginForm handleHarvestLogin={handleHarvestLogin} />
+          <h2>Change Harvest Account</h2>
+          <HarvestLogin handleHarvestLogin={handleHarvestLogin} />
         </div>
         <div className="col-sm-6">
           <h2>Change Costlocker Account</h2>
-          {clLoginError ? <p className="bg-danger"><strong>Login error</strong>:<br />{decodeURIComponent(clLoginError)}</p> : ''}
-          {costlockerLogin}
+          <CostlockerLogin clLoginError={clLoginError} loginUrl={loginUrl} />
         </div>
       </div>
     </div>

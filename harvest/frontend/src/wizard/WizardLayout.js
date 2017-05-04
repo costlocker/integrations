@@ -1,7 +1,9 @@
 import React from 'react';
 import { UIView } from 'ui-router-react';
 
-export default function WizardLayout({ user, steps }) {
+import { User } from '../auth/User';
+
+export default function WizardLayout({ auth, steps }) {
   const stepsItems = [];
   steps.titles.forEach((title, index) => {
     const i = index + 1;
@@ -17,10 +19,11 @@ export default function WizardLayout({ user, steps }) {
     <div>
       <div className="row bg-info">
         <div className="col-sm-6">
-          Harvest -> Costlocker
+          Harvest<br />
+          Costlocker
         </div>
         <div className="col-sm-6 text-right">
-          {user}
+          <User auth={auth} isFirstStep={steps.getCurrentStep() === 1} />
         </div>
       </div>
       <div className="row">
