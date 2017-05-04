@@ -5,9 +5,10 @@ import { Visualizer } from 'ui-router-visualizer';
 import Login from './auth/Login';
 import Projects from './harvest/Projects';
 import Project from './harvest/Project';
-import PeopleCosts from './harvest/PeopleCosts';
+import { PeopleCosts } from './harvest/PeopleCosts';
 import Expenses from './harvest/Expenses';
-import Billing from './harvest/Billing';
+import { Billing } from './harvest/Billing';
+import Summary from './harvest/Summary';
 import WizardLayout from './wizard/WizardLayout';
 import Steps from './wizard/Steps';
 import { appState, isNotLoggedIn } from './state';
@@ -125,7 +126,7 @@ const states = [
   buildHarvestProjectStep(3, 'peoplecosts', data => <PeopleCosts peopleCosts={data} />),
   buildHarvestProjectStep(4, 'expenses', data => <Expenses expenses={data} />),
   buildHarvestProjectStep(5, 'billing', data => <Billing billing={data} />),
-  buildHarvestProjectStep(6, null, data => <div>Import summary...<pre>{JSON.stringify(data, null, 2)}</pre></div>),
+  buildHarvestProjectStep(6, null, data => <Summary project={data} />),
 ];
 
 let plugins = [servicesPlugin, pushStateLocationPlugin, Visualizer];

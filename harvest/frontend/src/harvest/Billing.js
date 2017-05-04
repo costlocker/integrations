@@ -1,6 +1,23 @@
 import React from 'react';
 
-export default function Billing({ billing }) {
+const BillingAggregation = ({ billing }) => (
+  <table className="table table-striped table-hover table-condensed">
+    <thead>
+      <tr>
+        <th>Issued Amount [$]</th>
+        <th>Invoiced Amount [$]</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{billing.stats.issued}</td>
+        <td>{billing.stats.invoiced}</td>
+      </tr>
+    </tbody>
+  </table>
+);
+
+const Billing = ({ billing }) => {
   return (
     <div>
       <h2>Billing</h2>
@@ -9,20 +26,7 @@ export default function Billing({ billing }) {
         So we load client invoices and aggregate them to issued/invoiced number.
         Numbers could be wrong, take it as guess. You should check that the numbers are OK before starting import to Costlocker.
       </p>
-      <table className="table table-striped table-hover table-condensed">
-        <thead>
-          <tr>
-            <th>Issued Amount [$]</th>
-            <th>Invoiced Amount [$]</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>{billing.stats.issued}</td>
-            <td>{billing.stats.invoiced}</td>
-          </tr>
-        </tbody>
-      </table>
+      <BillingAggregation billing={billing} />
 
       <h3>Invoices</h3>
       <table className="table table-striped table-hover table-condensed">
@@ -48,3 +52,5 @@ export default function Billing({ billing }) {
     </div>
   );
 }
+
+export { Billing, BillingAggregation }

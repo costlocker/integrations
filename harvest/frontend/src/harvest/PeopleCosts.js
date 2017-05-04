@@ -1,32 +1,50 @@
 import React from 'react';
 
-const taskToPeopleCosts = (tasks) => {
-  const rows = [];
-  tasks.forEach(task => {
-    rows.push(
-      <tr key={task.id}>
-        <th>{task.activity.name}</th>
-        <td></td>
-        <td>{task.hours.tracked}</td>
-        <td>{task.activity.hourly_rate}</td>
-      </tr>
-    );
-    task.people.forEach(person => {
-      const key = `${task.id}-${person.id}`
+const CostlockerCosts = ({ peopleCosts }) => {
+  const taskToPeopleCosts = () => {
+    const rows = [];
+    peopleCosts.tasks.forEach(task => {
       rows.push(
-        <tr key={key}>
-          <td>- <em>{person.person.full_name}</em></td>
-          <td>{person.hours.budget}</td>
-          <td>{person.hours.tracked}</td>
-          <td>-</td>
+        <tr key={task.id}>
+          <th>{task.activity.name}</th>
+          <td></td>
+          <td>{task.hours.tracked}</td>
+          <td>{task.activity.hourly_rate}</td>
         </tr>
       );
-    })
-  });
-  return rows;
-}
+      task.people.forEach(person => {
+        const key = `${task.id}-${person.id}`
+        rows.push(
+          <tr key={key}>
+            <td>- <em>{person.person.full_name}</em></td>
+            <td>{person.hours.budget}</td>
+            <td>{person.hours.tracked}</td>
+            <td>-</td>
+          </tr>
+        );
+      })
+    });
+    return rows;
+  }
 
-export default function PeopleCosts({ peopleCosts }) {
+  return (
+    <table className="table table-striped table-hover table-condensed">
+      <thead>
+        <tr>
+          <th>Activity / Person</th>
+          <th>Estimated hours</th>
+          <th>Tracked hours</th>
+          <th>Client rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        {taskToPeopleCosts()}
+      </tbody>
+    </table>
+  )
+};
+
+const PeopleCosts = ({ peopleCosts }) => {
   return (
     <div>
       <h2>Tasks, Team &rarr; Activities, People</h2>
@@ -75,21 +93,11 @@ export default function PeopleCosts({ peopleCosts }) {
         </div>
         <div className="col-sm-6">
           <h3>People costs in Costlocker</h3>
-          <table className="table table-striped table-hover table-condensed">
-            <thead>
-              <tr>
-                <th>Activity / Person</th>
-                <th>Estimated hours</th>
-                <th>Tracked hours</th>
-                <th>Client rate</th>
-              </tr>
-            </thead>
-            <tbody>
-              {taskToPeopleCosts(peopleCosts.tasks)}
-            </tbody>
-          </table>
+          <CostlockerCosts peopleCosts={peopleCosts} />
         </div>
       </div>
     </div>
   );
 }
+
+export { PeopleCosts, CostlockerCosts };
