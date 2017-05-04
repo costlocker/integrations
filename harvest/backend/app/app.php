@@ -66,7 +66,15 @@ $app
 
 $app
     ->post('/costlocker', function (Request $r) use ($app) {
-        $strategy = new \Costlocker\Integrations\HarvestToCostlocker($app['guzzle'], $app['session'], getenv('CL_HOST'));
+        $strategy = new \Costlocker\Integrations\HarvestToCostlocker(
+            $app['guzzle'],
+            $app['session'],
+            new \Monolog\Logger(
+                'import',
+                [new \Monolog\Handler\StreamHandler(__DIR__ . '/../var/log/import.log')]
+            ),
+            getenv('CL_HOST')
+        );
         return $strategy($r);
     })->before(\Costlocker\Integrations\Auth\CheckAuthorization::costlocker($app['session']));
 

@@ -3,6 +3,8 @@
 namespace Costlocker\Integrations;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
+use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -11,26 +13,32 @@ class HarvestToCostlocker
 {
     private $client;
     private $session;
+    private $logger;
     private $domain;
 
-    public function __construct(Client $c, SessionInterface $s, $domain)
+    public function __construct(Client $c, SessionInterface $s, Logger $l, $domain)
     {
         $this->client = $c;
         $this->session = $s;
+        $this->logger = $l;
         $this->domain = $domain;
     }
 
     public function __invoke(Request $r)
     {
         $projectResponse = $this->call("/projects/", $this->transformProject($r));
-        if ($projectResponse->getStatusCode() != 200) {
-            return new JsonResponse([], 400);
+        $timeentriesResponse = null;
+        if ($projectResponse->getStatusCode() == 200) {
+            $timeentriesResponse = $this->call("/timeentries/", $this->transformTimeentries($r));
+            $projectId = 1;
+            $response = new JsonResponse([
+                'projectUrl' => "{$this->domain}/projects/detail/{$projectId}/overview"
+            ]);
+        } else {
+            $response = new JsonResponse([], 400);
         }
-        $timeentriesResponse = $this->call("/timeentries/", $this->transformTimeentries($r));
-        $projectId = 1;
-        return new JsonResponse([
-            'projectUrl' => "{$this->domain}/projects/detail/{$projectId}/overview"
-        ]);
+        $this->log($r, $response, $projectResponse, $timeentriesResponse);
+        return $response;
     }
 
     private function transformProject(Request $r)
@@ -122,5 +130,28 @@ class HarvestToCostlocker
             ],
             'json' => $json,
         ]);
+    }
+
+    private function log(Request $r, JsonResponse $response, Response $projectResponse, Response $timeentriesResponse = null)
+    {
+        $responseToLog = function (Response $res = null) {
+            if (!$res) {
+                return null;
+            }
+            return [
+                'status' => $res->getStatusCode(),
+                'body' => (string) $res->getBody(),
+            ];
+        };
+        $this->logger->log(
+            $response->isOk() ? Logger::INFO : Logger::ERROR,
+            'Import',
+            [
+                'request' => $r->getContent(),
+                'response' => $response->getContent(),
+                'projects' => $responseToLog($projectResponse),
+                'timeentries' => $responseToLog($timeentriesResponse),
+            ]
+        );
     }
 }
