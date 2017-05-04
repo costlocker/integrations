@@ -49,14 +49,20 @@ $app['guzzle.cached'] = function ($app) {
         $stack->push(new \Kevinrob\GuzzleCache\CacheMiddleware($cache), 'cache');
         return new \GuzzleHttp\Client(['handler' => $stack]);
     }
-    return $app['guzzle'];
+    return new \GuzzleHttp\Client();
 };
 
-$getLoggedUser = new Costlocker\Integrations\Auth\GetUser($app['session']);
+$app['client.costlocker'] = function () use ($app) {
+    return new \Costlocker\Integrations\CostlockerClient($app['guzzle'], $app['session'], getenv('CL_HOST'));
+};
+
+$app['client.user'] = function () use ($app) {
+    return new Costlocker\Integrations\Auth\GetUser($app['session'], $app['client.costlocker']);
+};
 
 $app
-    ->get('/user', function () use ($getLoggedUser) {
-        return $getLoggedUser();
+    ->get('/user', function () use ($app) {
+        return $app['client.user'](true);
     });
 
 $app
@@ -71,20 +77,18 @@ $app
             return ResponseHelper::error('Import is disabled');
         }
         $strategy = new \Costlocker\Integrations\HarvestToCostlocker(
-            $app['guzzle'],
-            $app['session'],
+            $app['client.costlocker'],
             new \Monolog\Logger(
                 'import',
                 [new \Monolog\Handler\StreamHandler(__DIR__ . '/../var/log/import.log')]
-            ),
-            getenv('CL_HOST')
+            )
         );
         return $strategy($r);
     })->before(\Costlocker\Integrations\Auth\CheckAuthorization::costlocker($app['session']));
 
 $app
-    ->post('/harvest', function (Request $r) use ($app, $getLoggedUser) {
-        $strategy = new \Costlocker\Integrations\Auth\AuthorizeInHarvest($app['guzzle'], $app['session'], $getLoggedUser);
+    ->post('/harvest', function (Request $r) use ($app) {
+        $strategy = new \Costlocker\Integrations\Auth\AuthorizeInHarvest($app['guzzle'], $app['session'], $app['client.user']);
         return $strategy($r);
     });
 

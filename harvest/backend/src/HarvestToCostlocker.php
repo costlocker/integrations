@@ -2,40 +2,34 @@
 
 namespace Costlocker\Integrations;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Costlocker\Integrations\Api\ResponseHelper;
 
 class HarvestToCostlocker
 {
     private $client;
-    private $session;
     private $logger;
-    private $domain;
 
-    public function __construct(Client $c, SessionInterface $s, Logger $l, $domain)
+    public function __construct(CostlockerClient $c, Logger $l)
     {
         $this->client = $c;
-        $this->session = $s;
         $this->logger = $l;
-        $this->domain = $domain;
     }
 
     public function __invoke(Request $r)
     {
         $project = $this->transformProject($r);
-        $projectResponse = $this->call("/projects/", $project);
+        $projectResponse = $this->client->__invoke("/projects/", $project);
         $timeentriesResponse = null;
         if ($projectResponse->getStatusCode() == 200) {
             $createdProject = json_decode($projectResponse->getBody(), true)['data'][0];
             $timeentries = $this->transformTimeentries($project, $createdProject);
-            $timeentriesResponse = $this->call("/timeentries/", $timeentries);
+            $timeentriesResponse = $this->client->__invoke("/timeentries/", $timeentries);
             $response = new JsonResponse([
-                'projectUrl' => "{$this->domain}/projects/detail/{$createdProject['id']}/overview"
+                'projectUrl' => $this->client->getUrl("/projects/detail/{$createdProject['id']}/overview"),
             ]);
         } else {
             $response = ResponseHelper::error('Project creation has failed');
@@ -51,7 +45,7 @@ class HarvestToCostlocker
             'name' => $project['name'],
             'client' => $project['client']['name'],
             'responsible_people' => [
-                $this->session->get('costlocker')['account']['person']['email'],
+                $this->client->getLoggedEmail(),
             ],
             'items' => array_merge(
                 $this->transformPeopleCosts($r->request->get('peoplecosts')['tasks']),
@@ -122,19 +116,6 @@ class HarvestToCostlocker
             ];
         }
         return $items;
-    }
-
-    private function call($path, array $json)
-    {
-        $accessToken = $this->session->get('costlocker')['accessToken']['access_token'];
-        return $this->client->post("{$this->domain}/api-public/v2{$path}", [
-            'http_errors' => false,
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Authorization' => "Bearer {$accessToken}",
-            ],
-            'json' => $json,
-        ]);
     }
 
     private function log(Request $r, JsonResponse $response, Response $projectResponse, Response $timeentriesResponse = null)
