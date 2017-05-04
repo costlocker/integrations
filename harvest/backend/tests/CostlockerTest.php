@@ -9,11 +9,12 @@ use GuzzleHttp\Psr7\Response;
 class CostlockerTest extends GivenApi
 {
     private $client;
+    private $requests = [];
 
     public function createApplication()
     {
         $app = parent::createApplication();
-        $this->client = m::mock(\GuzzleHttp\Client::class);
+        $this->client = m::mock(Client::class);
         $app['guzzle'] = $this->client;
         return $app;
     }
@@ -24,6 +25,17 @@ class CostlockerTest extends GivenApi
         $this->client->shouldReceive('post')->twice()->andReturn(new Response(200));
         $response = $this->importProject();
         assertThat($response->getStatusCode(), is(200));
+    }
+
+    public function testTransformHarvestDataToCostlockerFormat()
+    {
+        $this->spyApiCalls();
+        $this->importProject();
+        assertThat($this->requests['projects']['name'], is(nonEmptyString()));
+        assertThat($this->requests['projects']['client'], is(nonEmptyString()));
+        assertThat($this->requests['projects']['responsible_people'], is(arrayWithSize(1)));
+        assertThat($this->requests['projects']['items'], is(arrayWithSize(6)));
+        assertThat($this->requests['timeentries'], is(arrayWithSize(2)));
     }
 
     public function testFailedImport()
@@ -40,9 +52,27 @@ class CostlockerTest extends GivenApi
         assertThat($response->getStatusCode(), is(401));
     }
 
+    private function spyApiCalls()
+    {
+        $this->givenLoggedUser();
+        $this->client->shouldReceive('post')
+            ->andReturnUsing(function ($url, array $data) {
+                $versionPosition = strpos($url, 'v2');
+                $path = trim(substr($url, $versionPosition + 2), '/');
+                $this->requests[$path] = $data['json'];
+                return new Response(200);
+            });
+        $this->importProject();
+    }
+
     private function givenLoggedUser()
     {
         $this->app['session']->set('costlocker', [
+            'account' => [
+                'person' => [
+                    'email' => 'irrelevant email',
+                ],
+            ],
             'accessToken' => [
                 'access_token' => 'irrelevant access token',
             ],
@@ -54,7 +84,7 @@ class CostlockerTest extends GivenApi
         return $this->request([
             'method' => 'POST',
             'url' => '/costlocker',
-            'json' => [],
+            'json' => json_decode(file_get_contents(__DIR__ . '/fixtures/import.json')),
         ]);
     }
 

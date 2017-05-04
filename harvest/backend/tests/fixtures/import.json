@@ -1,0 +1,166 @@
+{
+    "selectedProject": {
+        "id": 13788046,
+        "name": "Trello",
+        "client": {
+            "id": 5554369,
+            "name": "2f"
+        },
+        "dates": {
+            "date_start": "2017-03-01",
+            "date_end": null
+        },
+        "finance": {
+            "bill_by": "Tasks",
+            "budget": 360,
+            "budget_by": "project",
+            "estimate": 360,
+            "estimate_by": "project",
+            "hourly_rate": null,
+            "cost_budget": null,
+            "cost_budget_include_expenses": false
+        },
+        "links": {
+            "peoplecosts": "/harvest?peoplecosts=13788046",
+            "expenses": "/harvest?expenses=13788046&from=20170424&to=20170531",
+            "billing": "/harvest?billing=13788046&client=5554369&from=20170424&to=20170531"
+        }
+    },
+    "peoplecosts": {
+        "tasks": [
+            {
+                "id": 7783430,
+                "activity": {
+                    "name": "Programming",
+                    "hourly_rate": 500
+                },
+                "hours": {
+                    "tracked": 24
+                },
+                "people": [
+                    {
+                        "finance": {
+                            "billed_rate": 500
+                        },
+                        "hours": {
+                            "budget": 24,
+                            "tracked": 24
+                        },
+                        "person": {
+                            "email": "zdenek.drahos@atoto.cz",
+                            "first_name": "Zdeněk",
+                            "last_name": "Drahoš",
+                            "full_name": "Zdeněk Drahoš",
+                            "role": "ADMIN",
+                            "salary": {
+                                "payment": "hourly",
+                                "hourly_rate": 200
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "id": 7783432,
+                "activity": {
+                    "name": "Project Management",
+                    "hourly_rate": 400
+                },
+                "hours": {
+                    "tracked": 6.5
+                },
+                "people": [
+                    {
+                        "finance": {
+                            "billed_rate": 400
+                        },
+                        "hours": {
+                            "budget": 6.5,
+                            "tracked": 6.5
+                        },
+                        "person": {
+                            "email": "zdenek.drahos@atoto.cz",
+                            "first_name": "Zdeněk",
+                            "last_name": "Drahoš",
+                            "full_name": "Zdeněk Drahoš",
+                            "role": "ADMIN",
+                            "salary": {
+                                "payment": "hourly",
+                                "hourly_rate": 200
+                            }
+                        }
+                    }
+                ]
+            }
+        ],
+        "people": [
+            {
+                "id": 1592111,
+                "finance": {
+                    "billed_rate": 478.69
+                },
+                "hours": {
+                    "budget": 30.5,
+                    "tracked": 30.5
+                },
+                "person": {
+                    "email": "zdenek.drahos@atoto.cz",
+                    "first_name": "Zdeněk",
+                    "last_name": "Drahoš",
+                    "full_name": "Zdeněk Drahoš",
+                    "role": "ADMIN",
+                    "salary": {
+                        "payment": "hourly",
+                        "hourly_rate": 200
+                    }
+                }
+            }
+        ]
+    },
+    "expenses": [
+        {
+            "id": 14631358,
+            "description": "3x Transportation (my notes)",
+            "purchased": {
+                "total_amount": 1050,
+                "date": "2017-04-29"
+            },
+            "billed": {
+                "total_amount": 1050
+            }
+        },
+        {
+            "id": 14631359,
+            "description": "1x Rent",
+            "purchased": {
+                "total_amount": 11000,
+                "date": "2017-04-29"
+            },
+            "billed": {
+                "total_amount": 11000
+            }
+        }
+    ],
+    "billing": {
+        "stats": {
+            "issued": 800,
+            "invoiced": 12300
+        },
+        "invoices": [
+            {
+                "id": 12685377,
+                "description": "#2",
+                "total_amount": 800,
+                "date": "2017-05-03",
+                "is_invoiced": false
+            },
+            {
+                "id": 12613594,
+                "description": "#1 Hello world",
+                "total_amount": 12300,
+                "date": "2017-04-29",
+                "is_invoiced": true
+            }
+        ]
+    }
+}
