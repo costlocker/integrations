@@ -9,14 +9,17 @@ use GuzzleHttp\Psr7\Response;
 class CostlockerTest extends GivenApi
 {
     private $client;
+    private $database;
     private $requests = [];
-    private $createdId = 2367; // id in costlocker.json
+
+    private $costlockerId = 2367; // id in costlocker.json
+    private $harvestId = 13788046; // id in costlocker.json
 
     public function createApplication()
     {
         $app = parent::createApplication();
-        $this->client = m::mock(Client::class);
-        $app['guzzle'] = $this->client;
+        $this->client = $app['guzzle'] = m::mock(Client::class);
+        $this->database = $app['import.database'] = new ImportDatabase(__DIR__ . '/fixtures/');
         return $app;
     }
 
@@ -46,7 +49,14 @@ class CostlockerTest extends GivenApi
         $response = $this->importProject();
         $json = json_decode($response->getContent(), true);
         assertThat($json['projectUrl'], containsString('/projects/'));
-        assertThat($json['projectUrl'], containsString("/{$this->createdId}/"));
+        assertThat($json['projectUrl'], containsString("/{$this->costlockerId}/"));
+    }
+
+    public function testSaveMappingInDatabase()
+    {
+        $this->spyApiCalls();
+        $this->importProject();
+        assertThat($this->database->getProjects(), is([$this->harvestId]));
     }
 
     public function testFailedImport()

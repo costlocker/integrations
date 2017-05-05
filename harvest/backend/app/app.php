@@ -54,6 +54,10 @@ $app['client.user'] = function () use ($app) {
     return new Costlocker\Integrations\Auth\GetUser($app['session'], $app['client.costlocker']);
 };
 
+$app['import.database'] = function () {
+    return new Costlocker\Integrations\ImportDatabase(__DIR__ . '/../var/database');
+};
+
 $app
     ->get('/user', function () use ($app) {
         return $app['client.user'](true);
@@ -72,6 +76,7 @@ $app
         }
         $strategy = new \Costlocker\Integrations\HarvestToCostlocker(
             $app['client.costlocker'],
+            $app['import.database'],
             new \Monolog\Logger(
                 'import',
                 [new \Monolog\Handler\StreamHandler(__DIR__ . '/../var/log/import.log')]

@@ -11,26 +11,31 @@ use Costlocker\Integrations\Api\ResponseHelper;
 class HarvestToCostlocker
 {
     private $client;
+    private $database;
     private $logger;
 
-    public function __construct(CostlockerClient $c, Logger $l)
+    public function __construct(CostlockerClient $c, ImportDatabase $d, Logger $l)
     {
         $this->client = $c;
+        $this->database = $d;
         $this->logger = $l;
     }
 
     public function __invoke(Request $r)
     {
-        $project = $this->transformProject($r);
+        $projectRequest = $r->request->all();
+        $project = $this->transformProject($projectRequest);
         $projectResponse = $this->client->__invoke("/projects/", $project);
         $timeentriesResponse = null;
         if ($projectResponse->getStatusCode() == 200) {
+            $this->database->setHarvestAccount('test');
             $createdProject = json_decode($projectResponse->getBody(), true)['data'][0];
             $timeentries = $this->transformTimeentries($project, $createdProject);
             $timeentriesResponse = $this->client->__invoke("/timeentries/", $timeentries);
             $response = new JsonResponse([
                 'projectUrl' => $this->client->getUrl("/projects/detail/{$createdProject['id']}/overview"),
             ]);
+            $this->database->saveProject($projectRequest, $createdProject);
         } else {
             $response = ResponseHelper::error('Project creation has failed');
         }
@@ -38,19 +43,18 @@ class HarvestToCostlocker
         return $response;
     }
 
-    private function transformProject(Request $r)
+    private function transformProject(array $projectRequest)
     {
-        $project = $r->request->get('selectedProject');
         return [
-            'name' => $project['name'],
-            'client' => $project['client']['name'],
+            'name' => $projectRequest['selectedProject']['name'],
+            'client' => $projectRequest['selectedProject']['client']['name'],
             'responsible_people' => [
                 $this->client->getLoggedEmail(),
             ],
             'items' => array_merge(
-                $this->transformPeopleCosts($r->request->get('peoplecosts')['tasks']),
-                $this->transformExpenses($r->request->get('expenses')),
-                $this->transformBilling($r->request->get('billing')['stats'])
+                $this->transformPeopleCosts($projectRequest['peoplecosts']['tasks']),
+                $this->transformExpenses($projectRequest['expenses']),
+                $this->transformBilling($projectRequest['billing']['stats'])
             ),
         ];
     }
