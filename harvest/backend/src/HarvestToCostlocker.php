@@ -44,6 +44,7 @@ class HarvestToCostlocker
 
     private function transformProject(array $harvestProject)
     {
+        $harvestId = $harvestProject['selectedProject']['id'];
         return [
             'name' => $harvestProject['selectedProject']['name'],
             'client' => $harvestProject['selectedProject']['client']['name'],
@@ -51,27 +52,28 @@ class HarvestToCostlocker
                 $this->client->getLoggedEmail(),
             ],
             'items' => array_merge(
-                $this->transformPeopleCosts($harvestProject['peoplecosts']['tasks']),
-                $this->transformExpenses($harvestProject['expenses']),
-                $this->transformBilling($harvestProject['billing']['stats'])
+                $this->transformPeopleCosts($harvestId, $harvestProject['peoplecosts']['tasks']),
+                $this->transformExpenses($harvestId, $harvestProject['expenses']),
+                $this->transformBilling($harvestId, $harvestProject['billing']['stats'])
             ),
-            'harvest' => $harvestProject['selectedProject']['id'],
+            'harvest' => $harvestId,
         ];
     }
 
-    private function transformPeopleCosts(array $tasks)
+    private function transformPeopleCosts($projectId, array $tasks)
     {
         $items = [];
         foreach ($tasks as $task) {
             foreach ($task['people'] as $person) {
                 $items[] = [
-                    'item' => 'person',
+                    'item' => ['type' => 'person'] + $this->database->getPerson($projectId, $task['id'], $person['person']['id']),
                     'activity' => $task['activity'],
                     'hours' => $person['hours'],
                     'person' => $person['person'],
                     'harvest' => [
                         'task' => $task['id'],
                         'user' => $person['person']['id'],
+                        'timeentry' => "{$task['id']}_{$person['person']['id']}",
                     ],
                 ];
             }
@@ -79,14 +81,14 @@ class HarvestToCostlocker
         return $items;
     }
 
-    private function transformExpenses(array $expenses)
+    private function transformExpenses($projectId, array $expenses)
     {
         $items = [];
         foreach ($expenses as $expense) {
             $harvestId = $expense['id'];
             unset($expense['id']);
             $items[] = [
-                'item' => 'expense',
+                'item' => ['type' => 'expense'] + $this->database->getExpense($projectId, $harvestId),
                 'expense' => $expense,
                 'harvest' => $harvestId,
             ];
@@ -94,12 +96,12 @@ class HarvestToCostlocker
         return $items;
     }
 
-    private function transformBilling(array $billingStats)
+    private function transformBilling($projectId, array $billingStats)
     {
         $items = [];
         foreach ($billingStats as $status => $amount) {
             $items[] = [
-                'item' => 'billing',
+                'item' => ['type' => 'billing'] + $this->database->getBilling($projectId, $status),
                 'billing' => [
                     'description' => "Harvest import - {$status}",
                     'total_amount' => $amount,
@@ -116,7 +118,7 @@ class HarvestToCostlocker
     {
         $items = [];
         foreach ($projectRequest['items'] as $index => $item) {
-            if (in_array($item['item'], ['billing', 'expense'])) {
+            if (in_array($item['item']['type'], ['billing', 'expense'])) {
                 continue;
             }
             $items[] = [

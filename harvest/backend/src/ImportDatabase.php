@@ -57,13 +57,41 @@ class ImportDatabase
                     $mapping['persons'][$harvestMapping['user']] = $item['item']['person_id'];
                     $timeentry = array_shift($timeentries);
                     if (isset($timeentry['uuid'])) {
-                        $activityAndPerson = "{$item['item']['activity_id']}_{$item['item']['person_id']}";
-                        $mapping['timeentries'][$activityAndPerson] = $timeentry['uuid'];
+                        $mapping['timeentries'][$harvestMapping['timeentry']] = $timeentry['uuid'];
                     }
                     break;
             }
         }
         return $mapping;
+    }
+
+    public function getBilling($projectId, $status)
+    {
+        $this->loadDatabase();
+        $mapping = $this->currentCompany['projects'][$projectId]['billing'] ?? [];
+        return array_key_exists($status, $mapping) ? ['billing_id' => $mapping[$status]] : [];
+    }
+
+    public function getExpense($projectId, $expenseId)
+    {
+        $this->loadDatabase();
+        $mapping = $this->currentCompany['projects'][$projectId]['expenses'] ?? [];
+        return array_key_exists($expenseId, $mapping) ? ['expense_id' => $mapping[$expenseId]] : [];
+    }
+
+    public function getPerson($projectId, $taskId, $userId)
+    {
+        $this->loadDatabase();
+        $activities = $this->currentCompany['projects'][$projectId]['activities'] ?? [];
+        $persons = $this->currentCompany['projects'][$projectId]['persons'] ?? [];
+        $result = [];
+        if (array_key_exists($taskId, $activities)) {
+            $result += ['activity_id' => $activities[$taskId]];
+        }
+        if (array_key_exists($userId, $persons)) {
+            $result += ['person_id' => $persons[$userId]];
+        }
+        return $result;
     }
 
     public function separateProjectsByStatus(array $projects)
