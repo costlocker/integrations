@@ -69,14 +69,14 @@ class HarvestToCostlocker
         foreach ($tasks as $task) {
             foreach ($task['people'] as $person) {
                 $items[] = [
-                    'item' => ['type' => 'person'] + $this->database->getPerson($projectId, $task['id'], $person['person']['id']),
+                    'item' => ['type' => 'person'] + $this->database->getPerson($projectId, $task['id'], $person['id']),
                     'activity' => $task['activity'],
                     'hours' => $person['hours'],
                     'person' => $person['person'],
                     'harvest' => [
                         'task' => $task['id'],
-                        'user' => $person['person']['id'],
-                        'timeentry' => "{$task['id']}_{$person['person']['id']}",
+                        'user' => $person['id'],
+                        'timeentry' => "{$task['id']}_{$person['id']}",
                     ],
                 ];
             }

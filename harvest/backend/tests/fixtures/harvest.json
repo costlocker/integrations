@@ -39,6 +39,7 @@
                 },
                 "people": [
                     {
+                        "id": 1592111,
                         "finance": {
                             "billed_rate": 500
                         },
@@ -47,7 +48,6 @@
                             "tracked": 24
                         },
                         "person": {
-                            "id": 1592111,
                             "email": "zdenek.drahos@atoto.cz",
                             "first_name": "Zdeněk",
                             "last_name": "Drahoš",
@@ -72,6 +72,7 @@
                 },
                 "people": [
                     {
+                        "id": 1592111,
                         "finance": {
                             "billed_rate": 400
                         },
@@ -80,7 +81,6 @@
                             "tracked": 6.5
                         },
                         "person": {
-                            "id": 1592111,
                             "email": "zdenek.drahos@atoto.cz",
                             "first_name": "Zdeněk",
                             "last_name": "Drahoš",
