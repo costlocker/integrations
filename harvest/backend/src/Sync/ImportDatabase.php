@@ -65,6 +65,13 @@ class ImportDatabase
         return $mapping;
     }
 
+    public function getProjectId($projectId)
+    {
+        $this->loadDatabase();
+        $costlockerId = $this->currentCompany['projects'][$projectId]['id'] ?? null;
+        return $costlockerId ? ['id' => $costlockerId] : [];
+    }
+
     public function getBilling($projectId, $status)
     {
         return $this->getMapping($projectId, ['billing' => ['billing_id', $status]]);

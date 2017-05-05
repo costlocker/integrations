@@ -48,7 +48,7 @@ class HarvestToCostlocker
     private function transformProject(array $harvestProject)
     {
         $harvestId = $harvestProject['selectedProject']['id'];
-        return [
+        return $this->database->getProjectId($harvestId) + [
             'name' => $harvestProject['selectedProject']['name'],
             'client' => $harvestProject['selectedProject']['client']['name'],
             'responsible_people' => [
