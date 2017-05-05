@@ -24,11 +24,13 @@ class HarvestToCostlocker
     public function __invoke(Request $r)
     {
         $projectRequest = $this->transformProject($r->request->all());
+        $requests = [$projectRequest];
         $projectResponse = $this->client->__invoke("/projects/", $projectRequest);
         $timeentriesResponse = null;
         if ($projectResponse->getStatusCode() == 200) {
             $createdProject = $this->responseToJson($projectResponse)[0];
             $timeentries = $this->transformTimeentries($projectRequest, $createdProject);
+            $requests[] = $timeentries;
             $timeentriesResponse = $this->client->__invoke("/timeentries/", $timeentries);
             $response = new JsonResponse([
                 'projectUrl' => $this->client->getUrl("/projects/detail/{$createdProject['id']}/overview"),
@@ -36,9 +38,9 @@ class HarvestToCostlocker
             $createdTimeentries = $this->responseToJson($timeentriesResponse);
             $this->database->saveProject($projectRequest, $createdProject, $createdTimeentries);
         } else {
-            $response = ResponseHelper::error('Project creation has failed');
+            $response = ResponseHelper::error('Project import has failed');
         }
-        $this->log($r, $response, $projectResponse, $timeentriesResponse);
+        $this->log($r, $requests, $response, $projectResponse, $timeentriesResponse);
         return $response;
     }
 
@@ -140,7 +142,7 @@ class HarvestToCostlocker
         return [];
     }
 
-    private function log(Request $r, JsonResponse $response, Response $projectResponse, Response $timeentriesResponse = null)
+    private function log(Request $r, array $requests, JsonResponse $response, Response $projectResponse, Response $timeentriesResponse = null)
     {
         $responseToLog = function (Response $res = null) {
             if (!$res) {
@@ -155,10 +157,15 @@ class HarvestToCostlocker
             $response->isOk() ? Logger::INFO : Logger::ERROR,
             'Import',
             [
-                'request' => $r->getContent(),
-                'response' => $response->getContent(),
-                'projects' => $responseToLog($projectResponse),
-                'timeentries' => $responseToLog($timeentriesResponse),
+                'requests' => [
+                    'app' => $r->getContent(),
+                    'costlocker' => $requests,
+                ],
+                'responses' => [
+                    'app' => $response->getContent(),
+                    'projects' => $responseToLog($projectResponse),
+                    'timeentries' => $responseToLog($timeentriesResponse),
+                ],
             ]
         );
     }
