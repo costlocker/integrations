@@ -13,10 +13,18 @@ $app = new Silex\Application();
 $app['debug'] = getenv('APP_ENV') !== 'production';
 
 \Symfony\Component\Debug\ErrorHandler::register();
+$getLogFile = function ($file) {
+    $env = getenv('APP_ENV');
+    return __DIR__ . "/../var/log/{$env}-{$file}.log";
+};
 $app->register(new Silex\Provider\MonologServiceProvider(), [
-    'monolog.logfile' => __DIR__ . '/../var/log/app.log',
+    'monolog.logfile' => $getLogFile('app'),
     'monolog.level' => Monolog\Logger::NOTICE,
 ]);
+$app['monolog.import'] = function () use ($getLogFile) {
+    $handler = new \Monolog\Handler\StreamHandler($getLogFile('import'));
+    return new \Monolog\Logger('import', [$handler]);
+};
 $app->register(new Silex\Provider\SessionServiceProvider(), [
     'session.test' => getenv('APP_ENV') === 'test',
     'session.storage.save_path' => __DIR__ . '/../var/sessions/'
@@ -86,14 +94,7 @@ $app
         if (getenv('CL_IMPORT_DISABLED') == 'true') {
             return ResponseHelper::error('Import is disabled');
         }
-        $strategy = new \Costlocker\Integrations\HarvestToCostlocker(
-            $app['client.costlocker'],
-            $app['import.database'],
-            new \Monolog\Logger(
-                'import',
-                [new \Monolog\Handler\StreamHandler(__DIR__ . '/../var/log/import.log')]
-            )
-        );
+        $strategy = new \Costlocker\Integrations\HarvestToCostlocker($app['client.costlocker'], $app['import.database'], $app['monolog.import']);
         return $strategy($r);
     })
     ->before($checkAuthorization('harvest'))
