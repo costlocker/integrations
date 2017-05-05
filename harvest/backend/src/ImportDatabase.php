@@ -67,29 +67,36 @@ class ImportDatabase
 
     public function getBilling($projectId, $status)
     {
-        $this->loadDatabase();
-        $mapping = $this->currentCompany['projects'][$projectId]['billing'] ?? [];
-        return array_key_exists($status, $mapping) ? ['billing_id' => $mapping[$status]] : [];
+        return $this->getMapping($projectId, ['billing' => ['billing_id', $status]]);
     }
 
     public function getExpense($projectId, $expenseId)
     {
-        $this->loadDatabase();
-        $mapping = $this->currentCompany['projects'][$projectId]['expenses'] ?? [];
-        return array_key_exists($expenseId, $mapping) ? ['expense_id' => $mapping[$expenseId]] : [];
+        return $this->getMapping($projectId, ['expenses' => ['expense_id', $expenseId]]);
     }
 
     public function getPerson($projectId, $taskId, $userId)
     {
+        return $this->getMapping($projectId, [
+            'activities' => ['activity_id', $taskId],
+            'persons' => ['person_id', $userId],
+        ]);
+    }
+
+    public function getTimeentry($projectId, $key)
+    {
+        return $this->getMapping($projectId, ['timeentries' => ['uuid', $key]]);
+    }
+
+    private function getMapping($projectId, array $fields)
+    {
         $this->loadDatabase();
-        $activities = $this->currentCompany['projects'][$projectId]['activities'] ?? [];
-        $persons = $this->currentCompany['projects'][$projectId]['persons'] ?? [];
         $result = [];
-        if (array_key_exists($taskId, $activities)) {
-            $result += ['activity_id' => $activities[$taskId]];
-        }
-        if (array_key_exists($userId, $persons)) {
-            $result += ['person_id' => $persons[$userId]];
+        foreach ($fields as $group => list($field, $id)) {
+            $mapping = $this->currentCompany['projects'][$projectId][$group] ?? [];
+            if (array_key_exists($id, $mapping)) {
+                $result += [$field => $mapping[$id]];
+            }
         }
         return $result;
     }

@@ -121,7 +121,8 @@ class HarvestToCostlocker
             if (in_array($item['item']['type'], ['billing', 'expense'])) {
                 continue;
             }
-            $items[] = [
+            $uuid = $this->database->getTimeentry($projectRequest['harvest'], $item['harvest']['timeentry']);
+            $items[] = $uuid + [
                 'description' => "Harvest import",
                 'date' => date('Y-m-d 00:00:00'),
                 'duration' => round($item['hours']['tracked'] * 3600),
