@@ -20,23 +20,28 @@ class ImportDatabase
         $this->encodingOptions = $encodingOptions;
     }
 
-    public function saveProject(array $projectRequest, array $costlockerProject)
+    public function saveProject(array $projectRequest, array $costlockerProject, array $costlockerTimeentries)
     {
         $this->loadDatabase();
         $harvestProjectId = $projectRequest['harvest'];
         $currentProject = $this->currentCompany['projects'][$harvestProjectId] ?? ['id' => $costlockerProject['id']];
-        $this->currentCompany['projects'][$harvestProjectId] =
-            $this->updateItemsMapping($currentProject, $projectRequest['items'], $costlockerProject['items']);
+        $this->currentCompany['projects'][$harvestProjectId] = $this->updateItemsMapping(
+            $currentProject,
+            $projectRequest['items'],
+            $costlockerProject['items'],
+            $costlockerTimeentries
+        );
         $this->persist();
     }
 
-    private function updateItemsMapping(array $mapping, array $requestItems, array $responseItems)
+    private function updateItemsMapping(array $mapping, array $requestItems, array $responseItems, array $timeentries)
     {
         $mapping += [
             'expenses' => [],
             'billing' => [],
             'activities' => [],
             'persons' => [],
+            'timeentries' => [],
         ];
         foreach ($responseItems as $index => $item) {
             $harvestMapping = $requestItems[$index]['harvest'];
@@ -50,6 +55,11 @@ class ImportDatabase
                 case 'person':
                     $mapping['activities'][$harvestMapping['task']] = $item['item']['activity_id'];
                     $mapping['persons'][$harvestMapping['user']] = $item['item']['person_id'];
+                    $timeentry = array_shift($timeentries);
+                    if (isset($timeentry['uuid'])) {
+                        $activityAndPerson = "{$item['item']['activity_id']}_{$item['item']['person_id']}";
+                        $mapping['timeentries'][$activityAndPerson] = $timeentry['uuid'];
+                    }
                     break;
             }
         }

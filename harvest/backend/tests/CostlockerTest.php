@@ -11,6 +11,7 @@ class CostlockerTest extends GivenApi
     private $client;
     private $database;
     private $requests = [];
+    private $responses = ['costlocker-projects.json', 'costlocker-timeentries.json'];
 
     private $costlockerId = 2367; // id in costlocker.json
     private $harvestId = 13788046; // id in costlocker.json
@@ -27,18 +28,11 @@ class CostlockerTest extends GivenApi
         return $app;
     }
 
-    public function testCreateProjectAndTimesheet()
-    {
-        $this->givenLoggedUser();
-        $this->whenApiIsCalled()->twice()->andReturn($this->givenValidResponse());
-        $response = $this->importProject();
-        assertThat($response->getStatusCode(), is(200));
-    }
-
     public function testTransformHarvestDataToCostlockerFormat()
     {
         $this->spyApiCalls();
-        $this->importProject();
+        $response = $this->importProject();
+        assertThat($response->getStatusCode(), is(200));
         assertThat($this->requests['projects']['name'], is(nonEmptyString()));
         assertThat($this->requests['projects']['client'], is(nonEmptyString()));
         assertThat($this->requests['projects']['responsible_people'], is(arrayWithSize(1)));
@@ -89,14 +83,14 @@ class CostlockerTest extends GivenApi
                 $versionPosition = strpos($url, 'v2');
                 $path = trim(substr($url, $versionPosition + 2), '/');
                 $this->requests[$path] = $data['json'];
-                return $this->givenValidResponse();
+                return $this->givenValidResponse("costlocker-{$path}.json");
             });
         $this->importProject();
     }
 
-    private function givenValidResponse()
+    private function givenValidResponse($file)
     {
-        return new Response(200, [], json_encode($this->givenJsonResponse('costlocker.json')));
+        return new Response(200, [], json_encode($this->givenJsonResponse($file)));
     }
 
     private function givenLoggedUser()

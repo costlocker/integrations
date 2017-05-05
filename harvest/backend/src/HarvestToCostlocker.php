@@ -27,13 +27,14 @@ class HarvestToCostlocker
         $projectResponse = $this->client->__invoke("/projects/", $projectRequest);
         $timeentriesResponse = null;
         if ($projectResponse->getStatusCode() == 200) {
-            $createdProject = json_decode($projectResponse->getBody(), true)['data'][0];
+            $createdProject = $this->responseToJson($projectResponse)[0];
             $timeentries = $this->transformTimeentries($projectRequest, $createdProject);
             $timeentriesResponse = $this->client->__invoke("/timeentries/", $timeentries);
             $response = new JsonResponse([
                 'projectUrl' => $this->client->getUrl("/projects/detail/{$createdProject['id']}/overview"),
             ]);
-            $this->database->saveProject($projectRequest, $createdProject);
+            $createdTimeentries = $this->responseToJson($timeentriesResponse);
+            $this->database->saveProject($projectRequest, $createdProject, $createdTimeentries);
         } else {
             $response = ResponseHelper::error('Project creation has failed');
         }
@@ -126,6 +127,14 @@ class HarvestToCostlocker
             ];
         }
         return $items;
+    }
+
+    private function responseToJson(Response $r)
+    {
+        if ($r->getStatusCode() == 200) {
+            return json_decode($r->getBody(), true)['data'];
+        }
+        return [];
     }
 
     private function log(Request $r, JsonResponse $response, Response $projectResponse, Response $timeentriesResponse = null)
