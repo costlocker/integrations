@@ -1,6 +1,6 @@
 <?php
 
-namespace Costlocker\Integrations;
+namespace Costlocker\Integrations\Sync;
 
 use Mockery as m;
 use Costlocker\Integrations\Auth\GetUser;

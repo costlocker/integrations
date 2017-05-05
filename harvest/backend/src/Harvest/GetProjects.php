@@ -4,7 +4,7 @@ namespace Costlocker\Integrations\Harvest;
 
 use Symfony\Component\HttpFoundation\Request;
 use Costlocker\Integrations\HarvestClient;
-use Costlocker\Integrations\ImportDatabase;
+use Costlocker\Integrations\Sync\ImportDatabase;
 
 class GetProjects
 {

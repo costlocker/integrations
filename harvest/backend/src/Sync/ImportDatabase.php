@@ -1,6 +1,6 @@
 <?php
 
-namespace Costlocker\Integrations;
+namespace Costlocker\Integrations\Sync;
 
 use Costlocker\Integrations\Auth\GetUser;
 

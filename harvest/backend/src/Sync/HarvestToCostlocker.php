@@ -1,12 +1,13 @@
 <?php
 
-namespace Costlocker\Integrations;
+namespace Costlocker\Integrations\Sync;
 
 use GuzzleHttp\Psr7\Response;
 use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Costlocker\Integrations\Api\ResponseHelper;
+use Costlocker\Integrations\CostlockerClient;
 
 class HarvestToCostlocker
 {

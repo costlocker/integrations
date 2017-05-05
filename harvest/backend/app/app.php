@@ -74,7 +74,7 @@ $checkAuthorization = function ($service) use ($app) {
 };
 
 $app['import.database'] = function ($app) {
-    return new Costlocker\Integrations\ImportDatabase($app['client.user'], __DIR__ . '/../var/database');
+    return new Costlocker\Integrations\Sync\ImportDatabase($app['client.user'], __DIR__ . '/../var/database');
 };
 
 $app
@@ -94,7 +94,7 @@ $app
         if (getenv('CL_IMPORT_DISABLED') == 'true') {
             return ResponseHelper::error('Import is disabled');
         }
-        $strategy = new \Costlocker\Integrations\HarvestToCostlocker($app['client.costlocker'], $app['import.database'], $app['monolog.import']);
+        $strategy = new \Costlocker\Integrations\Sync\HarvestToCostlocker($app['client.costlocker'], $app['import.database'], $app['monolog.import']);
         return $strategy($r);
     })
     ->before($checkAuthorization('harvest'))

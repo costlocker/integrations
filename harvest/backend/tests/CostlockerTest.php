@@ -5,13 +5,13 @@ namespace Costlocker\Integrations;
 use Mockery as m;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use Costlocker\Integrations\Sync\ImportDatabase;
 
 class CostlockerTest extends GivenApi
 {
     private $client;
     private $database;
     private $requests = [];
-    private $responses = ['costlocker-projects.json', 'costlocker-timeentries.json'];
 
     private $costlockerId = 2367; // id in costlocker.json
     private $harvestId = 13788046; // id in costlocker.json
