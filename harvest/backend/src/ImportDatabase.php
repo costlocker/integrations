@@ -8,20 +8,52 @@ class ImportDatabase
 {
     private $user;
     private $database;
+    private $encodingOptions;
+
     private $currentFile;
     private $currentCompany = [];
 
-    public function __construct(GetUser $u, $dir)
+    public function __construct(GetUser $u, $dir, $encodingOptions = null)
     {
         $this->user = $u;
         $this->database = $dir;
+        $this->encodingOptions = $encodingOptions;
     }
 
-    public function saveProject(array $harvestProject, array $costlockerProject)
+    public function saveProject(array $projectRequest, array $costlockerProject)
     {
         $this->loadDatabase();
-        $this->currentCompany['projects'][$harvestProject['selectedProject']['id']] = $costlockerProject['id'];
+        $harvestProjectId = $projectRequest['harvest'];
+        $currentProject = $this->currentCompany['projects'][$harvestProjectId] ?? ['id' => $costlockerProject['id']];
+        $this->currentCompany['projects'][$harvestProjectId] =
+            $this->updateItemsMapping($currentProject, $projectRequest['items'], $costlockerProject['items']);
         $this->persist();
+    }
+
+    private function updateItemsMapping(array $mapping, array $requestItems, array $responseItems)
+    {
+        $mapping += [
+            'expenses' => [],
+            'billing' => [],
+            'activities' => [],
+            'persons' => [],
+        ];
+        foreach ($responseItems as $index => $item) {
+            $harvestMapping = $requestItems[$index]['harvest'];
+            switch ($item['item']['type']) {
+                case 'expense':
+                    $mapping['expenses'][$harvestMapping] = $item['item']['expense_id'];
+                    break;
+                case 'billing':
+                    $mapping['billing'][$harvestMapping] = $item['item']['billing_id'];
+                    break;
+                case 'person':
+                    $mapping['activities'][$harvestMapping['task']] = $item['item']['activity_id'];
+                    $mapping['persons'][$harvestMapping['user']] = $item['item']['person_id'];
+                    break;
+            }
+        }
+        return $mapping;
     }
 
     public function separateProjectsByStatus(array $projects)
@@ -51,6 +83,6 @@ class ImportDatabase
 
     private function persist()
     {
-        file_put_contents($this->currentFile, json_encode($this->currentCompany));
+        file_put_contents($this->currentFile, json_encode($this->currentCompany, $this->encodingOptions));
     }
 }

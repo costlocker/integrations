@@ -23,13 +23,12 @@ class HarvestToCostlocker
 
     public function __invoke(Request $r)
     {
-        $projectRequest = $r->request->all();
-        $project = $this->transformProject($projectRequest);
-        $projectResponse = $this->client->__invoke("/projects/", $project);
+        $projectRequest = $this->transformProject($r->request->all());
+        $projectResponse = $this->client->__invoke("/projects/", $projectRequest);
         $timeentriesResponse = null;
         if ($projectResponse->getStatusCode() == 200) {
             $createdProject = json_decode($projectResponse->getBody(), true)['data'][0];
-            $timeentries = $this->transformTimeentries($project, $createdProject);
+            $timeentries = $this->transformTimeentries($projectRequest, $createdProject);
             $timeentriesResponse = $this->client->__invoke("/timeentries/", $timeentries);
             $response = new JsonResponse([
                 'projectUrl' => $this->client->getUrl("/projects/detail/{$createdProject['id']}/overview"),
@@ -42,19 +41,20 @@ class HarvestToCostlocker
         return $response;
     }
 
-    private function transformProject(array $projectRequest)
+    private function transformProject(array $harvestProject)
     {
         return [
-            'name' => $projectRequest['selectedProject']['name'],
-            'client' => $projectRequest['selectedProject']['client']['name'],
+            'name' => $harvestProject['selectedProject']['name'],
+            'client' => $harvestProject['selectedProject']['client']['name'],
             'responsible_people' => [
                 $this->client->getLoggedEmail(),
             ],
             'items' => array_merge(
-                $this->transformPeopleCosts($projectRequest['peoplecosts']['tasks']),
-                $this->transformExpenses($projectRequest['expenses']),
-                $this->transformBilling($projectRequest['billing']['stats'])
+                $this->transformPeopleCosts($harvestProject['peoplecosts']['tasks']),
+                $this->transformExpenses($harvestProject['expenses']),
+                $this->transformBilling($harvestProject['billing']['stats'])
             ),
+            'harvest' => $harvestProject['selectedProject']['id'],
         ];
     }
 
@@ -68,6 +68,10 @@ class HarvestToCostlocker
                     'activity' => $task['activity'],
                     'hours' => $person['hours'],
                     'person' => $person['person'],
+                    'harvest' => [
+                        'task' => $task['id'],
+                        'user' => $person['person']['id'],
+                    ],
                 ];
             }
         }
@@ -78,10 +82,12 @@ class HarvestToCostlocker
     {
         $items = [];
         foreach ($expenses as $expense) {
+            $harvestId = $expense['id'];
             unset($expense['id']);
             $items[] = [
                 'item' => 'expense',
                 'expense' => $expense,
+                'harvest' => $harvestId,
             ];
         }
         return $items;
@@ -99,6 +105,7 @@ class HarvestToCostlocker
                     'date' => date('Y-m-d'),
                     'status' => $status
                 ],
+                'harvest' => $status,
             ];
         }
         return $items;

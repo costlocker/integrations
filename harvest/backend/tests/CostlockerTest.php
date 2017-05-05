@@ -19,7 +19,11 @@ class CostlockerTest extends GivenApi
     {
         $app = parent::createApplication();
         $app['guzzle'] = $this->client = m::mock(Client::class);
-        $app['import.database'] = $this->database = new ImportDatabase($app['client.user'], __DIR__ . '/fixtures/');
+        $app['import.database'] = $this->database = new ImportDatabase(
+            $app['client.user'],
+            __DIR__ . '/fixtures/',
+            JSON_PRETTY_PRINT
+        );
         return $app;
     }
 

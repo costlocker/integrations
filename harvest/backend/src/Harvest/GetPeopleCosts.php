@@ -46,6 +46,7 @@ class GetPeopleCosts
                         'people' => array_map(
                             function (array $person) use ($users) {
                                 return [
+                                    'id' => $person['user_id'],
                                     'finance' => [
                                         'billed_rate' => $person['billed_rate'],
                                     ],
