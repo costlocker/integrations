@@ -46,21 +46,33 @@ $app['guzzle.cached'] = function ($app) {
     return new \GuzzleHttp\Client();
 };
 
-$app['client.costlocker'] = function () use ($app) {
+$app['client.costlocker'] = function ($app) {
     return new \Costlocker\Integrations\CostlockerClient($app['guzzle'], $app['client.user'], getenv('CL_HOST'));
 };
 
-$app['client.user'] = function () use ($app) {
+$app['client.user'] = function ($app) {
     return new Costlocker\Integrations\Auth\GetUser($app['session']);
 };
 
-$app['import.database'] = function () use ($app) {
+$app['client.check'] = function ($app) {
+    return new Costlocker\Integrations\Auth\CheckAuthorization($app['session'], $app['client.costlocker']);
+};
+
+$checkAuthorization = function ($service) use ($app) {
+    // prevents 'Cannot override frozen service "guzzle"'
+    return function () use ($service, $app) {
+        return $app['client.check']->checkAccount($service);
+    };
+};
+
+$app['import.database'] = function ($app) {
     return new Costlocker\Integrations\ImportDatabase($app['client.user'], __DIR__ . '/../var/database');
 };
 
 $app
     ->get('/user', function () use ($app) {
-        return $app['client.user'](true);
+        $app['client.check']->verifyCostlockerToken();
+        return $app['client.user']();
     });
 
 $app
@@ -83,7 +95,9 @@ $app
             )
         );
         return $strategy($r);
-    })->before(\Costlocker\Integrations\Auth\CheckAuthorization::costlocker($app['session']));
+    })
+    ->before($checkAuthorization('harvest'))
+    ->before($checkAuthorization('costlocker'));
 
 $app
     ->post('/harvest', function (Request $r) use ($app) {
@@ -93,15 +107,15 @@ $app
 
 $app
     ->get('/harvest', function (Request $r) use ($app) {
-        $getUser = $app['client.user'];
         $apiClient = new Costlocker\Integrations\HarvestClient(
             $app['guzzle.cached'],
-            $getUser->getHarvestUrl(),
-            $getUser->getHarvestAuthorization()
+            $app['client.user']->getHarvestUrl(),
+            $app['client.user']->getHarvestAuthorization()
         );
         $strategy = new Costlocker\Integrations\Harvest\GetDataFromHarvest($app['import.database']);
         $data = $strategy($r, $apiClient);
         return new JsonResponse($data);
-    })->before(\Costlocker\Integrations\Auth\CheckAuthorization::harvest($app['session']));
+    })
+    ->before($checkAuthorization('harvest'));
 
 return $app;

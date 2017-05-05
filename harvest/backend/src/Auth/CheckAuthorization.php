@@ -3,33 +3,35 @@
 namespace Costlocker\Integrations\Auth;
 
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Costlocker\Integrations\CostlockerClient;
 use Costlocker\Integrations\Api\ResponseHelper;
 
 class CheckAuthorization
 {
     private $session;
-    private $service;
+    private $client;
 
-    public static function harvest(SessionInterface $s)
-    {
-        return new self($s, 'harvest');
-    }
-
-    public static function costlocker(SessionInterface $s)
-    {
-        return new self($s, 'costlocker');
-    }
-
-    private function __construct(SessionInterface $s, $service)
+    public function __construct(SessionInterface $s, CostlockerClient $c)
     {
         $this->session = $s;
-        $this->service = $service;
+        $this->client = $c;
     }
 
-    public function __invoke()
+    public function checkAccount($service)
     {
-        if (!$this->session->get($this->service)) {
-            return ResponseHelper::error("Unathorized in {$this->service}", 401);
+        if (!$this->session->get($service)) {
+            return ResponseHelper::error("Unathorized in {$service}", 401);
+        }
+    }
+
+    public function verifyCostlockerToken()
+    {
+        $costlocker = $this->session->get('costlocker');
+        if ($costlocker) {
+            $response = $this->client->__invoke('/me');
+            if ($response->getStatusCode() !== 200) {
+                $this->session->remove('costlocker');
+            }
         }
     }
 }
