@@ -4,9 +4,17 @@ namespace Costlocker\Integrations\Harvest;
 
 use Symfony\Component\HttpFoundation\Request;
 use Costlocker\Integrations\HarvestClient;
+use Costlocker\Integrations\ImportDatabase;
 
 class GetProjects
 {
+    private $database;
+
+    public function __construct(ImportDatabase $d)
+    {
+        $this->database = $d;
+    }
+    
     public function __invoke(Request $r, HarvestClient $apiClient)
     {
         $clients = [];
@@ -18,7 +26,7 @@ class GetProjects
             return date('Ymd', strtotime($date));
         };
 
-        return array_map(
+        $projects = array_map(
             function (array $project) use ($clients, $formatDate) {
                 $latestRecordPlusOneMonth = date(
                     'Y-m-d',
@@ -64,5 +72,6 @@ class GetProjects
             },
             $apiClient("/projects")
         );
+        return $this->database->separateProjectsByStatus($projects);
     }
 }

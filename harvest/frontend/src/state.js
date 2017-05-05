@@ -6,7 +6,7 @@ const appState = immstruct({
     costlocker: null,
   },
   harvest: {
-    projects: [],
+    projects: null,
     selectedProject: null,
     peoplecosts: null,
     expenses: null,

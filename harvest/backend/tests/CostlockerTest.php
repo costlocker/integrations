@@ -56,7 +56,11 @@ class CostlockerTest extends GivenApi
     {
         $this->spyApiCalls();
         $this->importProject();
-        assertThat($this->database->getProjects(), is([$this->harvestId]));
+        $projects = [['id' => $this->costlockerId], ['id' => $this->harvestId]];
+        assertThat($this->database->separateProjectsByStatus($projects), is([
+            'new' => [reset($projects)],
+            'imported' => [end($projects)],
+        ]));
     }
 
     public function testFailedImport()

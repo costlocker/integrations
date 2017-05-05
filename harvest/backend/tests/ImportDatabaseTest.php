@@ -8,6 +8,10 @@ class ImportDatabaseTest extends \PHPUnit_Framework_TestCase
     {
         $database = new ImportDatabase(__DIR__ . '/fixtures');
         $database->setHarvestAccount('company-that-was-never-imported');
-        assertThat($database->getProjects(), is(emptyArray()));
+        $projects = [['id' => 123]];
+        assertThat($database->separateProjectsByStatus($projects), is([
+            'new' => $projects,
+            'imported' => [],
+        ]));
     }
 }

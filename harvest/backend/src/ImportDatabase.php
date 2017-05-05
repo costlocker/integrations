@@ -29,9 +29,15 @@ class ImportDatabase
         $this->persist();
     }
 
-    public function getProjects()
+    public function separateProjectsByStatus(array $projects)
     {
-        return array_keys($this->currentCompany['projects'] ?? []);
+        $mappedProjects = array_keys($this->currentCompany['projects'] ?? []);
+        $result = ['new' => [], 'imported' => []];
+        foreach ($projects as $project) {
+            $status = in_array($project['id'], $mappedProjects) ? 'imported' : 'new';
+            $result[$status][] = $project;
+        }
+        return $result;
     }
 
     private function persist()

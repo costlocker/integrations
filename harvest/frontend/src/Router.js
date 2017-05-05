@@ -117,7 +117,7 @@ const states = [
       {
         token: 'loadProjects',
         resolveFn: () => {
-          if (!appState.cursor(['harvest', 'projects']).deref().length) {
+          if (appState.cursor(['harvest', 'projects']).deref() === null) {
             fetchFromApi('/harvest')
               .then(projects => appState.cursor(['harvest']).set('projects', projects));
           }

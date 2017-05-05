@@ -4,9 +4,17 @@ namespace Costlocker\Integrations\Harvest;
 
 use Symfony\Component\HttpFoundation\Request;
 use Costlocker\Integrations\HarvestClient;
+use Costlocker\Integrations\ImportDatabase;
 
 class GetDataFromHarvest
 {
+    private $database;
+
+    public function __construct(ImportDatabase $d)
+    {
+        $this->database = $d;
+    }
+
     public function __invoke(Request $r, HarvestClient $apiClient)
     {
         $strategy = null;
@@ -17,7 +25,7 @@ class GetDataFromHarvest
         } elseif ($r->query->get('peoplecosts')) {
             $strategy = new GetPeopleCosts();
         } else {
-            $strategy = new GetProjects();
+            $strategy = new GetProjects($this->database);
         }
         return $strategy($r, $apiClient);
     }
