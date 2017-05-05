@@ -4,32 +4,46 @@ namespace Costlocker\Integrations\Auth;
 
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Costlocker\Integrations\CostlockerClient;
 
 class GetUser
 {
     private $session;
-    private $client;
 
-    public function __construct(SessionInterface $s, CostlockerClient $c)
+    public function __construct(SessionInterface $s)
     {
         $this->session = $s;
-        $this->client = $c;
     }
 
-    public function __invoke($checkCostlockerAccount = false)
+    public function __invoke()
     {
-        $costlocker = $this->session->get('costlocker');
-        if ($costlocker && $checkCostlockerAccount) {
-            $response = $this->client->__invoke('/me');
-            if ($response->getStatusCode() !== 200) {
-                $costlocker = [];
-            }
-        }
-
         return new JsonResponse([
             'harvest' => $this->session->get('harvest')['account'] ?? null,
-            'costlocker' => $costlocker['account'] ?? null,
+            'costlocker' => $this->session->get('costlocker')['account'] ?? null,
         ]);
+    }
+
+    public function getHarvestUrl()
+    {
+        return $this->session->get('harvest')['account']['company_url'];
+    }
+
+    public function getHarvestAuthorization()
+    {
+        return $this->session->get('harvest')['auth'];
+    }
+
+    public function getHarvestSubdomain()
+    {
+        return $this->session->get('harvest')['account']['company_subdomain'];
+    }
+
+    public function getCostlockerEmail()
+    {
+        return $this->session->get('costlocker')['account']['person']['email'];
+    }
+
+    public function getCostlockerAccessToken()
+    {
+        return $this->session->get('costlocker')['accessToken']['access_token'];
     }
 }

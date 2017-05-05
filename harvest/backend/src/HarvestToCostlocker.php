@@ -28,7 +28,6 @@ class HarvestToCostlocker
         $projectResponse = $this->client->__invoke("/projects/", $project);
         $timeentriesResponse = null;
         if ($projectResponse->getStatusCode() == 200) {
-            $this->database->setHarvestAccount('test');
             $createdProject = json_decode($projectResponse->getBody(), true)['data'][0];
             $timeentries = $this->transformTimeentries($project, $createdProject);
             $timeentriesResponse = $this->client->__invoke("/timeentries/", $timeentries);

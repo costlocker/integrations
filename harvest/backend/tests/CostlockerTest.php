@@ -18,8 +18,8 @@ class CostlockerTest extends GivenApi
     public function createApplication()
     {
         $app = parent::createApplication();
-        $this->client = $app['guzzle'] = m::mock(Client::class);
-        $this->database = $app['import.database'] = new ImportDatabase(__DIR__ . '/fixtures/');
+        $app['guzzle'] = $this->client = m::mock(Client::class);
+        $app['import.database'] = $this->database = new ImportDatabase($app['client.user'], __DIR__ . '/fixtures/');
         return $app;
     }
 
@@ -97,6 +97,11 @@ class CostlockerTest extends GivenApi
 
     private function givenLoggedUser()
     {
+        $this->app['session']->set('harvest', [
+            'account' => [
+                'company_subdomain' => 'test',
+            ],
+        ]);
         $this->app['session']->set('costlocker', [
             'account' => [
                 'person' => [

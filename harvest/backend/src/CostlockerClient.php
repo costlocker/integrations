@@ -3,24 +3,23 @@
 namespace Costlocker\Integrations;
 
 use GuzzleHttp\Client;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Costlocker\Integrations\Auth\GetUser;
 
 class CostlockerClient
 {
     private $client;
-    private $session;
+    private $user;
     private $domain;
 
-    public function __construct(Client $c, SessionInterface $s, $domain)
+    public function __construct(Client $c, GetUser $u, $domain)
     {
         $this->client = $c;
-        $this->session = $s;
+        $this->user = $u;
         $this->domain = $domain;
     }
 
     public function __invoke($path, array $json = null)
     {
-        $accessToken = $this->session->get('costlocker')['accessToken']['access_token'];
         return $this->client->request(
             is_array($json) ? 'post' : 'get',
             $this->getUrl("/api-public/v2{$path}"),
@@ -28,7 +27,7 @@ class CostlockerClient
                 'http_errors' => false,
                 'headers' => [
                     'Content-Type' => 'application/json',
-                    'Authorization' => "Bearer {$accessToken}",
+                    'Authorization' => "Bearer {$this->user->getCostlockerAccessToken()}",
                 ],
                 'json' => $json,
             ]
@@ -42,6 +41,6 @@ class CostlockerClient
 
     public function getLoggedEmail()
     {
-        return $this->session->get('costlocker')['account']['person']['email'];
+        return $this->user->getCostlockerEmail();
     }
 }

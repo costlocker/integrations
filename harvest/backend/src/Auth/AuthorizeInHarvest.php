@@ -37,6 +37,7 @@ class AuthorizeInHarvest
             'account' => [
                 'company_name' => $json['company']['name'],
                 'company_url' => $json['company']['base_uri'],
+                'company_subdomain' => str_replace('.harvestapp.com', '', $json['company']['full_domain']),
                 'user_name' => "{$json['user']['first_name']} {$json['user']['last_name']}",
                 'user_avatar' => $json['user']['avatar_url'],
             ],
