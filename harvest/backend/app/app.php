@@ -13,23 +13,17 @@ $app = new Silex\Application();
 $app['debug'] = getenv('APP_ENV') !== 'production';
 
 \Symfony\Component\Debug\ErrorHandler::register();
-$monologConfig = [
+$app->register(new Silex\Provider\MonologServiceProvider(), [
     'monolog.logfile' => __DIR__ . '/../var/log/app.log',
     'monolog.level' => Monolog\Logger::NOTICE,
-];
-$app->register(new Silex\Provider\MonologServiceProvider(), $monologConfig);
-
+]);
 $app->register(new Silex\Provider\SessionServiceProvider(), [
     'session.test' => getenv('APP_ENV') === 'test',
     'session.storage.save_path' => __DIR__ . '/../var/sessions/'
 ]);
 
-$app->before(function (Request $request) {
-    if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
-        $data = json_decode($request->getContent(), true);
-        $request->request->replace(is_array($data) ? $data : array());
-    }
-});
+$app->before(new Costlocker\Integrations\Api\DecodeJsonRequest());
+$app->error(new \Costlocker\Integrations\Api\ConvertExceptionToJson());
 
 $app['guzzle'] = function () {
     return new \GuzzleHttp\Client();
@@ -101,11 +95,4 @@ $app
         return new JsonResponse($data);
     })->before(\Costlocker\Integrations\Auth\CheckAuthorization::harvest($app['session']));
 
-$app->error(function (Exception $e) {
-    if ($e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
-        return ResponseHelper::error($e->getMessage(), $e->getStatusCode());
-    }
-    return ResponseHelper::error('Internal Server Error', 500);
-});
- 
 return $app;
