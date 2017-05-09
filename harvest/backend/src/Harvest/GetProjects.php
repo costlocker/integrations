@@ -33,6 +33,16 @@ class GetProjects
                     strtotime($project['project']['hint_latest_record_at'])
                     + 30 * 24 * 3600 // add one month to latest tracking
                 );
+                $dateStart = [
+                    $project['project']['starts_on'],
+                    $project['project']['hint_earliest_record_at'],
+                    date('Y-m-d', strtotime('today')),
+                ];
+                $dateEnd = [
+                    $project['project']['ends_on'],
+                    $project['project']['hint_earliest_record_at'],
+                    date('Y-m-d', strtotime('tomorrow')),
+                ];
                 return [
                     'id' => $project['project']['id'],
                     'name' => $project['project']['name'],
@@ -41,8 +51,8 @@ class GetProjects
                         'name' => $clients[$project['project']['client_id']],
                     ],
                     'dates' => [
-                        'date_start' => $project['project']['starts_on'] ?: $project['project']['hint_earliest_record_at'],
-                        'date_end' => $project['project']['ends_on'] ?: $project['project']['hint_earliest_record_at'],
+                        'date_start' => current(array_filter($dateStart)),
+                        'date_end' => current(array_filter($dateEnd)),
                     ],
                     'finance' => [
                         'bill_by' => $project['project']['bill_by'],
