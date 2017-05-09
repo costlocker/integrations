@@ -53,6 +53,7 @@ class HarvestToCostlocker
         return $this->database->getProjectId($harvestId) + [
             'name' => $harvestProject['selectedProject']['name'],
             'client' => $harvestProject['selectedProject']['client']['name'],
+            'dates' => $harvestProject['selectedProject']['dates'],
             'responsible_people' => [
                 $this->client->getLoggedEmail(),
             ],

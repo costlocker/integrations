@@ -41,8 +41,8 @@ class GetProjects
                         'name' => $clients[$project['project']['client_id']],
                     ],
                     'dates' => [
-                        'date_start' => $project['project']['starts_on'],
-                        'date_end' => $project['project']['ends_on'],
+                        'date_start' => $project['project']['starts_on'] ?: $project['project']['hint_earliest_record_at'],
+                        'date_end' => $project['project']['ends_on'] ?: $project['project']['hint_earliest_record_at'],
                     ],
                     'finance' => [
                         'bill_by' => $project['project']['bill_by'],
