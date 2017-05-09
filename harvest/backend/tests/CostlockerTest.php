@@ -61,14 +61,30 @@ class CostlockerTest extends GivenApi
         ]));
     }
 
-    public function testFailedImport()
+    /** @dataProvider provideInvalidCostlockerResponse */
+    public function testFailedImport(Response $r, $expectedError)
     {
         $this->givenLoggedUser();
-        $this->whenApiIsCalled()->andReturn(new Response(500));
+        $this->whenApiIsCalled()->andReturn($r);
         $response = $this->importProject();
         assertThat($response->getStatusCode(), is(400));
+        assertThat($response->getContent(), containsString($expectedError));
     }
 
+    public function provideInvalidCostlockerResponse()
+    {
+        return [
+            'unknown error' => [
+                new Response(500),
+                'Project import has failed',
+            ],
+            'costlocker error' => [
+                new Response(400, [], json_encode($this->givenJsonResponse('costlocker-failure.json'))),
+                'Unauthorized access (Invalid Authorization header)'
+            ],
+        ];
+    }
+    
     public function testUnauthorizedRequest()
     {
         $response = $this->importProject();

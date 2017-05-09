@@ -39,7 +39,9 @@ class HarvestToCostlocker
             $createdTimeentries = $this->responseToJson($timeentriesResponse);
             $this->database->saveProject($projectRequest, $createdProject, $createdTimeentries);
         } else {
-            $response = ResponseHelper::error('Project import has failed');
+            $apiError = json_decode($projectResponse->getBody(), true)['errors'][0] ?? [];
+            $error = $apiError ? "{$apiError['title']} ({$apiError['detail']})" : 'Project import has failed';
+            $response = ResponseHelper::error($error);
         }
         $this->log($r, $requests, $response, $projectResponse, $timeentriesResponse);
         return $response;

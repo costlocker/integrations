@@ -1,0 +1,9 @@
+{
+    "errors": [
+        {
+            "status": 403,
+            "title": "Unauthorized access",
+            "detail": "Invalid Authorization header"
+        }
+    ]
+}
