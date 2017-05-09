@@ -26,7 +26,7 @@ class GetPeopleCosts
                 'role' => $person['user']['is_admin'] ? 'ADMIN' : 'EMPLOYEE',
                 'salary' => [
                     'payment' => 'hourly',
-                    'hourly_rate' => $person['user']['cost_rate'],
+                    'hourly_rate' => $person['user']['cost_rate'] ?: 0,
                 ],
             ];
         }
