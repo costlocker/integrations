@@ -1,6 +1,9 @@
 
 const apiUrl = 'http://harvest-costlocker.dev/api';
-const loginUrl = `${apiUrl}/costlocker`;
+const loginUrls = {
+  costlocker: `${apiUrl}/oauth/costlocker`,
+  harvest: `${apiUrl}/oauth/harvest`,
+};
 
 const handleErrors = (response) => {
   if (!response.ok) {
@@ -31,4 +34,4 @@ const pushToApi = (path: string, data: Object) =>
   .then(handleErrors)
   .then(response => response.json());
 
-export { fetchFromApi, pushToApi, loginUrl };
+export { fetchFromApi, pushToApi, loginUrls };

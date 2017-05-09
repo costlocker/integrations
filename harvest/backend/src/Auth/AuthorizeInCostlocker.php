@@ -25,7 +25,7 @@ class AuthorizeInCostlocker
                 'urlAccessToken' => "{$costlockerHost}/api-public/oauth2/access_token",
                 'urlResourceOwnerDetails' => "{$costlockerHost}/api-public/v2/me",
             ]),
-            getenv('CL_FRONTED_URL')
+            getenv('APP_FRONTED_URL')
         );
     }
 

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Errors } from '../Helpers';
 
-export default function CostlockerLogin({ title, loginError, loginUrl }) {
+export default function OAuthLogin({ title, loginError, loginUrl }) {
   return (
     <div>
       <Errors title="Login error" error={loginError} />

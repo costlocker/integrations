@@ -84,14 +84,20 @@ $app
     });
 
 $app
-    ->get('/costlocker', function (Request $r) use ($app) {
+    ->get('/oauth/costlocker', function (Request $r) use ($app) {
         $strategy = Costlocker\Integrations\Auth\AuthorizeInCostlocker::buildFromEnv($app['session']);
         return $strategy($r);
     });
 
 $app
+    ->get('/oauth/harvest', function (Request $r) use ($app) {
+        $strategy = Costlocker\Integrations\Auth\AuthorizeInHarvest::buildFromEnv($app['session']);
+        return $strategy($r);
+    });
+
+$app
     ->post('/costlocker', function (Request $r) use ($app) {
-        if (getenv('CL_IMPORT_DISABLED') == 'true') {
+        if (getenv('APP_IMPORT_DISABLED') == 'true') {
             return ResponseHelper::error('Import is disabled');
         }
         $strategy = new \Costlocker\Integrations\Sync\HarvestToCostlocker($app['client.costlocker'], $app['import.database'], $app['monolog.import']);
@@ -99,12 +105,6 @@ $app
     })
     ->before($checkAuthorization('harvest'))
     ->before($checkAuthorization('costlocker'));
-
-$app
-    ->post('/harvest', function (Request $r) use ($app) {
-        $strategy = new \Costlocker\Integrations\Auth\AuthorizeInHarvest($app['guzzle'], $app['session'], $app['client.user']);
-        return $strategy($r);
-    });
 
 $app
     ->get('/harvest', function (Request $r) use ($app) {

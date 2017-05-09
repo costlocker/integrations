@@ -1,10 +1,9 @@
 import React from 'react';
 
-import HarvestLogin from './HarvestLogin';
-import CostlockerLogin from './CostlockerLogin';
+import OAuthLogin from './OAuthLogin';
 import { FullButton, ExternalLink } from '../Helpers';
 
-export default function Login({ isLoggedIn, auth, goToNextStep, handleHarvestLogin, loginUrl, clLoginError, harvestLoginError }) {
+export default function Login({ isLoggedIn, auth, goToNextStep, loginUrls, clLoginError, harvestLoginError }) {
   let navigation = null;
   if (isLoggedIn) {
       navigation = <div className="row">
@@ -16,22 +15,23 @@ export default function Login({ isLoggedIn, auth, goToNextStep, handleHarvestLog
   return (
     <div>
       {navigation}
-      <div className="row">
+      <div className="row text-center">
         <div className="col-sm-6">
           <h2>Harvest <ExternalLink url="https://getharvest.com" /></h2>
-          <HarvestLogin
+          <OAuthLogin
             title={auth.harvest
               ? <span>Switch account <strong>{auth.harvest.user_name}</strong></span>
               : 'Login to Harvest'}
-            handleHarvestLogin={handleHarvestLogin} loginError={harvestLoginError} />
+            loginError={harvestLoginError}
+            loginUrl={loginUrls.harvest} />
         </div>
-        <div className="col-sm-6 text-center">
+        <div className="col-sm-6">
           <h2>Costlocker <ExternalLink url="https://new.costlocker.com" /></h2>
-          <CostlockerLogin
+          <OAuthLogin
             title={auth.costlocker
               ? <span>Switch account <strong>{auth.costlocker.person.first_name} {auth.costlocker.person.last_name}</strong></span>
               : 'Login to Costlocker'}
-            loginError={clLoginError} loginUrl={loginUrl} />
+            loginError={clLoginError} loginUrl={loginUrls.costlocker} />
         </div>
       </div>
     </div>

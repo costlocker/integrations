@@ -11,7 +11,7 @@ import Results from './harvest/Results';
 import WizardLayout from './wizard/WizardLayout';
 import Steps from './wizard/Steps';
 import { appState, isNotLoggedIn } from './state';
-import { pushToApi, fetchFromApi, loginUrl } from './api';
+import { pushToApi, fetchFromApi, loginUrls } from './api';
 
 const steps = new Steps([
   'Login',
@@ -22,15 +22,6 @@ const steps = new Steps([
   'Summary',
   'Results',
 ]);
-
-const handleHarvestLogin = (props) => pushToApi('/harvest', props)
-  .then(user => appState.cursor().update(
-    (state) => (state
-      .setIn(['auth', 'harvest'], user.harvest)
-      .setIn(['app', 'harvestError'], null)
-    )
-  ))
-  .catch(() => appState.cursor(['app']).set('harvestError', 'Invalid credentials or domain'));
 
 const loadHarvestData = (type) => ([
   {
@@ -76,15 +67,14 @@ export const states = [
   },
   {
     name: 'wizard.1',
-    url: '/1?clLoginError',
+    url: '/1?clLoginError&harvestLoginError',
     component: (props) => <Login
       isLoggedIn={!isNotLoggedIn()}
       auth={appState.cursor(['auth']).deref().toJS()}
-      handleHarvestLogin={handleHarvestLogin}
       goToNextStep={steps.goToNextStep}
-      loginUrl={loginUrl}
+      loginUrls={loginUrls}
       clLoginError={props.transition.params().clLoginError}
-      harvestLoginError={appState.cursor(['app', 'harvestError']).deref()} />,
+      harvestLoginError={props.transition.params().harvestLoginError} />,
     resolve: [
       {
         token: 'loadUser',

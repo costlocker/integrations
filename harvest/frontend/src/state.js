@@ -13,9 +13,6 @@ const appState = immstruct({
     billing: null,
   },
   importResult: null,
-  app: {
-    harvestError: null,
-  }
 });
 
 const isNotLoggedIn = () =>
