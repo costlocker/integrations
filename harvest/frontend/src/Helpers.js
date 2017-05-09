@@ -10,4 +10,24 @@ const FullButton = ({ text, onClick }) => (
   </div>
 );
 
-export { FullButton };
+const Errors = ({ title, error }) => {
+  if (!error) {
+    return null;
+  }
+  return (
+    <div className="panel panel-danger">
+      <div className="panel-heading">
+        {title}
+      </div>
+      <div className="panel-body">
+        {decodeURIComponent(error)}
+      </div>
+    </div>
+  );
+};
+
+const ExternalLink = ({ url }) => (
+  <a href={url} target="_blank"><i className="fa fa-external-link"></i></a>
+);
+
+export { FullButton, Errors, ExternalLink };

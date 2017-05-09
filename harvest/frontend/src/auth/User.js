@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { ExternalLink } from '../Helpers';
+
 const AnonymousUser = () => <em>Not logged in</em>;
 
 const HarvestUser = ({ user }) => {
@@ -10,7 +12,7 @@ const HarvestUser = ({ user }) => {
     <div>
       <strong>
         {user.user_name}
-      </strong> (<a href={user.company_url}>{user.company_name}</a>)
+      </strong> ({user.company_name} <ExternalLink url={user.company_url} />)
     </div>
   );
 };
@@ -28,14 +30,11 @@ const CostlockerUser = ({ user }) => {
   );
 };
 
-const User = ({ auth, isFirstStep }) => {
-  if (isFirstStep) {
-    return null;
-  }
+const User = ({ auth }) => {
   return (
     <div>
-      <HarvestUser user={auth.harvest} />
-      <CostlockerUser user={auth.costlocker} />
+      <div className="text-warning"><HarvestUser user={auth.harvest} /></div>
+      <div className="text-primary"><CostlockerUser user={auth.costlocker} /></div>
     </div>
   );
 };

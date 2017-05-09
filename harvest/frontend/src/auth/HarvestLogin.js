@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import { Errors } from '../Helpers';
+
 export default class extends Component {
   handleSubmit = (e) => {
       e.preventDefault();
@@ -12,6 +14,7 @@ export default class extends Component {
   render() {
     return (
       <form onSubmit={this.handleSubmit}>
+        <Errors title="Login error" error={this.props.loginError} />
         <div className="form-group">
           <label htmlFor="username">Username</label>
           <input ref="username" type="email" className="form-control" id="username" placeholder="Username" />
@@ -28,7 +31,7 @@ export default class extends Component {
           </div>
         </div>
         <div>
-          <button className="btn btn-primary">Login to Harvest</button>
+          <button className="btn btn-primary">{this.props.title}</button>
         </div>
       </form>
     );

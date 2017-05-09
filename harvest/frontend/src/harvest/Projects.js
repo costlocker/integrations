@@ -1,16 +1,21 @@
 import React from 'react';
 
 const ProjectsList = ({ title, projects, goTo }) => {
-  console.log(projects);
   if (!projects.length) {
     return null;
   }
+  const areNew = title === 'New projects' ;
+  const status = areNew ? 'new' : 'imported';
+  const labelClass = areNew ? 'primary' : 'success';
   return (
     <div>
-      <h3>{title}</h3>
-      <ul>
+      <ul title={title}>
         {projects.map(project => (
-          <li key={project.id}><a href="" onClick={(e) => goTo(e, project)}>{project.name}</a></li>
+          <li key={project.id}>
+            <a href="" onClick={(e) => goTo(e, project)}>
+              {project.name}
+            </a> <span className={`label label-${labelClass}`}>{status}</span>
+          </li>
         ))}
       </ul>
     </div>

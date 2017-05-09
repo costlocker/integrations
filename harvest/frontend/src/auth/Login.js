@@ -2,39 +2,36 @@ import React from 'react';
 
 import HarvestLogin from './HarvestLogin';
 import CostlockerLogin from './CostlockerLogin';
-import { HarvestUser, CostlockerUser } from './User';
-import { FullButton } from '../Helpers';
+import { FullButton, ExternalLink } from '../Helpers';
 
-export default function Login({ isLoggedIn, auth, goToNextStep, handleHarvestLogin, loginUrl, clLoginError }) {
-  let navigation = <hr />;
+export default function Login({ isLoggedIn, auth, goToNextStep, handleHarvestLogin, loginUrl, clLoginError, harvestLoginError }) {
+  let navigation = null;
   if (isLoggedIn) {
-      navigation = <FullButton text="Continue to Projects" onClick={goToNextStep} />;
+      navigation = <div className="row">
+        <div className="col-sm-12">
+          <FullButton text="Continue to Projects" onClick={goToNextStep} />
+        </div>
+      </div>;
   }
   return (
     <div>
+      {navigation}
       <div className="row">
         <div className="col-sm-6">
-          <h2>Harvest User</h2>
-          <HarvestUser user={auth.harvest} />
+          <h2>Harvest <ExternalLink url="https://getharvest.com" /></h2>
+          <HarvestLogin
+            title={auth.harvest
+              ? <span>Switch account <strong>{auth.harvest.user_name}</strong></span>
+              : 'Login to Harvest'}
+            handleHarvestLogin={handleHarvestLogin} loginError={harvestLoginError} />
         </div>
-        <div className="col-sm-6">
-          <h2>Costlocker User</h2>
-          <CostlockerUser user={auth.costlocker} />
-        </div>
-      </div>
-      <div className="row">
-        <div className="col-sm-12">
-          {navigation}
-        </div>
-      </div>
-      <div className="row">
-        <div className="col-sm-6">
-          <h2>Change Harvest Account</h2>
-          <HarvestLogin handleHarvestLogin={handleHarvestLogin} />
-        </div>
-        <div className="col-sm-6">
-          <h2>Change Costlocker Account</h2>
-          <CostlockerLogin clLoginError={clLoginError} loginUrl={loginUrl} />
+        <div className="col-sm-6 text-center">
+          <h2>Costlocker <ExternalLink url="https://new.costlocker.com" /></h2>
+          <CostlockerLogin
+            title={auth.costlocker
+              ? <span>Switch account <strong>{auth.costlocker.person.first_name} {auth.costlocker.person.last_name}</strong></span>
+              : 'Login to Costlocker'}
+            loginError={clLoginError} loginUrl={loginUrl} />
         </div>
       </div>
     </div>

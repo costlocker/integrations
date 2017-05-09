@@ -1,10 +1,12 @@
 import React from 'react';
 
-export default function CostlockerLogin({ clLoginError, loginUrl }) {
+import { Errors } from '../Helpers';
+
+export default function CostlockerLogin({ title, loginError, loginUrl }) {
   return (
     <div>
-      {clLoginError ? <p className="bg-danger"><strong>Login error</strong>:<br />{decodeURIComponent(clLoginError)}</p> : ''}
-      <a href={loginUrl} className="btn btn-primary">Login to Costlocker</a>
+      <Errors title="Login error" error={loginError} />
+      <a href={loginUrl} className="btn btn-primary">{title}</a>
     </div>
   );
 };

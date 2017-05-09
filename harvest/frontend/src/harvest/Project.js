@@ -2,33 +2,33 @@ import React from 'react';
 
 export default function Project({ project, data, detailComponent, steps }) {
   let detail = <div>Loading...</div>;
+  let navigation = null;
   if (data !== null) {
-    let navigation = null;
     if (steps.getCurrentTitle() !== 'Summary') {
-      navigation = <div className="row">
-        <div className="col-sm-6 text-left">
-          <button className="btn btn-default" onClick={steps.goToPreviousStep}>Back to {steps.getPreviousTitle()}</button>
+      navigation =
+        <div className="breadcrumb">
+          <div className="row">
+            <div className="col-sm-6 text-left">
+              <button className="btn btn-default btn-sm" onClick={steps.goToPreviousStep}>&larr; Back to {steps.getPreviousTitle()}</button>
+            </div>
+            <div className="col-sm-6 text-right">
+              <button className="btn btn-info btn-sm" onClick={steps.goToNextStep}>Continue to {steps.getNextTitle()} &rarr;</button>
+            </div>
+          </div>
         </div>
-        <div className="col-sm-6 text-right">
-          <button className="btn btn-success" onClick={steps.goToNextStep}>Continue to {steps.getNextTitle()}</button>
-        </div>
-      </div>
     };
-    detail = <div>
-      {navigation}
-      {detailComponent}
-      {navigation}
-    </div>;
+    detail = <div>{detailComponent}</div>;
   }
   return (
     <div>
-      <h1>
+      {navigation}
+      <h1 title={project.id}>
         {project.name}
         <span className="label label-primary" title="Client">{project.client.name}</span>
-        <span className="label label-info" title="Dates">{project.dates.date_start} - {project.dates.date_end}</span>
-        <span className="label label-default" title="ID">{project.id}</span>
+        <span className="label label-warning" title="Dates">{project.dates.date_start} - {project.dates.date_end}</span>
       </h1>
       {detail}
+      {navigation}
     </div>
   );
 };

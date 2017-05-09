@@ -27,8 +27,13 @@ const steps = new Steps(Router, [
 ]);
 
 const handleHarvestLogin = (props) => pushToApi('/harvest', props)
-  .then(user => appState.cursor(['auth']).set('harvest', user.harvest))
-  .catch(() => alert('Invalid credentials'));
+  .then(user => appState.cursor().update(
+    (state) => (state
+      .setIn(['auth', 'harvest'], user.harvest)
+      .setIn(['app', 'harvestError'], null)
+    )
+  ))
+  .catch(() => appState.cursor(['app']).set('harvestError', 'Invalid credentials or domain'));
 
 const loadHarvestData = (type) => ([
   {
@@ -81,7 +86,8 @@ const states = [
       handleHarvestLogin={handleHarvestLogin}
       goToNextStep={steps.goToNextStep}
       loginUrl={loginUrl}
-      clLoginError={props.transition.params().clLoginError} />,
+      clLoginError={props.transition.params().clLoginError}
+      harvestLoginError={appState.cursor(['app', 'harvestError']).deref()} />,
     resolve: [
       {
         token: 'loadUser',
