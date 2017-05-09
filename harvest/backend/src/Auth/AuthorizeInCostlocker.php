@@ -56,9 +56,14 @@ class AuthorizeInCostlocker
                     'code' => $r->query->get('code')
                 ]);
                 $resourceOwner = $this->provider->getResourceOwner($accessToken);
+                $costlockerUser = $resourceOwner->toArray()['data'];
+                $costockerRole = $costlockerUser['person']['role'];
+                if (!in_array($costockerRole, ['OWNER', 'ADMIN'])) {
+                    return $this->sendError("Only ADMIN or OWNER can import project, you are {$costockerRole}");
+                }
                 $this->session->remove('costlockerLogin');
                 $this->session->set('costlocker', [
-                    'account' => $resourceOwner->toArray()['data'],
+                    'account' => $costlockerUser,
                     'accessToken' => $accessToken->jsonSerialize(),
                 ]);
                 return new RedirectResponse($this->appUrl);
