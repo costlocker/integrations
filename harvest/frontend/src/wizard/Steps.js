@@ -1,7 +1,6 @@
 
 export default class Steps {
-  constructor(router, titles) {
-    this.router = router;
+  constructor(titles) {
     this.currentStep = 1;
     this.titles = titles;
   }
@@ -39,6 +38,6 @@ export default class Steps {
       e.preventDefault();
     }
     this.currentStep = step;
-    this.router.stateService.go(`wizard.${step}`, undefined, { location: true });
+    this.redirectToRoute(`wizard.${step}`);
   }
 }

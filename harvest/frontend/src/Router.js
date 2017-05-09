@@ -1,6 +1,4 @@
 import React from 'react';
-import { UIRouterReact, servicesPlugin, pushStateLocationPlugin } from 'ui-router-react';
-import { Visualizer } from 'ui-router-visualizer';
 
 import Login from './auth/Login';
 import Projects from './harvest/Projects';
@@ -15,8 +13,7 @@ import Steps from './wizard/Steps';
 import { appState, isNotLoggedIn } from './state';
 import { pushToApi, fetchFromApi, loginUrl } from './api';
 
-const Router = new UIRouterReact();
-const steps = new Steps(Router, [
+const steps = new Steps([
   'Login',
   'Projects',
   'People costs',
@@ -63,7 +60,7 @@ const buildHarvestProjectStep = (step, type, component) => ({
   resolve: type ? loadHarvestData(type) : [],
 });
 
-const states = [
+export const states = [
   {
     name: 'homepage',
     url: '/',
@@ -165,8 +162,6 @@ const states = [
   },
 ];
 
-let plugins = [servicesPlugin, pushStateLocationPlugin, Visualizer];
-
 const hooks = [
   {
     event: 'onBefore',
@@ -199,9 +194,8 @@ const hooks = [
   },
 ];
 
-plugins.forEach(plugin => Router.plugin(plugin));
-states.forEach(state => Router.stateRegistry.register(state));
-hooks.forEach(hook => Router.transitionService[hook.event](hook.criteria, hook.callback, { priority: hook.priority }));
-Router.urlRouter.otherwise(() => '/');
-
-export { Router };
+export const config = (router) => {
+  router.urlRouter.otherwise(() => '/');
+  steps.redirectToRoute = (route) => router.stateService.go(route, undefined, { location: true });
+  hooks.forEach(hook => router.transitionService[hook.event](hook.criteria, hook.callback, { priority: hook.priority }));
+}
