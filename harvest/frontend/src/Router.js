@@ -108,13 +108,14 @@ const states = [
     url: '/2',
     component: () => {
       const goTo = (project) => {
-        appState.cursor(['harvest']).update(
-          harvest => harvest
-            .set('selectedProject', project)
-            .set('peoplecosts', null)
-            .set('expenses', null)
-            .set('billing', null)
-        );
+        appState.cursor().update(
+          state => state
+            .setIn(['importResult'], null)
+            .updateIn(['harvest'], harvest => harvest
+              .set('selectedProject', project)
+              .set('peoplecosts', null)
+              .set('expenses', null)
+              .set('billing', null)));
         steps.goToNextStep();
       };
       return <Projects projects={appState.cursor(['harvest', 'projects']).deref()} goToProject={goTo} />;
