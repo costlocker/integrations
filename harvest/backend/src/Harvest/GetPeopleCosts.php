@@ -51,7 +51,7 @@ class GetPeopleCosts
                                         'billed_rate' => $person['billed_rate'],
                                     ],
                                     'hours' => [
-                                        'budget' => $person['projected_hours'],
+                                        'budget' => $person['projected_hours'] ?? $person['total_hours'],
                                         'tracked' => $person['total_hours'],
                                     ],
                                     'person' => $users[$person['user_id']],
@@ -71,7 +71,7 @@ class GetPeopleCosts
                             'billed_rate' => $person['billed_rate'],
                         ],
                         'hours' => [
-                            'budget' => $person['projected_hours'],
+                            'budget' => $person['projected_hours'] ?? $person['total_hours'],
                             'tracked' => $person['total_hours'],
                         ],
                         'person' => $users[$person['user_id']],
