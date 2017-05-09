@@ -5,10 +5,22 @@
     },
     "data": [
         {
-            "uuid": "8a557308-21b1-47b8-a2e8-8a64be8f9a62"
+            "uuid": "8a557308-21b1-47b8-a2e8-8a64be8f9a62",
+            "assignment": {
+                "project_id": "2367",
+                "activity_id": 462,
+                "person_id": 502,
+                "task_id": null
+            }
         },
         {
-            "uuid": "71c01a0a-78bc-47bb-887b-df477220bf41"
+            "uuid": "71c01a0a-78bc-47bb-887b-df477220bf41",
+            "assignment": {
+                "project_id": "2367",
+                "activity_id": 463,
+                "person_id": 502,
+                "task_id": null
+            }
         }
     ]
 }
