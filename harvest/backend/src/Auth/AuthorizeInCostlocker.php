@@ -38,6 +38,9 @@ class AuthorizeInCostlocker
 
     public function __invoke(Request $r)
     {
+        if (getenv('CL_CLIENT_SECRET')) {
+            return $this->sendError('Remote login is not activated.');
+        }
         if (!$r->query->get('code') && !$r->query->get('error')) {
             // getState must be called after getAuthorizationUrl
             $url = $this->provider->getAuthorizationUrl();
