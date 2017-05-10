@@ -4,17 +4,20 @@ namespace Costlocker\Integrations\Auth;
 
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Costlocker\Integrations\CostlockerClient;
+use Costlocker\Integrations\HarvestClient;
 use Costlocker\Integrations\Api\ResponseHelper;
 
 class CheckAuthorization
 {
     private $session;
-    private $client;
+    private $costlockerClient;
+    private $harvestClient;
 
-    public function __construct(SessionInterface $s, CostlockerClient $c)
+    public function __construct(SessionInterface $s, CostlockerClient $c, HarvestClient $h)
     {
         $this->session = $s;
-        $this->client = $c;
+        $this->costlockerClient = $c;
+        $this->harvestClient = $h;
     }
 
     public function checkAccount($service)
@@ -24,13 +27,18 @@ class CheckAuthorization
         }
     }
 
-    public function verifyCostlockerToken()
+    public function verifyTokens()
     {
-        $costlocker = $this->session->get('costlocker');
-        if ($costlocker) {
-            $response = $this->client->__invoke('/me');
+        $this->verifyToken('costlocker', $this->costlockerClient, '__invoke', '/me');
+        $this->verifyToken('harvest', $this->harvestClient, 'getResponse', '/account/who_am_i');
+    }
+
+    private function verifyToken($service, $client, $method, $endpoint)
+    {
+        if (!$this->checkAccount($service)) {
+            $response = $client->{$method}($endpoint);
             if ($response->getStatusCode() !== 200) {
-                $this->session->remove('costlocker');
+                $this->session->remove($service);
             }
         }
     }

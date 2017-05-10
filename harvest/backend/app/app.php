@@ -45,12 +45,20 @@ $app['client.costlocker'] = function ($app) {
     return new \Costlocker\Integrations\CostlockerClient($app['guzzle'], $app['client.user'], getenv('CL_HOST'));
 };
 
+$app['client.harvest'] = function ($app) {
+    return new Costlocker\Integrations\HarvestClient($app['guzzle.cached'], $app['client.user']);
+};
+
 $app['client.user'] = function ($app) {
     return new Costlocker\Integrations\Auth\GetUser($app['session']);
 };
 
 $app['client.check'] = function ($app) {
-    return new Costlocker\Integrations\Auth\CheckAuthorization($app['session'], $app['client.costlocker']);
+    return new Costlocker\Integrations\Auth\CheckAuthorization(
+        $app['session'],
+        $app['client.costlocker'],
+        $app['client.harvest']
+    );
 };
 
 $checkAuthorization = function ($service) use ($app) {
@@ -66,7 +74,7 @@ $app['import.database'] = function ($app) {
 
 $app
     ->get('/user', function () use ($app) {
-        $app['client.check']->verifyCostlockerToken();
+        $app['client.check']->verifyTokens();
         return $app['client.user']();
     });
 
@@ -99,13 +107,8 @@ $app
 
 $app
     ->get('/harvest', function (Request $r) use ($app) {
-        $apiClient = new Costlocker\Integrations\HarvestClient(
-            $app['guzzle.cached'],
-            $app['client.user']->getHarvestUrl(),
-            $app['client.user']->getHarvestAuthorization()
-        );
         $strategy = new Costlocker\Integrations\Harvest\GetDataFromHarvest($app['import.database']);
-        $data = $strategy($r, $apiClient);
+        $data = $strategy($r, $app['client.harvest']);
         return new JsonResponse($data);
     })
     ->before($checkAuthorization('harvest'));

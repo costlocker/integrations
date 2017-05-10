@@ -3,31 +3,34 @@
 namespace Costlocker\Integrations;
 
 use GuzzleHttp\Client;
+use Costlocker\Integrations\Auth\GetUser;
 
 class HarvestClient
 {
     private $client;
-    private $domain;
-    private $authHeader;
+    private $getUser;
 
-    public function __construct(Client $client, $domain, $authHeader)
+    public function __construct(Client $c, GetUser $u)
     {
-        $this->client = $client;
-        $this->domain = $domain;
-        $this->authHeader = $authHeader;
+        $this->client = $c;
+        $this->getUser = $u;
     }
 
-    public function __invoke($path, $returnStatusCode = false)
+    public function __invoke($path)
     {
-        $response = $this->client->get("{$this->domain}{$path}", [
+        $response = $this->getResponse($path);
+        return json_decode($response->getBody(), true);
+    }
+
+    public function getResponse($path)
+    {
+        return $this->client->get("{$this->getUser->getHarvestUrl()}{$path}", [
             'http_errors' => false,
             'headers' => [
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
-                'Authorization' => $this->authHeader,
+                'Authorization' => $this->getUser->getHarvestAuthorization(),
             ],
         ]);
-        $json = json_decode($response->getBody(), true);
-        return $returnStatusCode ? [$response->getStatusCode(), $json] : $json;
     }
 }
