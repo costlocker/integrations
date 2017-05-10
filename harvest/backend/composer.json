@@ -18,6 +18,7 @@
         "vlucas/phpdotenv": "^2.4",
         "silex/silex": "^2.0",
         "monolog/monolog": "^1.22",
+        "sentry/sentry": "^1.6",
         "guzzlehttp/guzzle": "^6.2",
         "league/oauth2-client": "^2.2",
         "kevinrob/guzzle-cache-middleware": "^2.0",
