@@ -1,0 +1,15 @@
+version: "2"
+
+services:
+    application:
+        container_name: harvest-costlocker
+        build:
+            context: .
+            dockerfile: ./.docker/Dockerfile
+        # env variables aren't accessible in APACHE/nginx, use backend/.env for cofiguration
+        ports:
+            - "19991:80"
+        volumes:
+            - "./backend/var/sessions:/app/backend/var/sessions"
+            - "./backend/var/database:/app/backend/var/database"
+            - "./backend/var/log:/app/backend/var/log"

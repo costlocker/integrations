@@ -3,3 +3,4 @@ var
 vendor
 .env
 phpunit.xml
+docker-compose.yml
