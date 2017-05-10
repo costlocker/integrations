@@ -13,7 +13,9 @@ class GetPeopleCosts
 
         $taskPersons = [];
         foreach ($rawProject['tasks'] as $task) {
-            $taskPersons[$task['task_id']] = $apiClient("/projects/{$r->query->get('peoplecosts')}/team_analysis?task_id={$task['task_id']}&period=lifespan");
+            $taskPersons[$task['task_id']] = $apiClient(
+                "/projects/{$r->query->get('peoplecosts')}/team_analysis?task_id={$task['task_id']}&period=lifespan"
+            );
         }
 
         $users = [];

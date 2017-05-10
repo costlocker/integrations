@@ -146,8 +146,13 @@ class HarvestToCostlocker
         return [];
     }
 
-    private function log(Request $r, array $requests, JsonResponse $response, Response $projectResponse, Response $timeentriesResponse = null)
-    {
+    private function log(
+        Request $r,
+        array $requests,
+        JsonResponse $response,
+        Response $projectResponse,
+        Response $timeentriesResponse = null
+    ) {
         $responseToLog = function (Response $res = null) {
             if (!$res) {
                 return null;

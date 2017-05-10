@@ -14,7 +14,8 @@ class GetProjects
     {
         $this->database = $d;
     }
-    
+
+    /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
     public function __invoke(Request $r, HarvestClient $apiClient)
     {
         $clients = [];

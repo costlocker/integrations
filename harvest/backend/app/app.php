@@ -100,7 +100,11 @@ $app
         if (getenv('APP_IMPORT_DISABLED') == 'true') {
             return ResponseHelper::error('Import is disabled');
         }
-        $strategy = new \Costlocker\Integrations\Sync\HarvestToCostlocker($app['client.costlocker'], $app['import.database'], $app['monolog.import']);
+        $strategy = new \Costlocker\Integrations\Sync\HarvestToCostlocker(
+            $app['client.costlocker'],
+            $app['import.database'],
+            $app['monolog.import']
+        );
         return $strategy($r);
     })
     ->before($checkAuthorization('harvest'))

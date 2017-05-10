@@ -20,10 +20,7 @@ class GetExpenses
             function (array $expense) use ($categories) {
                 return [
                     'id' => $expense['expense']['id'],
-                    'description' =>
-                        "{$expense['expense']['units']}x " .
-                        $categories[$expense['expense']['expense_category_id']] .
-                        ($expense['expense']['notes'] ? " ({$expense['expense']['notes']})" : ''),
+                    'description' => $this->expenseToDescription($expense, $categories),
                     'purchased' => [
                         'total_amount' => $expense['expense']['total_cost'],
                         'date' => $expense['expense']['spent_at'],
@@ -35,5 +32,12 @@ class GetExpenses
             },
             $expenses
         );
+    }
+
+    private function expenseToDescription(array $expense, array $categories)
+    {
+        return "{$expense['expense']['units']}x " .
+            $categories[$expense['expense']['expense_category_id']] .
+            ($expense['expense']['notes'] ? " ({$expense['expense']['notes']})" : '');
     }
 }

@@ -96,6 +96,7 @@ class CostlockerTest extends GivenApi
         $this->givenLoggedUser();
         $this->whenApiIsCalled()
             ->andReturnUsing(function ($method, $url, array $data) {
+                assertThat($method, is('post'));
                 $versionPosition = strpos($url, 'v2');
                 $path = trim(substr($url, $versionPosition + 2), '/');
                 $this->requests[$path] = $data['json'];
