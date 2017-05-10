@@ -8,6 +8,7 @@
 ```
 cd backend
 composer install
+cp .env.example .env
 ```
 
 ### Frontend
@@ -15,6 +16,7 @@ composer install
 ```
 cd frontend
 yarn install
+cp .env.example .env
 ```
 
 ### Apache VirtualHost example
