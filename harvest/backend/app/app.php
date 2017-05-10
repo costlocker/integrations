@@ -12,49 +12,12 @@ $dotenv->load();
 $app = new Silex\Application();
 $app['debug'] = getenv('APP_ENV') !== 'production';
 
-\Symfony\Component\Debug\ErrorHandler::register();
-$getLogFile = function ($file) {
-    $env = getenv('APP_ENV');
-    return __DIR__ . "/../var/log/{$env}-{$file}.log";
-};
-$app->register(new Silex\Provider\MonologServiceProvider(), [
-    'monolog.logfile' => $getLogFile('app'),
-    'monolog.level' => Monolog\Logger::NOTICE,
-    'monolog.dsn' => getenv('APP_SENTRYLOG_DSN'),
-    'monolog.handler' => function (Silex\Application $app) {
-        $dsn = $app['monolog.dsn'];
-        if (!$dsn) {
-            return new \Monolog\Handler\StreamHandler($app['monolog.logfile']);
-        }
-        $level = \Silex\Provider\MonologServiceProvider::translateLevel($app['monolog.level']);
-        return new \Monolog\Handler\RavenHandler(
-            new Raven_Client($app['monolog.dsn'], [
-                'environment' => getenv('APP_ENV'),
-                'tags' => [
-                    'app' => 'harvest',
-                    'php_version' => phpversion(),
-                ],
-            ]),
-            $level,
-            $app['monolog.bubble']
-        );
-    }
-]);
-$app['monolog.import'] = function ($app) use ($getLogFile) {
-    $handlers = [
-        new \Monolog\Handler\StreamHandler($getLogFile('import'))
-    ];
-    if ($app['monolog.dsn']) {
-        $handlers[] = $app['monolog.handler'];
-    }
-    return new \Monolog\Logger('import', $handlers);
-};
 $app->register(new Silex\Provider\SessionServiceProvider(), [
     'session.test' => getenv('APP_ENV') === 'test',
     'session.storage.save_path' => __DIR__ . '/../var/sessions/'
 ]);
-
-$app->before(new Costlocker\Integrations\Api\DecodeJsonRequest());
+$app->register(new \Costlocker\Integrations\Api\LogErrorsAndExceptions(__DIR__ . '/../var/log'));
+$app->before(new \Costlocker\Integrations\Api\DecodeJsonRequest());
 $app->error(new \Costlocker\Integrations\Api\ConvertExceptionToJson());
 
 $app['guzzle'] = function () {
