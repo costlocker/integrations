@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom';
 import { UIRouter, UIView, pushStateLocationPlugin } from 'ui-router-react';
 import { Visualizer } from 'ui-router-visualizer';
 
+import { isDevelopmentMode } from './config';
 import { appState } from './state';
 import { states, config } from './Router';
 
-const isDevelopmentMode = true;
 export const plugins = isDevelopmentMode ? [pushStateLocationPlugin, Visualizer] : [pushStateLocationPlugin];
 
 const render = () =>

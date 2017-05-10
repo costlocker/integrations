@@ -1,5 +1,6 @@
 
-const apiUrl = 'http://harvest-costlocker.dev/api';
+import { apiUrl } from './config';
+
 const loginUrls = {
   costlocker: `${apiUrl}/oauth/costlocker`,
   harvest: `${apiUrl}/oauth/harvest`,
