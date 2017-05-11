@@ -1,0 +1,199 @@
+{
+    "project": {
+        "id": 13875889,
+        "client_id": 5583367,
+        "name": "Task hourly rate + no budget",
+        "code": "",
+        "active": true,
+        "billable": true,
+        "bill_by": "Tasks",
+        "budget": null,
+        "budget_by": "none",
+        "notify_when_over_budget": false,
+        "over_budget_notification_percentage": 80,
+        "over_budget_notified_at": null,
+        "show_budget_to_all": false,
+        "created_at": "2017-05-09T09:50:32Z",
+        "updated_at": "2017-05-11T04:44:06Z",
+        "starts_on": null,
+        "ends_on": null,
+        "estimate": null,
+        "estimate_by": "none",
+        "hint_earliest_record_at": null,
+        "hint_latest_record_at": null,
+        "notes": "",
+        "hourly_rate": null,
+        "cost_budget": null,
+        "cost_budget_include_expenses": false
+    },
+    "analysis": {
+        "detailed_report_url": "\/reports\/detailed\/131\/2017\/131\/2017\/any\/any\/13875889\/5583367\/ign\/ign\/any",
+        "billable_detailed_report_url": "\/reports\/detailed\/131\/2017\/131\/2017\/any\/any\/13875889\/5583367\/yes\/ign\/any",
+        "nonbillable_detailed_report_url": "\/reports\/detailed\/131\/2017\/131\/2017\/any\/any\/13875889\/5583367\/no\/ign\/any",
+        "tasks": [
+            {
+                "task_id": 7837777,
+                "name": "Programming",
+                "billable": true,
+                "archived": false,
+                "total_hours": 0,
+                "billable_hours": 0,
+                "billed_rate": 100,
+                "billable_amount": 0,
+                "internal_cost": 0,
+                "detailed_report_url": "\/reports\/detailed\/131\/2017\/131\/2017\/any\/7837777\/13875889\/5583367\/yes\/ign\/any",
+                "budget": null,
+                "budget_spent": 0,
+                "budget_left": null,
+                "over_budget": null,
+                "over_budget_percentage": null,
+                "budget_spent_percentage": null
+            },
+            {
+                "task_id": 7837779,
+                "name": "Project Management",
+                "billable": true,
+                "archived": false,
+                "total_hours": 0,
+                "billable_hours": 0,
+                "billed_rate": 200,
+                "billable_amount": 0,
+                "internal_cost": 0,
+                "detailed_report_url": "\/reports\/detailed\/131\/2017\/131\/2017\/any\/7837779\/13875889\/5583367\/yes\/ign\/any",
+                "budget": null,
+                "budget_spent": 0,
+                "budget_left": null,
+                "over_budget": null,
+                "over_budget_percentage": null,
+                "budget_spent_percentage": null
+            },
+            {
+                "task_id": 7837780,
+                "name": "Business Development",
+                "billable": false,
+                "archived": false,
+                "total_hours": 0,
+                "billable_hours": 0,
+                "billed_rate": 0,
+                "billable_amount": 0,
+                "internal_cost": 0,
+                "detailed_report_url": "\/reports\/detailed\/131\/2017\/131\/2017\/any\/7837780\/13875889\/5583367\/no\/ign\/any",
+                "budget": null,
+                "budget_spent": 0,
+                "budget_left": null,
+                "over_budget": null,
+                "over_budget_percentage": null,
+                "budget_spent_percentage": null
+            }
+        ],
+        "team_members": [
+            {
+                "user_id": 1601155,
+                "avatar_url": "https:\/\/cache.harvestapp.com\/assets\/profile_images\/cornell_clock_tower.png?1494323398",
+                "full_name": "Tester Testrovi\u010d",
+                "is_project_manager": true,
+                "archived": false,
+                "total_hours": 0,
+                "billable_hours": 0,
+                "billed_rate": 0,
+                "billable_amount": 0,
+                "cost_rate": null,
+                "internal_cost": 0,
+                "detailed_report_url": "\/reports\/detailed\/131\/2017\/131\/2017\/1601155\/any\/13875889\/5583367\/ign\/ign\/any",
+                "budget": null,
+                "budget_left": null,
+                "over_budget": null,
+                "over_budget_percentage": null,
+                "budget_spent_percentage": null
+            }
+        ]
+    },
+    "tasks": {
+        "7837777": [
+            {
+                "user_id": 1601155,
+                "avatar_url": "https:\/\/cache.harvestapp.com\/assets\/profile_images\/cornell_clock_tower.png?1494323398",
+                "full_name": "Tester Testrovi\u010d",
+                "is_project_manager": true,
+                "archived": false,
+                "total_hours": 0,
+                "billable_hours": 0,
+                "billed_rate": 0,
+                "billable_amount": 0,
+                "cost_rate": null,
+                "internal_cost": 0,
+                "detailed_report_url": "\/reports\/detailed\/131\/2017\/131\/2017\/1601155\/7837777\/13875889\/5583367\/ign\/ign\/any",
+                "budget": null,
+                "budget_left": null,
+                "over_budget": null,
+                "over_budget_percentage": null,
+                "budget_spent_percentage": null
+            }
+        ],
+        "7837779": [
+            {
+                "user_id": 1601155,
+                "avatar_url": "https:\/\/cache.harvestapp.com\/assets\/profile_images\/cornell_clock_tower.png?1494323398",
+                "full_name": "Tester Testrovi\u010d",
+                "is_project_manager": true,
+                "archived": false,
+                "total_hours": 0,
+                "billable_hours": 0,
+                "billed_rate": 0,
+                "billable_amount": 0,
+                "cost_rate": null,
+                "internal_cost": 0,
+                "detailed_report_url": "\/reports\/detailed\/131\/2017\/131\/2017\/1601155\/7837779\/13875889\/5583367\/ign\/ign\/any",
+                "budget": null,
+                "budget_left": null,
+                "over_budget": null,
+                "over_budget_percentage": null,
+                "budget_spent_percentage": null
+            }
+        ],
+        "7837780": [
+            {
+                "user_id": 1601155,
+                "avatar_url": "https:\/\/cache.harvestapp.com\/assets\/profile_images\/cornell_clock_tower.png?1494323398",
+                "full_name": "Tester Testrovi\u010d",
+                "is_project_manager": true,
+                "archived": false,
+                "total_hours": 0,
+                "billable_hours": 0,
+                "billed_rate": 0,
+                "billable_amount": 0,
+                "cost_rate": null,
+                "internal_cost": 0,
+                "detailed_report_url": "\/reports\/detailed\/131\/2017\/131\/2017\/1601155\/7837780\/13875889\/5583367\/ign\/ign\/any",
+                "budget": null,
+                "budget_left": null,
+                "over_budget": null,
+                "over_budget_percentage": null,
+                "budget_spent_percentage": null
+            }
+        ]
+    },
+    "people": [
+        {
+            "user": {
+                "id": 1601155,
+                "email": "zdenek.drahos+oauthtest@atoto.cz",
+                "created_at": "2017-05-09T09:49:56Z",
+                "is_admin": true,
+                "first_name": "Tester",
+                "last_name": "Testrovi\u010d",
+                "timezone": "Berlin",
+                "is_contractor": false,
+                "telephone": "",
+                "is_active": true,
+                "has_access_to_all_future_projects": false,
+                "default_hourly_rate": 0,
+                "department": null,
+                "wants_newsletter": true,
+                "updated_at": "2017-05-09T09:49:56Z",
+                "cost_rate": null,
+                "weekly_capacity": 126000
+            }
+        }
+    ]
+}
