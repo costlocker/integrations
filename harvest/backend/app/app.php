@@ -76,7 +76,8 @@ $app
     ->get('/user', function () use ($app) {
         $app['client.check']->verifyTokens();
         return $app['client.user']();
-    });
+    })
+    ->after(new Costlocker\Integrations\Auth\FakeCostlockerAuthorization($app['session']));
 
 $app
     ->get('/oauth/costlocker', function (Request $r) use ($app) {
