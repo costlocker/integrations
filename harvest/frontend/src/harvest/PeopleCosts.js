@@ -50,8 +50,14 @@ const PeopleCosts = ({ peopleCosts, project }) => {
       <h2>Harvest Project</h2>
       <div className="row">
         <ul>
-          <li>Invoiced by: <strong>{project.finance.bill_by}</strong></li>
-          <li>Budget by: <strong>{project.finance.budget_by}</strong></li>
+          <li>
+            <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods/#setting-up-an-invoice-method" target="_blank">Invoiced by</a>
+            <em> (client rates)</em>: <strong>{project.finance.bill_by}</strong>
+          </li>
+          <li>
+            <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods/#setting-up-a-budget" target="_blank">Budget by</a>
+            <em> (estimated hours)</em>: <strong>{project.finance.budget_by}</strong>
+          </li>
         </ul>
       </div>
       <h2>Tasks, Team &rarr; Activities, People</h2>
