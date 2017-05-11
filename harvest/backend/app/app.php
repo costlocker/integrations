@@ -10,7 +10,7 @@ $dotenv = new Dotenv\Dotenv(__DIR__ . '/../');
 $dotenv->load();
 
 $app = new Silex\Application();
-$app['debug'] = getenv('APP_ENV') !== 'production';
+$app['debug'] = in_array(getenv('APP_ENV'), ['local', 'test']);
 
 $app->register(new Silex\Provider\SessionServiceProvider(), [
     'session.test' => getenv('APP_ENV') === 'test',
