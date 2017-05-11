@@ -23,7 +23,7 @@ class CheckAuthorization
     public function checkAccount($service)
     {
         if (!$this->session->get($service)) {
-            return ResponseHelper::error("Unathorized in {$service}", 401);
+            return ResponseHelper::error("Unauthorized in {$service}", 401);
         }
     }
 
