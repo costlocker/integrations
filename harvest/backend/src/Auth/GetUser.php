@@ -42,6 +42,11 @@ class GetUser
         return $this->session->get('costlocker')['account']['person']['email'];
     }
 
+    public function getCostlockerCompanyId()
+    {
+        return $this->session->get('costlocker')['account']['company']['id'];
+    }
+
     public function getCostlockerAccessToken()
     {
         return $this->session->get('costlocker')['accessToken']['access_token'];

@@ -24,14 +24,14 @@ class ImportDatabase
     {
         $this->loadDatabase();
         $harvestProjectId = $projectRequest['harvest'];
-        $currentProject = $this->currentCompany['projects'][$harvestProjectId] ?? ['id' => $costlockerProject['id']];
-        $this->currentCompany['projects'][$harvestProjectId] = $this->updateItemsMapping(
+        $currentProject = $this->getCurrentProjects()[$harvestProjectId] ?? ['id' => $costlockerProject['id']];
+        $mapping = $this->updateItemsMapping(
             $currentProject,
             $projectRequest['items'],
             $costlockerProject['items'],
             $costlockerTimeentries
         );
-        $this->persist();
+        $this->updateProject($harvestProjectId, $mapping);
     }
 
     private function updateItemsMapping(array $mapping, array $requestItems, array $responseItems, array $timeentries)
@@ -68,7 +68,7 @@ class ImportDatabase
     public function getProjectId($projectId)
     {
         $this->loadDatabase();
-        $costlockerId = $this->currentCompany['projects'][$projectId]['id'] ?? null;
+        $costlockerId = $this->getCurrentProjects()[$projectId]['id'] ?? null;
         return $costlockerId ? ['id' => $costlockerId] : [];
     }
 
@@ -100,7 +100,7 @@ class ImportDatabase
         $this->loadDatabase();
         $result = [];
         foreach ($fields as $group => list($field, $id)) {
-            $mapping = $this->currentCompany['projects'][$projectId][$group] ?? [];
+            $mapping = $this->getCurrentProjects()[$projectId][$group] ?? [];
             if (array_key_exists($id, $mapping)) {
                 $result += [$field => $mapping[$id]];
             }
@@ -111,13 +111,24 @@ class ImportDatabase
     public function separateProjectsByStatus(array $projects)
     {
         $this->loadDatabase();
-        $mappedProjects = array_keys($this->currentCompany['projects'] ?? []);
+        $mappedProjects = array_keys($this->getCurrentProjects());
         $result = ['new' => [], 'imported' => []];
         foreach ($projects as $project) {
             $status = in_array($project['id'], $mappedProjects) ? 'imported' : 'new';
             $result[$status][] = $project;
         }
         return $result;
+    }
+
+    private function getCurrentProjects()
+    {
+        return $this->currentCompany[$this->user->getCostlockerCompanyId()]['projects'] ?? [];
+    }
+
+    private function updateProject($harvestId, array $mapping)
+    {
+        $this->currentCompany[$this->user->getCostlockerCompanyId()]['projects'][$harvestId] = $mapping;
+        $this->persist();
     }
 
     private function loadDatabase()

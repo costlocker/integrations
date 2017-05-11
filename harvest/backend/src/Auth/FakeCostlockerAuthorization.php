@@ -24,6 +24,7 @@ class FakeCostlockerAuthorization
                     'last_name' => 'User',
                 ],
                 'company' => [
+                    'id' => null,
                     'name' => 'No company',
                 ],
             ];

@@ -122,6 +122,9 @@ class CostlockerTest extends GivenApi
                 'person' => [
                     'email' => 'irrelevant email',
                 ],
+                'company' => [
+                    'id' => 'company-id-from-costlocker',
+                ],
             ],
             'accessToken' => [
                 'access_token' => 'irrelevant access token',

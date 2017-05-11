@@ -12,6 +12,7 @@ class ImportDatabaseTest extends \PHPUnit_Framework_TestCase
         $database = new ImportDatabase(
             m::mock(GetUser::class)
                 ->shouldReceive('getHarvestSubdomain')->once()->andReturn('company-that-was-never-imported')
+                ->shouldReceive('getCostlockerCompanyId')->atLeast()->once()->andReturn('irrelevant-costlocker-id')
                 ->getMock(),
             __DIR__ . '/fixtures'
         );
