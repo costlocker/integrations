@@ -162,8 +162,13 @@ class HarvestToCostlocker
                 'body' => (string) $res->getBody(),
             ];
         };
+        $isPsrOk = function (Response $res = null) {
+            return $res && $res->getStatusCode() == 200;
+        };
         $this->logger->log(
-            $response->isOk() ? Logger::INFO : Logger::ERROR,
+            $isPsrOk($projectResponse)
+                ? ($isPsrOk($timeentriesResponse) ? Logger::INFO : Logger::WARNING)
+                : Logger::ERROR,
             'Import',
             [
                 'requests' => [
