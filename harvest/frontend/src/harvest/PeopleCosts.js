@@ -44,9 +44,16 @@ const CostlockerCosts = ({ peopleCosts }) => {
   )
 };
 
-const PeopleCosts = ({ peopleCosts }) => {
+const PeopleCosts = ({ peopleCosts, project }) => {
   return (
     <div>
+      <h2>Harvest Project</h2>
+      <div className="row">
+        <ul>
+          <li>Invoiced by: <strong>{project.finance.bill_by}</strong></li>
+          <li>Budget by: <strong>{project.finance.budget_by}</strong></li>
+        </ul>
+      </div>
       <h2>Tasks, Team &rarr; Activities, People</h2>
       <div className="row">
         <div className="col-sm-6">

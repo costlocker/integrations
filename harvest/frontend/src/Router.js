@@ -117,7 +117,8 @@ export const states = [
       }
     ]
   },
-  buildHarvestProjectStep(3, 'peoplecosts', data => <PeopleCosts peopleCosts={data} />),
+  buildHarvestProjectStep(3, 'peoplecosts', data => <PeopleCosts
+    peopleCosts={data} project={appState.cursor(['harvest', 'selectedProject']).deref()} />),
   buildHarvestProjectStep(4, 'expenses', data => <Expenses expenses={data} />),
   buildHarvestProjectStep(5, 'billing', data => <Billing billing={data} />),
   buildHarvestProjectStep(6, null, data => <Summary project={data} goToNextStep={steps.goToNextStep} />),
