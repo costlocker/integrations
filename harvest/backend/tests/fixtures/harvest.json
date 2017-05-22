@@ -154,14 +154,16 @@
                 "description": "#2",
                 "total_amount": 800,
                 "date": "2017-05-03",
-                "is_invoiced": false
+                "is_sent": false,
+                "state": "draft"
             },
             {
                 "id": 12613594,
                 "description": "#1 Hello world",
                 "total_amount": 12300,
                 "date": "2017-04-29",
-                "is_invoiced": true
+                "is_sent": true,
+                "state": "paid"
             }
         ]
     }

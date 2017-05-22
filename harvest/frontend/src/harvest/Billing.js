@@ -35,7 +35,8 @@ const Billing = ({ billing }) => {
             <th>Invoice</th>
             <th>Date</th>
             <th>Amount [$]</th>
-            <th>Is invoiced?</th>
+            <th>Status</th>
+            <th>Is sent?</th>
           </tr>
         </thead>
         <tbody>
@@ -44,7 +45,8 @@ const Billing = ({ billing }) => {
               <th title={bill.id}>{bill.description}</th>
               <td>{bill.date}</td>
               <td>{bill.total_amount}</td>
-              <td>{bill.is_invoiced ? 'yes' : 'no'}</td>
+              <td>{bill.state}</td>
+              <td>{bill.is_sent ? 'yes' : 'no'}</td>
             </tr>
           ))}
         </tbody>

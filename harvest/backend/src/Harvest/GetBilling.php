@@ -19,9 +19,9 @@ class GetBilling
         ];
         $invoices = array_map(
             function (array $invoice) use (&$stats) {
-                $isInvoiced = $invoice['invoices']['state'] == 'paid';
+                $isSent = $invoice['invoices']['state'] != 'draft';
                 $amount = $invoice['invoices']['amount'];
-                if ($isInvoiced) {
+                if ($isSent) {
                     $stats['sent'] += $amount;
                 } else {
                     $stats['draft'] += $amount;
@@ -33,7 +33,8 @@ class GetBilling
                         ($invoice['invoices']['subject'] ? " {$invoice['invoices']['subject']}" : ''),
                     'total_amount' => $amount,
                     'date' => $invoice['invoices']['issued_at'],
-                    'is_invoiced' => $isInvoiced,
+                    'is_sent' => $isSent,
+                    'state' => $invoice['invoices']['state'],
                 ];
             },
             $apiClient("/invoices?from={$dateStart}&to={$dateEnd}&client={$client}&page=1")
