@@ -14,17 +14,17 @@ class GetBilling
         $client = $r->query->get('client', '');
 
         $stats = [
-            'issued' => 0,
-            'invoiced' => 0,
+            'draft' => 0,
+            'sent' => 0,
         ];
         $invoices = array_map(
             function (array $invoice) use (&$stats) {
                 $isInvoiced = $invoice['invoices']['state'] == 'paid';
                 $amount = $invoice['invoices']['amount'];
                 if ($isInvoiced) {
-                    $stats['invoiced'] += $amount;
+                    $stats['sent'] += $amount;
                 } else {
-                    $stats['issued'] += $amount;
+                    $stats['draft'] += $amount;
                 }
                 return [
                     'id' => $invoice['invoices']['id'],

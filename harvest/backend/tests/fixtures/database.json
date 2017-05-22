@@ -8,8 +8,8 @@
                     "14631359": 175
                 },
                 "billing": {
-                    "issued": 154,
-                    "invoiced": 155
+                    "draft": 154,
+                    "sent": 155
                 },
                 "activities": {
                     "7783430": 462,

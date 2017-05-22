@@ -145,8 +145,8 @@
     ],
     "billing": {
         "stats": {
-            "issued": 800,
-            "invoiced": 12300
+            "draft": 800,
+            "sent": 12300
         },
         "invoices": [
             {

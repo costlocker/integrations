@@ -22,7 +22,7 @@ class ImportDatabaseTest extends \PHPUnit_Framework_TestCase
             'imported' => [],
         ]));
         assertThat($database->getProjectId(123), is(emptyArray()));
-        assertThat($database->getBilling(123, 'invoiced'), is(emptyArray()));
+        assertThat($database->getBilling(123, 'sent'), is(emptyArray()));
         assertThat($database->getExpense(123, 'irrelevant id'), is(emptyArray()));
         assertThat($database->getPerson(123, 'irrelevant task', 'irrelevant person'), is(emptyArray()));
         assertThat($database->getTimeentry(123, 'irrelevant composite key'), is(emptyArray()));
