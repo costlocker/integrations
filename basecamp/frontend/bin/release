@@ -1,0 +1,17 @@
+#!/bin/sh
+
+release() {
+    build_frontend
+    commit_changes
+}
+
+build_frontend() {
+    yarn run build
+}
+
+commit_changes() {
+    git add --all build
+    git commit -m "Rebuild files $(date +"%Y-%m-%d %H:%M:%S")"
+}
+
+release
