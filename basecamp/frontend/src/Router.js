@@ -1,7 +1,8 @@
 import React from 'react';
 
 import { appState, isNotLoggedIn } from './state';
-import { fetchFromApi } from './api';
+import { fetchFromApi, loginUrls } from './api';
+import Login from './auth/Login';
 
 let redirectToRoute;
 
@@ -19,7 +20,7 @@ if (isNotLoggedIn()) {
 export const states = [
   {
     name: 'homepage',
-    url: '/',
+    url: '/?clLoginError',
     redirectTo: 'projects',
   },
   {
@@ -29,13 +30,11 @@ export const states = [
   },
   {
     name: 'login',
-    url: '/login',
-    component: () => (
-      <div>
-        <h1>Login</h1>
-        <a onClick={() => redirectToRoute('projects')}>Login</a>
-      </div>
-    ),
+    url: '/login?clLoginError',
+    component: (props) => <Login
+      auth={appState.cursor(['auth']).deref().toJS()}
+      loginUrls={loginUrls}
+      clLoginError={props.transition.params().clLoginError} />,
   },
 ];
 

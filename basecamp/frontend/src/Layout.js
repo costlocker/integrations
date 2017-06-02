@@ -1,7 +1,10 @@
 import React from 'react';
 import { UIView } from 'ui-router-react';
+import { appState } from './state';
+import { User } from './auth/User';
 
 export default function Layout() {
+  const auth = appState.cursor(['auth']).deref().toJS();
   return (
     <div>
       <nav className="navbar navbar-default">
@@ -13,12 +16,12 @@ export default function Layout() {
               </a>
             </div>
             <div className="navbar-brand">
-              <span className="text-warning">Basecamp</span><br />
-              <span className="text-primary">Costlocker</span>
+              <span className="text-primary">Costlocker</span><br />
+              <span className="text-success">Basecamp</span>
             </div>
           </div>
           <div className="navbar-text navbar-right text-right">
-            USER
+            <User auth={auth} />
           </div>
         </div>
       </nav>

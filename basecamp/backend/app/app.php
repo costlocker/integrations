@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 $dotenv = new Dotenv\Dotenv(__DIR__ . '/../');
 $dotenv->load();
@@ -18,13 +19,35 @@ $app->register(new \Costlocker\Integrations\Api\LogErrorsAndExceptions(__DIR__ .
 $app->before(new \Costlocker\Integrations\Api\DecodeJsonRequest());
 $app->error(new \Costlocker\Integrations\Api\ConvertExceptionToJson());
 
+$app['guzzle'] = function () {
+    return new \GuzzleHttp\Client();
+};
+
+$app['client.costlocker'] = function ($app) {
+    return new \Costlocker\Integrations\CostlockerClient($app['guzzle'], $app['client.user'], getenv('CL_HOST'));
+};
+
+$app['client.user'] = function ($app) {
+    return new Costlocker\Integrations\Auth\GetUser($app['session']);
+};
+
+$app['client.check'] = function ($app) {
+    return new Costlocker\Integrations\Auth\CheckAuthorization(
+        $app['session'],
+        $app['client.costlocker']
+    );
+};
+
 $app
-    ->get('/user', function () {
-        return new JsonResponse([
-            'costlocker' => [
-                'name' => 'John Doe',
-            ],
-        ]);
+    ->get('/user', function () use ($app) {
+        $app['client.check']->verifyTokens();
+        return $app['client.user']();
+    });
+
+$app
+    ->get('/oauth/costlocker', function (Request $r) use ($app) {
+        $strategy = Costlocker\Integrations\Auth\AuthorizeInCostlocker::buildFromEnv($app['session']);
+        return $strategy($r);
     });
 
 return $app;
