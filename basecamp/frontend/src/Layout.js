@@ -4,6 +4,19 @@ import { appState } from './state';
 import { redirectToRoute } from './Router';
 import { User } from './auth/User';
 
+const Navigation = () => {
+  const goTo = (route) => (e) => {
+    e.preventDefault();
+    redirectToRoute(route);
+  };
+  return (
+    <ul className="nav nav-pills">
+      <li><a href="" onClick={goTo('projects')}>Costlocker projects</a></li>
+      <li><a href="" onClick={goTo('basecamp')}>Basecamp accounts</a></li>
+    </ul>
+  );
+};
+
 export default function Layout() {
   const auth = appState.cursor(['auth']).deref().toJS();
   return (
@@ -27,6 +40,11 @@ export default function Layout() {
         </div>
       </nav>
       <div className="container">
+        <div className="row">
+          <div className="col-sm-12">
+            {auth.costlocker ? <Navigation /> : ''}
+          </div>
+        </div>
         <div className="row">
           <div className="col-sm-12">
             <UIView />

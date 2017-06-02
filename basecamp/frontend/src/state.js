@@ -8,6 +8,9 @@ const appState = immstruct({
   costlocker: {
     projects: null,
   },
+  basecamp: {
+    projects: [],
+  },
 });
 
 const isNotLoggedIn = () =>

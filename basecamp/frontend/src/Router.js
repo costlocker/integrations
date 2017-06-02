@@ -4,6 +4,7 @@ import { appState, isNotLoggedIn } from './state';
 import { fetchFromApi, loginUrls } from './api';
 import Login from './auth/Login';
 import Projects from './costlocker/Projects';
+import Sync from './costlocker/Sync';
 import Accounts from './basecamp/Accounts';
 
 export let redirectToRoute;
@@ -19,6 +20,30 @@ if (isNotLoggedIn()) {
     .catch(e => console.log('Anonymous user'));
 }
 
+const loadCostlockerProjects = [
+  {
+    token: 'loadCostlockerProjects',
+    resolveFn: () => {
+      if (!appState.cursor(['costlocker', 'projects']).deref()) {
+        fetchFromApi('/costlocker')
+          .then(projects => appState.cursor(['costlocker']).set('projects', projects));
+      }
+    }
+  }
+];
+
+const loadBasecampProjects = [
+  {
+    token: 'loadBasecampProjects',
+    resolveFn: () => {
+      if (!appState.cursor(['basecamp', 'projects']).deref()) {
+        fetchFromApi('/basecamp')
+          .then(projects => appState.cursor(['basecamp']).set('projects', projects));
+      }
+    }
+  }
+];
+
 export const states = [
   {
     name: 'homepage',
@@ -28,16 +53,10 @@ export const states = [
   {
     name: 'projects',
     url: '/projects',
-    component: () => <Projects projects={appState.cursor(['costlocker', 'projects']).deref()} />,
-    resolve: [
-      {
-        token: 'loadProjects',
-        resolveFn: () => {
-          fetchFromApi('/costlocker')
-            .then(projects => appState.cursor(['costlocker']).set('projects', projects));
-        }
-      }
-    ]
+    component: () => <Projects
+      projects={appState.cursor(['costlocker', 'projects']).deref()}
+      redirectToRoute={redirectToRoute} />,
+    resolve: loadCostlockerProjects,
   },
   {
     name: 'login',
@@ -53,6 +72,15 @@ export const states = [
     component: (props) => <Accounts
       basecamp={appState.cursor(['auth', 'basecamp']).deref()}
       loginUrls={loginUrls} />,
+  },
+  {
+    name: 'sync',
+    url: '/sync',
+    component: (props) => <Sync
+      costlockerProjects={appState.cursor(['costlocker', 'projects']).deref()}
+      basecampProjects={appState.cursor(['basecamp', 'projects']).deref()}
+    />,
+    resolve: loadCostlockerProjects.concat(loadBasecampProjects),
   },
 ];
 
