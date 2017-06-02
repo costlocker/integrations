@@ -5,10 +5,10 @@ namespace Costlocker\Integrations;
 class AuthorizationTest extends GivenApi
 {
     /** @dataProvider provideSecureUrl */
-    public function testUnauthorizedRequest($secureUrl)
+    public function testUnauthorizedRequest($method, $secureUrl)
     {
         $response = $this->request([
-            'method' => 'GET',
+            'method' => $method,
             'url' => $secureUrl,
         ]);
         assertThat($response->getStatusCode(), is(401));
@@ -17,8 +17,9 @@ class AuthorizationTest extends GivenApi
     public function provideSecureUrl()
     {
         return [
-            ['/costlocker'],
-            ['/basecamp'],
+            ['GET', '/costlocker'],
+            ['GET', '/basecamp?account=123'],
+            ['POST', '/basecamp'],
         ];
     }
 }

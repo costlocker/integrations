@@ -13,7 +13,10 @@ const appState = immstruct({
   },
   sync: {
     selectedAccount: null,
+    costlockerProject: null,
+    basecampProject: null,
     isProjectCreated: true,
+    result: null,
   }
 });
 

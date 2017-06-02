@@ -79,4 +79,12 @@ $app
     })
     ->before($checkAuthorization('basecamp'));
 
+$app
+    ->post('/basecamp', function (Request $r) use ($app) {
+        $strategy = new Costlocker\Integrations\Basecamp\SyncProject($app['client.costlocker']);
+        $data = $strategy($r->request->all());
+        return new JsonResponse($data);
+    })
+    ->before($checkAuthorization('basecamp'));
+
 return $app;

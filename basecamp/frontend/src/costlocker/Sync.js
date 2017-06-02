@@ -3,6 +3,8 @@ import React from 'react';
 export default function Sync({
   costlockerProjects, basecampProjects,
   isBasecampProjectCreated, changeSyncMode,
+  selectedCostlockerProject, changeCostlockerProject,
+  selectedBasecampProject, changeBasecampProject,
   basecampAccounts, selectedBasecampAccount, changeBasecampAccount,
   redirectToRoute
 }) {
@@ -11,10 +13,14 @@ export default function Sync({
   } else if (!costlockerProjects.length) {
     return <span>No projects available</span>;
   }
+  const startSynchronization = (e) => {
+    e.preventDefault();
+    redirectToRoute('syncInProgress');
+  };
 
   return <div>
     <h1>Synchronize Costlocker & Basecamp</h1>
-    <form className="form">
+    <form className="form" onSubmit={startSynchronization}>
       <div className="form-group">
         <label htmlFor="basecampAccount">Choose a Basecamp acccount to export it to</label>
         <select
@@ -30,7 +36,10 @@ export default function Sync({
       </div>
       <div className="form-group">
         <label htmlFor="costlockerProject">Costlocker project</label>
-        <select className="form-control" name="costlockerProject" id="costlockerProject">
+        <select
+          className="form-control" name="costlockerProject" id="costlockerProject"
+          value={selectedCostlockerProject} onChange={changeCostlockerProject}
+        >
           {costlockerProjects.map(project => (
             <option key={project.id} value={project.id}>
               {project.name} ({project.client.name})
@@ -58,7 +67,10 @@ export default function Sync({
       {basecampProjects.length && !isBasecampProjectCreated &&
       <div className="form-group">
         <label htmlFor="basecampProject">Basecamp project</label>
-        <select className="form-control" name="basecampProject" id="basecampProject">
+        <select
+          className="form-control" name="basecampProject" id="basecampProject"
+          value={selectedBasecampProject} onChange={changeBasecampProject}
+        >
           {basecampProjects.map(project => (
             <option key={project.id} value={project.id}>
               {project.name}
