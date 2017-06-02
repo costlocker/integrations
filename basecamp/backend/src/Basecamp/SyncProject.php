@@ -65,7 +65,7 @@ class SyncProject
                 $activities[$item['item']['activity_id']]['tasks'][$id] = $task;
             }
         }
-        return [$persons, $activities];
+        return [$persons, array_reverse($activities, true)];
     }
 
     private function createProject(array $project)
