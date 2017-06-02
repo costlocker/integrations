@@ -1,0 +1,7 @@
+<!-- https://github.com/basecamp/basecamp-classic-api/blob/master/sections/companies.md -->
+<companies>
+    <company>
+        <id type="integer">1</id>
+        <name>Globex Corporation</name>
+    </company>
+</companies>

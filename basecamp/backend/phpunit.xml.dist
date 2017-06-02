@@ -13,11 +13,19 @@
     <testsuites>
         <testsuite name="Tests suite">
             <directory>./tests/</directory>
+            <exclude>./tests/Basecamp/remote</exclude>
         </testsuite>
     </testsuites>
 
     <php>
         <env name="APP_ENV" value="test" />
         <env name="APP_SENTRYLOG_DSN" value="" />
+
+        <!-- API auth for remote basecamp3 test -->
+        <env name="accessToken" value="" />
+        <env name="accountUrl" value="https://3.basecampapi.com/account_id" />
+        <env name="accountVersion" value="bc3" />
+        <env name="newPersonEmail" value="" />
+        <env name="existingPersonInBasecamp" value="" />
     </php>
 </phpunit>

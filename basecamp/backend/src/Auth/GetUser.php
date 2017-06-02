@@ -26,4 +26,22 @@ class GetUser
     {
         return $this->session->get('costlocker')['accessToken']['access_token'];
     }
+
+    public function getBasecampAccessToken()
+    {
+        return $this->session->get('basecamp')['accessToken']['access_token'];
+    }
+
+    public function getBasecampAccount($accountId)
+    {
+        foreach ($this->session->get('basecamp')['account']['accounts'] as $account) {
+            if ($account['id'] == $accountId) {
+                return $account;
+            }
+        }
+        return [
+            'product' => '',
+            'href' => 'https://3.basecampapi.com',
+        ];
+    }
 }

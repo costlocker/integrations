@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "name": "Development",
+    "description": "What we need for launch",
+    "created_at": "2012-03-22T16:46:52-05:00",
+    "updated_at": "2012-03-22T16:56:52-05:00",
+    "url": "https://basecamp.com/999999999/api/v1/projects/605816632/todolists/968316918.json",
+    "app_url": "https://basecamp.com/999999999/projects/605816632/todolists/968316918",
+    "completed": false,
+    "position": 1,
+    "private": false,
+    "trashed": false,
+    "completed_count": 3,
+    "remaining_count": 5,
+    "creator": {
+      "id": 127326141,
+      "name": "David Heinemeier Hansson",
+      "avatar_url": "https://asset0.37img.com/global/9d2148cb8ed8e2e8ecbc625dd1cbe7691896c7d9/avatar.96.gif?r=3",
+      "fullsize_avatar_url": "https://asset0.37img.com/global/9d2148cb8ed8e2e8ecbc625dd1cbe7691896c7d9/original.gif?r=3"
+    },
+    "bucket": {
+      "id": 605816632,
+      "name": "BCX",
+      "type": "Project",
+      "url": "https://basecamp.com/999999999/api/v1/projects/605816632.json",
+      "app_url": "https://basecamp.com/999999999/projects/605816632"
+    }
+  }
+]

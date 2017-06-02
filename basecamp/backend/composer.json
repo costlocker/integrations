@@ -8,6 +8,8 @@
     "autoload-dev": {
         "files": [
             "tests/GivenApi.php",
+            "tests/Basecamp/ApiCall.php",
+            "tests/Basecamp/GivenBasecampConnect.php",
             "vendor/hamcrest/hamcrest-php/hamcrest/Hamcrest.php"
         ]
     },
@@ -21,7 +23,8 @@
         "sentry/sentry": "^1.6",
         "guzzlehttp/guzzle": "^6.2",
         "league/oauth2-client": "^2.2",
-        "14four/oauth2-basecamp": "^1.0"
+        "14four/oauth2-basecamp": "^1.0",
+        "symfony/console": "^3.3"
     },
     "require-dev": {
         "phpunit/phpunit": "~5",

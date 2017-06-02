@@ -1,0 +1,9 @@
+<!-- https://github.com/basecamp/basecamp-classic-api/blob/master/sections/people.md#get-people-across-projects -->
+<people>
+  <person>
+      <id type="integer">1</id>
+      <first-name>John</first-name>
+      <last-name>Doe</last-name>
+      <email-address>johndoe@example.com</email-address>
+  </person>
+</people>

@@ -1,0 +1,16 @@
+<!-- https://github.com/basecamp/basecamp-classic-api/blob/master/sections/todo_lists.md#get-all-lists-across-projects -->
+<todo-lists array="true">
+  <todo-list>
+    <id type="integer">1</id>
+    <name>Development</name>
+    <!-- for unknown reason todo items are loaded with extra query -->
+    <todo-items array="true">
+      <todo-item>
+          <id type="integer">1</id>
+          <content>todo</content>
+          <creator-id>1</creator-id>
+          <creator-name>John Doe</creator-name>
+      </todo-item>
+    </todo-items>
+  </todo-list>
+</todo-lists>

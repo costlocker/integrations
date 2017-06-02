@@ -1,0 +1,13 @@
+<!-- https://github.com/basecamp/basecamp-classic-api/blob/master/sections/projects.md -->
+<projects>
+    <project>
+        <id type="integer">1</id>
+        <name>Design</name>
+         <status>archived</status>
+    </project>
+    <project>
+        <id type="integer">2</id>
+        <name>Development</name>
+         <status>active</status>
+    </project>
+</projects>
