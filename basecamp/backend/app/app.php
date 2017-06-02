@@ -27,6 +27,10 @@ $app['client.costlocker'] = function ($app) {
     return new \Costlocker\Integrations\CostlockerClient($app['guzzle'], $app['client.user'], getenv('CL_HOST'));
 };
 
+$app['client.basecamp'] = function ($app) {
+    return new \Costlocker\Integrations\Basecamp\BasecampFactory($app['client.user']);
+};
+
 $app['client.user'] = function ($app) {
     return new Costlocker\Integrations\Auth\GetUser($app['session']);
 };
@@ -73,7 +77,7 @@ $app
 
 $app
     ->get('/basecamp', function (Request $r) use ($app) {
-        $strategy = new Costlocker\Integrations\Basecamp\GetProjects($app['client.user']);
+        $strategy = new Costlocker\Integrations\Basecamp\GetProjects($app['client.basecamp']);
         $data = $strategy($r);
         return new JsonResponse($data);
     })
@@ -81,7 +85,7 @@ $app
 
 $app
     ->post('/basecamp', function (Request $r) use ($app) {
-        $strategy = new Costlocker\Integrations\Basecamp\SyncProject($app['client.costlocker']);
+        $strategy = new Costlocker\Integrations\Basecamp\SyncProject($app['client.costlocker'], $app['client.basecamp']);
         $data = $strategy($r->request->all());
         return new JsonResponse($data);
     })
