@@ -38,6 +38,13 @@ $app['client.check'] = function ($app) {
     );
 };
 
+$checkAuthorization = function ($service) use ($app) {
+    // prevents 'Cannot override frozen service "guzzle"'
+    return function () use ($service, $app) {
+        return $app['client.check']->checkAccount($service);
+    };
+};
+
 $app
     ->get('/user', function () use ($app) {
         $app['client.check']->verifyTokens();
@@ -49,5 +56,13 @@ $app
         $strategy = Costlocker\Integrations\Auth\AuthorizeInCostlocker::buildFromEnv($app['session']);
         return $strategy($r);
     });
+
+$app
+    ->get('/costlocker', function () use ($app) {
+        $strategy = new Costlocker\Integrations\Costlocker\GetProjects($app['client.costlocker']);
+        $data = $strategy();
+        return new JsonResponse($data);
+    })
+    ->before($checkAuthorization('costlocker'));
 
 return $app;

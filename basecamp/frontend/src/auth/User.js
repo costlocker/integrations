@@ -11,7 +11,7 @@ const CostlockerUser = ({ user, redirectToRoute }) => {
       <strong>
         {user.person.first_name} {user.person.last_name}
       </strong> ({user.company.name})
-      &nbsp;<button onClick={() => redirectToRoute('login')} className="btn btn-default">
+      &nbsp;<button onClick={() => redirectToRoute('login')} className="btn btn-default btn-sm">
           Switch Costlocker account
       </button>
     </div>

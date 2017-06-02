@@ -4,6 +4,9 @@ const appState = immstruct({
   auth: {
     costlocker: null,
   },
+  costlocker: {
+    projects: null,
+  },
 });
 
 const isNotLoggedIn = () =>

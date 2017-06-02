@@ -3,6 +3,7 @@ import React from 'react';
 import { appState, isNotLoggedIn } from './state';
 import { fetchFromApi, loginUrls } from './api';
 import Login from './auth/Login';
+import Projects from './costlocker/Projects';
 
 export let redirectToRoute;
 
@@ -26,7 +27,16 @@ export const states = [
   {
     name: 'projects',
     url: '/projects',
-    component: () => <h1>Projects</h1>,
+    component: () => <Projects projects={appState.cursor(['costlocker', 'projects']).deref()} />,
+    resolve: [
+      {
+        token: 'loadProjects',
+        resolveFn: () => {
+          fetchFromApi('/costlocker')
+            .then(projects => appState.cursor(['costlocker']).set('projects', projects));
+        }
+      }
+    ]
   },
   {
     name: 'login',
