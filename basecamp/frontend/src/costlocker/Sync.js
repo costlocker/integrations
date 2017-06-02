@@ -1,6 +1,11 @@
 import React from 'react';
 
-export default function Projects({ costlockerProjects, basecampProjects, redirectToRoute }) {
+export default function Sync({
+  costlockerProjects, basecampProjects,
+  isBasecampProjectCreated, changeSyncMode,
+  basecampAccounts, selectedBasecampAccount, changeBasecampAccount,
+  redirectToRoute
+}) {
   if (!costlockerProjects) {
     return <span>Loading...</span>;
   } else if (!costlockerProjects.length) {
@@ -10,6 +15,19 @@ export default function Projects({ costlockerProjects, basecampProjects, redirec
   return <div>
     <h1>Synchronize Costlocker & Basecamp</h1>
     <form className="form">
+      <div className="form-group">
+        <label htmlFor="basecampAccount">Choose a Basecamp acccount to export it to</label>
+        <select
+           className="form-control" name="costlockerProject" id="costlockerProject"
+           value={selectedBasecampAccount} onChange={changeBasecampAccount}
+        >
+          {basecampAccounts.map(account => (
+            <option key={account.id} value={account.id}>
+              {account.name}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="form-group">
         <label htmlFor="costlockerProject">Costlocker project</label>
         <select className="form-control" name="costlockerProject" id="costlockerProject">
@@ -24,20 +42,20 @@ export default function Projects({ costlockerProjects, basecampProjects, redirec
         <label>How would you like to add this project to the Basecamp</label>
         <div className="radio">
           <label>
-            <input type="radio" name="basecampImport" id="basecampImport_create" value="create" defaultChecked />
+            <input type="radio" name="basecampImport" value="create" onChange={changeSyncMode} checked={isBasecampProjectCreated} />
             Create a new project in Basecamp
           </label>
         </div>
         {basecampProjects.length &&
         <div className="radio">
           <label>
-            <input type="radio" name="basecampImport" id="basecampImport_add" value="add" />
+            <input type="radio" name="basecampImport" value="add" onChange={changeSyncMode} checked={!isBasecampProjectCreated} />
             Add to an existing project in Basecamp
           </label>
         </div>
         }
       </div>
-      {basecampProjects.length &&
+      {basecampProjects.length && !isBasecampProjectCreated &&
       <div className="form-group">
         <label htmlFor="basecampProject">Basecamp project</label>
         <select className="form-control" name="basecampProject" id="basecampProject">

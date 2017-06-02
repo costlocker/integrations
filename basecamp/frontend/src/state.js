@@ -11,9 +11,16 @@ const appState = immstruct({
   basecamp: {
     projects: [],
   },
+  sync: {
+    selectedAccount: null,
+    isProjectCreated: true,
+  }
 });
 
-const isNotLoggedIn = () =>
+const isNotLoggedInCostlocker = () =>
   appState.cursor(['auth', 'costlocker']).deref() === null;
 
-export { appState, isNotLoggedIn };
+const isNotLoggedInBasecamp = () =>
+  appState.cursor(['auth', 'basecamp']).deref() === null;
+
+export { appState, isNotLoggedInCostlocker, isNotLoggedInBasecamp };

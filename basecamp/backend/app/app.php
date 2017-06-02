@@ -72,9 +72,9 @@ $app
     ->before($checkAuthorization('costlocker'));
 
 $app
-    ->get('/basecamp', function () use ($app) {
+    ->get('/basecamp', function (Request $r) use ($app) {
         $strategy = new Costlocker\Integrations\Basecamp\GetProjects();
-        $data = $strategy();
+        $data = $strategy($r);
         return new JsonResponse($data);
     })
     ->before($checkAuthorization('basecamp'));

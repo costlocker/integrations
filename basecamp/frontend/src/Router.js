@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { appState, isNotLoggedIn } from './state';
+import { appState, isNotLoggedInCostlocker, isNotLoggedInBasecamp } from './state';
 import { fetchFromApi, loginUrls } from './api';
 import Login from './auth/Login';
 import Projects from './costlocker/Projects';
@@ -9,11 +9,14 @@ import Accounts from './basecamp/Accounts';
 
 export let redirectToRoute;
 
-if (isNotLoggedIn()) {
+if (isNotLoggedInCostlocker()) {
   fetchFromApi('/user')
     .then((user) => {
-      appState.cursor(['auth']).update(
-        auth => auth.set('costlocker', user.costlocker).set('basecamp', user.basecamp)
+      appState.cursor().update(
+        auth => auth
+          .setIn(['auth', 'costlocker'], user.costlocker)
+          .setIn(['auth', 'basecamp'], user.basecamp)
+          .setIn(['sync', 'selectedAccount'], user.basecamp.accounts[0].id)
       );
       redirectToRoute('homepage');
     })
@@ -32,17 +35,14 @@ const loadCostlockerProjects = [
   }
 ];
 
-const loadBasecampProjects = [
-  {
-    token: 'loadBasecampProjects',
-    resolveFn: () => {
-      if (!appState.cursor(['basecamp', 'projects']).deref()) {
-        fetchFromApi('/basecamp')
-          .then(projects => appState.cursor(['basecamp']).set('projects', projects));
-      }
-    }
+appState.on('next-animation-frame', function (newStructure, oldStructure, keyPath) {
+  const oldId = oldStructure.getIn(['sync', 'selectedAccount']);
+  const accountId = newStructure.getIn(['sync', 'selectedAccount']);
+  if (oldId !== accountId) {
+    fetchFromApi(`/basecamp?account=${accountId}`)
+      .then(projects => appState.cursor(['basecamp']).set('projects', projects));
   }
-];
+});
 
 export const states = [
   {
@@ -79,8 +79,13 @@ export const states = [
     component: (props) => <Sync
       costlockerProjects={appState.cursor(['costlocker', 'projects']).deref()}
       basecampProjects={appState.cursor(['basecamp', 'projects']).deref()}
+      basecampAccounts={appState.cursor(['auth', 'basecamp']).deref().accounts}
+      selectedBasecampAccount={appState.cursor(['sync', 'selectedAccount']).deref()}
+      changeBasecampAccount={(e) => appState.cursor(['sync']).set('selectedAccount', e.target.value)}
+      isBasecampProjectCreated={appState.cursor(['sync', 'isProjectCreated']).deref()}
+      changeSyncMode={(e) => appState.cursor(['sync']).set('isProjectCreated', e.target.value === "create")}
     />,
-    resolve: loadCostlockerProjects.concat(loadBasecampProjects),
+    resolve: loadCostlockerProjects,
   },
 ];
 
@@ -91,11 +96,26 @@ const hooks = [
       to: state => {
         const publicStates = ['login'];
         const isPrivateState = publicStates.indexOf(state.name) === -1;
-        return isPrivateState && isNotLoggedIn();
+        return isPrivateState && isNotLoggedInCostlocker();
       }
     },
     callback: (transition: any) =>
       transition.router.stateService.target('login', undefined, { location: true }),
+    priority: 10,
+  },
+  {
+    event: 'onBefore',
+    criteria: {
+      to: state => {
+        const basecampEndpoints = ['sync'];
+        const isBasecampState = basecampEndpoints.indexOf(state.name) !== -1;
+        return isBasecampState && isNotLoggedInBasecamp();
+      }
+    },
+    callback: (transition: any) => {
+      alert('Login in Basecamp before starting synchronization');
+      return transition.router.stateService.target('projects', undefined, { location: true });
+    },
     priority: 10,
   },
 ];
