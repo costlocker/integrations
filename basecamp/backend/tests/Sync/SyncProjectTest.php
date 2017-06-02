@@ -28,7 +28,15 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
         $this->basecamp->shouldReceive('grantAccess')->once()
             ->with($basecampId, [
                 'John Doe (john@example.com)' => 'john@example.com',
+                'Peter Nobody (peter@example.com)' => 'peter@example.com',
             ]);
+        $this->basecamp->shouldReceive('createTodolist')->once()
+            ->with($basecampId, 'Development')
+            ->andReturn($basecampId);
+        $this->basecamp->shouldReceive('createTodo')->once()
+            ->with($basecampId, $basecampId, 'Homepage', null);
+        $this->basecamp->shouldReceive('createTodo')->once()
+            ->with($basecampId, $basecampId, 'Development', null);
         $this->synchronize();
     }
 
