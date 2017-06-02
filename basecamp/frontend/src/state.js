@@ -3,6 +3,7 @@ import immstruct from 'immstruct';
 const appState = immstruct({
   auth: {
     costlocker: null,
+    basecamp: null,
   },
   costlocker: {
     projects: null,

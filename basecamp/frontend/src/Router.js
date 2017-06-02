@@ -4,6 +4,7 @@ import { appState, isNotLoggedIn } from './state';
 import { fetchFromApi, loginUrls } from './api';
 import Login from './auth/Login';
 import Projects from './costlocker/Projects';
+import Accounts from './basecamp/Accounts';
 
 export let redirectToRoute;
 
@@ -11,7 +12,7 @@ if (isNotLoggedIn()) {
   fetchFromApi('/user')
     .then((user) => {
       appState.cursor(['auth']).update(
-        auth => auth.set('costlocker', user.costlocker)
+        auth => auth.set('costlocker', user.costlocker).set('basecamp', user.basecamp)
       );
       redirectToRoute('homepage');
     })
@@ -45,6 +46,13 @@ export const states = [
       auth={appState.cursor(['auth']).deref().toJS()}
       loginUrls={loginUrls}
       clLoginError={props.transition.params().clLoginError} />,
+  },
+  {
+    name: 'basecamp',
+    url: '/basecamp',
+    component: (props) => <Accounts
+      basecamp={appState.cursor(['auth', 'basecamp']).deref()}
+      loginUrls={loginUrls} />,
   },
 ];
 

@@ -3,6 +3,7 @@ import { apiUrl } from './config';
 
 const loginUrls = {
   costlocker: `${apiUrl}/oauth/costlocker`,
+  basecamp: `${apiUrl}/oauth/basecamp`,
 };
 
 const handleErrors = (response) => {

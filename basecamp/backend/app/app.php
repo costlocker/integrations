@@ -58,6 +58,12 @@ $app
     });
 
 $app
+    ->get('/oauth/basecamp', function (Request $r) use ($app) {
+        $strategy = Costlocker\Integrations\Auth\AuthorizeInBasecamp::buildFromEnv($app['session']);
+        return $strategy($r);
+    });
+
+$app
     ->get('/costlocker', function () use ($app) {
         $strategy = new Costlocker\Integrations\Costlocker\GetProjects($app['client.costlocker']);
         $data = $strategy();
