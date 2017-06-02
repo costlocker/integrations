@@ -1,0 +1,44 @@
+{
+    "data": {
+        "id": "1",
+        "name": "Website",
+        "client": {
+            "id": "1",
+            "name": "ACME"
+        },
+        "items": [
+            {
+                "item": {
+                    "type": "activity",
+                    "activity_id": "1"
+                },
+                "hours": {
+                    "budget": 32,
+                    "tracked": 0,
+                    "is_aggregation": true
+                },
+                "activity": {
+                    "name": "Development",
+                    "hourly_rate": 50
+                }
+            },
+            {
+                "item": {
+                    "type": "person",
+                    "activity_id": "1",
+                    "person_id": "1"
+                },
+                "hours": {
+                    "budget": 32,
+                    "tracked": 0,
+                    "is_aggregation": true
+                },
+                "person": {
+                    "email": "john@example.com",
+                    "first_name": "John",
+                    "last_name": "Doe"
+                }
+            }
+        ]
+    }
+}

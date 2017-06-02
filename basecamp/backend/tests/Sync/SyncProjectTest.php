@@ -20,8 +20,15 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateProject()
     {
-        $this->givenCostlockerProject('no-activities.json');
-        $this->basecamp->shouldReceive('createProject')->once()->with('ACME | Website', null, null);
+        $basecampId = 'irrelevant new id';
+        $this->givenCostlockerProject('one-person.json');
+        $this->basecamp->shouldReceive('createProject')->once()
+            ->with('ACME | Website', null, null)
+            ->andReturn($basecampId);
+        $this->basecamp->shouldReceive('grantAccess')->once()
+            ->with($basecampId, [
+                'John Doe (john@example.com)' => 'john@example.com',
+            ]);
         $this->synchronize();
     }
 
