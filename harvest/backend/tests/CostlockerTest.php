@@ -7,7 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Costlocker\Integrations\Sync\ImportDatabase;
 
-class AuthorizationTest extends GivenApi
+class CostlockerTest extends GivenApi
 {
     private $client;
     private $database;
