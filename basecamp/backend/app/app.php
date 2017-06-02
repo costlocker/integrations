@@ -71,4 +71,12 @@ $app
     })
     ->before($checkAuthorization('costlocker'));
 
+$app
+    ->get('/basecamp', function () use ($app) {
+        $strategy = new Costlocker\Integrations\Basecamp\GetProjects();
+        $data = $strategy();
+        return new JsonResponse($data);
+    })
+    ->before($checkAuthorization('basecamp'));
+
 return $app;

@@ -2,19 +2,23 @@
 
 namespace Costlocker\Integrations;
 
-class CostlockerTest extends GivenApi
+class AuthorizationTest extends GivenApi
 {
-    public function testUnauthorizedRequest()
+    /** @dataProvider provideSecureUrl */
+    public function testUnauthorizedRequest($secureUrl)
     {
-        $response = $this->importProject();
+        $response = $this->request([
+            'method' => 'GET',
+            'url' => $secureUrl,
+        ]);
         assertThat($response->getStatusCode(), is(401));
     }
 
-    private function importProject()
+    public function provideSecureUrl()
     {
-        return $this->request([
-            'method' => 'GET',
-            'url' => '/costlocker',
-        ]);
+        return [
+            ['/costlocker'],
+            ['/basecamp'],
+        ];
     }
 }
