@@ -16,7 +16,7 @@ if (isNotLoggedInCostlocker()) {
         auth => auth
           .setIn(['auth', 'costlocker'], user.costlocker)
           .setIn(['auth', 'basecamp'], user.basecamp)
-          .setIn(['sync', 'selectedAccount'], user.basecamp.accounts[0].id)
+          .setIn(['sync', 'selectedAccount'], user.basecamp ? user.basecamp.accounts[0].id : null)
       );
       redirectToRoute('homepage');
     })
