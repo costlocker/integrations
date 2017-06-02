@@ -4,7 +4,7 @@ import { appState, isNotLoggedIn } from './state';
 import { fetchFromApi, loginUrls } from './api';
 import Login from './auth/Login';
 
-let redirectToRoute;
+export let redirectToRoute;
 
 if (isNotLoggedIn()) {
   fetchFromApi('/user')

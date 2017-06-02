@@ -1,6 +1,7 @@
 import React from 'react';
 import { UIView } from 'ui-router-react';
 import { appState } from './state';
+import { redirectToRoute } from './Router';
 import { User } from './auth/User';
 
 export default function Layout() {
@@ -21,7 +22,7 @@ export default function Layout() {
             </div>
           </div>
           <div className="navbar-text navbar-right text-right">
-            <User auth={auth} />
+            <User auth={auth} redirectToRoute={redirectToRoute} />
           </div>
         </div>
       </nav>
