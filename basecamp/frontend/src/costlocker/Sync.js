@@ -1,31 +1,21 @@
 import React from 'react';
 
-export default function Sync({
-  costlockerProjects, basecampProjects,
-  isBasecampProjectCreated, changeSyncMode,
-  selectedCostlockerProject, changeCostlockerProject,
-  selectedBasecampProject, changeBasecampProject,
-  basecampAccounts, selectedBasecampAccount, changeBasecampAccount,
-  redirectToRoute
-}) {
+export default function Sync({ costlockerProjects, basecampProjects, basecampAccounts, syncForm }) {
   if (!costlockerProjects) {
     return <span>Loading...</span>;
   } else if (!costlockerProjects.length) {
     return <span>No projects available</span>;
   }
-  const startSynchronization = (e) => {
-    e.preventDefault();
-    redirectToRoute('syncInProgress');
-  };
+  const isBasecampProjectCreated = syncForm.get('mode') === 'create';
 
   return <div>
     <h1>Synchronize Costlocker & Basecamp</h1>
-    <form className="form" onSubmit={startSynchronization}>
+    <form className="form" onSubmit={syncForm.submit}>
       <div className="form-group">
-        <label htmlFor="basecampAccount">Choose a Basecamp acccount to export it to</label>
+        <label htmlFor="account">Choose a Basecamp acccount to export it to</label>
         <select
-           className="form-control" name="costlockerProject" id="costlockerProject"
-           value={selectedBasecampAccount} onChange={changeBasecampAccount}
+           className="form-control" name="account" id="account"
+           value={syncForm.get('account')} onChange={syncForm.set('account')}
         >
           {basecampAccounts.map(account => (
             <option key={account.id} value={account.id}>
@@ -38,7 +28,7 @@ export default function Sync({
         <label htmlFor="costlockerProject">Costlocker project</label>
         <select
           className="form-control" name="costlockerProject" id="costlockerProject"
-          value={selectedCostlockerProject} onChange={changeCostlockerProject}
+          value={syncForm.get('costlockerProject')} onChange={syncForm.set('costlockerProject')}
         >
           {costlockerProjects.map(project => (
             <option key={project.id} value={project.id}>
@@ -51,14 +41,16 @@ export default function Sync({
         <label>How would you like to add this project to the Basecamp</label>
         <div className="radio">
           <label>
-            <input type="radio" name="basecampImport" value="create" onChange={changeSyncMode} checked={isBasecampProjectCreated} />
+            <input type="radio" name="mode" value="create"
+              checked={isBasecampProjectCreated} onChange={syncForm.set('mode')} />
             Create a new project in Basecamp
           </label>
         </div>
         {basecampProjects.length &&
         <div className="radio">
           <label>
-            <input type="radio" name="basecampImport" value="add" onChange={changeSyncMode} checked={!isBasecampProjectCreated} />
+            <input type="radio" name="mode" value="add"
+              checked={!isBasecampProjectCreated} onChange={syncForm.set('mode')} />
             Add to an existing project in Basecamp
           </label>
         </div>
@@ -69,7 +61,7 @@ export default function Sync({
         <label htmlFor="basecampProject">Basecamp project</label>
         <select
           className="form-control" name="basecampProject" id="basecampProject"
-          value={selectedBasecampProject} onChange={changeBasecampProject}
+          value={syncForm.get('basecampProject')} onChange={syncForm.set('basecampProject')}
         >
           {basecampProjects.map(project => (
             <option key={project.id} value={project.id}>

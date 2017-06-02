@@ -16,7 +16,7 @@ if (isNotLoggedInCostlocker()) {
         auth => auth
           .setIn(['auth', 'costlocker'], user.costlocker)
           .setIn(['auth', 'basecamp'], user.basecamp)
-          .setIn(['sync', 'selectedAccount'], user.basecamp ? user.basecamp.accounts[0].id : null)
+          .setIn(['sync', 'account'], user.basecamp ? user.basecamp.accounts[0].id : null)
       );
       redirectToRoute('homepage');
     })
@@ -39,8 +39,8 @@ const loadCostlockerProjects = [
 ];
 
 appState.on('next-animation-frame', function (newStructure, oldStructure, keyPath) {
-  const oldId = oldStructure.getIn(['sync', 'selectedAccount']);
-  const accountId = newStructure.getIn(['sync', 'selectedAccount']);
+  const oldId = oldStructure.getIn(['sync', 'account']);
+  const accountId = newStructure.getIn(['sync', 'account']);
   if (oldId !== accountId) {
     fetchFromApi(`/basecamp?account=${accountId}`)
       .then(projects => appState.cursor().update(
@@ -87,15 +87,14 @@ export const states = [
       costlockerProjects={appState.cursor(['costlocker', 'projects']).deref()}
       basecampProjects={appState.cursor(['basecamp', 'projects']).deref()}
       basecampAccounts={appState.cursor(['auth', 'basecamp']).deref().accounts}
-      selectedBasecampAccount={appState.cursor(['sync', 'selectedAccount']).deref()}
-      changeBasecampAccount={(e) => appState.cursor(['sync']).set('selectedAccount', e.target.value)}
-      selectedCostlockerProject={appState.cursor(['sync', 'costlockerProject']).deref()}
-      changeCostlockerProject={(e) => appState.cursor(['sync']).set('costlockerProject', e.target.value)}
-      selectedBasecampProject={appState.cursor(['sync', 'basecampProject']).deref()}
-      changeBasecampProject={(e) => appState.cursor(['sync']).set('basecampProject', e.target.value)}
-      isBasecampProjectCreated={appState.cursor(['sync', 'isProjectCreated']).deref()}
-      changeSyncMode={(e) => appState.cursor(['sync']).set('isProjectCreated', e.target.value === "create")}
-      redirectToRoute={redirectToRoute}
+      syncForm={{
+        get: (type) => appState.cursor(['sync', type]).deref(),
+        set: (type) => (e) => appState.cursor(['sync']).set(type, e.target.value),
+        submit: (e) => {
+          e.preventDefault();
+          redirectToRoute('syncInProgress');
+        }
+      }}
     />,
     resolve: loadCostlockerProjects,
   },
@@ -107,11 +106,7 @@ export const states = [
       {
         token: 'submitChange',
         resolveFn: () => {
-          pushToApi(`/basecamp`, {
-            account: appState.cursor(['sync', 'selectedAccount']).deref(),
-            costlocker: appState.cursor(['sync', 'costlockerProject']).deref(),
-            basecamp: appState.cursor(['sync', 'basecampProject']).deref(),
-          })
+          pushToApi(`/basecamp`, appState.cursor(['sync']).deref())
           .then(r => appState.cursor(['sync']).set('result', r))
           .catch(e => alert('Synchronization has failed'));
         }

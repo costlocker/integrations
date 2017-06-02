@@ -15,7 +15,7 @@ class SyncProject
 
     public function __invoke(array $config)
     {
-        $response = $this->costlocker->__invoke("/projects/{$config['costlocker']}?types=peoplecosts");
+        $response = $this->costlocker->__invoke("/projects/{$config['costlockerProject']}?types=peoplecosts");
         $project = json_decode($response->getBody(), true)['data'];
 
         return [
