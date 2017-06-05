@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { ExternalLink } from '../Helpers';
+
 export default function Projects({ projects, redirectToRoute }) {
   if (!projects) {
     return <span>Loading....</span>;
@@ -38,9 +40,23 @@ export default function Projects({ projects, redirectToRoute }) {
                 </td>
                 <td>
                   {project.basecamps.map(basecamp => (
-                    <a href={basecamp.url} target="_blank" rel="noopener noreferrer">
-                      {basecamp.account.name} ({basecamp.account.product})
-                    </a>
+                    <div key={basecamp.id}>
+                      <em>
+                        {basecamp.account.name} ({basecamp.account.product})
+                      </em>
+                      &nbsp;&nbsp;
+                      <ExternalLink url={basecamp.url} />
+                      <button
+                        className="btn btn-link" title="Refresh project"
+                        onClick={() => redirectToRoute(
+                          'sync',
+                          { account: basecamp.account.id, clProject: project.id, bcProject: basecamp.id }
+                        )}
+                      >
+                        <i className="fa fa-refresh"></i>
+                      </button>
+                      <br />
+                    </div>
                   ))}
                 </td>
               </tr>

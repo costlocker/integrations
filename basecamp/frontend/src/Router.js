@@ -82,7 +82,7 @@ export const states = [
   },
   {
     name: 'sync',
-    url: '/sync',
+    url: '/sync?account&clProject&bcProject',
     component: (props) => <Sync
       costlockerProjects={appState.cursor(['costlocker', 'projects']).deref()}
       basecampProjects={appState.cursor(['basecamp', 'projects']).deref()}
@@ -96,7 +96,23 @@ export const states = [
         }
       }}
     />,
-    resolve: loadCostlockerProjects,
+    resolve: loadCostlockerProjects.concat([
+      {
+        token: 'loadUrlParms',
+        deps: ['$transition$'],
+        resolveFn: ($transition$) => {
+          const params = $transition$.params();
+          if (params.account && params.clProject && params.bcProject) {
+            appState.cursor(['sync']).update(sync => sync
+              .set('account', params.account)
+              .set('mode', 'add')
+              .set('costlockerProject', params.clProject)
+              .set('basecampProject', params.bcProject)
+            )
+          }
+        }
+      }
+    ]),
   },
   {
     name: 'syncInProgress',
@@ -148,6 +164,6 @@ const hooks = [
 
 export const config = (router) => {
   router.urlRouter.otherwise(() => '/');
-  redirectToRoute = (route) => router.stateService.go(route, undefined, { location: true });
+  redirectToRoute = (route, params) => router.stateService.go(route, params, { location: true });
   hooks.forEach(hook => router.transitionService[hook.event](hook.criteria, hook.callback, { priority: hook.priority }));
 }
