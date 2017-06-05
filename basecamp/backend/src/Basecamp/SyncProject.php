@@ -32,12 +32,9 @@ class SyncProject
         $grantedPeople = $this->grantAccess($bcProjectId, $people);
         $bcProject['basecampPeople'] = $this->basecamp->getPeople($bcProjectId);
         $todolists = $this->createTodolists($bcProject, $activities);
+        $delete = $this->deleteLegacyEntitiesInBasecamp($bcProject, $config);
 
-        if ($bcProject['isUpdated'] && $config['isDeleteEnabled']) {
-            $delete = $this->deleteLegacyEntitiesInBasecamp($bcProject);
-        } else {
-            $delete = [];
-        }
+        $this->updateMapping($bcProject, $delete);
 
         return [
             'costlocker' => $project,
@@ -95,13 +92,14 @@ class SyncProject
     {
         $existingProject = $this->database->findProject($project['id']);
         if ($existingProject) {
-            return ['isUpdated' => true] + $existingProject;
+            return ['isCreated' => false, 'costlocker_id' => $project['id']] + $existingProject;
         }
         $name = "{$project['client']['name']} | {$project['name']}";
         return [
             'id' => $this->basecamp->createProject($name, null, null),
+            'costlocker_id' => $project['id'],
             'activities' => [],
-            'isUpdated' => false
+            'isCreated' => true
         ];
     }
 
@@ -161,29 +159,58 @@ class SyncProject
         return $this->basecamp->createTodo($bcProject['id'], $bcTodolist['id'], $task['name'], $assignee);
     }
 
-    private function deleteLegacyEntitiesInBasecamp(array $bcProject)
+    private function deleteLegacyEntitiesInBasecamp(array $bcProject, array $config)
     {
         $summary = [
-            'todolists' => [],
+            'activities' => [],
             'tasks' => [],
+            'persons' => [],
         ];
+
+        if ($bcProject['isCreated'] || !$config['isDeleteEnabled']) {
+            return $summary;
+        }
+
         $bcTodolists = $this->basecamp->getTodolists($bcProject['id']);
-        foreach ($bcProject['activities'] as $activity) {
+
+        foreach ($bcProject['activities'] as $activityId => $activity) {
             $bcTodolistId = $activity['id'];
             if (array_key_exists($bcTodolistId, $bcTodolists)) {
-                foreach (array_merge($activity['tasks'], $activity['persons']) as $bcTodoId) {
-                    if (array_key_exists($bcTodoId, $bcTodolists[$bcTodolistId]->todoitems)) {
-                        $this->basecamp->deleteTodo($bcProject, $bcTodolistId, $bcTodoId);
-                        $summary['tasks'][] = $bcTodoId;
-                        unset($bcTodolists[$bcTodolistId]->todoitems[$bcTodoId]);
+                foreach (['tasks', 'persons'] as $type) {
+                    foreach ($activity[$type] as $id => $bcTodoId) {
+                        if (array_key_exists($bcTodoId, $bcTodolists[$bcTodolistId]->todoitems)) {
+                            $this->basecamp->deleteTodo($bcProject['id'], $bcTodolistId, $bcTodoId);
+                            unset($bcTodolists[$bcTodolistId]->todoitems[$bcTodoId]);
+                        }
+                        $summary[$type][$activityId][$id] = $id;
                     }
                 }
                 if (!$bcTodolists[$bcTodolistId]->todoitems) {
                     $this->basecamp->deleteTodolist($bcProject['id'], $bcTodolistId);
-                    $summary['todolists'][] = $activity;
+                    $summary['activities'][$activityId] = $activityId;
                 }
+            } else {
+                $summary['activities'][$activityId] = $activityId;
             }
         }
         return $summary;
+    }
+
+    private function updateMapping(array $bcProject, array $deleteSummary)
+    {
+        foreach ($deleteSummary['activities'] as $activity) {
+            unset($bcProject['activities'][$activity]);
+        }
+        foreach (['tasks', 'persons'] as $type) {
+            foreach ($deleteSummary[$type] as $activityId => $tasks) {
+                foreach ($tasks as $id) {
+                    unset($bcProject['activities'][$activityId][$type][$id]);
+                }
+            }
+        }
+        $this->database->upsertProject($bcProject['costlocker_id'], [
+            'id' => $bcProject['id'],
+            'activities' => $bcProject['activities'],
+        ]);
     }
 }

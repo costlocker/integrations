@@ -81,10 +81,11 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
 
     public function testPartialDelete()
     {
+        $basecampId = 'irrelevant project';
         $this->database->upsertProject(
             1,
             [
-                'id' => 'irrelevant project',
+                'id' => $basecampId,
                 'activities' => [
                     1 => [
                         'id' => 'non-empty todolist',
@@ -127,6 +128,20 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
         $this->basecamp->shouldReceive('deleteTodolist')->once()->with(m::any(), 'empty todolist');
         $this->basecamp->shouldReceive('deleteTodo')->once()->with(m::any(), m::any(), 'existing todo');
         $this->synchronize();
+        $this->assertEquals(
+            [
+                'id' => $basecampId,
+                'activities' => [
+                    // not deleted because todolist is not empty in BC
+                    1 => [
+                        'id' => 'non-empty todolist',
+                        'tasks' => [],
+                        'persons' => [],
+                    ]
+                ],
+            ],
+            $this->database->findProject(1)
+        );
     }
 
     private function givenCostlockerProject($file)
