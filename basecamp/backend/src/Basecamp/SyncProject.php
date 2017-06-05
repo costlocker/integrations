@@ -11,11 +11,13 @@ class SyncProject
     private $costlocker;
     /** @var \Costlocker\Integrations\Basecamp\Api\BasecampApi */
     private $basecamp;
+    private $database;
 
-    public function __construct(CostlockerClient $c, BasecampFactory $b)
+    public function __construct(CostlockerClient $c, BasecampFactory $b, array $db = [])
     {
         $this->costlocker = $c;
         $this->basecampFactory = $b;
+        $this->database = $db;
     }
 
     public function __invoke(array $config)
@@ -25,7 +27,8 @@ class SyncProject
         list($people, $activities) = $this->analyzeProjectItems($project['items']);
 
         $this->basecamp = $this->basecampFactory->__invoke($config['account']);
-        $bcProjectId = $this->createProject($project);
+        $bcProject = $this->upsertProject($project);
+        $bcProjectId = $bcProject['id'];
         $grantedPeople = $this->grantAccess($bcProjectId, $people);
         $bcPeople = $this->basecamp->getPeople($bcProjectId);
         $todolists = $this->createTodolists($bcProjectId, $bcPeople, $activities);
@@ -77,10 +80,15 @@ class SyncProject
         return [$persons, array_reverse($activities, true)];
     }
 
-    private function createProject(array $project)
+    private function upsertProject(array $project)
     {
+        if (array_key_exists($project['id'], $this->database)) {
+            return $this->database[$project['id']];
+        }
         $name = "{$project['client']['name']} | {$project['name']}";
-        return $this->basecamp->createProject($name, null, null);
+        return [
+            'id' => $this->basecamp->createProject($name, null, null),
+        ];
     }
 
     private function grantAccess($bcProjectId, array $peopleFromCostlocker)

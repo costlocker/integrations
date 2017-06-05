@@ -11,6 +11,7 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
 {
     private $costlocker;
     private $basecamp;
+    private $database = [];
 
     protected function setUp()
     {
@@ -25,6 +26,33 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
         $this->basecamp->shouldReceive('createProject')->once()
             ->with('ACME | Website', null, null)
             ->andReturn($basecampId);
+        $this->basecamp->shouldReceive('grantAccess')->once()
+            ->with($basecampId, [
+                'John Doe (john@example.com)' => 'john@example.com',
+                'Peter Nobody (peter@example.com)' => 'peter@example.com',
+            ]);
+        $this->basecamp->shouldReceive('getPeople')->once()
+            ->andReturn($this->givenBasecampPeople([1 => 'john@example.com', 2 => 'peter@example.com']));
+        $this->basecamp->shouldReceive('createTodolist')->once()
+            ->with($basecampId, 'Development')
+            ->andReturn($basecampId);
+        $this->basecamp->shouldReceive('createTodo')->once()
+            ->with($basecampId, $basecampId, 'Homepage', 1);
+        $this->basecamp->shouldReceive('createTodo')->once()
+            ->with($basecampId, $basecampId, 'Development', 2);
+        $this->synchronize();
+    }
+
+    public function testUpdateProject()
+    {
+        $basecampId = 'existing id';
+        $this->database = [
+            1 => [
+                'id' => $basecampId,
+            ],
+        ];
+        $this->givenCostlockerProject('one-person.json');
+        $this->basecamp->shouldReceive('createProject')->never();
         $this->basecamp->shouldReceive('grantAccess')->once()
             ->with($basecampId, [
                 'John Doe (john@example.com)' => 'john@example.com',
@@ -65,7 +93,7 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
     {
         $basecampFactory = m::mock(BasecampFactory::class);
         $basecampFactory->shouldReceive('__invoke')->andReturn($this->basecamp);
-        $uc = new SyncProject($this->costlocker, $basecampFactory);
+        $uc = new SyncProject($this->costlocker, $basecampFactory, $this->database);
         $uc([
             'account' => 'irrelevant basecamp account',
             'costlockerProject' => 'irrelevant id',
