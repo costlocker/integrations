@@ -182,7 +182,7 @@ class SyncProject
                     foreach (['tasks', 'persons'] as $type) {
                         foreach ($activity[$type] as $id => $bcTodoId) {
                             if (array_key_exists($bcTodoId, $bcTodolists[$bcTodolistId]->todoitems)) {
-                                $this->basecamp->deleteTodo($bcProject['id'], $bcTodolistId, $bcTodoId);
+                                $this->basecamp->deleteTodo($bcProject['id'], $bcTodoId);
                                 unset($bcTodolists[$bcTodolistId]->todoitems[$bcTodoId]);
                             }
                             $summary[$type][$activityId][$id] = $id;
