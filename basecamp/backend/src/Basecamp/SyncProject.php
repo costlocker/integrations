@@ -13,7 +13,7 @@ class SyncProject
     private $basecamp;
     private $database;
 
-    public function __construct(CostlockerClient $c, BasecampFactory $b, array $db = [])
+    public function __construct(CostlockerClient $c, BasecampFactory $b, SyncDatabase $db)
     {
         $this->costlocker = $c;
         $this->basecampFactory = $b;
@@ -93,8 +93,9 @@ class SyncProject
 
     private function upsertProject(array $project)
     {
-        if (array_key_exists($project['id'], $this->database)) {
-            return ['isUpdated' => true] + $this->database[$project['id']];
+        $existingProject = $this->database->findProject($project['id']);
+        if ($existingProject) {
+            return ['isUpdated' => true] + $existingProject;
         }
         $name = "{$project['client']['name']} | {$project['name']}";
         return [

@@ -11,7 +11,7 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
 {
     private $costlocker;
     private $basecamp;
-    private $database = [];
+    private $database;
 
     private $isDeleteEnabled = false;
 
@@ -19,6 +19,7 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
     {
         $this->costlocker = m::mock(CostlockerClient::class);
         $this->basecamp = m::mock(BasecampApi::class);
+        $this->database = new InMemoryDatabase();
     }
 
     public function testCreateProject()
@@ -48,8 +49,9 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
     public function testPartialUpdate()
     {
         $basecampId = 'existing id';
-        $this->database = [
-            1 => [
+        $this->database->upsertProject(
+            1,
+            [
                 'id' => $basecampId,
                 'activities' => [
                     1 => [
@@ -61,8 +63,8 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
                         ],
                     ],
                 ],
-            ],
-        ];
+            ]
+        );
         $this->givenCostlockerProject('one-person.json');
         $this->basecamp->shouldReceive('createProject')->never();
         $this->basecamp->shouldReceive('grantAccess')->once()
@@ -79,8 +81,9 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
 
     public function testPartialDelete()
     {
-        $this->database = [
-            1 => [
+        $this->database->upsertProject(
+            1,
+            [
                 'id' => 'irrelevant project',
                 'activities' => [
                     1 => [
@@ -103,8 +106,8 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
                         'persons' => [],
                     ],
                 ],
-            ],
-        ];
+            ]
+        );
         $this->isDeleteEnabled = true;
         $this->givenCostlockerProject('empty-project.json');
         $this->basecamp->shouldReceive('getPeople')->once()
