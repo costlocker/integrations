@@ -19,6 +19,10 @@ $app->register(new \Costlocker\Integrations\Api\LogErrorsAndExceptions(__DIR__ .
 $app->before(new \Costlocker\Integrations\Api\DecodeJsonRequest());
 $app->error(new \Costlocker\Integrations\Api\ConvertExceptionToJson());
 
+$app['database'] = function () {
+    return new Costlocker\Integrations\Database\FileDatabase(__DIR__ . '/../var/temp-db.json');
+};
+
 $app['guzzle'] = function () {
     return new \GuzzleHttp\Client();
 };
@@ -93,7 +97,8 @@ $app
 
         $strategy = new Costlocker\Integrations\Basecamp\SyncProject(
             $app['client.costlocker'],
-            $app['client.basecamp']
+            $app['client.basecamp'],
+            $app['database']
         );
         $data = $strategy($request);
         return new JsonResponse($data);
