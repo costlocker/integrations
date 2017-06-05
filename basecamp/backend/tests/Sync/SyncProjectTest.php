@@ -52,8 +52,10 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
                 'activities' => [
                     1 => [
                         'id' => $basecampId,
-                        'todos' => [
+                        'tasks' => [
                             885 => $basecampId,
+                        ],
+                        'persons' => [
                         ],
                     ],
                 ],
