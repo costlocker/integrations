@@ -6,6 +6,7 @@ class SyncRequest
 {
     public $costlockerProject;
     public $account;
+    public $updatedBasecampProject;
 
     public $isDeletingTodosEnabled = false;
     public $isRevokeAccessEnabled = false;

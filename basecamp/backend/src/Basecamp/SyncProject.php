@@ -27,7 +27,7 @@ class SyncProject
         list($people, $activities) = $this->analyzeProjectItems($project['items']);
 
         $this->basecamp = $this->basecampFactory->__invoke($config->account);
-        $bcProject = $this->upsertProject($project);
+        $bcProject = $this->upsertProject($project, $config);
         $bcProjectId = $bcProject['id'];
         $grantedPeople = $this->grantAccess($bcProjectId, $people);
         $bcProject['basecampPeople'] = $this->basecamp->getPeople($bcProjectId);
@@ -88,15 +88,15 @@ class SyncProject
         return [$persons, array_reverse($activities, true)];
     }
 
-    private function upsertProject(array $project)
+    private function upsertProject(array $project, SyncRequest $config)
     {
-        $existingProject = $this->database->findProject($project['id']);
+        $existingProject = $this->database->findProject($project['id'], $config->updatedBasecampProject);
         if ($existingProject) {
             return ['isCreated' => false, 'costlocker_id' => $project['id']] + $existingProject;
         }
         $name = "{$project['client']['name']} | {$project['name']}";
         return [
-            'id' => $this->basecamp->createProject($name, null, null),
+            'id' => $config->updatedBasecampProject ?: $this->basecamp->createProject($name, null, null),
             'costlocker_id' => $project['id'],
             'activities' => [],
             'isCreated' => true

@@ -13,20 +13,25 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
     private $basecamp;
     private $database;
 
-    private $isDeleteEnabled = false;
+    private $request;
 
     protected function setUp()
     {
         $this->costlocker = m::mock(CostlockerClient::class);
         $this->basecamp = m::mock(BasecampApi::class);
         $this->database = new InMemoryDatabase();
+        $this->request = new SyncRequest();
+        $this->request->account = 'irrelevant basecamp account';
+        $this->request->costlockerProject = 'irrelevant id';
     }
 
-    public function testCreateProject()
+    /** @dataProvider provideCreate */
+    public function testCreateProject($updatedBasecampProject, $basecampId)
     {
-        $basecampId = 'irrelevant new id';
+        $this->request->updatedBasecampProject = $updatedBasecampProject;
         $this->givenCostlockerProject('one-person.json');
-        $this->basecamp->shouldReceive('createProject')->once()
+        $this->basecamp->shouldReceive('createProject')
+            ->times($updatedBasecampProject ? 0 : 1)
             ->with('ACME | Website', null, null)
             ->andReturn($basecampId);
         $this->basecamp->shouldReceive('grantAccess')->once()
@@ -63,6 +68,14 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
             ],
             $this->database->findProject(1)
         );
+    }
+
+    public function provideCreate()
+    {
+        return [
+            'create new project' => [null, 'irrelevant new id'],
+            'add to existing project' => ['irrelevant existing id', 'irrelevant existing id'],
+        ];
     }
 
     public function testPartialUpdate()
@@ -145,7 +158,8 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
                 ],
             ]
         );
-        $this->isDeleteEnabled = true;
+        $this->request->isDeletingTodosEnabled = true;
+        $this->request->isRevokeAccessEnabled = true;
         $this->givenCostlockerProject('empty-project.json');
         $this->basecamp->shouldReceive('getPeople')->once()
             ->andReturn($this->givenBasecampPeople([1 => 'john@example.com', 2 => 'peter@example.com']));
@@ -203,16 +217,10 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
 
     private function synchronize()
     {
-        $request = new SyncRequest();
-        $request->account = 'irrelevant basecamp account';
-        $request->costlockerProject = 'irrelevant id';
-        $request->isDeletingTodosEnabled = $this->isDeleteEnabled;
-        $request->isRevokeAccessEnabled = $this->isDeleteEnabled;
-
         $basecampFactory = m::mock(BasecampFactory::class);
         $basecampFactory->shouldReceive('__invoke')->andReturn($this->basecamp);
         $uc = new SyncProject($this->costlocker, $basecampFactory, $this->database);
-        $uc($request);
+        $uc($this->request);
     }
 
     public function tearDown()

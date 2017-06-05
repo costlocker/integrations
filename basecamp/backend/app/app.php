@@ -85,8 +85,17 @@ $app
 
 $app
     ->post('/basecamp', function (Request $r) use ($app) {
-        $strategy = new Costlocker\Integrations\Basecamp\SyncProject($app['client.costlocker'], $app['client.basecamp']);
-        $data = $strategy($r->request->all());
+        $request = new Costlocker\Integrations\Basecamp\SyncRequest();
+        $request->account = $r->request->get('account');
+        $request->costlockerProject = $r->request->get('costlockerProject');
+        $isProjectLinked = $r->request->get('mode') == 'add';
+        $request->updatedBasecampProject = $isProjectLinked ? $r->request->get('basecampProject') : null;
+
+        $strategy = new Costlocker\Integrations\Basecamp\SyncProject(
+            $app['client.costlocker'],
+            $app['client.basecamp']
+        );
+        $data = $strategy($request);
         return new JsonResponse($data);
     })
     ->before($checkAuthorization('basecamp'));

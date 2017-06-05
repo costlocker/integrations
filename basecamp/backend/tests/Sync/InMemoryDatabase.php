@@ -6,13 +6,14 @@ class InMemoryDatabase implements SyncDatabase
 {
     private $mapping;
 
-    public function findProject($costockerProjectId)
+    public function findProject($costockerProjectId, $basecampProjectId = null)
     {
-        return $this->mapping[$costockerProjectId] ?? null;
+        $basecampProjects = $this->mapping[$costockerProjectId] ?? [];
+        return $basecampProjects[$basecampProjectId] ?? reset($basecampProjects);
     }
 
     public function upsertProject($costockerProjectId, array $mapping)
     {
-        $this->mapping[$costockerProjectId] = $mapping;
+        $this->mapping[$costockerProjectId][$mapping['id']] = $mapping;
     }
 }
