@@ -33,12 +33,19 @@ class SyncProject
         $bcProject['basecampPeople'] = $this->basecamp->getPeople($bcProjectId);
         $todolists = $this->createTodolists($bcProject, $activities);
 
+        if ($bcProject['isUpdated'] && $config['isDeleteEnabled']) {
+            $delete = $this->deleteLegacyEntitiesInBasecamp($bcProject);
+        } else {
+            $delete = [];
+        }
+
         return [
             'costlocker' => $project,
             'basecamp' => [
                 'id' => $bcProjectId,
                 'people' => $grantedPeople,
                 'activities' => $todolists,
+                'delete' => $delete,
             ],
         ];
     }
@@ -87,12 +94,13 @@ class SyncProject
     private function upsertProject(array $project)
     {
         if (array_key_exists($project['id'], $this->database)) {
-            return $this->database[$project['id']];
+            return ['isUpdated' => true] + $this->database[$project['id']];
         }
         $name = "{$project['client']['name']} | {$project['name']}";
         return [
             'id' => $this->basecamp->createProject($name, null, null),
             'activities' => [],
+            'isUpdated' => false
         ];
     }
 
@@ -102,7 +110,9 @@ class SyncProject
         foreach ($peopleFromCostlocker as $email => $fullname) {
             $peopleEmails["{$fullname} ({$email})"] = $email;
         }
-        $this->basecamp->grantAccess($bcProjectId, $peopleEmails);
+        if ($peopleEmails) {
+            $this->basecamp->grantAccess($bcProjectId, $peopleEmails);
+        }
         return $peopleEmails;
     }
 
@@ -148,5 +158,31 @@ class SyncProject
         }
         $assignee = $bcProject['basecampPeople'][$task['email']]->id;
         return $this->basecamp->createTodo($bcProject['id'], $bcTodolist['id'], $task['name'], $assignee);
+    }
+
+    private function deleteLegacyEntitiesInBasecamp(array $bcProject)
+    {
+        $summary = [
+            'todolists' => [],
+            'tasks' => [],
+        ];
+        $bcTodolists = $this->basecamp->getTodolists($bcProject['id']);
+        foreach ($bcProject['activities'] as $activity) {
+            $bcTodolistId = $activity['id'];
+            if (array_key_exists($bcTodolistId, $bcTodolists)) {
+                foreach (array_merge($activity['tasks'], $activity['persons']) as $bcTodoId) {
+                    if (array_key_exists($bcTodoId, $bcTodolists[$bcTodolistId]->todoitems)) {
+                        $this->basecamp->deleteTodo($bcProject, $bcTodolistId, $bcTodoId);
+                        $summary['tasks'][] = $bcTodoId;
+                        unset($bcTodolists[$bcTodolistId]->todoitems[$bcTodoId]);
+                    }
+                }
+                if (!$bcTodolists[$bcTodolistId]->todoitems) {
+                    $this->basecamp->deleteTodolist($bcProject['id'], $bcTodolistId);
+                    $summary['todolists'][] = $activity;
+                }
+            }
+        }
+        return $summary;
     }
 }

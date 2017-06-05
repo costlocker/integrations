@@ -13,6 +13,8 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
     private $basecamp;
     private $database = [];
 
+    private $isDeleteEnabled = false;
+
     protected function setUp()
     {
         $this->costlocker = m::mock(CostlockerClient::class);
@@ -75,6 +77,55 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
         $this->synchronize();
     }
 
+    public function testPartialDelete()
+    {
+        $this->database = [
+            1 => [
+                'id' => 'irrelevant project',
+                'activities' => [
+                    1 => [
+                        'id' => 'non-empty todolist',
+                        'tasks' => [
+                            885 => 'existing todo',
+                        ],
+                        'persons' => [
+                            885 => 'unknown basecamp id',
+                        ],
+                    ],
+                    2 => [
+                        'id' => 'empty todolist',
+                        'tasks' => [],
+                        'persons' => [],
+                    ],
+                    3 => [
+                        'id' => 'todolist not in BC',
+                        'tasks' => [],
+                        'persons' => [],
+                    ],
+                ],
+            ],
+        ];
+        $this->isDeleteEnabled = true;
+        $this->givenCostlockerProject('empty-project.json');
+        $this->basecamp->shouldReceive('getPeople')->once()
+            ->andReturn($this->givenBasecampPeople([1 => 'john@example.com', 2 => 'peter@example.com']));
+        $this->basecamp->shouldReceive('getTodolists')->once()
+            ->andReturn([
+                'non-empty todolist' => (object) [
+                    'todoitems' => [
+                        'existing todo' => (object) [],
+                        'todo manually created in BC (non-empty todolist is not deleted)' => (object) [],
+                    ],
+                ],
+                'empty todolist' => (object) [
+                    'todoitems' => [],
+                ],
+            ]);
+        $this->basecamp->shouldReceive('deleteTodolist')->once()->with(m::any(), 'empty todolist');
+        $this->basecamp->shouldReceive('deleteTodo')->once()->with(m::any(), m::any(), 'existing todo');
+        $this->synchronize();
+    }
+
     private function givenCostlockerProject($file)
     {
         $json = file_get_contents(__DIR__ . "/fixtures/{$file}");
@@ -102,6 +153,7 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
         $uc([
             'account' => 'irrelevant basecamp account',
             'costlockerProject' => 'irrelevant id',
+            'isDeleteEnabled' => $this->isDeleteEnabled,
         ]);
     }
 
