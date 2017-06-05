@@ -137,6 +137,63 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
                 'id' => $basecampId,
                 'activities' => [
                     1 => [
+                        'id' => $basecampId,
+                        'tasks' => [
+                            885 => $basecampId,
+                            900 => 'deleted todo',
+                            901 => 'unknown todo',
+                        ],
+                        'persons' => [
+                            885 => $basecampId,
+                        ],
+                    ],
+                ],
+            ]
+        );
+        $this->request->isDeletingTodosEnabled = true;
+        $this->request->isRevokeAccessEnabled = true;
+        $this->givenCostlockerProject('one-person.json');
+        $this->basecamp->shouldReceive('grantAccess')->once();
+        $this->basecamp->shouldReceive('getPeople')->once()
+            ->andReturn($this->givenBasecampPeople([1 => 'john@example.com', 2 => 'peter@example.com']));
+        $this->basecamp->shouldReceive('getTodolists')->once()
+            ->andReturn([
+                $basecampId => (object) [
+                    'todoitems' => [
+                        'deleted todo' => (object) ['assignee_id' => null],
+                    ],
+                ],
+            ]);
+        $this->basecamp->shouldReceive('deleteTodo')->once()->with(m::any(), 'deleted todo');
+        $this->synchronize();
+        $this->assertEquals(
+            [
+                'id' => $basecampId,
+                'activities' => [
+                    1 => [
+                        'id' => $basecampId,
+                        'tasks' => [
+                            885 => $basecampId,
+                        ],
+                        'persons' => [
+                            885 => $basecampId,
+                        ],
+                    ],
+                ],
+            ],
+            $this->database->findProject(1)
+        );
+    }
+
+    public function testFullDelete()
+    {
+        $basecampId = 'irrelevant project';
+        $this->database->upsertProject(
+            1,
+            [
+                'id' => $basecampId,
+                'activities' => [
+                    1 => [
                         'id' => 'non-empty todolist',
                         'tasks' => [
                             885 => 'existing todo',
