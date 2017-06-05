@@ -58,6 +58,7 @@ class SyncProject
                     'id' => $item['item']['activity_id'],
                     'name' => $item['activity']['name'],
                     'tasks' => [],
+                    'persons' => [],
                 ];
             }
             if ($item['item']['type'] == 'person') {
