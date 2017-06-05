@@ -71,6 +71,21 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampAcc
         </select>
       </div>
       }
+      <div className="form-group">
+        <label>What should happen when something is deleted in the Costlocker?</label>
+        <div>
+          <label className="checkbox-inline">
+            <input type="checkbox" name="deleteTasks"
+              onChange={syncForm.set('isDeletingTodosEnabled')} checked={syncForm.get('isDeletingTodosEnabled')}
+              /> Delete todos
+          </label>
+          <label className="checkbox-inline">
+            <input type="checkbox" name="revokeAccess"
+              onChange={syncForm.set('isRevokeAccessEnabled')} checked={syncForm.get('isRevokeAccessEnabled')}
+              /> Revoke access to persons without todo
+          </label>
+        </div>
+      </div>
       <button type="submit" className="btn btn-primary">Synchronize</button>
     </form>
   </div>;

@@ -98,6 +98,8 @@ $app
         $request->costlockerProject = $r->request->get('costlockerProject');
         $isProjectLinked = $r->request->get('mode') == 'add';
         $request->updatedBasecampProject = $isProjectLinked ? $r->request->get('basecampProject') : null;
+        $request->isDeletingTodosEnabled = $r->request->get('isDeletingTodosEnabled');
+        $request->isRevokeAccessEnabled = $r->request->get('isRevokeAccessEnabled');
 
         $strategy = new Costlocker\Integrations\Basecamp\SyncProject(
             $app['client.costlocker'],

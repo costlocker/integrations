@@ -89,7 +89,10 @@ export const states = [
       basecampAccounts={appState.cursor(['auth', 'basecamp']).deref().accounts}
       syncForm={{
         get: (type) => appState.cursor(['sync', type]).deref(),
-        set: (type) => (e) => appState.cursor(['sync']).set(type, e.target.value),
+        set: (type) => (e) => appState.cursor(['sync']).set(
+          type,
+          e.target.type === 'checkbox' ? e.target.checked : e.target.value
+        ),
         submit: (e) => {
           e.preventDefault();
           redirectToRoute('syncInProgress');
