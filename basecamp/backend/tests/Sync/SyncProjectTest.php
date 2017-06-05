@@ -153,8 +153,9 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
             ->andReturn([
                 'non-empty todolist' => (object) [
                     'todoitems' => [
-                        'existing todo' => (object) [],
-                        'todo manually created in BC (non-empty todolist is not deleted)' => (object) [],
+                        'existing todo' => (object) ['assignee_id' => null],
+                        'todo manually created in BC (non-empty todolist is not deleted)' =>
+                            (object) ['assignee_id' => 2],
                     ],
                 ],
                 'empty todolist' => (object) [
@@ -163,7 +164,7 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
             ]);
         $this->basecamp->shouldReceive('deleteTodolist')->once()->with(m::any(), 'empty todolist');
         $this->basecamp->shouldReceive('deleteTodo')->once()->with(m::any(), m::any(), 'existing todo');
-        $this->basecamp->shouldReceive('revokeAccess')->twice();
+        $this->basecamp->shouldReceive('revokeAccess')->once();
         $this->synchronize();
         $this->assertEquals(
             [

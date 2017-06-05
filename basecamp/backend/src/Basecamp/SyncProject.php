@@ -195,8 +195,17 @@ class SyncProject
             }
         }
 
+        $assignedIds = [];
+        foreach ($bcTodolists as $todolist) {
+            foreach ($todolist->todoitems as $todoitem) {
+                $assignedIds[$todoitem->assignee_id] = $todoitem->assignee_id;
+            }
+        }
+
         foreach ($bcProject['basecampPeople'] as $email => $bcPerson) {
-            if (!$bcPerson->admin && !array_key_exists($email, $peopleFromCostlocker)) {
+            if (!$bcPerson->admin &&
+                !array_key_exists($email, $peopleFromCostlocker) &&
+                !array_key_exists($bcPerson->id, $assignedIds)) {
                 $this->basecamp->revokeAccess($bcProject['id'], $bcPerson->id);
             }
         }
