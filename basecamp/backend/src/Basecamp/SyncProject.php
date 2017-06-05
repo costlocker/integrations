@@ -30,15 +30,15 @@ class SyncProject
         $bcProject = $this->upsertProject($project);
         $bcProjectId = $bcProject['id'];
         $grantedPeople = $this->grantAccess($bcProjectId, $people);
-        $bcPeople = $this->basecamp->getPeople($bcProjectId);
-        $todolists = $this->createTodolists($bcProjectId, $bcPeople, $activities);
+        $bcProject['basecampPeople'] = $this->basecamp->getPeople($bcProjectId);
+        $todolists = $this->createTodolists($bcProject, $activities);
 
         return [
             'costlocker' => $project,
             'basecamp' => [
                 'id' => $bcProjectId,
                 'people' => $grantedPeople,
-                'todolists' => $todolists,
+                'activities' => $todolists,
             ],
         ];
     }
@@ -51,6 +51,7 @@ class SyncProject
         foreach ($projectItems as $item) {
             if ($item['item']['type'] == 'activity') {
                 $activities[$item['item']['activity_id']] = [
+                    'id' => $item['item']['activity_id'],
                     'name' => $item['activity']['name'],
                     'tasks' => [],
                 ];
@@ -64,12 +65,14 @@ class SyncProject
                 if ($item['item']['type'] == 'person') {
                     $id = $item['item']['person_id'];
                     $task = [
+                        'id' => $id,
                         'name' => $activities[$item['item']['activity_id']]['name'],
                         'email' => $item['person']['email'],
                     ];
                 } else {
                     $id = $item['item']['task_id'];
                     $task = [
+                        'id' => $id,
                         'name' => $item['task']['name'],
                         'email' => $personsMap[$item['item']['person_id']],
                     ];
@@ -88,6 +91,7 @@ class SyncProject
         $name = "{$project['client']['name']} | {$project['name']}";
         return [
             'id' => $this->basecamp->createProject($name, null, null),
+            'activities' => [],
         ];
     }
 
@@ -101,21 +105,40 @@ class SyncProject
         return $peopleEmails;
     }
 
-    private function createTodolists($bcProjectId, array $bcPeople, array $activities)
+    private function createTodolists(array $bcProject, array $activities)
     {
         $mapping = [];
         foreach ($activities as $activityId => $activity) {
-            $bcTodolistId = $this->basecamp->createTodolist($bcProjectId, $activity['name']);
+            $bcTodolist = $this->upsertTodolist($bcProject, $activity);
             $todos = [];
             foreach ($activity['tasks'] as $taskId => $task) {
-                $assignee = $bcPeople[$task['email']]->id;
-                $todos[$taskId] = $this->basecamp->createTodo($bcProjectId, $bcTodolistId, $task['name'], $assignee);
+                $todos[$taskId] = $this->upsertTodo($bcProject, $bcTodolist, $task);
             }
             $mapping[$activityId] = [
-                'id' => $bcTodolistId,
+                'id' => $bcTodolist['id'],
                 'todos' => $todos,
             ];
         }
         return $mapping;
+    }
+
+    private function upsertTodolist(array $bcProject, array $activity)
+    {
+        if (array_key_exists($activity['id'], $bcProject['activities'])) {
+            return $bcProject['activities'][$activity['id']];
+        }
+        return [
+            'id' => $this->basecamp->createTodolist($bcProject['id'], $activity['name']),
+            'todos' => [],
+        ];
+    }
+
+    private function upsertTodo(array $bcProject, array $bcTodolist, array $task)
+    {
+        if (array_key_exists($task['id'], $bcTodolist['todos'])) {
+            return $bcTodolist['todos'][$task['id']];
+        }
+        $assignee = $bcProject['basecampPeople'][$task['email']]->id;
+        return $this->basecamp->createTodo($bcProject['id'], $bcTodolist['id'], $task['name'], $assignee);
     }
 }

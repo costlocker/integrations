@@ -43,12 +43,20 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
         $this->synchronize();
     }
 
-    public function testUpdateProject()
+    public function testPartialUpdate()
     {
         $basecampId = 'existing id';
         $this->database = [
             1 => [
                 'id' => $basecampId,
+                'activities' => [
+                    1 => [
+                        'id' => $basecampId,
+                        'todos' => [
+                            885 => $basecampId,
+                        ],
+                    ],
+                ],
             ],
         ];
         $this->givenCostlockerProject('one-person.json');
@@ -60,13 +68,8 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
             ]);
         $this->basecamp->shouldReceive('getPeople')->once()
             ->andReturn($this->givenBasecampPeople([1 => 'john@example.com', 2 => 'peter@example.com']));
-        $this->basecamp->shouldReceive('createTodolist')->once()
-            ->with($basecampId, 'Development')
-            ->andReturn($basecampId);
-        $this->basecamp->shouldReceive('createTodo')->once()
-            ->with($basecampId, $basecampId, 'Homepage', 1);
-        $this->basecamp->shouldReceive('createTodo')->once()
-            ->with($basecampId, $basecampId, 'Development', 2);
+        $this->basecamp->shouldReceive('createTodolist')->never();
+        $this->basecamp->shouldReceive('createTodo')->once();
         $this->synchronize();
     }
 
