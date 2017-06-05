@@ -18,7 +18,7 @@ class BasecampFactory
 
     public function __invoke($accountId): BasecampApi
     {
-        $account = $this->user->getBasecampAccount($accountId);
+        $account = $this->getAccount($accountId);
 
         $api = new Connect(new BasecampClient);
         $api->init(
@@ -28,5 +28,10 @@ class BasecampFactory
         );
 
         return $api;
+    }
+
+    public function getAccount($accountId)
+    {
+        return $this->user->getBasecampAccount($accountId);
     }
 }

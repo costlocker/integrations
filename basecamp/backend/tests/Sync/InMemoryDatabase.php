@@ -16,4 +16,9 @@ class InMemoryDatabase implements SyncDatabase
     {
         $this->mapping[$costockerProjectId][$mapping['id']] = $mapping;
     }
+
+    public function findProjects($costlockerProjectId)
+    {
+        return $this->database[$costlockerProjectId] ?? [];
+    }
 }

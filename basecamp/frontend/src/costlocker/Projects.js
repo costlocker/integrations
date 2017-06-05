@@ -23,6 +23,7 @@ export default function Projects({ projects, redirectToRoute }) {
             <tr>
               <th>Costlocker project</th>
               <th>Is synchronized?</th>
+              <th>Basecamps</th>
             </tr>
           </thead>
           <tbody>
@@ -30,10 +31,17 @@ export default function Projects({ projects, redirectToRoute }) {
               <tr key={project.id}>
                 <td>{project.name} <span className="label label-default">{project.client.name}</span></td>
                 <td>{
-                  project.id % 2 === 1
+                  project.basecamps.length
                   ? <span className="label label-success">YES</span>
                   : <span className="label label-danger">NO</span>
                 }
+                </td>
+                <td>
+                  {project.basecamps.map(basecamp => (
+                    <a href={basecamp.url} target="_blank" rel="noopener noreferrer">
+                      {basecamp.account.name} ({basecamp.account.product})
+                    </a>
+                  ))}
                 </td>
               </tr>
             ))}

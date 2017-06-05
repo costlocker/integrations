@@ -73,7 +73,11 @@ $app
 
 $app
     ->get('/costlocker', function () use ($app) {
-        $strategy = new Costlocker\Integrations\Costlocker\GetProjects($app['client.costlocker']);
+        $strategy = new Costlocker\Integrations\Costlocker\GetProjects(
+            $app['client.costlocker'],
+            $app['client.basecamp'],
+            $app['database']
+        );
         $data = $strategy();
         return new JsonResponse($data);
     })

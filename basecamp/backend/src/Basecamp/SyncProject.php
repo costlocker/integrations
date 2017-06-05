@@ -34,7 +34,7 @@ class SyncProject
         $todolists = $this->createTodolists($bcProject, $activities);
         $delete = $this->deleteLegacyEntitiesInBasecamp($bcProject, $people, $todolists, $config);
 
-        $this->updateMapping($bcProject, $todolists, $delete);
+        $this->updateMapping($bcProject, $todolists, $delete, $config);
 
         return [
             'costlocker' => $project,
@@ -222,7 +222,7 @@ class SyncProject
         return $deleted;
     }
 
-    private function updateMapping(array $bcProject, array $todolists, array $deleteSummary)
+    private function updateMapping(array $bcProject, array $todolists, array $deleteSummary, SyncRequest $config)
     {
         foreach ($todolists as $activityId => $activity) {
             if (!array_key_exists($activityId, $bcProject['activities'])) {
@@ -253,6 +253,7 @@ class SyncProject
 
         $this->database->upsertProject($bcProject['costlocker_id'], [
             'id' => $bcProject['id'],
+            'account' => $this->basecampFactory->getAccount($config->account),
             'activities' => $bcProject['activities'],
         ]);
     }

@@ -17,7 +17,7 @@ class FileDatabase implements SyncDatabase
 
     public function findProject($costockerProjectId, $basecampProjectId = null)
     {
-        $basecampProjects = $this->database[$costockerProjectId] ?? [];
+        $basecampProjects = $this->findProjects($costockerProjectId);
         return $basecampProjects[$basecampProjectId] ?? reset($basecampProjects);
     }
 
@@ -25,5 +25,11 @@ class FileDatabase implements SyncDatabase
     {
         $this->database[$costockerProjectId][$mapping['id']] = $mapping;
         file_put_contents($this->file, json_encode($this->database, JSON_PRETTY_PRINT));
+    }
+
+    public function findProjects($costlockerProjectId)
+    {
+        // fixme: filter by tenant
+        return $this->database[$costlockerProjectId] ?? [];
     }
 }

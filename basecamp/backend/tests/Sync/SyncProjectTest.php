@@ -54,6 +54,7 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'id' => $basecampId,
+                'account' => [],
                 'activities' => [
                     1 => [
                         'id' => $basecampId,
@@ -112,6 +113,7 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'id' => $basecampId,
+                'account' => [],
                 'activities' => [
                     1 => [
                         'id' => $basecampId,
@@ -169,6 +171,7 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'id' => $basecampId,
+                'account' => [],
                 'activities' => [
                     1 => [
                         'id' => $basecampId,
@@ -240,6 +243,7 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'id' => $basecampId,
+                'account' => [],
                 'activities' => [
                     // not deleted because todolist is not empty in BC
                     1 => [
@@ -276,6 +280,7 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
     {
         $basecampFactory = m::mock(BasecampFactory::class);
         $basecampFactory->shouldReceive('__invoke')->andReturn($this->basecamp);
+        $basecampFactory->shouldReceive('getAccount')->andReturn([]);
         $uc = new SyncProject($this->costlocker, $basecampFactory, $this->database);
         $uc($this->request);
     }
