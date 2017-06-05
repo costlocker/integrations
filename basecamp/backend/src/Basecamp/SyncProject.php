@@ -27,7 +27,8 @@ class SyncProject
         $this->basecamp = $this->basecampFactory->__invoke($config['account']);
         $bcProjectId = $this->createProject($project);
         $grantedPeople = $this->grantAccess($bcProjectId, $people);
-        $todolists = $this->createTodolists($bcProjectId, $activities);
+        $bcPeople = $this->basecamp->getPeople($bcProjectId);
+        $todolists = $this->createTodolists($bcProjectId, $bcPeople, $activities);
 
         return [
             'costlocker' => $project,
@@ -42,6 +43,7 @@ class SyncProject
     private function analyzeProjectItems(array $projectItems)
     {
         $persons = [];
+        $personsMap = [];
         $activities = [];
         foreach ($projectItems as $item) {
             if ($item['item']['type'] == 'activity') {
@@ -53,14 +55,21 @@ class SyncProject
             if ($item['item']['type'] == 'person') {
                 $person = $item['person'];
                 $persons[$person['email']] = "{$person['first_name']} {$person['last_name']}";
+                $personsMap[$item['item']['person_id']] = $person['email'];
             }
             if (isset($item['hours']['is_aggregation']) && !$item['hours']['is_aggregation']) {
                 if ($item['item']['type'] == 'person') {
                     $id = $item['item']['person_id'];
-                    $task = $activities[$item['item']['activity_id']]['name'];
+                    $task = [
+                        'name' => $activities[$item['item']['activity_id']]['name'],
+                        'email' => $item['person']['email'],
+                    ];
                 } else {
                     $id = $item['item']['task_id'];
-                    $task = $item['task']['name'];
+                    $task = [
+                        'name' => $item['task']['name'],
+                        'email' => $personsMap[$item['item']['person_id']],
+                    ];
                 }
                 $activities[$item['item']['activity_id']]['tasks'][$id] = $task;
             }
@@ -84,14 +93,15 @@ class SyncProject
         return $peopleEmails;
     }
 
-    private function createTodolists($bcProjectId, array $activities)
+    private function createTodolists($bcProjectId, array $bcPeople, array $activities)
     {
         $mapping = [];
         foreach ($activities as $activityId => $activity) {
             $bcTodolistId = $this->basecamp->createTodolist($bcProjectId, $activity['name']);
             $todos = [];
             foreach ($activity['tasks'] as $taskId => $task) {
-                $todos[$taskId] = $this->basecamp->createTodo($bcProjectId, $bcTodolistId, $task, null);
+                $assignee = $bcPeople[$task['email']]->id;
+                $todos[$taskId] = $this->basecamp->createTodo($bcProjectId, $bcTodolistId, $task['name'], $assignee);
             }
             $mapping[$activityId] = [
                 'id' => $bcTodolistId,

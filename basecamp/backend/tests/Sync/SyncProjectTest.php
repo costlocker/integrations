@@ -30,20 +30,35 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
                 'John Doe (john@example.com)' => 'john@example.com',
                 'Peter Nobody (peter@example.com)' => 'peter@example.com',
             ]);
+        $this->basecamp->shouldReceive('getPeople')->once()
+            ->andReturn($this->givenBasecampPeople([1 => 'john@example.com', 2 => 'peter@example.com']));
         $this->basecamp->shouldReceive('createTodolist')->once()
             ->with($basecampId, 'Development')
             ->andReturn($basecampId);
         $this->basecamp->shouldReceive('createTodo')->once()
-            ->with($basecampId, $basecampId, 'Homepage', null);
+            ->with($basecampId, $basecampId, 'Homepage', 1);
         $this->basecamp->shouldReceive('createTodo')->once()
-            ->with($basecampId, $basecampId, 'Development', null);
+            ->with($basecampId, $basecampId, 'Development', 2);
         $this->synchronize();
     }
 
-    public function givenCostlockerProject($file)
+    private function givenCostlockerProject($file)
     {
         $json = file_get_contents(__DIR__ . "/fixtures/{$file}");
         $this->costlocker->shouldReceive('__invoke')->andReturn(new Response(200, [], $json));
+    }
+
+    private function givenBasecampPeople(array $emails)
+    {
+        $people = [];
+        foreach ($emails as $id => $email) {
+            $people[$email] = (object) [
+                'id' => $id,
+                'name' => $email,
+                'admin' => false,
+            ];
+        }
+        return $people;
     }
 
     private function synchronize()
