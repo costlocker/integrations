@@ -34,7 +34,7 @@ class SyncProject
         $todolists = $this->createTodolists($bcProject, $activities);
         $delete = $this->deleteLegacyEntitiesInBasecamp($bcProject, $config);
 
-        $this->updateMapping($bcProject, $delete);
+        $this->updateMapping($bcProject, $todolists, $delete);
 
         return [
             'costlocker' => $project,
@@ -196,18 +196,35 @@ class SyncProject
         return $summary;
     }
 
-    private function updateMapping(array $bcProject, array $deleteSummary)
+    private function updateMapping(array $bcProject, array $todolists, array $deleteSummary)
     {
+        foreach ($todolists as $activityId => $activity) {
+            if (!array_key_exists($activityId, $bcProject['activities'])) {
+                $bcProject['activities'][$activityId] = [];
+            }
+            $bcProject['activities'][$activityId] += [
+                'id' => $activity['id'],
+                'tasks' => [],
+                'persons' => [],
+            ];
+            foreach (['tasks', 'persons'] as $type) {
+                foreach ($activity[$type] as $taskId => $bcTodoId) {
+                    $bcProject['activities'][$activityId][$type][$taskId] = $bcTodoId;
+                }
+            }
+        }
+
         foreach ($deleteSummary['activities'] as $activity) {
             unset($bcProject['activities'][$activity]);
         }
         foreach (['tasks', 'persons'] as $type) {
             foreach ($deleteSummary[$type] as $activityId => $tasks) {
-                foreach ($tasks as $id) {
-                    unset($bcProject['activities'][$activityId][$type][$id]);
+                foreach ($tasks as $taskId) {
+                    unset($bcProject['activities'][$activityId][$type][$taskId]);
                 }
             }
         }
+
         $this->database->upsertProject($bcProject['costlocker_id'], [
             'id' => $bcProject['id'],
             'activities' => $bcProject['activities'],

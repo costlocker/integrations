@@ -40,10 +40,29 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
             ->with($basecampId, 'Development')
             ->andReturn($basecampId);
         $this->basecamp->shouldReceive('createTodo')->once()
-            ->with($basecampId, $basecampId, 'Homepage', 1);
+            ->with($basecampId, $basecampId, 'Homepage', 1)
+            ->andReturn($basecampId);
         $this->basecamp->shouldReceive('createTodo')->once()
-            ->with($basecampId, $basecampId, 'Development', 2);
+            ->with($basecampId, $basecampId, 'Development', 2)
+            ->andReturn($basecampId);
         $this->synchronize();
+        $this->assertEquals(
+            [
+                'id' => $basecampId,
+                'activities' => [
+                    1 => [
+                        'id' => $basecampId,
+                        'tasks' => [
+                            885 => $basecampId,
+                        ],
+                        'persons' => [
+                            885 => $basecampId,
+                        ],
+                    ]
+                ],
+            ],
+            $this->database->findProject(1)
+        );
     }
 
     public function testPartialUpdate()
@@ -75,8 +94,25 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
         $this->basecamp->shouldReceive('getPeople')->once()
             ->andReturn($this->givenBasecampPeople([1 => 'john@example.com', 2 => 'peter@example.com']));
         $this->basecamp->shouldReceive('createTodolist')->never();
-        $this->basecamp->shouldReceive('createTodo')->once();
+        $this->basecamp->shouldReceive('createTodo')->once()->andReturn('new id');
         $this->synchronize();
+        $this->assertEquals(
+            [
+                'id' => $basecampId,
+                'activities' => [
+                    1 => [
+                        'id' => $basecampId,
+                        'tasks' => [
+                            885 => $basecampId,
+                        ],
+                        'persons' => [
+                            885 => 'new id',
+                        ],
+                    ]
+                ],
+            ],
+            $this->database->findProject(1)
+        );
     }
 
     public function testPartialDelete()
