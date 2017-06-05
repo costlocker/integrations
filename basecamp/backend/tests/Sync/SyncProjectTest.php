@@ -203,14 +203,16 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
 
     private function synchronize()
     {
+        $request = new SyncRequest();
+        $request->account = 'irrelevant basecamp account';
+        $request->costlockerProject = 'irrelevant id';
+        $request->isDeletingTodosEnabled = $this->isDeleteEnabled;
+        $request->isRevokeAccessEnabled = $this->isDeleteEnabled;
+
         $basecampFactory = m::mock(BasecampFactory::class);
         $basecampFactory->shouldReceive('__invoke')->andReturn($this->basecamp);
         $uc = new SyncProject($this->costlocker, $basecampFactory, $this->database);
-        $uc([
-            'account' => 'irrelevant basecamp account',
-            'costlockerProject' => 'irrelevant id',
-            'isDeleteEnabled' => $this->isDeleteEnabled,
-        ]);
+        $uc($request);
     }
 
     public function tearDown()

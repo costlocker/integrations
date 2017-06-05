@@ -20,13 +20,13 @@ class SyncProject
         $this->database = $db;
     }
 
-    public function __invoke(array $config)
+    public function __invoke(SyncRequest $config)
     {
-        $response = $this->costlocker->__invoke("/projects/{$config['costlockerProject']}?types=peoplecosts");
+        $response = $this->costlocker->__invoke("/projects/{$config->costlockerProject}?types=peoplecosts");
         $project = json_decode($response->getBody(), true)['data'];
         list($people, $activities) = $this->analyzeProjectItems($project['items']);
 
-        $this->basecamp = $this->basecampFactory->__invoke($config['account']);
+        $this->basecamp = $this->basecampFactory->__invoke($config->account);
         $bcProject = $this->upsertProject($project);
         $bcProjectId = $bcProject['id'];
         $grantedPeople = $this->grantAccess($bcProjectId, $people);
@@ -159,7 +159,7 @@ class SyncProject
         return $this->basecamp->createTodo($bcProject['id'], $bcTodolist['id'], $task['name'], $assignee);
     }
 
-    private function deleteLegacyEntitiesInBasecamp(array $bcProject, array $peopleFromCostlocker, array $config)
+    private function deleteLegacyEntitiesInBasecamp(array $bcProject, array $peopleFromCostlocker, SyncRequest $config)
     {
         $summary = [
             'activities' => [],
@@ -168,45 +168,49 @@ class SyncProject
             'revoked' => [],
         ];
 
-        if ($bcProject['isCreated'] || !$config['isDeleteEnabled']) {
+        if ($bcProject['isCreated'] || $config->isDeleteDisabled()) {
             return $summary;
         }
 
         $bcTodolists = $this->basecamp->getTodolists($bcProject['id']);
 
-        foreach ($bcProject['activities'] as $activityId => $activity) {
-            $bcTodolistId = $activity['id'];
-            if (array_key_exists($bcTodolistId, $bcTodolists)) {
-                foreach (['tasks', 'persons'] as $type) {
-                    foreach ($activity[$type] as $id => $bcTodoId) {
-                        if (array_key_exists($bcTodoId, $bcTodolists[$bcTodolistId]->todoitems)) {
-                            $this->basecamp->deleteTodo($bcProject['id'], $bcTodolistId, $bcTodoId);
-                            unset($bcTodolists[$bcTodolistId]->todoitems[$bcTodoId]);
+        if ($config->isDeletingTodosEnabled) {
+            foreach ($bcProject['activities'] as $activityId => $activity) {
+                $bcTodolistId = $activity['id'];
+                if (array_key_exists($bcTodolistId, $bcTodolists)) {
+                    foreach (['tasks', 'persons'] as $type) {
+                        foreach ($activity[$type] as $id => $bcTodoId) {
+                            if (array_key_exists($bcTodoId, $bcTodolists[$bcTodolistId]->todoitems)) {
+                                $this->basecamp->deleteTodo($bcProject['id'], $bcTodolistId, $bcTodoId);
+                                unset($bcTodolists[$bcTodolistId]->todoitems[$bcTodoId]);
+                            }
+                            $summary[$type][$activityId][$id] = $id;
                         }
-                        $summary[$type][$activityId][$id] = $id;
                     }
-                }
-                if (!$bcTodolists[$bcTodolistId]->todoitems) {
-                    $this->basecamp->deleteTodolist($bcProject['id'], $bcTodolistId);
+                    if (!$bcTodolists[$bcTodolistId]->todoitems) {
+                        $this->basecamp->deleteTodolist($bcProject['id'], $bcTodolistId);
+                        $summary['activities'][$activityId] = $activityId;
+                    }
+                } else {
                     $summary['activities'][$activityId] = $activityId;
                 }
-            } else {
-                $summary['activities'][$activityId] = $activityId;
             }
         }
 
-        $assignedIds = [];
-        foreach ($bcTodolists as $todolist) {
-            foreach ($todolist->todoitems as $todoitem) {
-                $assignedIds[$todoitem->assignee_id] = $todoitem->assignee_id;
+        if ($config->isRevokeAccessEnabled) {
+            $assignedIds = [];
+            foreach ($bcTodolists as $todolist) {
+                foreach ($todolist->todoitems as $todoitem) {
+                    $assignedIds[$todoitem->assignee_id] = $todoitem->assignee_id;
+                }
             }
-        }
 
-        foreach ($bcProject['basecampPeople'] as $email => $bcPerson) {
-            if (!$bcPerson->admin &&
-                !array_key_exists($email, $peopleFromCostlocker) &&
-                !array_key_exists($bcPerson->id, $assignedIds)) {
-                $this->basecamp->revokeAccess($bcProject['id'], $bcPerson->id);
+            foreach ($bcProject['basecampPeople'] as $email => $bcPerson) {
+                if (!$bcPerson->admin &&
+                    !array_key_exists($email, $peopleFromCostlocker) &&
+                    !array_key_exists($bcPerson->id, $assignedIds)) {
+                    $this->basecamp->revokeAccess($bcProject['id'], $bcPerson->id);
+                }
             }
         }
 
