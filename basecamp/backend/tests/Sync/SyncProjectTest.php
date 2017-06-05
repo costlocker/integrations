@@ -163,6 +163,7 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
             ]);
         $this->basecamp->shouldReceive('deleteTodolist')->once()->with(m::any(), 'empty todolist');
         $this->basecamp->shouldReceive('deleteTodo')->once()->with(m::any(), m::any(), 'existing todo');
+        $this->basecamp->shouldReceive('revokeAccess')->twice();
         $this->synchronize();
         $this->assertEquals(
             [

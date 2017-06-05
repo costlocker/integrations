@@ -32,7 +32,7 @@ class SyncProject
         $grantedPeople = $this->grantAccess($bcProjectId, $people);
         $bcProject['basecampPeople'] = $this->basecamp->getPeople($bcProjectId);
         $todolists = $this->createTodolists($bcProject, $activities);
-        $delete = $this->deleteLegacyEntitiesInBasecamp($bcProject, $config);
+        $delete = $this->deleteLegacyEntitiesInBasecamp($bcProject, $people, $config);
 
         $this->updateMapping($bcProject, $todolists, $delete);
 
@@ -159,12 +159,13 @@ class SyncProject
         return $this->basecamp->createTodo($bcProject['id'], $bcTodolist['id'], $task['name'], $assignee);
     }
 
-    private function deleteLegacyEntitiesInBasecamp(array $bcProject, array $config)
+    private function deleteLegacyEntitiesInBasecamp(array $bcProject, array $peopleFromCostlocker, array $config)
     {
         $summary = [
             'activities' => [],
             'tasks' => [],
             'persons' => [],
+            'revoked' => [],
         ];
 
         if ($bcProject['isCreated'] || !$config['isDeleteEnabled']) {
@@ -193,6 +194,13 @@ class SyncProject
                 $summary['activities'][$activityId] = $activityId;
             }
         }
+
+        foreach ($bcProject['basecampPeople'] as $email => $bcPerson) {
+            if (!$bcPerson->admin && !array_key_exists($email, $peopleFromCostlocker)) {
+                $this->basecamp->revokeAccess($bcProject['id'], $bcPerson->id);
+            }
+        }
+
         return $summary;
     }
 
