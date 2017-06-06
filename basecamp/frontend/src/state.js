@@ -15,6 +15,7 @@ const appState = immstruct({
     account: null,
     costlockerProject: null,
     basecampProject: null,
+    areTodosEnabled: true,
     isDeletingTodosEnabled: false,
     isRevokeAccessEnabled: false,
     mode: 'create',

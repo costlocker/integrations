@@ -32,14 +32,21 @@ class SyncProject
         if ($this->checkDeletedProject($bcProject)) {
             return;
         }
-        $grantedPeople = $this->grantAccess($bcProjectId, $people);
-        $bcProject['basecampPeople'] = $this->basecamp->getPeople($bcProjectId);
-        $todolists = $this->createTodolists($bcProject, $activities);
-        $delete = $this->deleteLegacyEntitiesInBasecamp($bcProject, $people, $todolists, $config);
+        if ($config->areTodosEnabled) {
+            $grantedPeople = $this->grantAccess($bcProjectId, $people);
+            $bcProject['basecampPeople'] = $this->basecamp->getPeople($bcProjectId);
+            $todolists = $this->createTodolists($bcProject, $activities);
+            $delete = $this->deleteLegacyEntitiesInBasecamp($bcProject, $people, $todolists, $config);
+        } else {
+            $grantedPeople = [];
+            $todolists = [];
+            $delete = [];
+        }
 
         $this->updateMapping($bcProject, $todolists, $delete, $config);
 
         return [
+            'request' => get_object_vars($config),
             'costlocker' => $project,
             'basecamp' => [
                 'id' => $bcProjectId,
@@ -240,29 +247,31 @@ class SyncProject
 
     private function updateMapping(array $bcProject, array $todolists, array $deleteSummary, SyncRequest $config)
     {
-        foreach ($todolists as $activityId => $activity) {
-            if (!array_key_exists($activityId, $bcProject['activities'])) {
-                $bcProject['activities'][$activityId] = [];
-            }
-            $bcProject['activities'][$activityId] += [
-                'id' => $activity['id'],
-                'tasks' => [],
-                'persons' => [],
-            ];
-            foreach (['tasks', 'persons'] as $type) {
-                foreach ($activity[$type] as $taskId => $bcTodoId) {
-                    $bcProject['activities'][$activityId][$type][$taskId] = $bcTodoId;
+        if ($config->areTodosEnabled) {
+            foreach ($todolists as $activityId => $activity) {
+                if (!array_key_exists($activityId, $bcProject['activities'])) {
+                    $bcProject['activities'][$activityId] = [];
+                }
+                $bcProject['activities'][$activityId] += [
+                    'id' => $activity['id'],
+                    'tasks' => [],
+                    'persons' => [],
+                ];
+                foreach (['tasks', 'persons'] as $type) {
+                    foreach ($activity[$type] as $taskId => $bcTodoId) {
+                        $bcProject['activities'][$activityId][$type][$taskId] = $bcTodoId;
+                    }
                 }
             }
-        }
 
-        foreach ($deleteSummary['activities'] as $activity) {
-            unset($bcProject['activities'][$activity]);
-        }
-        foreach (['tasks', 'persons'] as $type) {
-            foreach ($deleteSummary[$type] as $activityId => $tasks) {
-                foreach ($tasks as $taskId) {
-                    unset($bcProject['activities'][$activityId][$type][$taskId]);
+            foreach ($deleteSummary['activities'] as $activity) {
+                unset($bcProject['activities'][$activity]);
+            }
+            foreach (['tasks', 'persons'] as $type) {
+                foreach ($deleteSummary[$type] as $activityId => $tasks) {
+                    foreach ($tasks as $taskId) {
+                        unset($bcProject['activities'][$activityId][$type][$taskId]);
+                    }
                 }
             }
         }

@@ -72,6 +72,21 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampAcc
       </div>
       }
       <div className="form-group">
+        <label>What is exported to Basecamp?</label>
+        <div>
+          <label className="checkbox-inline disabled">
+            <input type="checkbox" disabled defaultChecked={true}
+              /> Project name
+          </label>
+          <label className="checkbox-inline">
+            <input type="checkbox" name="areTodosEnabled"
+              onChange={syncForm.set('areTodosEnabled')} checked={syncForm.get('areTodosEnabled')}
+              /> Personnel costs are transformed to todolists
+          </label>
+        </div>
+      </div>
+      {syncForm.get('areTodosEnabled') &&
+      <div className="form-group">
         <label>What should happen when something is deleted in the Costlocker?</label>
         <div>
           <label className="checkbox-inline">
@@ -86,6 +101,7 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampAcc
           </label>
         </div>
       </div>
+      }
       <button type="submit" className="btn btn-primary">Synchronize</button>
     </form>
   </div>;

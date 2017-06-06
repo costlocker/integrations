@@ -8,6 +8,7 @@ class SyncRequest
     public $account;
     public $updatedBasecampProject;
 
+    public $areTodosEnabled = true;
     public $isDeletingTodosEnabled = false;
     public $isRevokeAccessEnabled = false;
 

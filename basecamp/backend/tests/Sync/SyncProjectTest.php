@@ -79,6 +79,24 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testCreateProjectWithoutTodolists()
+    {
+        $basecampId = 'irrelevant project';
+        $this->request->areTodosEnabled = false;
+        $this->givenCostlockerProject('one-person.json');
+        $this->basecamp->shouldReceive('createProject')->once()->andReturn($basecampId);
+        $this->basecamp->shouldReceive('grantAccess')->never();
+        $this->synchronize();
+        $this->assertEquals(
+            [
+                'id' => $basecampId,
+                'account' => [],
+                'activities' => [],
+            ],
+            $this->database->findProject(1)
+        );
+    }
+
     public function testPartialUpdate()
     {
         $basecampId = 'existing id';
