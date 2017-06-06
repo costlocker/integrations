@@ -50,10 +50,9 @@ class AuthorizeInBasecamp
                 ]);
                 $resourceOwner = $this->provider->getResourceOwner($accessToken);
                 $basecampUser = $resourceOwner->toArray();
-                $this->persistUser->__invoke($basecampUser, $accessToken);
+                
                 $this->session->set('basecamp', [
-                    'account' => $basecampUser,
-                    'accessToken' => $accessToken->jsonSerialize(),
+                    'userId' => $this->persistUser->__invoke($basecampUser, $accessToken),
                 ]);
                 return new RedirectResponse($this->appUrl);
             } catch (\Exception $e) {

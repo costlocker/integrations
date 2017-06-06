@@ -4,49 +4,89 @@ namespace Costlocker\Integrations\Auth;
 
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Doctrine\ORM\EntityManagerInterface;
+use Costlocker\Integrations\Database\CostlockerUser;
+use Costlocker\Integrations\Database\BasecampUser;
+use Costlocker\Integrations\Database\BasecampAccount;
 
 class GetUser
 {
     private $session;
+    private $entityManager;
+    private $costlockerUser;
+    private $basecampUser;
 
-    public function __construct(SessionInterface $s)
+    public function __construct(SessionInterface $s, EntityManagerInterface $em)
     {
         $this->session = $s;
+        $this->entityManager = $em;
     }
 
     public function __invoke()
     {
         return new JsonResponse([
-            'basecamp' => $this->session->get('basecamp')['account'] ?? null,
-            'costlocker' => $this->session->get('costlocker')['account'] ?? null,
+            'basecamp' => $this->getBasecampUser()->data,
+            'costlocker' => $this->getCostlockerUser()->data,
         ]);
     }
 
-    public function getCostlockerUserId()
+    public function getCostlockerUser(): CostlockerUser
     {
-        return $this->session->get('costlocker')['userId'];
+        if (!$this->costlockerUser) {
+            $userId = $this->session->get('costlocker')['userId'] ?? 0;
+            $user = $this->entityManager->getRepository(CostlockerUser::class)
+                ->find($userId);
+            $this->costlockerUser = $user;
+        }
+        return $this->costlockerUser ?: new CostlockerUser();
+    }
+
+    public function getBasecampUser(): BasecampUser
+    {
+        if (!$this->basecampUser) {
+            $userId = $this->session->get('basecamp')['userId'] ?? 0;
+            $user = $this->entityManager->getRepository(BasecampUser::class)
+                ->find($userId);
+            $this->basecampUser = $user;
+        }
+        return $this->basecampUser ?: new BasecampUser();
     }
 
     public function getCostlockerAccessToken()
     {
-        return $this->session->get('costlocker')['accessToken']['access_token'];
+        $sql =<<<SQL
+            SELECT access_token
+            FROM apitoken
+            WHERE costlocker_user_id = :cl AND basecamp_user_id IS NULL
+            ORDER BY id DESC
+            LIMIT 1
+SQL;
+        $params = [
+            'cl' => $this->getCostlockerUser()->id,
+        ];
+        $query = $this->entityManager->getConnection()->executeQuery($sql, $params);
+        return $query->fetchColumn();
     }
 
     public function getBasecampAccessToken()
     {
-        return $this->session->get('basecamp')['accessToken']['access_token'];
+        $sql =<<<SQL
+            SELECT access_token
+            FROM apitoken
+            WHERE costlocker_user_id = :cl AND basecamp_user_id = :bc
+            ORDER BY id DESC
+            LIMIT 1
+SQL;
+        $params = [
+            'cl' => $this->getCostlockerUser()->id,
+            'bc' => $this->getBasecampUser()->id,
+        ];
+        $query = $this->entityManager->getConnection()->executeQuery($sql, $params);
+        return $query->fetchColumn();
     }
 
     public function getBasecampAccount($accountId)
     {
-        foreach ($this->session->get('basecamp')['account']['accounts'] as $account) {
-            if ($account['id'] == $accountId) {
-                return $account;
-            }
-        }
-        return [
-            'product' => '',
-            'href' => 'https://3.basecampapi.com',
-        ];
+        return $this->getBasecampUser()->getAccount($accountId) ?: new BasecampAccount();
     }
 }

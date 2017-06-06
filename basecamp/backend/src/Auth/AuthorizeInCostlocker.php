@@ -64,12 +64,9 @@ class AuthorizeInCostlocker
                 if (!in_array($costockerRole, ['OWNER', 'ADMIN'])) {
                     return $this->sendError("Only ADMIN or OWNER can import project, you are {$costockerRole}");
                 }
-                $userId = $this->persistUser->__invoke($costlockerUser, $accessToken);
                 $this->session->remove('costlockerLogin');
                 $this->session->set('costlocker', [
-                    'userId' => $userId,
-                    'account' => $costlockerUser,
-                    'accessToken' => $accessToken->jsonSerialize(),
+                    'userId' => $this->persistUser->__invoke($costlockerUser, $accessToken),
                 ]);
                 return new RedirectResponse($this->appUrl);
             } catch (\Exception $e) {

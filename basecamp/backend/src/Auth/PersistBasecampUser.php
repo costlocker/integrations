@@ -3,7 +3,6 @@
 namespace Costlocker\Integrations\Auth;
 
 use League\OAuth2\Client\Token\AccessToken as OAuthToken;
-use Costlocker\Integrations\Database\CostlockerUser;
 use Costlocker\Integrations\Database\BasecampUser;
 use Costlocker\Integrations\Database\BasecampAccount;
 use Costlocker\Integrations\Database\AccessToken;
@@ -26,7 +25,7 @@ class PersistBasecampUser
         $newUser = new BasecampUser();
         $newUser->id = $apiUser['identity']['id'];
         $newUser->data = $apiUser;
-        $newUser->costlockerUser = $this->getCurrentCostlockerUser();
+        $newUser->costlockerUser = $this->getUser->getCostlockerUser();
         $user = $this->findUserInDb($newUser) ?: $newUser;
 
         foreach ($apiUser['accounts'] as $apiAccount) {
@@ -49,17 +48,13 @@ class PersistBasecampUser
         $this->entityManager->persist($user);
         $this->entityManager->persist($token);
         $this->entityManager->flush();
+
+        return $user->id;
     }
 
     private function findUserInDb(BasecampUser $user)
     {
         return $this->entityManager->getRepository(BasecampUser::class)
             ->find($user->id);
-    }
-
-    private function getCurrentCostlockerUser()
-    {
-        return $this->entityManager->getRepository(CostlockerUser::class)
-            ->find($this->getUser->getCostlockerUserId());
     }
 }

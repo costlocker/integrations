@@ -37,7 +37,7 @@ $app['client.basecamp'] = function ($app) {
 };
 
 $app['client.user'] = function ($app) {
-    return new Costlocker\Integrations\Auth\GetUser($app['session']);
+    return new Costlocker\Integrations\Auth\GetUser($app['session'], $app['orm.em']);
 };
 
 $app['client.check'] = function ($app) {

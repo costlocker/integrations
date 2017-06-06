@@ -40,17 +40,18 @@ class BasecampUser
 
     public function addAccount(BasecampAccount $account)
     {
-        if ($this->hasAccount($account->id)) {
+        if ($this->getAccount($account->id)) {
             return;
         }
         $this->accounts->add($account);
         $account->basecampUser = $this;
     }
 
-    private function hasAccount($idAccount)
+    public function getAccount($idAccount)
     {
-        return $this->accounts->exists(function ($index, BasecampAccount $ac) use ($idAccount) {
+        $accounts = $this->accounts->filter(function (BasecampAccount $ac) use ($idAccount) {
             return $ac->id == $idAccount;
         });
+        return $accounts->first();
     }
 }
