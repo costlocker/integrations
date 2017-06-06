@@ -35,6 +35,7 @@ class BasecampFactory
     {
         $account = $this->user->getBasecampAccount($accountId);
         return [
+            'id' => $account->id,
             'token' => $this->user->getBasecampAccessToken(),
             'product' => $account->product,
             'href' => $account->urlApi,
