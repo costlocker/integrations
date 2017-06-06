@@ -1,0 +1,74 @@
+{
+    "meta": {
+        "events": {
+            "peoplecosts.change": 1
+        }
+    },
+    "links": {
+        "webhook": {
+            "webhook": "https://new.costlocker.com/api-public/v2/webhooks/e8aaf5f0-b2eb-4b11-82ba-d297f5fc9da2",
+            "example": "https://new.costlocker.com/api-public/v2/webhooks/e8aaf5f0-b2eb-4b11-82ba-d297f5fc9da2/test"
+        }
+    },
+    "data": [
+        {
+            "event": "peoplecosts.change",
+            "data": [
+                {
+                    "id": "1",
+                    "items": [
+                        {
+                            "action": "upsert",
+                            "item": {
+                                "type": "person",
+                                "activity_id": "1",
+                                "person_id": "1"
+                            },
+                            "hours": {
+                                "budget": 22
+                            },
+                            "activity": {
+                                "name": "Design"
+                            },
+                            "person": {
+                                "email": "john@example.com",
+                                "first_name": "John",
+                                "last_name": "Doe"
+                            }
+                        },
+                        {
+                            "action": "delete",
+                            "item": {
+                                "type": "task",
+                                "activity_id": "1",
+                                "person_id": "1",
+                                "task_id": "972"
+                            },
+                            "hours": {
+                                "budget": 0
+                            },
+                            "task": {
+                                "name": ""
+                            },
+                            "activity": {
+                                "name": "Design"
+                            },
+                            "person": {
+                                "email": "john@example.com",
+                                "first_name": "John",
+                                "last_name": "Doe"
+                            }
+                        }
+                    ],
+                    "links": {
+                        "project": "https://new.costlocker.com/api-public/v2/projects/3002",
+                        "peoplecosts": "https://new.costlocker.com/api-public/v2/projects/3002?types=peoplecosts",
+                        "billing": "https://new.costlocker.com/api-public/v2/projects/3002?types=billing",
+                        "expenses": "https://new.costlocker.com/api-public/v2/projects/3002?types=expenses",
+                        "discounts": "https://new.costlocker.com/api-public/v2/projects/3002?types=discounts"
+                    }
+                }
+            ]
+        }
+    ]
+}

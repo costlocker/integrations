@@ -278,7 +278,7 @@ class SyncProjectToBasecamp
 
         $this->database->upsertProject($bcProject['costlocker_id'], [
             'id' => $bcProject['id'],
-            'account' => $this->basecampFactory->getAccount($config->account),
+            'account' => $this->basecampFactory->getAccount(),
             'activities' => $bcProject['activities'],
         ]);
     }

@@ -10,28 +10,29 @@ use Costlocker\Integrations\Basecamp\Api\BasecampApi;
 class BasecampFactory
 {
     private $user;
+    private $account;
 
     public function __construct(GetUser $u)
     {
         $this->user = $u;
     }
 
-    public function __invoke($accountId): BasecampApi
+    public function __invoke($account): BasecampApi
     {
-        $account = $this->getAccount($accountId);
+        $this->account = is_array($account) ? $account : $this->user->getBasecampAccount($account);
 
         $api = new Connect(new BasecampClient);
         $api->init(
             $this->user->getBasecampAccessToken(),
-            $account['href'],
-            $account['product']
+            $this->account['href'],
+            $this->account['product']
         );
 
         return $api;
     }
 
-    public function getAccount($accountId)
+    public function getAccount()
     {
-        return $this->user->getBasecampAccount($accountId);
+        return $this->account;
     }
 }
