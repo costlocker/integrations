@@ -62,15 +62,22 @@ $app
 
 $app
     ->get('/oauth/costlocker', function (Request $r) use ($app) {
-        $strategy = Costlocker\Integrations\Auth\AuthorizeInCostlocker::buildFromEnv($app['session']);
+        $strategy = Costlocker\Integrations\Auth\AuthorizeInCostlocker::buildFromEnv(
+            $app['session'],
+            new Costlocker\Integrations\Auth\PersistsCostlockerUser($app['orm.em'])
+        );
         return $strategy($r);
     });
 
 $app
     ->get('/oauth/basecamp', function (Request $r) use ($app) {
-        $strategy = Costlocker\Integrations\Auth\AuthorizeInBasecamp::buildFromEnv($app['session']);
+        $strategy = Costlocker\Integrations\Auth\AuthorizeInBasecamp::buildFromEnv(
+            $app['session'],
+            new Costlocker\Integrations\Auth\PersistBasecampUser($app['orm.em'], $app['client.user'])
+        );
         return $strategy($r);
-    });
+    })
+    ->before($checkAuthorization('costlocker'));
 
 $app
     ->get('/costlocker', function () use ($app) {

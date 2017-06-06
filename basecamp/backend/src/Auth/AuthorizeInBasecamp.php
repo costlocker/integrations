@@ -12,8 +12,9 @@ class AuthorizeInBasecamp
 {
     private $session;
     private $provider;
+    private $persistUser;
 
-    public static function buildFromEnv(SessionInterface $s)
+    public static function buildFromEnv(SessionInterface $s, PersistBasecampUser $p)
     {
         return new self(
             $s,
@@ -22,14 +23,16 @@ class AuthorizeInBasecamp
                 'clientSecret' => getenv('BASECAMP_CLIENT_SECRET'),
                 'redirectUri' => getenv('BASECAMP_REDIRECT_URL'),
             ]),
+            $p,
             getenv('APP_FRONTED_URL')
         );
     }
 
-    public function __construct(SessionInterface $s, AbstractProvider $p, $appUrl)
+    public function __construct(SessionInterface $s, AbstractProvider $p, PersistBasecampUser $db, $appUrl)
     {
         $this->session = $s;
         $this->provider = $p;
+        $this->persistUser = $db;
         $this->appUrl = $appUrl;
     }
 
@@ -47,6 +50,7 @@ class AuthorizeInBasecamp
                 ]);
                 $resourceOwner = $this->provider->getResourceOwner($accessToken);
                 $basecampUser = $resourceOwner->toArray();
+                $this->persistUser->__invoke($basecampUser, $accessToken);
                 $this->session->set('basecamp', [
                     'account' => $basecampUser,
                     'accessToken' => $accessToken->jsonSerialize(),

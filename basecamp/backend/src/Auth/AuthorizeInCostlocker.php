@@ -11,8 +11,9 @@ class AuthorizeInCostlocker
 {
     private $session;
     private $provider;
+    private $persistUser;
 
-    public static function buildFromEnv(SessionInterface $s)
+    public static function buildFromEnv(SessionInterface $s, PersistsCostlockerUser $p)
     {
         $costlockerHost = getenv('CL_HOST');
         return new self(
@@ -25,14 +26,16 @@ class AuthorizeInCostlocker
                 'urlAccessToken' => "{$costlockerHost}/api-public/oauth2/access_token",
                 'urlResourceOwnerDetails' => "{$costlockerHost}/api-public/v2/me",
             ]),
+            $p,
             getenv('APP_FRONTED_URL')
         );
     }
 
-    public function __construct(SessionInterface $s, GenericProvider $p, $appUrl)
+    public function __construct(SessionInterface $s, GenericProvider $p, PersistsCostlockerUser $db, $appUrl)
     {
         $this->session = $s;
         $this->provider = $p;
+        $this->persistUser = $db;
         $this->appUrl = $appUrl;
     }
 
@@ -61,8 +64,10 @@ class AuthorizeInCostlocker
                 if (!in_array($costockerRole, ['OWNER', 'ADMIN'])) {
                     return $this->sendError("Only ADMIN or OWNER can import project, you are {$costockerRole}");
                 }
+                $userId = $this->persistUser->__invoke($costlockerUser, $accessToken);
                 $this->session->remove('costlockerLogin');
                 $this->session->set('costlocker', [
+                    'userId' => $userId,
                     'account' => $costlockerUser,
                     'accessToken' => $accessToken->jsonSerialize(),
                 ]);

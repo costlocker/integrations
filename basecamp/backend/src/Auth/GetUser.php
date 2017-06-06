@@ -22,6 +22,11 @@ class GetUser
         ]);
     }
 
+    public function getCostlockerUserId()
+    {
+        return $this->session->get('costlocker')['userId'];
+    }
+
     public function getCostlockerAccessToken()
     {
         return $this->session->get('costlocker')['accessToken']['access_token'];
