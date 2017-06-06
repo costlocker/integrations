@@ -19,11 +19,13 @@ class BasecampFactory
 
     public function __invoke($account): BasecampApi
     {
-        $this->account = is_array($account) ? $account : $this->user->getBasecampAccount($account);
+        $this->account = is_array($account) ? $account : $this->user->getBasecampAccount($account) + [
+            'token' => $this->user->getBasecampAccessToken(),
+        ];
 
         $api = new Connect(new BasecampClient);
         $api->init(
-            $this->user->getBasecampAccessToken(),
+            $this->account['token'],
             $this->account['href'],
             $this->account['product']
         );

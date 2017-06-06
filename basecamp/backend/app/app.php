@@ -114,4 +114,26 @@ $app
     })
     ->before($checkAuthorization('basecamp'));
 
+$app
+    ->post('/webhooks/basecamp', function (Request $r) use ($app) {
+        try {
+            $strategy = new Costlocker\Integrations\Basecamp\SyncWebhookToBasecamp(
+                $app['client.costlocker'],
+                $app['client.basecamp'],
+                $app['database']
+            );
+            $data = $strategy($r->getContent());
+            return new JsonResponse($data, 200);
+        } catch (\Exception $e) {
+            file_put_contents(
+                __DIR__ . '/../var/log/webhooks.log',
+                json_encode([
+                    'exception' => get_class($e),
+                    'error' => $e->getMessage(),
+                    'stack' => $e->getTrace(),
+                ], JSON_PRETTY_PRINT) . "\n");
+            return new JsonResponse([], 202);
+        }
+    });
+
 return $app;

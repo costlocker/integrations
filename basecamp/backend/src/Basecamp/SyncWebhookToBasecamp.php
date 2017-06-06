@@ -27,6 +27,7 @@ class SyncWebhookToBasecamp
         foreach ($projects as $id => $items) {
             $bcProject = $this->upsertProject($id);
             if (!$bcProject) {
+                $results[] = "{$id} is not mapped";
                 continue;
             }
             list($people, $activities) = $this->analyzeProjectItems($items);
@@ -34,7 +35,8 @@ class SyncWebhookToBasecamp
             $this->basecamp = $this->basecampFactory->__invoke($bcProject['account']);
             $bcProjectId = $bcProject['id'];
             if ($this->checkDeletedProject($bcProject)) {
-                return;
+                $results[] = "{$id} is deleted in BC";
+                continue;
             }
 
             $grantedPeople = $this->grantAccess($bcProjectId, $people);
