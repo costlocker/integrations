@@ -56,7 +56,7 @@ class GetUser
     {
         $sql =<<<SQL
             SELECT access_token
-            FROM apitoken
+            FROM oauth2_token
             WHERE costlocker_user_id = :cl AND basecamp_user_id IS NULL
             ORDER BY id DESC
             LIMIT 1
@@ -72,7 +72,7 @@ SQL;
     {
         $sql =<<<SQL
             SELECT access_token
-            FROM apitoken
+            FROM oauth2_token
             WHERE costlocker_user_id = :cl AND basecamp_user_id = :bc
             ORDER BY id DESC
             LIMIT 1

@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="apitoken")
+ * @ORM\Table(name="oauth2_token")
  */
 class AccessToken
 {

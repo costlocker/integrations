@@ -22,10 +22,12 @@ class PersistBasecampUser
 
     public function __invoke(array $apiUser, OAuthToken $apiToken)
     {
+        $clUser = $this->getUser->getCostlockerUser();
+
         $newUser = new BasecampUser();
         $newUser->id = $apiUser['identity']['id'];
         $newUser->data = $apiUser;
-        $newUser->costlockerUser = $this->getUser->getCostlockerUser();
+        $newUser->addCostlockerUser($clUser);
         $user = $this->findUserInDb($newUser) ?: $newUser;
 
         foreach ($apiUser['accounts'] as $apiAccount) {
@@ -39,7 +41,7 @@ class PersistBasecampUser
         }
 
         $token = new AccessToken();
-        $token->costlockerUser = $newUser->costlockerUser;
+        $token->costlockerUser = $clUser;
         $token->basecampUser = $user;
         $token->accessToken = $apiToken->getToken();
         $token->refreshToken = $apiToken->getRefreshToken();

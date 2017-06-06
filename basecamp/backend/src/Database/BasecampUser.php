@@ -23,10 +23,13 @@ class BasecampUser
     public $data;
 
     /**
-     * @ORM\ManyToOne(targetEntity="CostlockerUser")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\ManyToMany(targetEntity="CostlockerUser")
+     * @ORM\JoinTable(name="bc_cl_users",
+     *   joinColumns={@ORM\JoinColumn(name="bc_id", referencedColumnName="id")},
+     *   inverseJoinColumns={@ORM\JoinColumn(name="cl_id", referencedColumnName="id")}
+     * )
      */
-    public $costlockerUser;
+    public $costlockerUsers;
 
     /**
      * @ORM\OneToMany(targetEntity="BasecampAccount", mappedBy="basecampUser", cascade={"persist"})
@@ -36,6 +39,7 @@ class BasecampUser
     public function __construct()
     {
         $this->accounts = new ArrayCollection();
+        $this->costlockerUsers = new ArrayCollection();
     }
 
     public function addAccount(BasecampAccount $account)
@@ -47,10 +51,26 @@ class BasecampUser
         $account->basecampUser = $this;
     }
 
-    public function getAccount($idAccount)
+    public function getAccount($id)
     {
-        $accounts = $this->accounts->filter(function (BasecampAccount $ac) use ($idAccount) {
-            return $ac->id == $idAccount;
+        $accounts = $this->accounts->filter(function (BasecampAccount $ac) use ($id) {
+            return $ac->id == $id;
+        });
+        return $accounts->first();
+    }
+
+    public function addCostlockerUser(CostlockerUser $user)
+    {
+        if ($this->getCostlockerUser($user->id)) {
+            return;
+        }
+        $this->costlockerUsers->add($user);
+    }
+
+    private function getCostlockerUser($id)
+    {
+        $accounts = $this->accounts->filter(function (CostlockerUser $u) use ($id) {
+            return $u->id == $id;
         });
         return $accounts->first();
     }
