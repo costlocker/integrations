@@ -4,7 +4,7 @@ namespace Costlocker\Integrations\Basecamp;
 
 use Costlocker\Integrations\CostlockerClient;
 
-class SyncProject
+class SyncProjectToBasecamp
 {
     private $basecampFactory;
 

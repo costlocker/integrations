@@ -7,7 +7,7 @@ use GuzzleHttp\Psr7\Response;
 use Costlocker\Integrations\CostlockerClient;
 use Costlocker\Integrations\Basecamp\Api\BasecampApi;
 
-class SyncProjectTest extends \PHPUnit_Framework_TestCase
+class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
 {
     private $costlocker;
     private $basecamp;
@@ -317,7 +317,7 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
         $basecampFactory = m::mock(BasecampFactory::class);
         $basecampFactory->shouldReceive('__invoke')->andReturn($this->basecamp);
         $basecampFactory->shouldReceive('getAccount')->andReturn([]);
-        $uc = new SyncProject($this->costlocker, $basecampFactory, $this->database);
+        $uc = new SyncProjectToBasecamp($this->costlocker, $basecampFactory, $this->database);
         $uc($this->request);
     }
 

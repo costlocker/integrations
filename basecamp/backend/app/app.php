@@ -104,7 +104,7 @@ $app
             $request->isRevokeAccessEnabled = $r->request->get('isRevokeAccessEnabled');
         }
 
-        $strategy = new Costlocker\Integrations\Basecamp\SyncProject(
+        $strategy = new Costlocker\Integrations\Basecamp\SyncProjectToBasecamp(
             $app['client.costlocker'],
             $app['client.basecamp'],
             $app['database']
