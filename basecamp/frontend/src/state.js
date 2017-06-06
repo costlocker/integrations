@@ -4,6 +4,7 @@ const appState = immstruct({
   auth: {
     costlocker: null,
     basecamp: null,
+    availableAccounts: [],
   },
   costlocker: {
     projects: null,

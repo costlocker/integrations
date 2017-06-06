@@ -24,9 +24,12 @@ class GetUser
 
     public function __invoke()
     {
+        $clUser = $this->getCostlockerUser();
+        $bcUser = $this->getBasecampUser();
         return new JsonResponse([
-            'basecamp' => $this->getBasecampUser()->data,
-            'costlocker' => $this->getCostlockerUser()->data,
+            'costlocker' => $clUser->data,
+            'basecamp' => $bcUser->data,
+            'availableAccounts' => $this->getAvailableBasecampAccounts()
         ]);
     }
 
@@ -50,6 +53,25 @@ class GetUser
             $this->basecampUser = $user;
         }
         return $this->basecampUser ?: new BasecampUser();
+    }
+
+    private function getAvailableBasecampAccounts()
+    {
+        $costlockerUser = $this->getCostlockerUser();
+        if (!$costlockerUser->idTenant) {
+            return [];
+        }
+        $dql =<<<DQL
+            SELECT b
+            FROM Costlocker\Integrations\Database\BasecampAccount b
+            JOIN b.basecampUser bu
+            JOIN bu.costlockerUsers cu
+            WHERE cu.idTenant = :tenant
+DQL;
+        $params = [
+            'tenant' => $costlockerUser->idTenant,
+        ];
+        return $this->entityManager->createQuery($dql)->execute($params);
     }
 
     public function getCostlockerAccessToken()

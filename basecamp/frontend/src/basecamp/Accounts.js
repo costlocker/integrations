@@ -3,7 +3,7 @@ import React from 'react';
 import OAuthLogin from '../auth/OAuthLogin';
 import { ExternalLink } from '../Helpers';
 
-const BasecampAccounts = ({ basecamp }) => {
+const BasecampAccounts = ({ accounts }) => {
   return (
     <table className="table table-striped table-hover table-condensed">
       <thead>
@@ -13,7 +13,7 @@ const BasecampAccounts = ({ basecamp }) => {
         </tr>
       </thead>
       <tbody>
-        {basecamp.accounts.map(account => (
+        {accounts.map(account => (
           <tr key={account.id}>
             <td>{account.name} <ExternalLink url={account.app_href} /></td>
             <td>{account.product}</td>
@@ -24,7 +24,7 @@ const BasecampAccounts = ({ basecamp }) => {
   )
 }
 
-export default function Login({ basecamp, loginUrls }) {
+export default function Login({ basecamp, loginUrls, availableAccounts }) {
   return (
     <div>
       <div className="row">
@@ -35,8 +35,8 @@ export default function Login({ basecamp, loginUrls }) {
       </div>
       <div className="row">
         <div className="col-sm-12">
-          <h3>Accounts</h3>
-          {basecamp ? <BasecampAccounts basecamp={basecamp} /> : '...'}
+          <h3>Connected Accounts</h3>
+          <BasecampAccounts accounts={availableAccounts} />
         </div>
       </div>
       <div className="row">
