@@ -16,6 +16,7 @@ $app->register(new Silex\Provider\SessionServiceProvider(), [
     'session.storage.save_path' => __DIR__ . '/../var/sessions/'
 ]);
 $app->register(new \Costlocker\Integrations\Api\LogErrorsAndExceptions(__DIR__ . '/../var/log'));
+$app->register(new \Costlocker\Integrations\Api\DatabaseProvider(__DIR__ . '/../'));
 $app->before(new \Costlocker\Integrations\Api\DecodeJsonRequest());
 $app->error(new \Costlocker\Integrations\Api\ConvertExceptionToJson());
 

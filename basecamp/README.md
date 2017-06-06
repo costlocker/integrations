@@ -7,8 +7,18 @@
 
 ```
 cd backend
+createdb costlocker_basecamp -e -E utf8
 composer install
 cp .env.example .env
+bin/console migrations:migrate
+```
+
+##### Development
+
+```
+bin/console mig:diff --formatted
+bin/console mig:exec 20170606100151  --up
+bin/console mig:exec 20170606100151  --down
 ```
 
 ### Frontend
