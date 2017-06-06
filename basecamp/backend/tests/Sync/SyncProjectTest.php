@@ -99,6 +99,7 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
             ]
         );
         $this->givenCostlockerProject('one-person.json');
+        $this->basecamp->shouldReceive('projectExists')->once();
         $this->basecamp->shouldReceive('createProject')->never();
         $this->basecamp->shouldReceive('grantAccess')->once()
             ->with($basecampId, [
@@ -155,6 +156,7 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
         $this->request->isDeletingTodosEnabled = true;
         $this->request->isRevokeAccessEnabled = true;
         $this->givenCostlockerProject('one-person.json');
+        $this->basecamp->shouldReceive('projectExists')->once();
         $this->basecamp->shouldReceive('grantAccess')->once();
         $this->basecamp->shouldReceive('getPeople')->once()
             ->andReturn($this->givenBasecampPeople([1 => 'john@example.com', 2 => 'peter@example.com']));
@@ -221,6 +223,7 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
         $this->request->isDeletingTodosEnabled = true;
         $this->request->isRevokeAccessEnabled = true;
         $this->givenCostlockerProject('empty-project.json');
+        $this->basecamp->shouldReceive('projectExists')->once();
         $this->basecamp->shouldReceive('getPeople')->once()
             ->andReturn($this->givenBasecampPeople([1 => 'john@example.com', 2 => 'peter@example.com']));
         $this->basecamp->shouldReceive('getTodolists')->once()
@@ -255,6 +258,21 @@ class SyncProjectTest extends \PHPUnit_Framework_TestCase
             ],
             $this->database->findProject(1)
         );
+    }
+
+    public function testDeleteMappingForProjectDeletedInBasecamp()
+    {
+        $this->database->upsertProject(
+            1,
+            [
+                'id' => 'id of deleted project in basecamp',
+                'activities' => [],
+            ]
+        );
+        $this->givenCostlockerProject('empty-project.json');
+        $this->basecamp->shouldReceive('projectExists')->andThrow(Api\BasecampAccessException::class);
+        $this->synchronize();
+        assertThat($this->database->findProjects(1), is(emptyArray()));
     }
 
     private function givenCostlockerProject($file)

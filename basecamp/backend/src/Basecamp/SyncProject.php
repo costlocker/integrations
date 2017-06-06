@@ -29,6 +29,9 @@ class SyncProject
         $this->basecamp = $this->basecampFactory->__invoke($config->account);
         $bcProject = $this->upsertProject($project, $config);
         $bcProjectId = $bcProject['id'];
+        if ($this->checkDeletedProject($bcProject)) {
+            return;
+        }
         $grantedPeople = $this->grantAccess($bcProjectId, $people);
         $bcProject['basecampPeople'] = $this->basecamp->getPeople($bcProjectId);
         $todolists = $this->createTodolists($bcProject, $activities);
@@ -102,6 +105,19 @@ class SyncProject
             'activities' => [],
             'isCreated' => true
         ];
+    }
+
+    private function checkDeletedProject(array $bcProject)
+    {
+        if ($bcProject['isCreated']) {
+            return;
+        }
+        try {
+            $this->basecamp->projectExists($bcProject['id']);
+        } catch (Api\BasecampException $e) {
+            $this->database->deleteProject($bcProject['costlocker_id'], $bcProject['id']);
+            return true;
+        }
     }
 
     private function grantAccess($bcProjectId, array $peopleFromCostlocker)

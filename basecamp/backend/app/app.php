@@ -107,7 +107,7 @@ $app
             $app['database']
         );
         $data = $strategy($request);
-        return new JsonResponse($data);
+        return new JsonResponse($data, $data ? 200 : 404);
     })
     ->before($checkAuthorization('basecamp'));
 

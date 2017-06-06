@@ -19,6 +19,11 @@ class InMemoryDatabase implements SyncDatabase
 
     public function findProjects($costlockerProjectId)
     {
-        return $this->database[$costlockerProjectId] ?? [];
+        return $this->mapping[$costlockerProjectId] ?? [];
+    }
+
+    public function deleteProject($costlockerProjectId, $basecampProjectId)
+    {
+        unset($this->mapping[$costlockerProjectId][$basecampProjectId]);
     }
 }

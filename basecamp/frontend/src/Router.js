@@ -127,7 +127,15 @@ export const states = [
         resolveFn: () => {
           pushToApi(`/basecamp`, appState.cursor(['sync']).deref())
           .then(r => appState.cursor(['sync']).set('result', r))
-          .catch(e => alert('Synchronization has failed'));
+          .catch((e) => {
+            if (e.status === 404) {
+              alert('Project was deleted in Basecamp');
+              appState.cursor(['costlocker']).set('projects', null); // reload projects
+              redirectToRoute('projects');
+            } else {
+              alert('Synchronization has failed')
+            }
+          });
         }
       }
     ],

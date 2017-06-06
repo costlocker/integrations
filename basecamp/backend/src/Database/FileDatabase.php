@@ -24,12 +24,23 @@ class FileDatabase implements SyncDatabase
     public function upsertProject($costockerProjectId, array $mapping)
     {
         $this->database[$costockerProjectId][$mapping['id']] = $mapping;
-        file_put_contents($this->file, json_encode($this->database, JSON_PRETTY_PRINT));
+        $this->saveDb();
     }
 
     public function findProjects($costlockerProjectId)
     {
         // fixme: filter by tenant
         return $this->database[$costlockerProjectId] ?? [];
+    }
+
+    public function deleteProject($costlockerProjectId, $basecampProjectId)
+    {
+        unset($this->database[$costlockerProjectId][$basecampProjectId]);
+        $this->saveDb();
+    }
+
+    private function saveDb()
+    {
+        file_put_contents($this->file, json_encode($this->database, JSON_PRETTY_PRINT));
     }
 }
