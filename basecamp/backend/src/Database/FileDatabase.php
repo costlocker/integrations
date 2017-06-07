@@ -15,10 +15,10 @@ class FileDatabase implements SyncDatabase
         $this->database = is_file($file) ? json_decode(file_get_contents($file), true) : [];
     }
 
-    public function findProject($costockerProjectId, $basecampProjectId = null)
+    public function findProject($costockerProjectId)
     {
         $basecampProjects = $this->findProjects($costockerProjectId);
-        return $basecampProjects[$basecampProjectId] ?? reset($basecampProjects);
+        return reset($basecampProjects);
     }
 
     public function upsertProject($costockerProjectId, array $mapping)

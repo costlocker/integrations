@@ -101,7 +101,7 @@ class SyncProjectToBasecamp
 
     private function upsertProject(array $project, SyncRequest $config)
     {
-        $existingProject = $this->database->findProject($project['id'], $config->updatedBasecampProject);
+        $existingProject = $this->database->findProject($project['id']);
         if ($existingProject) {
             return ['isCreated' => false, 'costlocker_id' => $project['id']] + $existingProject;
         }
