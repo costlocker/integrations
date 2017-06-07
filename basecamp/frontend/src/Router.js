@@ -27,16 +27,19 @@ if (isNotLoggedInCostlocker()) {
   fetchUser().then(() => redirectToRoute('homepage'));
 }
 
+const fetchProjects = () =>
+   fetchFromApi('/costlocker')
+    .then(projects => appState.cursor()
+      .setIn(['costlocker', 'projects'], projects)
+      .setIn(['sync', 'costlockerProject'], projects[0].id)
+    );
+
 const loadCostlockerProjects = [
   {
     token: 'loadCostlockerProjects',
     resolveFn: () => {
       if (!appState.cursor(['costlocker', 'projects']).deref()) {
-        fetchFromApi('/costlocker')
-          .then(projects => appState.cursor()
-            .setIn(['costlocker', 'projects'], projects)
-            .setIn(['sync', 'costlockerProject'], projects[0].id)
-          );
+        fetchProjects();
       }
     }
   }
@@ -68,7 +71,13 @@ export const states = [
     url: '/projects',
     component: () => <Projects
       allProjects={appState.cursor(['costlocker', 'projects']).deref()}
-      redirectToRoute={redirectToRoute} />,
+      redirectToRoute={redirectToRoute}
+      disconnect={(id) =>
+        pushToApi(`/disconnect`, { project: id })
+          .then(() => fetchProjects())
+          .catch((e) => alert('Disconnect has failed'))
+      }
+    />,
     resolve: loadCostlockerProjects,
   },
   {

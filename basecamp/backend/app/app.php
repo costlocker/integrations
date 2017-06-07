@@ -112,6 +112,9 @@ $app
         if ($r->request->get('user')) {
             $uc = new Costlocker\Integrations\Auth\DisconnectBasecampAccount($app['orm.em'], $app['client.user']);
             $wasDisconnected = $uc($r->request->get('user'));
+        } elseif ($r->request->get('project')) {
+            $uc = new Costlocker\Integrations\Auth\DisconnectProject($app['db'], $app['client.user']);
+            $wasDisconnected = $uc($r->request->get('project'));
         }
         return new JsonResponse([], $wasDisconnected ? 200 : 400);
     })

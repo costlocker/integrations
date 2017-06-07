@@ -2,7 +2,7 @@ import React from 'react';
 
 import { ExternalLink } from '../Helpers';
 
-export default function Projects({ allProjects, redirectToRoute }) {
+export default function Projects({ allProjects, redirectToRoute, disconnect }) {
   if (!allProjects) {
     return <span>Loading....</span>;
   }
@@ -21,8 +21,9 @@ export default function Projects({ allProjects, redirectToRoute }) {
         <table className="table table-striped table-hover table-condensed">
           <thead>
             <tr>
-              <th>Costlocker project</th>
-              <th>Basecamps</th>
+              <th>Costlocker</th>
+              <th>Basecamp</th>
+              <th className="text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -37,18 +38,23 @@ export default function Projects({ allProjects, redirectToRoute }) {
                       </em>
                       &nbsp;&nbsp;
                       <ExternalLink url={basecamp.url} />
-                      <button
-                        className="btn btn-link" title="Refresh project"
-                        onClick={() => redirectToRoute(
-                          'sync',
-                          { clProject: project.id }
-                        )}
-                      >
-                        <i className="fa fa-refresh"></i>
-                      </button>
-                      <br />
                     </div>
                   ))}
+                </td>
+                <td className="text-right">
+                  <button
+                    className="btn btn-sm btn-primary" title="Refresh project"
+                    onClick={() => redirectToRoute(
+                      'sync',
+                      { clProject: project.id }
+                    )}
+                  >
+                    <i className="fa fa-refresh"></i> Refresh
+                  </button>
+                  &nbsp;&nbsp;
+                  <button className="btn btn-sm btn-danger" onClick={() => disconnect(project.id)}>
+                    <i className="fa fa-thrash"></i> Disconnect
+                  </button>
                 </td>
               </tr>
             ))}
