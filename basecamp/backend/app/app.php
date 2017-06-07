@@ -27,6 +27,12 @@ $app['database'] = function ($app) {
     );
 };
 
+$app['database.events'] = function ($app) {
+    return new \Costlocker\Integrations\Queue\EventsRepository(
+        $app['orm.em']
+    );
+};
+
 $app['guzzle'] = function () {
     return new \GuzzleHttp\Client();
 };
@@ -91,6 +97,12 @@ $app
         );
         $data = $strategy();
         return new JsonResponse($data);
+    })
+    ->before($checkAuthorization('costlocker'));
+
+$app
+    ->get('/events', function () use ($app) {
+        return new JsonResponse($app['database.events']->findLatestEvents());
     })
     ->before($checkAuthorization('costlocker'));
 

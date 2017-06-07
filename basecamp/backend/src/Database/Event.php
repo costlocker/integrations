@@ -25,6 +25,7 @@ class Event
     public $id;
 
     /**
+     * @var CostlockerUser
      * @ORM\ManyToOne(targetEntity="CostlockerUser")
      * @ORM\JoinColumn(name="cl_user_id", nullable=true, onDelete="SET NULL")
      */

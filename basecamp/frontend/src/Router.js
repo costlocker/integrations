@@ -6,6 +6,7 @@ import Login from './auth/Login';
 import Projects from './costlocker/Projects';
 import Sync from './costlocker/Sync';
 import Accounts from './basecamp/Accounts';
+import Events from './basecamp/Events';
 
 export let redirectToRoute;
 
@@ -38,6 +39,8 @@ const loadCostlockerProjects = [
     }
   }
 ];
+
+const loadEvents = () => fetchFromApi('/events').then(events => appState.cursor().set('events', events));
 
 appState.on('next-animation-frame', function (newStructure, oldStructure, keyPath) {
   const oldId = oldStructure.getIn(['sync', 'account']);
@@ -99,7 +102,9 @@ export const states = [
         ),
         submit: (e) => {
           e.preventDefault();
-          redirectToRoute('syncInProgress');
+          pushToApi(`/basecamp`, appState.cursor(['sync']).deref())
+            .then((r) => redirectToRoute('events'))
+            .catch((e) => alert('Synchronization has failed'));
         }
       }}
     />,
@@ -141,25 +146,16 @@ export const states = [
     ]),
   },
   {
-    name: 'syncInProgress',
-    url: '/sync/in-progress',
-    component: (props) => <pre>{JSON.stringify(appState.cursor(['sync']).deref(), null, 2)}</pre>,
+    name: 'events',
+    url: '/events',
+    component: () => <Events
+      events={appState.cursor(['events']).deref()}
+      refresh={loadEvents}
+    />,
     resolve: [
       {
-        token: 'submitChange',
-        resolveFn: () => {
-          pushToApi(`/basecamp`, appState.cursor(['sync']).deref())
-          .then(r => appState.cursor(['sync']).set('result', r))
-          .catch((e) => {
-            if (e.status === 404) {
-              alert('Project was deleted in Basecamp');
-              appState.cursor(['costlocker']).set('projects', null); // reload projects
-              redirectToRoute('projects');
-            } else {
-              alert('Synchronization has failed')
-            }
-          });
-        }
+        token: 'loadEvents',
+        resolveFn: loadEvents
       }
     ],
   },

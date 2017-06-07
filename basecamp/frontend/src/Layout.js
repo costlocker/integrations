@@ -14,6 +14,7 @@ const Navigation = () => {
       <li><a href="" onClick={goTo('projects')}>Costlocker projects</a></li>
       <li><a href="" onClick={goTo('basecamp')}>Basecamp accounts</a></li>
       <li><a href="" onClick={goTo('sync')}>Synchronize</a></li>
+      <li><a href="" onClick={goTo('events')}>Events</a></li>
     </ul>
   );
 };

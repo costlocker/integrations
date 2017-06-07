@@ -14,35 +14,24 @@ class ProcessSyncRequest
     private $entityManager;
     /** @var GetUser */
     private $getUser;
+    /** @var EventsRepository */
+    private $repository;
 
     public function __construct(Application $app)
     {
         $this->app = $app;
         $this->entityManager = $app['orm.em'];
         $this->getUser = $app['client.user'];
+        $this->repository = $app['database.events'];
     }
 
     public function __invoke()
     {
-        $events = $this->findUnprocessedEvents();
+        $events = $this->repository->findUnprocessedEvents();
         foreach ($events as $event) {
             $this->processEvent($event);
         }
         return count($events);
-    }
-
-    private function findUnprocessedEvents()
-    {
-        $dql =<<<DQL
-            SELECT e, u
-            FROM Costlocker\Integrations\Database\Event e
-            LEFT JOIN e.costlockerUser u
-            WHERE e.event = :request AND e.updatedAt IS NULL
-DQL;
-        $params = [
-            'request' => Event::SYNC_REQUEST,
-        ];
-        return $this->entityManager->createQuery($dql)->execute($params);
     }
 
     private function processEvent(Event $requestEvent)

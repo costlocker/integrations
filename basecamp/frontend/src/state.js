@@ -12,6 +12,7 @@ const appState = immstruct({
   basecamp: {
     projects: [],
   },
+  events: null,
   sync: {
     account: null,
     costlockerProject: '',
@@ -20,7 +21,6 @@ const appState = immstruct({
     isDeletingTodosEnabled: false,
     isRevokeAccessEnabled: false,
     mode: 'create',
-    result: null,
   }
 });
 
