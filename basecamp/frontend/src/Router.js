@@ -91,6 +91,7 @@ export const states = [
       basecampProjects={appState.cursor(['basecamp', 'projects']).deref()}
       basecampAccounts={appState.cursor(['auth', 'basecamp']).deref().accounts}
       syncForm={{
+        editedProject: props.transition.params().clProject,
         get: (type) => appState.cursor(['sync', type]).deref(),
         set: (type) => (e) => appState.cursor(['sync']).set(
           type,
@@ -108,13 +109,17 @@ export const states = [
         deps: ['$transition$'],
         resolveFn: ($transition$) => {
           const params = $transition$.params();
-          if (params.account && params.clProject && params.bcProject) {
-            appState.cursor(['sync']).update(sync => sync
-              .set('account', params.account)
-              .set('mode', 'add')
-              .set('costlockerProject', params.clProject)
-              .set('basecampProject', params.bcProject)
-            )
+          if (params.clProject) {
+            const projects = appState.cursor(['costlocker', 'projects']).deref().filter(p => p.id == params.clProject);
+            if (projects.length) {
+              const editedProject = projects[0];
+              appState.cursor(['sync']).update(sync => sync
+                .set('mode', 'edit')
+                .set('costlockerProject', editedProject.id)
+                .set('basecampProject', editedProject.basecamps[0].id)
+                .set('account', editedProject.basecamps[0].account.id)
+              )
+            }
           }
         }
       }

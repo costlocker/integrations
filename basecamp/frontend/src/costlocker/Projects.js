@@ -41,7 +41,7 @@ export default function Projects({ allProjects, redirectToRoute }) {
                         className="btn btn-link" title="Refresh project"
                         onClick={() => redirectToRoute(
                           'sync',
-                          { account: basecamp.account.id, clProject: project.id, bcProject: basecamp.id }
+                          { clProject: project.id }
                         )}
                       >
                         <i className="fa fa-refresh"></i>
