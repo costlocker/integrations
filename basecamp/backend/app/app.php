@@ -107,6 +107,14 @@ $app
     ->before($checkAuthorization('costlocker'));
 
 $app
+    ->post('/settings', function (Request $r) use ($app) {
+        $uc = new \Costlocker\Integrations\Costlocker\UpdateSettings($app['orm.em'], $app['client.user']);
+        $uc($r->request->all());
+        return new JsonResponse();
+    })
+    ->before($checkAuthorization('costlocker'));
+
+$app
     ->post('/disconnect', function (Request $r) use ($app) {
         $wasDisconnected = false;
         if ($r->request->get('user')) {

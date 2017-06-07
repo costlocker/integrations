@@ -13,6 +13,11 @@ const appState = immstruct({
     projects: [],
   },
   events: null,
+  companySettings: {
+    areTodosEnabled: true,
+    isDeletingTodosEnabled: false,
+    isRevokeAccessEnabled: false,
+  },
   sync: {
     account: null,
     costlockerProject: '',

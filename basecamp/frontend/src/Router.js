@@ -1,4 +1,5 @@
 import React from 'react';
+import { Map } from 'immutable';
 
 import { appState, isNotLoggedInCostlocker, isNotLoggedInBasecamp } from './state';
 import { fetchFromApi, pushToApi, loginUrls } from './api';
@@ -6,6 +7,7 @@ import Login from './auth/Login';
 import Projects from './costlocker/Projects';
 import Sync from './costlocker/Sync';
 import Accounts from './basecamp/Accounts';
+import Settings from './basecamp/Settings';
 import Events from './basecamp/Events';
 
 export let redirectToRoute;
@@ -19,6 +21,7 @@ const fetchUser = () =>
           .setIn(['auth', 'basecamp'], user.basecamp)
           .setIn(['auth', 'settings'], user.settings)
           .setIn(['sync', 'account'], user.basecamp ? user.basecamp.accounts[0].id : null)
+          .setIn(['companySettings'], user.settings ? Map(user.settings.sync) : null)
       );
     })
     .catch(e => console.log('Anonymous user'));
@@ -148,18 +151,37 @@ export const states = [
             }
           }
 
-          const companySettings = appState.cursor(['auth', 'settings']).deref().sync;
+          const companySettings = appState.cursor(['companySettings']).deref();
           appState.cursor(['sync']).update(sync => sync
             .set('mode', 'create')
             .set('costlockerProject', '')
             .set('basecampProject', '')
-            .set('areTodosEnabled', companySettings.areTodosEnabled)
-            .set('isDeletingTodosEnabled', companySettings.isDeletingTodosEnabled)
-            .set('isRevokeAccessEnabled', companySettings.isRevokeAccessEnabled)
+            .set('areTodosEnabled', companySettings.get('areTodosEnabled'))
+            .set('isDeletingTodosEnabled', companySettings.get('isDeletingTodosEnabled'))
+            .set('isRevokeAccessEnabled', companySettings.get('isRevokeAccessEnabled'))
           );
         }
       }
     ]),
+  },
+  {
+    name: 'settings',
+    url: '/settings',
+    component: (props) => <Settings
+      form={{
+        get: (type) => appState.cursor(['companySettings', type]).deref(),
+        set: (type) => (e) => appState.cursor(['companySettings']).set(
+          type,
+          e.target.type === 'checkbox' ? e.target.checked : e.target.value
+        ),
+        submit: (e) => {
+          e.preventDefault();
+          pushToApi(`/settings`, appState.cursor(['companySettings']).deref())
+            .then((r) => redirectToRoute('settings'))
+            .catch((e) => alert('Save has failed'));
+        }
+      }}
+    />,
   },
   {
     name: 'events',
