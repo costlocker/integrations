@@ -280,6 +280,7 @@ class SyncProjectToBasecamp
             'id' => $bcProject['id'],
             'account' => $this->basecampFactory->getAccount(),
             'activities' => $bcProject['activities'],
+            'settings' => $config->toSettings(),
         ]);
     }
 }

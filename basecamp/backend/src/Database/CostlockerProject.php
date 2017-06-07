@@ -24,7 +24,8 @@ class CostlockerProject
     public $costlockerCompany;
 
     /**
-     * @ORM\OneToMany(targetEntity="BasecampProject", mappedBy="costlockerProject")
+     * @var BasecampProject[]
+     * @ORM\OneToMany(targetEntity="BasecampProject", mappedBy="costlockerProject", cascade={"persist"})
      */
     public $projects;
 
@@ -37,5 +38,20 @@ class CostlockerProject
     {
         $this->createdAt = new \DateTime();
         $this->projects = new ArrayCollection();
+    }
+
+    public function upsertProject($basecampProjectId)
+    {
+        foreach ($this->projects as $project) {
+            if ($project->basecampProject == $basecampProjectId && !$project->deletedAt) {
+                return $project;
+            }
+        }
+
+        $newProject = new BasecampProject();
+        $newProject->costlockerProject = $this;
+        $newProject->basecampProject = $basecampProjectId;
+        $this->projects->add($newProject);
+        return $newProject;
     }
 }

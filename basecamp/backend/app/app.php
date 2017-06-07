@@ -20,8 +20,11 @@ $app->register(new \Costlocker\Integrations\Api\DatabaseProvider(__DIR__ . '/../
 $app->before(new \Costlocker\Integrations\Api\DecodeJsonRequest());
 $app->error(new \Costlocker\Integrations\Api\ConvertExceptionToJson());
 
-$app['database'] = function () {
-    return new Costlocker\Integrations\Database\FileDatabase(__DIR__ . '/../var/temp-db.json');
+$app['database'] = function ($app) {
+    return new \Costlocker\Integrations\Database\ProjectsDatabase(
+        $app['orm.em'],
+        $app['client.user']
+    );
 };
 
 $app['guzzle'] = function () {

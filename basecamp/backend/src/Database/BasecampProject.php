@@ -29,6 +29,7 @@ class BasecampProject
     public $basecampProject;
 
     /**
+     * @var BasecampAccount
      * @ORM\ManyToOne(targetEntity="BasecampAccount")
      * @ORM\JoinColumn(name="bc_account_id", nullable=false, onDelete="RESTRICT")
      */
