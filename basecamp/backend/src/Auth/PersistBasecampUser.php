@@ -27,8 +27,8 @@ class PersistBasecampUser
         $newUser = new BasecampUser();
         $newUser->id = $apiUser['identity']['id'];
         $newUser->data = $apiUser;
-        $newUser->addCostlockerUser($clUser);
         $user = $this->findUserInDb($newUser) ?: $newUser;
+        $clUser->addBasecampUser($user);
 
         foreach ($apiUser['accounts'] as $apiAccount) {
             $account = new BasecampAccount();
@@ -47,6 +47,7 @@ class PersistBasecampUser
         $token->refreshToken = $apiToken->getRefreshToken();
         $token->expiresAt = \DateTime::createFromFormat('U', $apiToken->getExpires());
 
+        $this->entityManager->persist($clUser);
         $this->entityManager->persist($user);
         $this->entityManager->persist($token);
         $this->entityManager->flush();

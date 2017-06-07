@@ -16,7 +16,7 @@ if (isNotLoggedInCostlocker()) {
         auth => auth
           .setIn(['auth', 'costlocker'], user.costlocker)
           .setIn(['auth', 'basecamp'], user.basecamp)
-          .setIn(['auth', 'availableAccounts'], user.availableAccounts)
+          .setIn(['auth', 'settings'], user.settings)
           .setIn(['sync', 'account'], user.basecamp ? user.basecamp.accounts[0].id : null)
       );
       redirectToRoute('homepage');
@@ -78,8 +78,9 @@ export const states = [
     name: 'basecamp',
     url: '/basecamp',
     component: (props) => <Accounts
-      basecamp={appState.cursor(['auth', 'basecamp']).deref()}
-      availableAccounts={appState.cursor(['auth', 'availableAccounts']).deref()}
+      basecampUser={appState.cursor(['auth', 'basecamp']).deref()}
+      costlockerUser={appState.cursor(['auth', 'costlocker']).deref()}
+      users={appState.cursor(['auth', 'settings']).deref().users}
       loginUrls={loginUrls} />,
   },
   {
