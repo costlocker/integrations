@@ -2,6 +2,7 @@ import immstruct from 'immstruct';
 
 const appState = immstruct({
   auth: {
+    isLoading: true,
     costlocker: null,
     basecamp: null,
     settings: null,

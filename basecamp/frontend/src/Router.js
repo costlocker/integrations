@@ -17,6 +17,7 @@ const fetchUser = () =>
     .then((user) => {
       appState.cursor().update(
         auth => auth
+          .setIn(['auth', 'isLoading'], false)
           .setIn(['auth', 'costlocker'], user.costlocker)
           .setIn(['auth', 'basecamp'], user.basecamp)
           .setIn(['auth', 'settings'], user.settings)
@@ -27,7 +28,7 @@ const fetchUser = () =>
     .catch(e => console.log('Anonymous user'));
 
 if (isNotLoggedInCostlocker()) {
-  fetchUser().then(() => redirectToRoute('homepage'));
+  fetchUser();
 }
 
 const fetchProjects = () =>
