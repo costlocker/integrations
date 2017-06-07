@@ -10,7 +10,8 @@ import Accounts from './app/Accounts';
 import Settings from './app/Settings';
 import Events from './app/Events';
 
-export let redirectToRoute;
+export let redirectToRoute = (route) => console.log('app is not ready', route);
+export let isRouteActive = () => false;
 
 const fetchUser = () =>
   fetchFromApi('/user')
@@ -92,8 +93,8 @@ export const states = [
       clLoginError={props.transition.params().clLoginError} />,
   },
   {
-    name: 'basecamp',
-    url: '/basecamp',
+    name: 'accounts',
+    url: '/accounts',
     component: (props) => <Accounts
       basecampUser={appState.cursor(['auth', 'basecamp']).deref()}
       costlockerUser={appState.cursor(['auth', 'costlocker']).deref()}
@@ -236,7 +237,10 @@ export const config = (router) => {
     if (e) {
       e.preventDefault();
     }
-    router.stateService.go(route, params, { location: true })
+    router.stateService.go(route, params, { location: true });
+    // rerender to change active state in menu - stateService.go realoads only <UIView>
+    appState.cursor(['app']).set('currentState', route);
   };
+  isRouteActive = router.stateService.is;
   hooks.forEach(hook => router.transitionService[hook.event](hook.criteria, hook.callback, { priority: hook.priority }));
 }

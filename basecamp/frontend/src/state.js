@@ -13,6 +13,7 @@ const appState = immstruct({
   basecamp: {
     projects: [],
   },
+  currentState: '', // helper for active menu items
   events: null,
   companySettings: {
     areTodosEnabled: true,

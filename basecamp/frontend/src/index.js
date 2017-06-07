@@ -5,7 +5,7 @@ import { Visualizer } from 'ui-router-visualizer';
 
 import { isDevelopmentMode } from './config';
 import { appState } from './state';
-import { states, config } from './Router';
+import { states, config, isRouteActive } from './Router';
 import App from './ui/App';
 import Loading from './ui/Loading';
 
@@ -18,7 +18,7 @@ const render = () => {
   } else {
     content =
       <UIRouter states={states} config={config} plugins={plugins}>
-        <App auth={appState.cursor(['auth']).deref()} />
+        <App auth={appState.cursor(['auth']).deref()} isRouteActive={isRouteActive} />
       </UIRouter>;
   }
   ReactDOM.render(content, document.getElementById('root'));

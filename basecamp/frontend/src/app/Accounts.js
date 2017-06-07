@@ -8,13 +8,28 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, users, 
     <div>
       <div className="row">
         <div className="col-sm-12">
-          <h1>Basecamp</h1>
+          <h1>Accounts</h1>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-sm-12">
+          <h3>Costlocker</h3>
+          <OAuthLogin
+            title={costlockerUser
+              ? <span>Switch account <strong>{costlockerUser.person.first_name} {costlockerUser.person.last_name}</strong></span>
+              : 'Login to Costlocker'}
+            loginError={null} loginUrl={loginUrls.costlocker} />
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-sm-12">
+          <h3>Basecamp</h3>
           <p><strong>Supported products:</strong> Basecamp 3, Basecamp 2, and Basecamp Classic</p>
         </div>
       </div>
       <div className="row">
         <div className="col-sm-12">
-          <h3>Connected Accounts</h3>
+          <h4>Connected Accounts</h4>
           {users.length ? (
           <table className="table table-striped table-condensed">
             <thead>

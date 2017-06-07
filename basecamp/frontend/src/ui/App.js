@@ -1,64 +1,59 @@
 import React from 'react';
 import { UIView } from 'ui-router-react';
-import { Link, Button } from '../ui/Components';
-
-const AnonymousUser = () => <em>Not logged in</em>;
+import { Link } from '../ui/Components';
 
 const CostlockerUser = ({ user }) => {
-  if (!user) {
-    return <AnonymousUser />;
-  }
   return (
-    <div>
+    <span>
       <strong>
         {user.person.first_name} {user.person.last_name}
       </strong> ({user.company.name})
-      &nbsp;<Button route='login' title='Switch Costlocker account' className="btn btn-default btn-sm" />
-    </div>
+    </span>
   );
 };
 
 const BasecampUser = ({ user }) => {
-  let userInfo = <AnonymousUser />;
   if (user) {
-    userInfo = <span>
+    return <span>
       {user.identity.first_name} {user.identity.last_name} ({user.identity.email_address})
     </span>;
+  } else {
+    return <em>Not logged in Basecamp</em>;
   }
-  return (
-    <div>
-      {userInfo}
-      &nbsp;<Button route='basecamp' title='Basecamp accounts' className="btn btn-default btn-sm" />
-    </div>
-  );
 };
 
 const User = ({ auth }) => {
-  return (
-    <div>
-      <div className="text-primary">
-        <CostlockerUser user={auth.get('costlocker')} />
-      </div>
-      <div className="text-success">
-        <BasecampUser user={auth.get('basecamp')} />
-      </div>
-    </div>
-  );
-};
+  if (!auth.get('costlocker')) {
+    return null;
+  }
+  return <div>
+    <span className="text-primary" title="Costlocker user">
+      <CostlockerUser user={auth.get('costlocker')} />
+    </span>
+    &nbsp;/&nbsp;
+    <span className="text-success" title="Basecamp user">
+      <BasecampUser user={auth.get('basecamp')} />
+    </span>
+  </div>;
+}
 
-const Navigation = () => {
+const Navigation = ({ isRouteActive }) => {
+  const routes = [
+    { route: 'projects', title: 'Projects' },
+    { route: 'sync', title: 'Add project' },
+    { route: 'events', title: 'Events' },
+    { route: 'settings', title: 'Settings' },
+  ];
   return (
-    <ul className="nav nav-pills">
-      <li><Link route='projects' title='Costlocker projects' /></li>
-      <li><Link route='basecamp' title='Basecamp accounts' /></li>
-      <li><Link route='sync' title='Synchronize' /></li>
-      <li><Link route='events' title='Events' /></li>
-      <li><Link route='settings' title='Settings' /></li>
+    <ul className="nav navbar-nav">
+      {routes.map(({ route, title }) => (
+      <li key={route} className={isRouteActive(route) ? 'active' : null}><Link route={route} title={title} /></li>
+      ))}
     </ul>
   );
 };
 
-export default function Layout({ auth }) {
+export default function Layout({ auth, isRouteActive }) {
   return (
     <div>
       <nav className="navbar navbar-default">
@@ -66,25 +61,25 @@ export default function Layout({ auth }) {
           <div className="navbar-header">
             <div className="navbar-brand">
               <a href="/">
-                <img alt="" src="https://cdn-images-1.medium.com/max/1200/1*BLdn5GGWwijxJkcr0I0rgg.png" width="40px" />
+                <img title="Costlocker" alt="Costlocker" src="https://cdn-images-1.medium.com/max/1200/1*BLdn5GGWwijxJkcr0I0rgg.png" />
+                &nbsp;+&nbsp;
+                <img title="Basecamp" alt="Basecamp" src="https://freeter.io/embedding-web-apps/project-management/basecamp.png" />
               </a>
             </div>
-            <div className="navbar-brand">
-              <span className="text-primary">Costlocker</span><br />
-              <span className="text-success">Basecamp</span>
-            </div>
           </div>
-          <div className="navbar-text navbar-right text-right">
-            <User auth={auth} />
+          <div>
+            {auth.get('costlocker') ? <Navigation isRouteActive={isRouteActive} /> : ''}
+          </div>
+          <div className="navbar-right text-right">
+            <ul className="nav navbar-nav">
+              <li className={isRouteActive('accounts') ? 'active' : null}>
+                <Link route='accounts' title={<User auth={auth} />} />
+              </li>
+            </ul>
           </div>
         </div>
       </nav>
       <div className="container">
-        <div className="row">
-          <div className="col-sm-12">
-            {auth.get('costlocker') ? <Navigation /> : ''}
-          </div>
-        </div>
         <div className="row">
           <div className="col-sm-12">
             <UIView />
