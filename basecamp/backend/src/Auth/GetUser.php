@@ -60,7 +60,7 @@ class GetUser
     private function getConnectedUsersAndAccounts()
     {
         $costlockerUser = $this->getCostlockerUser();
-        if (!$costlockerUser->idTenant) {
+        if (!$costlockerUser->id) {
             return [];
         }
         $dql =<<<DQL
@@ -68,10 +68,10 @@ class GetUser
             FROM Costlocker\Integrations\Database\CostlockerUser cu
             JOIN cu.basecampUsers bu
             JOIN bu.accounts ba
-            WHERE cu.idTenant = :tenant
+            WHERE cu.costlockerCompany = :tenant
 DQL;
         $params = [
-            'tenant' => $costlockerUser->idTenant,
+            'tenant' => $costlockerUser->costlockerCompany->id,
         ];
         return array_map(
             function (CostlockerUser $u) {

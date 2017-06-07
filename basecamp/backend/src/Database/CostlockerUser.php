@@ -9,11 +9,8 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @ORM\Entity
  * @ORM\Table(
  *  name="cl_user",
- *  indexes={
- *    @ORM\Index(name="cl_user_tenant", columns={"id_tenant"})
- *  },
  *  uniqueConstraints={
- *    @ORM\UniqueConstraint(name="cl_unique_user", columns={"email", "id_tenant"})
+ *    @ORM\UniqueConstraint(name="cl_unique_user", columns={"email", "cl_company_id"})
  *  }
  * )
  */
@@ -32,9 +29,10 @@ class CostlockerUser
     public $email;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\ManyToOne(targetEntity="CostlockerCompany")
+     * @ORM\JoinColumn(name="cl_company_id", nullable=false, onDelete="CASCADE")
      */
-    public $idTenant;
+    public $costlockerCompany;
 
     /**
      * @ORM\Column(type="json_array")
