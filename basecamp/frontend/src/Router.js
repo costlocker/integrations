@@ -10,7 +10,7 @@ import Events from './basecamp/Events';
 
 export let redirectToRoute;
 
-if (isNotLoggedInCostlocker()) {
+const fetchUser = () =>
   fetchFromApi('/user')
     .then((user) => {
       appState.cursor().update(
@@ -20,9 +20,11 @@ if (isNotLoggedInCostlocker()) {
           .setIn(['auth', 'settings'], user.settings)
           .setIn(['sync', 'account'], user.basecamp ? user.basecamp.accounts[0].id : null)
       );
-      redirectToRoute('homepage');
     })
     .catch(e => console.log('Anonymous user'));
+
+if (isNotLoggedInCostlocker()) {
+  fetchUser().then(() => redirectToRoute('homepage'));
 }
 
 const loadCostlockerProjects = [
@@ -84,6 +86,11 @@ export const states = [
       basecampUser={appState.cursor(['auth', 'basecamp']).deref()}
       costlockerUser={appState.cursor(['auth', 'costlocker']).deref()}
       users={appState.cursor(['auth', 'settings']).deref().users}
+      disconnect={(id) =>
+        pushToApi(`/disconnect`, { user: id })
+          .then(() => fetchUser())
+          .catch((e) => alert('Disconnect has failed'))
+      }
       loginUrls={loginUrls} />,
   },
   {

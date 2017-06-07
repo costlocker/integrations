@@ -69,4 +69,13 @@ class CostlockerUser
             })
             ->first();
     }
+
+    public function removeUser($id)
+    {
+        $user = $this->getUser($id);
+        if ($user) {
+            return $this->basecampUsers->removeElement($user);
+        }
+        return false;
+    }
 }

@@ -107,6 +107,17 @@ $app
     ->before($checkAuthorization('costlocker'));
 
 $app
+    ->post('/disconnect', function (Request $r) use ($app) {
+        $wasDisconnected = false;
+        if ($r->request->get('user')) {
+            $uc = new Costlocker\Integrations\Auth\DisconnectBasecampAccount($app['orm.em'], $app['client.user']);
+            $wasDisconnected = $uc($r->request->get('user'));
+        }
+        return new JsonResponse([], $wasDisconnected ? 200 : 400);
+    })
+    ->before($checkAuthorization('basecamp'));
+
+$app
     ->get('/basecamp', function (Request $r) use ($app) {
         $strategy = new Costlocker\Integrations\Basecamp\GetProjects($app['client.basecamp']);
         $data = $strategy($r);

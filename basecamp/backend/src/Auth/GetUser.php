@@ -63,6 +63,13 @@ class GetUser
         return $this->basecampUser ?: new BasecampUser();
     }
 
+    public function checkDisconnectedBasecampUser($userId)
+    {
+        if ($userId == $this->session->get('basecamp')['userId']) {
+            $this->session->remove('basecamp');
+        }
+    }
+
     private function getConnectedUsersAndAccounts()
     {
         $costlockerUser = $this->getCostlockerUser();

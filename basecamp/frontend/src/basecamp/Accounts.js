@@ -3,7 +3,7 @@ import React from 'react';
 import OAuthLogin from '../auth/OAuthLogin';
 import { ExternalLink } from '../Helpers';
 
-export default function Login({ basecampUser, costlockerUser, loginUrls, users }) {
+export default function Login({ basecampUser, costlockerUser, loginUrls, users, disconnect }) {
   return (
     <div>
       <div className="row">
@@ -27,6 +27,7 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, users }
                 <th>Person</th>
                 <th>Basecamp</th>
                 <th>Version</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -51,6 +52,7 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, users }
                 </td>
                 <td>{account.name} <ExternalLink url={account.urlApp} /></td>
                 <td>{account.product}</td>
+                <td>{isCurrentUser ? <button className="btn btn-sm btn-danger" onClick={() => disconnect(account.identity.id)}>Disconnect</button> : ''}</td>
               </tr>;
             }))}
             </tbody>
