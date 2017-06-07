@@ -149,7 +149,7 @@ $app
     ->before($checkAuthorization('basecamp'));
 
 $app
-    ->post('/webhooks/basecamp', function (Request $r) use ($pushEvent) {
+    ->post('/webhooks/handler', function (Request $r) use ($pushEvent) {
         return $pushEvent(\Costlocker\Integrations\Database\Event::WEBHOOK_SYNC, json_decode($r->getContent(), true));
     });
 
