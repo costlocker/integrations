@@ -30,6 +30,7 @@ class GetUser
             'costlocker' => $clUser->data,
             'basecamp' => $bcUser->data,
             'settings' => [
+                'sync' => $clUser->costlockerCompany->getSettings(),
                 'users' => $this->getConnectedUsersAndAccounts()
             ],
         ]);

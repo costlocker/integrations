@@ -34,8 +34,10 @@ class GetProjects
                             'id' => $mapping['id'],
                             'account' => $mapping['account'],
                             'url' => $this->buildProjectUrl($mapping['account'], $mapping['id']),
+                            'settings' => $mapping['settings'],
                         ];
                     },
+                    // fixme: fetch in loop
                     $this->database->findProjects($rawProject['id'])
                 )),
             ];

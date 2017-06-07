@@ -69,7 +69,8 @@ DQL;
             function (BasecampProject $p) {
                 return [
                     'id' => $p->basecampProject,
-                    'activities' => $p->settings,
+                    'activities' => $p->mapping,
+                    'settings' => $p->settings,
                     'account' => [
                         'id' => $p->basecampAccount->id,
                         'product' => $p->basecampAccount->product,

@@ -37,4 +37,10 @@ class CostlockerCompany
         $this->createdAt = new \DateTime();
         $this->projects = new ArrayCollection();
     }
+
+    public function getSettings()
+    {
+        $request = new \Costlocker\Integrations\Basecamp\SyncRequest();
+        return ($this->settings ?: []) + $request->toSettings();
+    }
 }

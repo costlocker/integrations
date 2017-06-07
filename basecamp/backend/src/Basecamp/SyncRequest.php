@@ -19,6 +19,10 @@ class SyncRequest
 
     public function toSettings()
     {
-        return get_object_vars($this);
+        return [
+            'areTodosEnabled' => $this->areTodosEnabled,
+            'isDeletingTodosEnabled' => $this->isDeletingTodosEnabled,
+            'isRevokeAccessEnabled' => $this->isRevokeAccessEnabled,
+        ];
     }
 }

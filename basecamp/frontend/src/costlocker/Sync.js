@@ -36,10 +36,11 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampAcc
       <div>
         <div className="form-group">
           <label htmlFor="costlockerProject">Costlocker project</label>
-          <select
+          <select required
             className="form-control" name="costlockerProject" id="costlockerProject"
             value={syncForm.get('costlockerProject')} onChange={syncForm.set('costlockerProject')}
           >
+            <option></option>
             {availableCostlockerProjects.map(project => (
               <option key={project.id} value={project.id}>
                 {project.name} ({project.client.name})
@@ -86,6 +87,7 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampAcc
             className="form-control" name="basecampProject" id="basecampProject"
             value={syncForm.get('basecampProject')} onChange={syncForm.set('basecampProject')}
           >
+            <option></option>
             {availableBasecampProjects.map(project => (
               <option key={project.id} value={project.id}>
                 {project.name}

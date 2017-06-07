@@ -113,14 +113,29 @@ export const states = [
             const projects = appState.cursor(['costlocker', 'projects']).deref().filter(p => p.id == params.clProject);
             if (projects.length) {
               const editedProject = projects[0];
+              const basecampProject = editedProject.basecamps[0];
               appState.cursor(['sync']).update(sync => sync
                 .set('mode', 'edit')
                 .set('costlockerProject', editedProject.id)
-                .set('basecampProject', editedProject.basecamps[0].id)
-                .set('account', editedProject.basecamps[0].account.id)
+                .set('basecampProject', basecampProject.id)
+                .set('account', basecampProject.account.id)
+                .set('areTodosEnabled', basecampProject.settings.areTodosEnabled)
+                .set('isDeletingTodosEnabled', basecampProject.settings.isDeletingTodosEnabled)
+                .set('isRevokeAccessEnabled', basecampProject.settings.isRevokeAccessEnabled)
               )
+              return;
             }
           }
+
+          const companySettings = appState.cursor(['auth', 'settings']).deref().sync;
+          appState.cursor(['sync']).update(sync => sync
+            .set('mode', 'create')
+            .set('costlockerProject', '')
+            .set('basecampProject', '')
+            .set('areTodosEnabled', companySettings.areTodosEnabled)
+            .set('isDeletingTodosEnabled', companySettings.isDeletingTodosEnabled)
+            .set('isRevokeAccessEnabled', companySettings.isRevokeAccessEnabled)
+          );
         }
       }
     ]),
