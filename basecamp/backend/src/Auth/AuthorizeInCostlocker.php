@@ -65,9 +65,9 @@ class AuthorizeInCostlocker
                     return $this->sendError("Only ADMIN or OWNER can import project, you are {$costockerRole}");
                 }
                 $this->session->remove('costlockerLogin');
-                $this->session->set('costlocker', [
-                    'userId' => $this->persistUser->__invoke($costlockerUser, $accessToken),
-                ]);
+                list($costlockerId, $basecampId) = $this->persistUser->__invoke($costlockerUser, $accessToken);
+                $this->session->set('costlocker', ['userId' => $costlockerId]);
+                $this->session->set('basecamp', ['userId' => $basecampId]);
                 return new RedirectResponse($this->appUrl);
             } catch (\Exception $e) {
                 return $this->sendError($e->getMessage());

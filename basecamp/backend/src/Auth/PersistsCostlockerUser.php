@@ -38,7 +38,10 @@ class PersistsCostlockerUser
         $this->entityManager->persist($token);
         $this->entityManager->flush();
 
-        return $user->id;
+        return [
+            $user->id,
+            count($user->basecampUsers) ? $user->basecampUsers->first()->id : null,
+        ];
     }
 
     private function findCompanyInDb($idCompany)

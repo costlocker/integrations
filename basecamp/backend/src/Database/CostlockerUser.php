@@ -40,6 +40,7 @@ class CostlockerUser
     public $data;
 
     /**
+     * @var BasecampUser[]
      * @ORM\ManyToMany(targetEntity="BasecampUser")
      * @ORM\JoinTable(name="bc_cl_users",
      *   joinColumns={@ORM\JoinColumn(name="cl_id", referencedColumnName="id")},
