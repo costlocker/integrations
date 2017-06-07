@@ -22,11 +22,10 @@ class PersistsCostlockerUser
         $company = $this->findCompanyInDb($apiUser['company']['id']) ?: new CostlockerCompany();
         $company->id = $apiUser['company']['id'];
 
-        $newUser = new CostlockerUser();
-        $newUser->email = $apiUser['person']['email'];
-        $newUser->costlockerCompany = $company;
-        $newUser->data = $apiUser;
-        $user = $this->findUserInDb($newUser) ?: $newUser;
+        $user = $this->findUserInDb($apiUser['person']['email'], $company->id) ?: new CostlockerUser();
+        $user->email = $apiUser['person']['email'];
+        $user->costlockerCompany = $company;
+        $user->data = $apiUser;
 
         $token = new AccessToken();
         $token->costlockerUser = $user;
@@ -48,9 +47,9 @@ class PersistsCostlockerUser
             ->find($idCompany);
     }
 
-    private function findUserInDb(CostlockerUser $user)
+    private function findUserInDb($email, $companyId)
     {
         return $this->entityManager->getRepository(CostlockerUser::class)
-            ->findOneBy(['email' => $user->email, 'costlockerCompany' => $user->costlockerCompany->id]);
+            ->findOneBy(['email' => $email, 'costlockerCompany' => $companyId]);
     }
 }

@@ -32,13 +32,18 @@ class BasecampUser
         $this->accounts = new ArrayCollection();
     }
 
-    public function addAccount(BasecampAccount $account)
+    public function upsertAccount($id)
     {
-        if ($this->getAccount($account->id)) {
-            return;
+        $account = $this->getAccount($id);
+        if ($account) {
+            return $account;
         }
-        $this->accounts->add($account);
-        $account->basecampUser = $this;
+
+        $newAccount = new BasecampAccount();
+        $newAccount->id = $id;
+        $newAccount->basecampUser = $this;
+        $this->accounts->add($newAccount);
+        return $newAccount;
     }
 
     public function getAccount($id)

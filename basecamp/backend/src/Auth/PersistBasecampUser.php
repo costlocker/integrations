@@ -4,7 +4,6 @@ namespace Costlocker\Integrations\Auth;
 
 use League\OAuth2\Client\Token\AccessToken as OAuthToken;
 use Costlocker\Integrations\Database\BasecampUser;
-use Costlocker\Integrations\Database\BasecampAccount;
 use Costlocker\Integrations\Database\AccessToken;
 use Costlocker\Integrations\Auth\GetUser;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,20 +23,17 @@ class PersistBasecampUser
     {
         $clUser = $this->getUser->getCostlockerUser();
 
-        $newUser = new BasecampUser();
-        $newUser->id = $apiUser['identity']['id'];
-        $newUser->data = $apiUser;
-        $user = $this->findUserInDb($newUser) ?: $newUser;
+        $user = $this->findUserInDb($apiUser['identity']['id']) ?: new BasecampUser();
+        $user->id = $apiUser['identity']['id'];
+        $user->data = $apiUser;
         $clUser->addBasecampUser($user);
 
         foreach ($apiUser['accounts'] as $apiAccount) {
-            $account = new BasecampAccount();
-            $account->id = $apiAccount['id'];
+            $account = $user->upsertAccount($apiAccount['id']);
             $account->name = $apiAccount['name'];
             $account->product = $apiAccount['product'];
             $account->urlApi = $apiAccount['href'];
             $account->urlApp = $apiAccount['app_href'];
-            $user->addAccount($account);
         }
 
         $token = new AccessToken();
@@ -55,9 +51,10 @@ class PersistBasecampUser
         return $user->id;
     }
 
-    private function findUserInDb(BasecampUser $user)
+    private function findUserInDb($id)
     {
-        return $this->entityManager->getRepository(BasecampUser::class)
-            ->find($user->id);
+        return $this->entityManager
+            ->getRepository(BasecampUser::class)
+            ->find($id);
     }
 }
