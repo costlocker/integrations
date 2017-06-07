@@ -25,16 +25,19 @@ class ProjectsDatabase implements SyncDatabase
         return reset($projects);
     }
 
-    public function upsertProject($costockerProjectId, array $mapping)
+    public function upsertProject($costockerProjectId, array $mapping, array $settings = [])
     {
         $costlockerProject = $this->entityManager->getRepository(CostlockerProject::class)
             ->find($costockerProjectId) ?: new CostlockerProject();
         $costlockerProject->id = $costockerProjectId;
-        $costlockerProject->costlockerCompany = $this->getUser->getCostlockerUser()->costlockerCompany;
+
+        if ($this->getUser->getCostlockerUser(false)) {
+            $costlockerProject->costlockerCompany = $this->getUser->getCostlockerUser()->costlockerCompany;
+        }
         
         $basecampProject = $costlockerProject->upsertProject($mapping['id']);
         $basecampProject->mapping = $mapping['activities'];
-        $basecampProject->settings = $mapping['settings'];
+        $basecampProject->settings = $settings;
         $basecampProject->basecampAccount = $this->entityManager
             ->getRepository(BasecampAccount::class)
             ->find($mapping['account']['id']);
@@ -51,13 +54,11 @@ class ProjectsDatabase implements SyncDatabase
             FROM Costlocker\Integrations\Database\BasecampProject bp
             JOIN bp.costlockerProject cp
             JOIN bp.basecampAccount ba
-            WHERE cp.costlockerCompany = :tenant
-              AND cp.id = :project
+            WHERE cp.id = :project
               AND bp.deletedAt IS NULL
             ORDER BY bp.id DESC
 DQL;
         $params = [
-            'tenant' => $this->getUser->getCostlockerUser()->costlockerCompany,
             'project' => $costlockerProjectId,
         ];
 
@@ -75,8 +76,6 @@ DQL;
                         'id' => $p->basecampAccount->id,
                         'product' => $p->basecampAccount->product,
                         'href' => $p->basecampAccount->urlApi,
-                        // temporary fix
-                        'token' => $this->getUser->getBasecampAccessToken(),
                     ],
                 ];
             },

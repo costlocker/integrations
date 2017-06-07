@@ -36,7 +36,12 @@ class GetUser
         ]);
     }
 
-    public function getCostlockerUser(): CostlockerUser
+    public function overrideCostlockerUser(CostlockerUser $user = null)
+    {
+        $this->costlockerUser = $user;
+    }
+
+    public function getCostlockerUser($returnNullObject = true)
     {
         if (!$this->costlockerUser) {
             $userId = $this->session->get('costlocker')['userId'] ?? 0;
@@ -44,7 +49,7 @@ class GetUser
                 ->find($userId);
             $this->costlockerUser = $user;
         }
-        return $this->costlockerUser ?: new CostlockerUser();
+        return $this->costlockerUser ?: ($returnNullObject ? new CostlockerUser() : null);
     }
 
     public function getBasecampUser(): BasecampUser
@@ -121,18 +126,18 @@ SQL;
         return $query->fetchColumn();
     }
 
-    public function getBasecampAccessToken()
+    public function getBasecampAccessToken($accountId)
     {
         $sql =<<<SQL
             SELECT access_token
             FROM oauth2_token
-            WHERE costlocker_user_id = :cl AND basecamp_user_id = :bc
-            ORDER BY id DESC
+            JOIN bc_account ON oauth2_token.basecamp_user_id = bc_account.basecamp_user_id
+            WHERE bc_account.id = :id
+            ORDER BY oauth2_token.id DESC
             LIMIT 1
 SQL;
         $params = [
-            'cl' => $this->getCostlockerUser()->id,
-            'bc' => $this->getBasecampUser()->id,
+            'id' => $accountId,
         ];
         $query = $this->entityManager->getConnection()->executeQuery($sql, $params);
         return $query->fetchColumn();
@@ -140,6 +145,8 @@ SQL;
 
     public function getBasecampAccount($accountId)
     {
-        return $this->getBasecampUser()->getAccount($accountId) ?: new BasecampAccount();
+        return $this->entityManager
+            ->getRepository(BasecampAccount::class)
+            ->find($accountId) ?: new BasecampAccount();
     }
 }

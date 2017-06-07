@@ -12,7 +12,7 @@ class InMemoryDatabase implements SyncDatabase
         return reset($basecampProjects);
     }
 
-    public function upsertProject($costockerProjectId, array $mapping)
+    public function upsertProject($costockerProjectId, array $mapping, array $settings = [])
     {
         $this->mapping[$costockerProjectId][$mapping['id']] = $mapping;
     }

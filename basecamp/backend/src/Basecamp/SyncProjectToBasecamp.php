@@ -30,7 +30,9 @@ class SyncProjectToBasecamp
         $bcProject = $this->upsertProject($project, $config);
         $bcProjectId = $bcProject['id'];
         if ($this->checkDeletedProject($bcProject)) {
-            return;
+            return [
+                'basecamp' => 'project was deleted'
+            ];
         }
         if ($config->areTodosEnabled) {
             $grantedPeople = $this->grantAccess($bcProjectId, $people);
@@ -280,7 +282,6 @@ class SyncProjectToBasecamp
             'id' => $bcProject['id'],
             'account' => $this->basecampFactory->getAccount(),
             'activities' => $bcProject['activities'],
-            'settings' => $config->toSettings(),
-        ]);
+        ], $config->toSettings());
     }
 }

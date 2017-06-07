@@ -13,7 +13,8 @@ class Version20170607075137 extends AbstractMigration
         $this->addSql(<<<SQL
             CREATE TABLE events (
                 id INT NOT NULL, 
-                bc_project_id INT, 
+                cl_user_id INT DEFAULT NULL, 
+                bc_project_id INT DEFAULT NULL, 
                 event INT NOT NULL, 
                 data JSON NOT NULL, 
                 created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, 
@@ -22,7 +23,13 @@ class Version20170607075137 extends AbstractMigration
             )
 SQL
         );
+        $this->addSql('CREATE INDEX IDX_5387574AD5094834 ON events (cl_user_id)');
         $this->addSql('CREATE INDEX IDX_5387574A20B6C967 ON events (bc_project_id)');
+        $this->addSql(<<<SQL
+            ALTER TABLE events ADD CONSTRAINT FK_5387574AD5094834 FOREIGN KEY (cl_user_id)
+                REFERENCES cl_user (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE
+SQL
+        );
         $this->addSql(<<<SQL
             ALTER TABLE events ADD CONSTRAINT FK_5387574A20B6C967 FOREIGN KEY (bc_project_id)
                 REFERENCES bc_project (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE

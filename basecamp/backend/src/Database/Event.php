@@ -10,8 +10,12 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Event
 {
+    const SYNC_REQUEST = 0x00;
     const WEBHOOK_SYNC = 0x10;
     const MANUAL_SYNC = 0x20;
+
+    const RESULT_SUCCESS = 0x1;
+    const RESULT_FAILURE = 0x2;
 
     /**
      * @ORM\Id
@@ -19,6 +23,12 @@ class Event
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="CostlockerUser")
+     * @ORM\JoinColumn(name="cl_user_id", nullable=true, onDelete="SET NULL")
+     */
+    public $costlockerUser;
 
     /**
      * @ORM\ManyToOne(targetEntity="BasecampProject")
@@ -49,6 +59,12 @@ class Event
     public function __construct()
     {
         $this->createdAt = new \DateTime();
+    }
+
+    public function markStatus($status, $result)
+    {
+        $this->event |= $status;
+        $this->data['result'] = $result;
         $this->updatedAt = new \DateTime();
     }
 }

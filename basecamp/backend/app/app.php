@@ -103,7 +103,7 @@ $app
     ->before($checkAuthorization('basecamp'));
 
 $pushEvent = function ($event, array $data) use ($app) {
-    $push = new \Costlocker\Integrations\Queue\PushSyncRequest($app['orm.em']);
+    $push = new \Costlocker\Integrations\Queue\PushSyncRequest($app['orm.em'], $app['client.user']);
     $push($event, $data);
     return new JsonResponse([], 200);
 };
@@ -111,13 +111,12 @@ $pushEvent = function ($event, array $data) use ($app) {
 $app
     ->post('/basecamp', function (Request $r) use ($pushEvent) {
         return $pushEvent(\Costlocker\Integrations\Database\Event::MANUAL_SYNC, $r->request->all());
-
     })
     ->before($checkAuthorization('basecamp'));
 
 $app
     ->post('/webhooks/basecamp', function (Request $r) use ($pushEvent) {
-        return $pushEvent(\Costlocker\Integrations\Database\Event::WEBHOOK_SYNC, json_decode($r->getContent()));
+        return $pushEvent(\Costlocker\Integrations\Database\Event::WEBHOOK_SYNC, json_decode($r->getContent(), true));
     });
 
 return $app;
