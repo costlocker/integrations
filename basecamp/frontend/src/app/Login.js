@@ -1,17 +1,17 @@
 import React from 'react';
 
 import OAuthLogin from './OAuthLogin';
-import { ExternalLink } from '../Helpers';
+import { ExternalLink } from '../ui/Components';
 
-export default function Login({ auth, loginUrls, clLoginError }) {
+export default function Login({ costlockerAuth, loginUrls, clLoginError }) {
   return (
     <div>
       <div className="row text-center">
         <div className="col-sm-12">
           <h2>Costlocker <ExternalLink url="https://new.costlocker.com" /></h2>
           <OAuthLogin
-            title={auth.costlocker
-              ? <span>Switch account <strong>{auth.costlocker.person.first_name} {auth.costlocker.person.last_name}</strong></span>
+            title={costlockerAuth
+              ? <span>Switch account <strong>{costlockerAuth.person.first_name} {costlockerAuth.person.last_name}</strong></span>
               : 'Login to Costlocker'}
             loginError={clLoginError} loginUrl={loginUrls.costlocker} />
         </div>

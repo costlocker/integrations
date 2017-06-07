@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { ExternalLink } from '../Helpers';
+import { ExternalLink, Button } from '../ui/Components';
 
-export default function Projects({ allProjects, redirectToRoute, disconnect }) {
+export default function Projects({ allProjects, disconnect }) {
   if (!allProjects) {
     return <span>Loading....</span>;
   }
@@ -42,19 +42,11 @@ export default function Projects({ allProjects, redirectToRoute, disconnect }) {
                   ))}
                 </td>
                 <td className="text-right">
-                  <button
-                    className="btn btn-sm btn-primary" title="Refresh project"
-                    onClick={() => redirectToRoute(
-                      'sync',
-                      { clProject: project.id }
-                    )}
-                  >
-                    <i className="fa fa-refresh"></i> Refresh
-                  </button>
+                  <Button route='sync' params={{ clProject: project.id }}
+                    title={<span><i className="fa fa-refresh"></i> Refresh</span>} className="btn btn-sm btn-primary" />
                   &nbsp;&nbsp;
-                  <button className="btn btn-sm btn-danger" onClick={() => disconnect(project.id)}>
-                    <i className="fa fa-thrash"></i> Disconnect
-                  </button>
+                  <Button action={() => disconnect(project.id)}
+                    title={<span><i className="fa fa-trash"></i> Disconnect</span>} className="btn btn-sm btn-danger" />
                 </td>
               </tr>
             ))}
@@ -68,9 +60,7 @@ export default function Projects({ allProjects, redirectToRoute, disconnect }) {
     {notConnectedProjectsCount &&
     <div className="row">
       <div className="col-sm-12">
-        <button onClick={() => redirectToRoute('sync')} className="btn btn-success">
-          Connect new project ({notConnectedProjectsCount})
-        </button>
+        <Button route='sync' title={<span>Connect new project ({notConnectedProjectsCount})</span>} className="btn btn-success" />
       </div>
     </div>
     }

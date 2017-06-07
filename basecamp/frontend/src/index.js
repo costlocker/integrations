@@ -6,14 +6,14 @@ import { Visualizer } from 'ui-router-visualizer';
 import { isDevelopmentMode } from './config';
 import { appState } from './state';
 import { states, config } from './Router';
-import Layout from './Layout';
+import App from './ui/App';
 
 export const plugins = isDevelopmentMode ? [pushStateLocationPlugin, Visualizer] : [pushStateLocationPlugin];
 
 const render = () =>
   ReactDOM.render(
     <UIRouter states={states} config={config} plugins={plugins}>
-      <Layout />
+      <App auth={appState.cursor(['auth']).deref()} />
     </UIRouter>,
     document.getElementById('root')
   );

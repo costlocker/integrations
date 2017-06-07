@@ -1,7 +1,7 @@
 import React from 'react';
 
-import OAuthLogin from '../auth/OAuthLogin';
-import { ExternalLink } from '../Helpers';
+import OAuthLogin from './OAuthLogin';
+import { ExternalLink, Button } from '../ui/Components';
 
 export default function Login({ basecampUser, costlockerUser, loginUrls, users, disconnect }) {
   return (
@@ -20,7 +20,7 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, users, 
             <thead>
               <tr>
                 <th>Costlocker</th>
-                <th colSpan="3" className="active text-center">Basecamp</th>
+                <th colSpan="4" className="active text-center">Basecamp</th>
               </tr>
               <tr>
                 <th>Person</th>
@@ -52,7 +52,7 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, users, 
                 </td>
                 <td>{account.name} <ExternalLink url={account.urlApp} /></td>
                 <td>{account.product}</td>
-                <td>{isCurrentUser ? <button className="btn btn-sm btn-danger" onClick={() => disconnect(account.identity.id)}>Disconnect</button> : ''}</td>
+                <td>{isCurrentUser ? <Button action={() => disconnect(account.identity.id)} title='Disconnect' className="btn btn-sm btn-danger" /> : ''}</td>
               </tr>;
             }))}
             </tbody>

@@ -3,12 +3,12 @@ import { Map } from 'immutable';
 
 import { appState, isNotLoggedInCostlocker, isNotLoggedInBasecamp } from './state';
 import { fetchFromApi, pushToApi, loginUrls } from './api';
-import Login from './auth/Login';
-import Projects from './costlocker/Projects';
-import Sync from './costlocker/Sync';
-import Accounts from './basecamp/Accounts';
-import Settings from './basecamp/Settings';
-import Events from './basecamp/Events';
+import Login from './app/Login';
+import Projects from './app/Projects';
+import Sync from './app/Sync';
+import Accounts from './app/Accounts';
+import Settings from './app/Settings';
+import Events from './app/Events';
 
 export let redirectToRoute;
 
@@ -74,7 +74,6 @@ export const states = [
     url: '/projects',
     component: () => <Projects
       allProjects={appState.cursor(['costlocker', 'projects']).deref()}
-      redirectToRoute={redirectToRoute}
       disconnect={(id) =>
         pushToApi(`/disconnect`, { project: id })
           .then(() => fetchProjects())
@@ -87,7 +86,7 @@ export const states = [
     name: 'login',
     url: '/login?clLoginError',
     component: (props) => <Login
-      auth={appState.cursor(['auth']).deref().toJS()}
+      costlockerAuth={appState.cursor(['auth', 'costlocker']).deref()}
       loginUrls={loginUrls}
       clLoginError={props.transition.params().clLoginError} />,
   },
@@ -232,6 +231,11 @@ const hooks = [
 
 export const config = (router) => {
   router.urlRouter.otherwise(() => '/');
-  redirectToRoute = (route, params) => router.stateService.go(route, params, { location: true });
+  redirectToRoute = (route, params, e) => {
+    if (e) {
+      e.preventDefault();
+    }
+    router.stateService.go(route, params, { location: true })
+  };
   hooks.forEach(hook => router.transitionService[hook.event](hook.criteria, hook.callback, { priority: hook.priority }));
 }

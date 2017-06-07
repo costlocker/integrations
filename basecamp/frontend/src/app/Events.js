@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { Button } from '../ui/Components';
+
 export default function Projects({ events, refresh }) {
   if (!events) {
     return <span>Loading....</span>;
@@ -11,7 +13,7 @@ export default function Projects({ events, refresh }) {
         <h1>Events</h1>
       </div>
       <div className="col-sm-4 text-right">
-        <a className="btn btn-sm btn-info" href="#" onClick={() => refresh()}>Refresh</a>
+        <Button action={refresh} title='Refresh' className="btn btn-sm btn-info" />
       </div>
     </div>
     <div className="row">

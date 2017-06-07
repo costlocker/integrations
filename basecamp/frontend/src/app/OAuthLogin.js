@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Errors } from '../Helpers';
+import { Errors } from '../ui/Components';
 
 export default function OAuthLogin({ title, loginError, loginUrl }) {
   return (
