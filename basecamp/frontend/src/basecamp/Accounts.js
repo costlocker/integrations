@@ -15,6 +15,7 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, users }
       <div className="row">
         <div className="col-sm-12">
           <h3>Connected Accounts</h3>
+          {users.length ? (
           <table className="table table-striped table-condensed">
             <thead>
               <tr>
@@ -54,6 +55,9 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, users }
             }))}
             </tbody>
           </table>
+          ) : (
+          <p className="text-muted">No Basecamp account is connected in your company</p>
+          )}
         </div>
       </div>
       <div className="row">
