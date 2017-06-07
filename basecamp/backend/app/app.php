@@ -108,7 +108,14 @@ $app
 
 $app
     ->post('/settings', function (Request $r) use ($app) {
-        $uc = new \Costlocker\Integrations\Costlocker\UpdateSettings($app['orm.em'], $app['client.user']);
+        $uc = new \Costlocker\Integrations\Costlocker\UpdateSettings(
+            $app['orm.em'],
+            $app['client.user'],
+            new \Costlocker\Integrations\Costlocker\RegisterWebhook(
+                $app['client.costlocker'],
+                "{$r->getSchemeAndHttpHost()}/api/webhooks/handler"
+            )
+        );
         $uc($r->request->all());
         return new JsonResponse();
     })

@@ -22,7 +22,7 @@ class CostlockerClient
     {
         return $this->client->request(
             is_array($json) ? 'post' : 'get',
-            $this->getUrl("/api-public/v2{$path}"),
+            $this->getUrl($path),
             [
                 'http_errors' => false,
                 'headers' => [
@@ -36,6 +36,6 @@ class CostlockerClient
 
     public function getUrl($path)
     {
-        return "{$this->domain}{$path}";
+        return is_int(strpos($path, 'api-public/')) ? $path : "{$this->domain}/api-public/v2{$path}";
     }
 }

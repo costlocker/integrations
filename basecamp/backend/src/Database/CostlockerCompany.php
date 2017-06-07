@@ -23,6 +23,11 @@ class CostlockerCompany
     public $settings;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    public $urlWebhook;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     public $createdAt;
@@ -41,6 +46,8 @@ class CostlockerCompany
     public function getSettings()
     {
         $request = new \Costlocker\Integrations\Basecamp\SyncRequest();
-        return ($this->settings ?: []) + $request->toSettings();
+        return ($this->settings ?: []) + $request->toSettings() + [
+            'areWebhooksEnabled' => false,
+        ];
     }
 }
