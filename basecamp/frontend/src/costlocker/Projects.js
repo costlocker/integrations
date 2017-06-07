@@ -2,29 +2,26 @@ import React from 'react';
 
 import { ExternalLink } from '../Helpers';
 
-export default function Projects({ projects, redirectToRoute }) {
-  if (!projects) {
+export default function Projects({ allProjects, redirectToRoute }) {
+  if (!allProjects) {
     return <span>Loading....</span>;
   }
+  const projects = allProjects.filter(p => p.basecamps.length);
+  const notConnectedProjectsCount = allProjects.length - projects.length;
 
   return <div>
     <div className="row">
-      <div className="col-sm-6">
-        <h1>Projects <span className="badge bg-primary">{projects.length}</span></h1>
-      </div>
-      <div className="col-sm-6 text-right">
-        <button onClick={() => redirectToRoute('sync')} className="btn btn-success">
-          Connect Costlocker and Basecamp
-        </button>
+      <div className="col-sm-12">
+        <h1>Projects</h1>
       </div>
     </div>
     <div className="row">
       <div className="col-sm-12">
+        {projects.length ? (
         <table className="table table-striped table-hover table-condensed">
           <thead>
             <tr>
               <th>Costlocker project</th>
-              <th>Is synchronized?</th>
               <th>Basecamps</th>
             </tr>
           </thead>
@@ -32,12 +29,6 @@ export default function Projects({ projects, redirectToRoute }) {
             {projects.map(project => (
               <tr key={project.id}>
                 <td>{project.name} <span className="label label-default">{project.client.name}</span></td>
-                <td>{
-                  project.basecamps.length
-                  ? <span className="label label-success">YES</span>
-                  : <span className="label label-danger">NO</span>
-                }
-                </td>
                 <td>
                   {project.basecamps.map(basecamp => (
                     <div key={basecamp.id}>
@@ -63,7 +54,19 @@ export default function Projects({ projects, redirectToRoute }) {
             ))}
           </tbody>
         </table>
+        ) : (
+        <p className="text-muted">No project in connected to Basecamp</p>
+        )}
       </div>
     </div>
+    {notConnectedProjectsCount &&
+    <div className="row">
+      <div className="col-sm-12">
+        <button onClick={() => redirectToRoute('sync')} className="btn btn-success">
+          Connect new project ({notConnectedProjectsCount})
+        </button>
+      </div>
+    </div>
+    }
   </div>;
 };

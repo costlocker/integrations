@@ -62,7 +62,7 @@ export const states = [
     name: 'projects',
     url: '/projects',
     component: () => <Projects
-      projects={appState.cursor(['costlocker', 'projects']).deref()}
+      allProjects={appState.cursor(['costlocker', 'projects']).deref()}
       redirectToRoute={redirectToRoute} />,
     resolve: loadCostlockerProjects,
   },
