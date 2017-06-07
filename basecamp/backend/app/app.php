@@ -102,49 +102,22 @@ $app
     })
     ->before($checkAuthorization('basecamp'));
 
+$pushEvent = function ($event, array $data) use ($app) {
+    $push = new \Costlocker\Integrations\Queue\PushSyncRequest($app['orm.em']);
+    $push($event, $data);
+    return new JsonResponse([], 200);
+};
+    
 $app
-    ->post('/basecamp', function (Request $r) use ($app) {
-        $request = new Costlocker\Integrations\Basecamp\SyncRequest();
-        $request->account = $r->request->get('account');
-        $request->costlockerProject = $r->request->get('costlockerProject');
-        $isProjectLinked = $r->request->get('mode') == 'add';
-        $request->updatedBasecampProject = $isProjectLinked ? $r->request->get('basecampProject') : null;
-        $request->areTodosEnabled = $r->request->get('areTodosEnabled');
-        if ($request->areTodosEnabled) {
-            $request->isDeletingTodosEnabled = $r->request->get('isDeletingTodosEnabled');
-            $request->isRevokeAccessEnabled = $r->request->get('isRevokeAccessEnabled');
-        }
+    ->post('/basecamp', function (Request $r) use ($pushEvent) {
+        return $pushEvent(\Costlocker\Integrations\Database\Event::MANUAL_SYNC, $r->request->all());
 
-        $strategy = new Costlocker\Integrations\Basecamp\SyncProjectToBasecamp(
-            $app['client.costlocker'],
-            $app['client.basecamp'],
-            $app['database']
-        );
-        $data = $strategy($request);
-        return new JsonResponse($data, $data ? 200 : 404);
     })
     ->before($checkAuthorization('basecamp'));
 
 $app
-    ->post('/webhooks/basecamp', function (Request $r) use ($app) {
-        try {
-            $strategy = new Costlocker\Integrations\Basecamp\SyncWebhookToBasecamp(
-                $app['client.costlocker'],
-                $app['client.basecamp'],
-                $app['database']
-            );
-            $data = $strategy($r->getContent());
-            return new JsonResponse($data, 200);
-        } catch (\Exception $e) {
-            file_put_contents(
-                __DIR__ . '/../var/log/webhooks.log',
-                json_encode([
-                    'exception' => get_class($e),
-                    'error' => $e->getMessage(),
-                    'stack' => $e->getTrace(),
-                ], JSON_PRETTY_PRINT) . "\n");
-            return new JsonResponse([], 202);
-        }
+    ->post('/webhooks/basecamp', function (Request $r) use ($pushEvent) {
+        return $pushEvent(\Costlocker\Integrations\Database\Event::WEBHOOK_SYNC, json_decode($r->getContent()));
     });
 
 return $app;
