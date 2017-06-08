@@ -26,7 +26,7 @@ class AuthorizeInBasecamp
                 'redirectUri' => getenv('BASECAMP_REDIRECT_URL'),
             ]),
             $p,
-            getenv('APP_FRONTED_URL') . 'accounts'
+            getenv('APP_FRONTED_URL')
         );
     }
 
