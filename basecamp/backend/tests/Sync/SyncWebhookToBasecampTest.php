@@ -41,6 +41,7 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
             ]);
         $this->basecamp->shouldReceive('getPeople')->once()
             ->andReturn($this->givenBasecampPeople([1 => 'john@example.com', 2 => 'peter@example.com']));
+        $this->givenBasecampTodolist($basecampId, []);
         $this->basecamp->shouldReceive('createTodolist')->once()
             ->with($basecampId, 'Development')
             ->andReturn($basecampId);
@@ -104,6 +105,7 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
             ]);
         $this->basecamp->shouldReceive('getPeople')->once()
             ->andReturn($this->givenBasecampPeople([1 => 'john@example.com']));
+        $this->givenBasecampTodolist($basecampId, []);
         $this->basecamp->shouldReceive('createTodo')->once()
             ->with($basecampId, $basecampId, 'Contact', 1)
             ->andReturn($basecampId);
@@ -166,6 +168,7 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
             ]);
         $this->basecamp->shouldReceive('getPeople')->once()
             ->andReturn($this->givenBasecampPeople([1 => 'john@example.com']));
+        $this->givenBasecampTodolist($basecampId, [$basecampId]);
         $this->basecamp->shouldReceive('deleteTodo')->once()->with(m::any(), $basecampId);
         $this->synchronize();
         $this->assertEquals(
@@ -222,6 +225,7 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
             ]);
         $this->basecamp->shouldReceive('getPeople')->once()
             ->andReturn($this->givenBasecampPeople([1 => 'john@example.com', 2 => 'peter@example.com']));
+        $this->givenBasecampTodolist('deleted todolist', ['first delete', 'second delete']);
         $this->basecamp->shouldReceive('deleteTodolist')->once()->with(m::any(), 'deleted todolist');
         $this->basecamp->shouldReceive('deleteTodo')->once()->with(m::any(), 'first delete');
         $this->basecamp->shouldReceive('deleteTodo')->once()->with(m::any(), 'second delete');
@@ -271,6 +275,20 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
             ];
         }
         return $people;
+    }
+
+    private function givenBasecampTodolist($todolistId, $todoIds = [])
+    {
+        $items = [];
+        foreach ($todoIds as $id) {
+            $items[$id] = (object) ['assignee_id' => null];
+        }
+        $this->basecamp->shouldReceive('getTodolists')->once()
+            ->andReturn([
+                $todolistId => (object) [
+                    'todoitems' => $items,
+                ],
+            ]);
     }
 
     private function synchronize()

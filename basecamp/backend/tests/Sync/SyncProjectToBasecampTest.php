@@ -317,14 +317,8 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
             [
                 'id' => $basecampId,
                 'account' => [],
-                'activities' => [
-                    // not deleted because todolist is not empty in BC
-                    1 => [
-                        'id' => 'non-empty todolist',
-                        'tasks' => [],
-                        'persons' => [],
-                    ]
-                ],
+                'activities' => [],
+                // non-empty todolist is not deleted in BC, but it is removed from mapping
             ],
             $this->database->findProject(1)
         );

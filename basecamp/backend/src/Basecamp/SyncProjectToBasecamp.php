@@ -24,10 +24,12 @@ class SyncProjectToBasecamp
     {
         $response = $this->costlocker->__invoke("/projects/{$config->costlockerProject}?types=peoplecosts");
         $project = json_decode($response->getBody(), true)['data'];
-        list($people, $activities) = $this->analyzeProjectItems($project['items']);
 
         $this->basecamp = $this->basecampFactory->__invoke($config->account);
         $bcProject = $this->upsertProject($project, $config);
+
+        list($people, $activities) = $this->analyzeProjectItems($bcProject, $project['items']);
+
         $bcProjectId = $bcProject['id'];
         if ($this->checkDeletedProject($bcProject)) {
             return [
@@ -38,7 +40,7 @@ class SyncProjectToBasecamp
             $grantedPeople = $this->grantAccess($bcProjectId, $people);
             $bcProject['basecampPeople'] = $this->basecamp->getPeople($bcProjectId);
             $todolists = $this->createTodolists($bcProject, $activities);
-            $delete = $this->deleteLegacyEntitiesInBasecamp($bcProject, $people, $todolists, $config);
+            $delete = $this->deleteLegacyEntitiesInBasecamp($bcProject, $people, $activities, $config);
         } else {
             $grantedPeople = [];
             $todolists = [];
@@ -59,18 +61,29 @@ class SyncProjectToBasecamp
         ];
     }
 
-    private function analyzeProjectItems(array $projectItems)
+    private function analyzeProjectItems(array $bcProject, array $projectItems)
     {
         $persons = [];
         $personsMap = [];
         $activities = [];
         foreach ($projectItems as $item) {
-            if ($item['item']['type'] == 'activity') {
+            $action = $item['action'] ?? 'upsert';
+            if (
+                ($item['item']['type'] == 'activity' || isset($item['activity']['name'])) &&
+                !array_key_exists($item['item']['activity_id'], $activities)
+            ) {
                 $activities[$item['item']['activity_id']] = [
                     'id' => $item['item']['activity_id'],
                     'name' => $item['activity']['name'],
-                    'tasks' => [],
-                    'persons' => [],
+                    'isDeleted' => $action == 'delete',
+                    'upsert' => [
+                        'tasks' => [],
+                        'persons' => [],
+                    ],
+                    'delete' => [
+                        'tasks' => [],
+                        'persons' => [],
+                    ],
                 ];
             }
             if ($item['item']['type'] == 'person') {
@@ -78,10 +91,10 @@ class SyncProjectToBasecamp
                 $persons[$person['email']] = "{$person['first_name']} {$person['last_name']}";
                 $personsMap[$item['item']['person_id']] = $person['email'];
             }
-            if (isset($item['hours']['is_aggregation']) && !$item['hours']['is_aggregation']) {
+            if (in_array($item['item']['type'], ['person', 'task'])) {
                 $personId = $item['item']['person_id'];
                 if ($item['item']['type'] == 'person') {
-                    $activities[$item['item']['activity_id']]['persons'][$personId] = [
+                    $activities[$item['item']['activity_id']][$action]['persons'][$personId] = [
                         'task_id' => null,
                         'person_id' => $personId,
                         'name' => $activities[$item['item']['activity_id']]['name'],
@@ -89,15 +102,43 @@ class SyncProjectToBasecamp
                     ];
                 } else {
                     $taskId = $item['item']['task_id'];
-                    $activities[$item['item']['activity_id']]['tasks'][$taskId] = [
+                    $activities[$item['item']['activity_id']][$action]['tasks'][$taskId] = [
                         'task_id' => $taskId,
                         'person_id' => $personId,
                         'name' => $item['task']['name'],
                         'email' => $personsMap[$item['item']['person_id']],
                     ];
+                    unset($activities[$item['item']['activity_id']]['upsert']['persons'][$personId]);
                 }
             }
         }
+
+        foreach ($bcProject['activities'] as $activityId => $activity) {
+            if (!isset($activities[$activityId])) {
+                $activities[$activityId] = [
+                    'id' => $activity['id'],
+                    'isDeleted' => true,
+                    'upsert' => [
+                        'tasks' => [],
+                        'persons' => [],
+                    ],
+                    'delete' => [
+                        'tasks' => [],
+                        'persons' => [],
+                    ],
+                ];
+            }
+
+            foreach (['tasks', 'persons'] as $type) {
+                foreach ($activity[$type] as $id => $mappedTodo) {
+                    if (isset($activities[$activityId]['upsert'][$type][$id])) {
+                        continue;
+                    }
+                    $activities[$activityId]['delete'][$type][$id] = $mappedTodo;
+                }
+            }
+        }
+
         return [$persons, array_reverse($activities, true)];
     }
 
@@ -145,15 +186,18 @@ class SyncProjectToBasecamp
     {
         $mapping = [];
         foreach ($activities as $activityId => $activity) {
+            if ($activity['isDeleted']) {
+                continue;
+            }
             $bcTodolist = $this->upsertTodolist($bcProject, $activity);
             $todos = [
                 'tasks' => [],
                 'persons' => [],
             ];
-            foreach ($activity['tasks'] as $id => $task) {
+            foreach ($activity['upsert']['tasks'] as $id => $task) {
                 $todos['tasks'][$id] = $this->upsertTodo($bcProject, $bcTodolist, $task);
             }
-            foreach ($activity['persons'] as $id => $personWithoutTasks) {
+            foreach ($activity['upsert']['persons'] as $id => $personWithoutTasks) {
                 $todos['persons'][$id] = $this->upsertTodo($bcProject, $bcTodolist, $personWithoutTasks);
             }
             $mapping[$activityId] = ['id' => $bcTodolist['id']] + $todos;
@@ -189,8 +233,9 @@ class SyncProjectToBasecamp
         ];
     }
 
-    private function deleteLegacyEntitiesInBasecamp(array $bcProject, array $peopleFromCostlocker, array $currentActivities, SyncRequest $config)
-    {
+    private function deleteLegacyEntitiesInBasecamp(
+        array $bcProject, array $peopleFromCostlocker, array $activities, SyncRequest $config
+    ) {
         $deleted = [
             'activities' => [],
             'tasks' => [],
@@ -205,26 +250,22 @@ class SyncProjectToBasecamp
         $bcTodolists = $this->basecamp->getTodolists($bcProject['id']);
 
         if ($config->isDeletingTodosEnabled) {
-            foreach ($bcProject['activities'] as $activityId => $activity) {
-                $bcTodolistId = $activity['id'];
-                if (array_key_exists($bcTodolistId, $bcTodolists)) {
-                    foreach (['tasks', 'persons'] as $type) {
-                        foreach ($activity[$type] as $id => $mappedTodo) {
-                            if (isset($currentActivities[$activityId][$type][$id])) {
-                                continue;
-                            }
-                            if (array_key_exists($mappedTodo['id'], $bcTodolists[$bcTodolistId]->todoitems)) {
-                                $this->basecamp->deleteTodo($bcProject['id'], $mappedTodo['id']);
-                                unset($bcTodolists[$bcTodolistId]->todoitems[$mappedTodo['id']]);
-                            }
-                            $deleted[$type][$activityId][$id] = $id;
+            foreach ($activities as $activityId => $activity) {
+                $bcTodolistId = $bcProject['activities'][$activityId]['id'] ?? null;
+                foreach (['tasks', 'persons'] as $type) {
+                    foreach ($activity['delete'][$type] as $id => $task) {
+                        $bcTodoId = $bcProject['activities'][$activityId][$type][$id]['id'];
+                        if (isset($bcTodolists[$bcTodolistId]) && array_key_exists($bcTodoId, $bcTodolists[$bcTodolistId]->todoitems)) {
+                            $this->basecamp->deleteTodo($bcProject['id'], $bcTodoId);
+                            unset($bcTodolists[$bcTodolistId]->todoitems[$bcTodoId]);
                         }
+                        $deleted[$type][$activityId][$id] = $id;
                     }
-                    if (!isset($currentActivities[$activityId]) && !$bcTodolists[$bcTodolistId]->todoitems) {
+                }
+                if ($activity['isDeleted']) {
+                    if (isset($bcTodolists[$bcTodolistId]) && !$bcTodolists[$bcTodolistId]->todoitems) {
                         $this->basecamp->deleteTodolist($bcProject['id'], $bcTodolistId);
-                        $deleted['activities'][$activityId] = $activityId;
                     }
-                } elseif (!isset($currentActivities[$activityId])) {
                     $deleted['activities'][$activityId] = $activityId;
                 }
             }

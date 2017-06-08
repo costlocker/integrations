@@ -30,6 +30,10 @@ class SyncWebhookToBasecamp
                 $results[] = "{$id} is not mapped";
                 continue;
             }
+            $config = new SyncRequest();
+            $config->areTodosEnabled = true;
+            $config->isDeletingTodosEnabled = true;
+            $config->isRevokeAccessEnabled = false; // always override because not all people are loaded
             list($people, $activities) = $this->analyzeProjectItems($items);
 
             $this->basecamp = $this->basecampFactory->__invoke($bcProject['account']);
@@ -39,11 +43,18 @@ class SyncWebhookToBasecamp
                 continue;
             }
 
-            $grantedPeople = $this->grantAccess($bcProjectId, $people);
-            $bcProject['basecampPeople'] = $this->basecamp->getPeople($bcProjectId);
-            $todolists = $this->createTodolists($bcProject, $activities);
-            $delete = $this->deleteLegacyEntitiesInBasecamp($bcProject, $activities);
-            $this->updateMapping($bcProject, $todolists, $delete);
+            if ($config->areTodosEnabled) {
+                $grantedPeople = $this->grantAccess($bcProjectId, $people);
+                $bcProject['basecampPeople'] = $this->basecamp->getPeople($bcProjectId);
+                $todolists = $this->createTodolists($bcProject, $activities);
+                $delete = $this->deleteLegacyEntitiesInBasecamp($bcProject, $people, $activities, $config);
+            } else {
+                $grantedPeople = [];
+                $todolists = [];
+                $delete = [];
+            }
+
+            $this->updateMapping($bcProject, $todolists, $delete, $config);
 
             $results[] = [
                 'costlocker' => [
@@ -172,6 +183,9 @@ class SyncWebhookToBasecamp
     {
         $mapping = [];
         foreach ($activities as $activityId => $activity) {
+            if ($activity['isDeleted']) {
+                continue;
+            }
             $bcTodolist = $this->upsertTodolist($bcProject, $activity);
             $todos = [
                 'tasks' => [],
@@ -216,56 +230,92 @@ class SyncWebhookToBasecamp
         ];
     }
 
-    private function deleteLegacyEntitiesInBasecamp(array $bcProject, array $activities)
-    {
+    private function deleteLegacyEntitiesInBasecamp(
+        array $bcProject, array $peopleFromCostlocker, array $activities, SyncRequest $config
+    ) {
         $deleted = [
             'activities' => [],
             'tasks' => [],
             'persons' => [],
             'revoked' => [],
         ];
-        foreach ($activities as $activityId => $activity) {
-            foreach (['tasks', 'persons'] as $type) {
-                foreach ($activity['delete'][$type] as $id => $task) {
-                    $mappedTodo = $bcProject['activities'][$activityId][$type][$id];
-                    $this->basecamp->deleteTodo($bcProject['id'], $mappedTodo['id']);
-                    $deleted[$type][$activityId][$id] = $id;
+
+        if ($bcProject['isCreated'] || $config->isDeleteDisabled()) {
+            return $deleted;
+        }
+
+        $bcTodolists = $this->basecamp->getTodolists($bcProject['id']);
+
+        if ($config->isDeletingTodosEnabled) {
+            foreach ($activities as $activityId => $activity) {
+                $bcTodolistId = $bcProject['activities'][$activityId]['id'] ?? null;
+                foreach (['tasks', 'persons'] as $type) {
+                    foreach ($activity['delete'][$type] as $id => $task) {
+                        $bcTodoId = $bcProject['activities'][$activityId][$type][$id]['id'];
+                        if (isset($bcTodolists[$bcTodolistId]) && array_key_exists($bcTodoId, $bcTodolists[$bcTodolistId]->todoitems)) {
+                            $this->basecamp->deleteTodo($bcProject['id'], $bcTodoId);
+                            unset($bcTodolists[$bcTodolistId]->todoitems[$bcTodoId]);
+                        }
+                        $deleted[$type][$activityId][$id] = $id;
+                    }
+                }
+                if ($activity['isDeleted']) {
+                    if (isset($bcTodolists[$bcTodolistId]) && !$bcTodolists[$bcTodolistId]->todoitems) {
+                        $this->basecamp->deleteTodolist($bcProject['id'], $bcTodolistId);
+                    }
+                    $deleted['activities'][$activityId] = $activityId;
                 }
             }
-            if ($activity['isDeleted']) {
-                $this->basecamp->deleteTodolist($bcProject['id'], $bcProject['activities'][$activityId]['id']);
-                $deleted['activities'][$activityId] = $activityId;
+        }
+
+        if ($config->isRevokeAccessEnabled) {
+            $assignedIds = [];
+            foreach ($bcTodolists as $todolist) {
+                foreach ($todolist->todoitems as $todoitem) {
+                    $assignedIds[$todoitem->assignee_id] = $todoitem->assignee_id;
+                }
+            }
+
+            foreach ($bcProject['basecampPeople'] as $email => $bcPerson) {
+                if (!$bcPerson->admin &&
+                    !array_key_exists($email, $peopleFromCostlocker) &&
+                    !array_key_exists($bcPerson->id, $assignedIds)) {
+                    $this->basecamp->revokeAccess($bcProject['id'], $bcPerson->id);
+                    $deleted['revoked'][$email] = $email;
+                }
             }
         }
 
         return $deleted;
     }
 
-    private function updateMapping(array $bcProject, array $todolists, array $deleteSummary)
+    private function updateMapping(array $bcProject, array $todolists, array $deleteSummary, SyncRequest $config)
     {
-        foreach ($todolists as $activityId => $activity) {
-            if (!array_key_exists($activityId, $bcProject['activities'])) {
-                $bcProject['activities'][$activityId] = [];
-            }
-            $bcProject['activities'][$activityId] += [
-                'id' => $activity['id'],
-                'tasks' => [],
-                'persons' => [],
-            ];
-            foreach (['tasks', 'persons'] as $type) {
-                foreach ($activity[$type] as $taskId => $mappedTodo) {
-                    $bcProject['activities'][$activityId][$type][$taskId] = $mappedTodo;
+        if ($config->areTodosEnabled) {
+            foreach ($todolists as $activityId => $activity) {
+                if (!array_key_exists($activityId, $bcProject['activities'])) {
+                    $bcProject['activities'][$activityId] = [];
+                }
+                $bcProject['activities'][$activityId] += [
+                    'id' => $activity['id'],
+                    'tasks' => [],
+                    'persons' => [],
+                ];
+                foreach (['tasks', 'persons'] as $type) {
+                    foreach ($activity[$type] as $taskId => $mappedTodo) {
+                        $bcProject['activities'][$activityId][$type][$taskId] = $mappedTodo;
+                    }
                 }
             }
-        }
 
-        foreach ($deleteSummary['activities'] as $activity) {
-            unset($bcProject['activities'][$activity]);
-        }
-        foreach (['tasks', 'persons'] as $type) {
-            foreach ($deleteSummary[$type] as $activityId => $tasks) {
-                foreach ($tasks as $taskId) {
-                    unset($bcProject['activities'][$activityId][$type][$taskId]);
+            foreach ($deleteSummary['activities'] as $activity) {
+                unset($bcProject['activities'][$activity]);
+            }
+            foreach (['tasks', 'persons'] as $type) {
+                foreach ($deleteSummary[$type] as $activityId => $tasks) {
+                    foreach ($tasks as $taskId) {
+                        unset($bcProject['activities'][$activityId][$type][$taskId]);
+                    }
                 }
             }
         }
@@ -274,6 +324,6 @@ class SyncWebhookToBasecamp
             'id' => $bcProject['id'],
             'account' => $this->basecampFactory->getAccount(),
             'activities' => $bcProject['activities'],
-        ]);
+        ], $config->toSettings());
     }
 }
