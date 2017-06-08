@@ -209,7 +209,11 @@ class SyncWebhookToBasecamp
             return $bcTodolist['persons'][$task['person_id']];
         }
         $assignee = $bcProject['basecampPeople'][$task['email']]->id;
-        return $this->basecamp->createTodo($bcProject['id'], $bcTodolist['id'], $task['name'], $assignee);
+        return [
+            'id' => $this->basecamp->createTodo($bcProject['id'], $bcTodolist['id'], $task['name'], $assignee),
+            'person_id' => $task['person_id'],
+            'name' => $task['name'],
+        ];
     }
 
     private function deleteLegacyEntitiesInBasecamp(array $bcProject, array $activities)
@@ -223,8 +227,8 @@ class SyncWebhookToBasecamp
         foreach ($activities as $activityId => $activity) {
             foreach (['tasks', 'persons'] as $type) {
                 foreach ($activity['delete'][$type] as $id => $task) {
-                    $bcTodoId = $bcProject['activities'][$activityId][$type][$id];
-                    $this->basecamp->deleteTodo($bcProject['id'], $bcTodoId);
+                    $mappedTodo = $bcProject['activities'][$activityId][$type][$id];
+                    $this->basecamp->deleteTodo($bcProject['id'], $mappedTodo['id']);
                     $deleted[$type][$activityId][$id] = $id;
                 }
             }
@@ -249,8 +253,8 @@ class SyncWebhookToBasecamp
                 'persons' => [],
             ];
             foreach (['tasks', 'persons'] as $type) {
-                foreach ($activity[$type] as $taskId => $bcTodoId) {
-                    $bcProject['activities'][$activityId][$type][$taskId] = $bcTodoId;
+                foreach ($activity[$type] as $taskId => $mappedTodo) {
+                    $bcProject['activities'][$activityId][$type][$taskId] = $mappedTodo;
                 }
             }
         }

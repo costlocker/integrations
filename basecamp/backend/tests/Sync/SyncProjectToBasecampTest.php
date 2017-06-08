@@ -59,10 +59,18 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
                     1 => [
                         'id' => $basecampId,
                         'tasks' => [
-                            885 => $basecampId,
+                            885 => [
+                                'id' => $basecampId,
+                                'person_id' => 1,
+                                'name' => 'Homepage',
+                            ],
                         ],
                         'persons' => [
-                            885 => $basecampId,
+                            885 => [
+                                'id' => $basecampId,
+                                'person_id' => 885,
+                                'name' => 'Development',
+                            ],
                         ],
                     ]
                 ],
@@ -108,7 +116,11 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
                     1 => [
                         'id' => $basecampId,
                         'tasks' => [
-                            885 => $basecampId,
+                            885 => [
+                                'id' => $basecampId,
+                                'person_id' => 1,
+                                'name' => 'Homepage',
+                            ],
                         ],
                         'persons' => [
                         ],
@@ -137,10 +149,18 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
                     1 => [
                         'id' => $basecampId,
                         'tasks' => [
-                            885 => $basecampId,
+                            885 => [
+                                'id' => $basecampId,
+                                'person_id' => 1,
+                                'name' => 'Homepage',
+                            ],
                         ],
                         'persons' => [
-                            885 => 'new id',
+                            885 => [
+                                'id' => 'new id',
+                                'person_id' => 885,
+                                'name' => 'Development',
+                            ],
                         ],
                     ]
                 ],
@@ -160,12 +180,28 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
                     1 => [
                         'id' => $basecampId,
                         'tasks' => [
-                            885 => $basecampId,
-                            900 => 'deleted todo',
-                            901 => 'unknown todo',
+                            885 => [
+                                'id' => $basecampId,
+                                'person_id' => 1,
+                                'name' => '',
+                            ],
+                            900 => [
+                                'id' => 'deleted todo',
+                                'person_id' => 1,
+                                'name' => '',
+                            ],
+                            901 => [
+                                'id' => 'unknown todo',
+                                'person_id' => 1,
+                                'name' => '',
+                            ],
                         ],
                         'persons' => [
-                            885 => $basecampId,
+                            885 => [
+                                'id' => $basecampId,
+                                'person_id' => 1,
+                                'name' => '',
+                            ],
                         ],
                     ],
                 ],
@@ -196,10 +232,18 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
                     1 => [
                         'id' => $basecampId,
                         'tasks' => [
-                            885 => $basecampId,
+                            885 => [
+                                'id' => $basecampId,
+                                'person_id' => 1,
+                                'name' => '',
+                            ],
                         ],
                         'persons' => [
-                            885 => $basecampId,
+                            885 => [
+                                'id' => $basecampId,
+                                'person_id' => 1,
+                                'name' => '',
+                            ],
                         ],
                     ],
                 ],
@@ -219,10 +263,18 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
                     1 => [
                         'id' => 'non-empty todolist',
                         'tasks' => [
-                            885 => 'existing todo',
+                            885 => [
+                                'id' => 'existing todo',
+                                'person_id' => 1,
+                                'name' => '',
+                            ],
                         ],
                         'persons' => [
-                            885 => 'unknown basecamp id',
+                            885 => [
+                                'id' => 'unknown basecamp id',
+                                'person_id' => 885,
+                                'name' => '',
+                            ],
                         ],
                     ],
                     2 => [

@@ -182,7 +182,11 @@ class SyncProjectToBasecamp
             return $bcTodolist['persons'][$task['person_id']];
         }
         $assignee = $bcProject['basecampPeople'][$task['email']]->id;
-        return $this->basecamp->createTodo($bcProject['id'], $bcTodolist['id'], $task['name'], $assignee);
+        return [
+            'id' => $this->basecamp->createTodo($bcProject['id'], $bcTodolist['id'], $task['name'], $assignee),
+            'person_id' => $task['person_id'],
+            'name' => $task['name'],
+        ];
     }
 
     private function deleteLegacyEntitiesInBasecamp(array $bcProject, array $peopleFromCostlocker, array $currentActivities, SyncRequest $config)
@@ -205,13 +209,13 @@ class SyncProjectToBasecamp
                 $bcTodolistId = $activity['id'];
                 if (array_key_exists($bcTodolistId, $bcTodolists)) {
                     foreach (['tasks', 'persons'] as $type) {
-                        foreach ($activity[$type] as $id => $bcTodoId) {
+                        foreach ($activity[$type] as $id => $mappedTodo) {
                             if (isset($currentActivities[$activityId][$type][$id])) {
                                 continue;
                             }
-                            if (array_key_exists($bcTodoId, $bcTodolists[$bcTodolistId]->todoitems)) {
-                                $this->basecamp->deleteTodo($bcProject['id'], $bcTodoId);
-                                unset($bcTodolists[$bcTodolistId]->todoitems[$bcTodoId]);
+                            if (array_key_exists($mappedTodo['id'], $bcTodolists[$bcTodolistId]->todoitems)) {
+                                $this->basecamp->deleteTodo($bcProject['id'], $mappedTodo['id']);
+                                unset($bcTodolists[$bcTodolistId]->todoitems[$mappedTodo['id']]);
                             }
                             $deleted[$type][$activityId][$id] = $id;
                         }
@@ -260,8 +264,8 @@ class SyncProjectToBasecamp
                     'persons' => [],
                 ];
                 foreach (['tasks', 'persons'] as $type) {
-                    foreach ($activity[$type] as $taskId => $bcTodoId) {
-                        $bcProject['activities'][$activityId][$type][$taskId] = $bcTodoId;
+                    foreach ($activity[$type] as $taskId => $mappedTodo) {
+                        $bcProject['activities'][$activityId][$type][$taskId] = $mappedTodo;
                     }
                 }
             }

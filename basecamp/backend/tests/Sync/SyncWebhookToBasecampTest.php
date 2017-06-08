@@ -59,10 +59,18 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
                     1 => [
                         'id' => $basecampId,
                         'tasks' => [
-                            971 => $basecampId,
+                            971 => [
+                                'id' => $basecampId,
+                                'person_id' => 1,
+                                'name' => 'Homepage',
+                            ],
                         ],
                         'persons' => [
-                            6 => $basecampId,
+                            6 => [
+                                'id' => $basecampId,
+                                'person_id' => 6,
+                                'name' => 'Development',
+                            ],
                         ],
                     ],
                 ],
@@ -79,7 +87,11 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
             1 => [
                 'id' => $basecampId,
                 'tasks' => [
-                    971 => $basecampId,
+                    971 => [
+                        'id' => $basecampId,
+                        'person_id' => 1,
+                        'name' => 'Homepage',
+                    ],
                 ],
                 'persons' => [
                 ],
@@ -104,8 +116,16 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
                     1 => [
                         'id' => $basecampId,
                         'tasks' => [
-                            971 => $basecampId,
-                            972 => $basecampId,
+                            971 => [
+                                'id' => $basecampId,
+                                'person_id' => 1,
+                                'name' => 'Homepage',
+                            ],
+                            972 => [
+                                'id' => $basecampId,
+                                'person_id' => 1,
+                                'name' => 'Contact',
+                            ],
                         ],
                         'persons' => [
                         ],
@@ -124,8 +144,16 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
             1 => [
                 'id' => $basecampId,
                 'tasks' => [
-                    971 => $basecampId,
-                    972 => $basecampId,
+                    971 => [
+                        'id' => $basecampId,
+                        'person_id' => 1,
+                        'name' => 'Homepage',
+                    ],
+                    972 => [
+                        'id' => $basecampId,
+                        'person_id' => 1,
+                        'name' => 'Contact',
+                    ],
                 ],
                 'persons' => [
                 ],
@@ -148,7 +176,11 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
                     1 => [
                         'id' => $basecampId,
                         'tasks' => [
-                            971 => $basecampId,
+                            971 => [
+                                'id' => $basecampId,
+                                'person_id' => 1,
+                                'name' => 'Homepage',
+                            ],
                         ],
                         'persons' => [
                         ],
@@ -169,8 +201,16 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
                 'tasks' => [
                 ],
                 'persons' => [
-                    1 => 'first delete',
-                    6 => 'second delete',
+                    1 => [
+                        'id' => 'first delete',
+                        'person_id' => 1,
+                        'name' => 'Development',
+                    ],
+                    6 => [
+                        'id' => 'second delete',
+                        'person_id' => 6,
+                        'name' => 'Development',
+                    ],
                 ],
             ],
         ]);
