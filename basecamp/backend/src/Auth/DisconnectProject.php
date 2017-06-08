@@ -4,16 +4,20 @@ namespace Costlocker\Integrations\Auth;
 
 use Doctrine\DBAL\Connection;
 use Costlocker\Integrations\Auth\GetUser;
+use Costlocker\Integrations\Queue\EventsLogger;
+use Costlocker\Integrations\Database\Event;
 
 class DisconnectProject
 {
     private $db;
     private $getUser;
+    private $logger;
 
-    public function __construct(Connection $db, GetUser $u)
+    public function __construct(Connection $db, GetUser $u, EventsLogger $l)
     {
         $this->db = $db;
         $this->getUser = $u;
+        $this->logger = $l;
     }
 
     public function __invoke($projectId)
@@ -28,6 +32,7 @@ class DisconnectProject
                 FROM cl_project
                 WHERE cl_company_id = :company
               )
+            RETURNING id
 SQL;
         $params = [
             'project' => $projectId,
@@ -35,6 +40,13 @@ SQL;
         ];
 
         $query = $this->db->executeQuery($sql, $params);
-        return $query->rowCount() > 0;
+        $wasDeleted = $query->rowCount() > 0;
+
+        $this->logger->__invoke(
+            Event::DISCONNECT_PROJECT,
+            $params + ['result' => $query->fetchAll(\PDO::FETCH_ASSOC)]
+        );
+
+        return $wasDeleted;
     }
 }

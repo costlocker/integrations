@@ -4,15 +4,19 @@ namespace Costlocker\Integrations\Costlocker;
 
 use Costlocker\Integrations\CostlockerClient;
 use Costlocker\Integrations\Database\CostlockerCompany;
+use Costlocker\Integrations\Queue\EventsLogger;
+use Costlocker\Integrations\Database\Event;
 
 class RegisterWebhook
 {
     private $client;
+    private $logger;
     private $webhookUrl;
 
-    public function __construct(CostlockerClient $c, $webhookUrl)
+    public function __construct(CostlockerClient $c, EventsLogger $l, $webhookUrl)
     {
         $this->client = $c;
+        $this->logger = $l;
         $this->webhookUrl = $webhookUrl;
     }
 
@@ -31,6 +35,11 @@ class RegisterWebhook
         );
         $json = json_decode($response->getBody(), true);
         $company->urlWebhook = $json['data'][0]['links']['webhook'];
+
+        $this->logger->__invoke(
+            Event::REGISTER_WEBHOOK,
+            ['webhook' => $company->urlWebhook, 'company' => $company->id]
+        );
     }
 
     private function exists($webhookUrl)

@@ -121,6 +121,7 @@ $app
             $app['client.user'],
             new \Costlocker\Integrations\Costlocker\RegisterWebhook(
                 $app['client.costlocker'],
+                $app['events.logger'],
                 "{$r->getSchemeAndHttpHost()}/api/webhooks/handler"
             )
         );
@@ -133,10 +134,18 @@ $app
     ->post('/disconnect', function (Request $r) use ($app) {
         $wasDisconnected = false;
         if ($r->request->get('user')) {
-            $uc = new Costlocker\Integrations\Auth\DisconnectBasecampAccount($app['orm.em'], $app['client.user']);
+            $uc = new Costlocker\Integrations\Auth\DisconnectBasecampAccount(
+                $app['orm.em'],
+                $app['client.user'],
+                $app['events.logger']
+            );
             $wasDisconnected = $uc($r->request->get('user'));
         } elseif ($r->request->get('project')) {
-            $uc = new Costlocker\Integrations\Auth\DisconnectProject($app['db'], $app['client.user']);
+            $uc = new Costlocker\Integrations\Auth\DisconnectProject(
+                $app['db'],
+                $app['client.user'],
+                $app['events.logger']
+            );
             $wasDisconnected = $uc($r->request->get('project'));
         }
         return new JsonResponse([], $wasDisconnected ? 200 : 400);
