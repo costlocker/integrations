@@ -90,7 +90,6 @@ class ProcessSyncRequest
     {
         try {
             $strategy = new \Costlocker\Integrations\Basecamp\SyncWebhookToBasecamp(
-                $this->app['client.costlocker'],
                 $this->app['client.basecamp'],
                 $this->app['database']
             );

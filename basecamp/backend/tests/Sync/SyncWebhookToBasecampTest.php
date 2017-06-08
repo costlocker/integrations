@@ -3,12 +3,10 @@
 namespace Costlocker\Integrations\Basecamp;
 
 use Mockery as m;
-use Costlocker\Integrations\CostlockerClient;
 use Costlocker\Integrations\Basecamp\Api\BasecampApi;
 
 class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
 {
-    private $costlocker;
     private $basecamp;
     private $database;
 
@@ -16,7 +14,6 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->costlocker = m::mock(CostlockerClient::class);
         $this->basecamp = m::mock(BasecampApi::class);
         $this->database = new InMemoryDatabase();
     }
@@ -296,7 +293,7 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
         $basecampFactory = m::mock(BasecampFactory::class);
         $basecampFactory->shouldReceive('__invoke')->andReturn($this->basecamp);
         $basecampFactory->shouldReceive('getAccount')->andReturn([]);
-        $uc = new SyncWebhookToBasecamp($this->costlocker, $basecampFactory, $this->database);
+        $uc = new SyncWebhookToBasecamp($basecampFactory, $this->database);
         $uc($this->request);
     }
 
