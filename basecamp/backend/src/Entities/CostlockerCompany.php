@@ -46,8 +46,8 @@ class CostlockerCompany
     public function getSettings()
     {
         $request = new \Costlocker\Integrations\Sync\SyncRequest();
-        return ($this->settings ?: []) + $request->toSettings() + [
-            'isCostlockerWebhookEnabled' => $this->urlWebhook ? true : false,
-        ];
+        return [
+            'isCostlockerWebhookEnabled' => $this->urlWebhook ? true : false
+        ] + ($this->settings ?: []) + $request->toSettings();
     }
 }
