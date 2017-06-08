@@ -28,13 +28,12 @@ export default function Projects({ events, refresh }) {
           </thead>
           <tbody>
             {events.map(event => {
-              let cssClass = null;
-              if (event.status === 'success') {
-                cssClass = 'success';
-              } else if (event.status === 'failure') {
-                cssClass = 'danger';
-              }
-              return <tr key={event.id} className={cssClass}>
+              const statusToCssClass = {
+                'success': 'success',
+                'failure': 'danger',
+                'nochange': 'warning',
+              };
+              return <tr key={event.id} className={statusToCssClass[event.status]}>
                 <td>{event.date}</td>
                 <td>{event.description}</td>
                 <td>{event.user

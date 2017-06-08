@@ -16,6 +16,7 @@ class Event
 
     const RESULT_SUCCESS = 0x1;
     const RESULT_FAILURE = 0x2;
+    const RESULT_NOCHANGE = 0x4;
 
     /**
      * @ORM\Id

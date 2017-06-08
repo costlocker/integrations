@@ -51,13 +51,16 @@ DQL;
                     Event::MANUAL_SYNC => 'manual sync',
                     Event::WEBHOOK_SYNC | Event::RESULT_SUCCESS => 'Successful sync after webhook',
                     Event::WEBHOOK_SYNC | Event::RESULT_FAILURE => 'Failed sync after webhook',
+                    Event::WEBHOOK_SYNC | Event::RESULT_NOCHANGE => 'No change after webhook sync',
                     Event::MANUAL_SYNC | Event::RESULT_SUCCESS => 'Successful sync after user request',
                     Event::MANUAL_SYNC | Event::RESULT_FAILURE => 'Failed sync after user request',
+                    Event::MANUAL_SYNC | Event::RESULT_NOCHANGE => 'No change after user request sync',
                 ];
                 $isRequest = $e->event == Event::SYNC_REQUEST;
                 $statuses = [
                     ($e->event | Event::RESULT_SUCCESS) => 'success',
                     ($e->event | Event::RESULT_FAILURE) => 'failure',
+                    ($e->event | Event::RESULT_NOCHANGE) => 'nochange',
                 ];
                 $date = $isRequest ? $e->createdAt : ($e->updatedAt ?: $e->createdAt);
                 return [
