@@ -190,7 +190,7 @@ export const states = [
     url: '/events',
     component: () => <Events
       events={appState.cursor(['events']).deref()}
-      refresh={loadEvents}
+      refresh={() => loadEvents().then(fetchProjects())} // hotfix for reloading projects list
     />,
     resolve: [
       {
