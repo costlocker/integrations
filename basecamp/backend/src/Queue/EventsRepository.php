@@ -4,14 +4,17 @@ namespace Costlocker\Integrations\Queue;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Costlocker\Integrations\Database\Event;
+use Costlocker\Integrations\Auth\GetUser;
 
 class EventsRepository
 {
     private $entityManager;
+    private $getUser;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, GetUser $u)
     {
         $this->entityManager = $em;
+        $this->getUser = $u;
     }
 
     public function findUnprocessedEvents()
@@ -34,10 +37,13 @@ DQL;
             SELECT e, u
             FROM Costlocker\Integrations\Database\Event e
             LEFT JOIN e.costlockerUser u
+            LEFT JOIN e.basecampProject p
+            LEFT JOIN p.costlockerProject pc
+            WHERE (u.costlockerCompany = :company OR pc.costlockerCompany = :company)
             ORDER BY e.id DESC
 DQL;
         $params = [
-            // filter by cl company
+            'company' => $this->getUser->getCostlockerUser()->costlockerCompany->id,
         ];
         $entities = $this->entityManager
             ->createQuery($dql)

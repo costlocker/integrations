@@ -29,7 +29,8 @@ $app['database'] = function ($app) {
 
 $app['database.events'] = function ($app) {
     return new \Costlocker\Integrations\Queue\EventsRepository(
-        $app['orm.em']
+        $app['orm.em'],
+        $app['client.user']
     );
 };
 

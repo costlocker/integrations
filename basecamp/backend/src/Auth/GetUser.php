@@ -81,10 +81,10 @@ class GetUser
             FROM Costlocker\Integrations\Database\CostlockerUser cu
             JOIN cu.basecampUsers bu
             JOIN bu.accounts ba
-            WHERE cu.costlockerCompany = :tenant
+            WHERE cu.costlockerCompany = :company
 DQL;
         $params = [
-            'tenant' => $costlockerUser->costlockerCompany->id,
+            'company' => $costlockerUser->costlockerCompany->id,
         ];
         return array_map(
             function (CostlockerUser $u) {
