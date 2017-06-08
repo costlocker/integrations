@@ -77,6 +77,25 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testIgnoreProjectWhereTodosSyncIsDisabled()
+    {
+        $basecampId = 'irrelevant project';
+        $this->request['areTodosEnabled'] = false;
+        $this->givenWebhook('create-activity-and-persons.json');
+        $this->whenProjectIsMapped($basecampId, [], ['areTodosEnabled' => false]);
+        $this->basecamp->shouldReceive('projectExists')->once();
+        $this->basecamp->shouldReceive('grantAccess')->never();
+        $this->synchronize();
+        $this->assertEquals(
+            [
+                'id' => $basecampId,
+                'account' => [],
+                'activities' => [],
+            ],
+            $this->database->findProject(1)
+        );
+    }
+
     public function testIgnoreUpdatedTaskOrActivity()
     {
         $basecampId = 'irrelevant project';
@@ -250,10 +269,10 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
         $this->request = json_decode($json, true);
     }
 
-    private function whenProjectIsMapped($basecampId, array $activities = [])
+    private function whenProjectIsMapped($basecampId, array $activities = [], array $settings = [])
     {
-        $settings = new SyncRequest();
-        $settings->isDeletingTodosEnabled = true;
+        $defaultSettings = new SyncRequest();
+        $defaultSettings->isDeletingTodosEnabled = true;
         $this->database->upsertProject(
             1,
             [
@@ -262,7 +281,7 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
                 'account' => [
                     'id' => 'irrelevant id',
                 ],
-                'settings' => $settings->toSettings(),
+                'settings' => $settings + $defaultSettings->toSettings(),
             ]
         );
     }

@@ -59,12 +59,13 @@ class SyncWebhookToBasecamp
         $config->isRevokeAccessEnabled = false; // always override (not all people are loaded)
 
         if ($project) {
-            $config->account =
-                $project['settings']['id'] ?? $config->account;
-            $config->areTodosEnabled =
-                $project['settings']['areTodosEnabled'] ?: $config->areTodosEnabled;
-            $config->isDeletingTodosEnabled =
-                $project['settings']['isDeletingTodosEnabled'] ?: $config->isDeletingTodosEnabled;
+            $config->account = $project['account']['id'] ?? $config->account;
+            $options = ['areTodosEnabled', 'isDeletingTodosEnabled'];
+            foreach ($options as $option) {
+                if (array_key_exists($option, $project['settings'])) {
+                    $config->{$option} = $project['settings'][$option];
+                }
+            }
         }
 
         return $config;
