@@ -251,12 +251,17 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
 
     private function whenProjectIsMapped($basecampId, array $activities = [])
     {
+        $settings = new SyncRequest();
+        $settings->isDeletingTodosEnabled = true;
         $this->database->upsertProject(
             1,
             [
                 'id' => $basecampId,
                 'activities' => $activities,
-                'account' => [],
+                'account' => [
+                    'id' => 'irrelevant id',
+                ],
+                'settings' => $settings->toSettings(),
             ]
         );
     }

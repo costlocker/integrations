@@ -4,10 +4,12 @@ namespace Costlocker\Integrations\Basecamp;
 
 class SyncWebhookToBasecamp
 {
+    private $database;
     private $synchronizer;
 
     public function __construct(BasecampFactory $b, SyncDatabase $db)
     {
+        $this->database = $db;
         $this->synchronizer = new Synchronizer($b, $db);
     }
 
@@ -16,10 +18,7 @@ class SyncWebhookToBasecamp
         $projects = $this->jsonEventsToProject($jsonEvents);
         $results = [];
         foreach ($projects as $id => $items) {
-            $config = new SyncRequest();
-            $config->areTodosEnabled = true;
-            $config->isDeletingTodosEnabled = true;
-            $config->isRevokeAccessEnabled = false; // always override because not all people are loaded
+            $config = $this->getProjectSettings($id);
 
             $r = new SyncProjectRequest();
             $r->costlockerId = $id;
@@ -50,5 +49,25 @@ class SyncWebhookToBasecamp
             }
         }
         return $projects;
+    }
+
+    private function getProjectSettings($costlockerId)
+    {
+        $project = $this->database->findProject($costlockerId);
+
+        $config = new SyncRequest();
+        $config->costlockerProject = $costlockerId;
+        $config->isRevokeAccessEnabled = false; // always override (not all people are loaded)
+
+        if ($project) {
+            $config->account =
+                $project['settings']['id'] ?? $config->account;
+            $config->areTodosEnabled =
+                $project['settings']['areTodosEnabled'] ?: $config->areTodosEnabled;
+            $config->isDeletingTodosEnabled =
+                $project['settings']['isDeletingTodosEnabled'] ?: $config->isDeletingTodosEnabled;
+        }
+
+        return $config;
     }
 }

@@ -323,10 +323,14 @@ class Synchronizer
             }
         }
 
-        $this->database->upsertProject($bcProject['costlocker_id'], [
-            'id' => $bcProject['id'],
-            'account' => $this->basecampFactory->getAccount(),
-            'activities' => $bcProject['activities'],
-        ], $config->toSettings());
+        $this->database->upsertProject(
+            $bcProject['costlocker_id'],
+            [
+                'id' => $bcProject['id'],
+                'account' => $this->basecampFactory->getAccount(),
+                'activities' => $bcProject['activities'],
+            ],
+            $config->toSettings()
+        );
     }
 }

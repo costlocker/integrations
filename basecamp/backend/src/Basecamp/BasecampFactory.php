@@ -17,9 +17,9 @@ class BasecampFactory
         $this->user = $u;
     }
 
-    public function __invoke($rawAccount): BasecampApi
+    public function __invoke($accountId): BasecampApi
     {
-        $this->accountId = is_array($rawAccount) ? $rawAccount['id'] : $rawAccount;
+        $this->accountId = $accountId;
         $account = $this->user->getBasecampAccount($this->accountId);
 
         $api = new Connect(new BasecampClient);
