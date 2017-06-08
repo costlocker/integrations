@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use League\OAuth2\Client\Provider\GenericProvider;
+use Costlocker\Integrations\Database\PersistCostlockerUser;
 
 class AuthorizeInCostlocker
 {
@@ -13,7 +14,7 @@ class AuthorizeInCostlocker
     private $provider;
     private $persistUser;
 
-    public static function buildFromEnv(SessionInterface $s, PersistsCostlockerUser $p)
+    public static function buildFromEnv(SessionInterface $s, PersistCostlockerUser $p)
     {
         $costlockerHost = getenv('CL_HOST');
         return new self(
@@ -31,7 +32,7 @@ class AuthorizeInCostlocker
         );
     }
 
-    public function __construct(SessionInterface $s, GenericProvider $p, PersistsCostlockerUser $db, $appUrl)
+    public function __construct(SessionInterface $s, GenericProvider $p, PersistCostlockerUser $db, $appUrl)
     {
         $this->session = $s;
         $this->provider = $p;

@@ -1,12 +1,14 @@
 <?php
 
-namespace Costlocker\Integrations\Basecamp;
+namespace Costlocker\Integrations\Sync;
 
 use Mockery as m;
 use GuzzleHttp\Psr7\Response;
 use Costlocker\Integrations\CostlockerClient;
+use Costlocker\Integrations\Basecamp\BasecampFactory;
 use Costlocker\Integrations\Basecamp\Api\BasecampApi;
-use Costlocker\Integrations\Database\Event;
+use Costlocker\Integrations\Basecamp\Api\BasecampAccessException;
+use Costlocker\Integrations\Entities\Event;
 
 class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
 {
@@ -344,7 +346,7 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
             ]
         );
         $this->givenCostlockerProject('empty-project.json');
-        $this->basecamp->shouldReceive('projectExists')->andThrow(Api\BasecampAccessException::class);
+        $this->basecamp->shouldReceive('projectExists')->andThrow(BasecampAccessException::class);
         $this->synchronize(Event::RESULT_FAILURE);
         assertThat($this->database->findProjects(1), is(emptyArray()));
     }

@@ -1,6 +1,9 @@
 <?php
 
-namespace Costlocker\Integrations\Basecamp;
+namespace Costlocker\Integrations\Sync;
+
+use Costlocker\Integrations\Basecamp\BasecampFactory;
+use Costlocker\Integrations\Basecamp\Api\BasecampException;
 
 class Synchronizer
 {
@@ -161,7 +164,7 @@ class Synchronizer
         }
         try {
             $this->basecamp->projectExists($bcProject['id']);
-        } catch (Api\BasecampException $e) {
+        } catch (BasecampException $e) {
             $this->database->deleteProject($bcProject['costlocker_id'], $bcProject['id']);
             return true;
         }

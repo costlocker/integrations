@@ -3,9 +3,9 @@
 namespace Costlocker\Integrations\Costlocker;
 
 use Costlocker\Integrations\CostlockerClient;
-use Costlocker\Integrations\Database\CostlockerCompany;
-use Costlocker\Integrations\Queue\EventsLogger;
-use Costlocker\Integrations\Database\Event;
+use Costlocker\Integrations\Entities\CostlockerCompany;
+use Costlocker\Integrations\Events\EventsLogger;
+use Costlocker\Integrations\Entities\Event;
 
 class RegisterWebhook
 {

@@ -1,9 +1,10 @@
 <?php
 
-namespace Costlocker\Integrations\Costlocker;
+namespace Costlocker\Integrations\Database;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Costlocker\Integrations\Auth\GetUser;
+use Costlocker\Integrations\Costlocker\RegisterWebhook;
 
 class UpdateSettings
 {

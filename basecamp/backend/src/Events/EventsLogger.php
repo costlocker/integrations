@@ -1,10 +1,10 @@
 <?php
 
-namespace Costlocker\Integrations\Queue;
+namespace Costlocker\Integrations\Events;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Costlocker\Integrations\Auth\GetUser;
-use Costlocker\Integrations\Database\Event;
+use Costlocker\Integrations\Entities\Event;
 
 class EventsLogger
 {

@@ -28,14 +28,14 @@ $app['database'] = function ($app) {
 };
 
 $app['database.events'] = function ($app) {
-    return new \Costlocker\Integrations\Queue\EventsRepository(
+    return new \Costlocker\Integrations\Events\EventsRepository(
         $app['orm.em'],
         $app['client.user']
     );
 };
 
 $app['events.logger'] = function ($app) {
-    return new \Costlocker\Integrations\Queue\EventsLogger(
+    return new \Costlocker\Integrations\Events\EventsLogger(
         $app['orm.em'],
         $app['client.user']
     );
@@ -81,7 +81,7 @@ $app
     ->get('/oauth/costlocker', function (Request $r) use ($app) {
         $strategy = Costlocker\Integrations\Auth\AuthorizeInCostlocker::buildFromEnv(
             $app['session'],
-            new Costlocker\Integrations\Auth\PersistsCostlockerUser($app['orm.em'])
+            new Costlocker\Integrations\Database\PersistCostlockerUser($app['orm.em'])
         );
         return $strategy($r);
     });
@@ -90,7 +90,7 @@ $app
     ->get('/oauth/basecamp', function (Request $r) use ($app) {
         $strategy = Costlocker\Integrations\Auth\AuthorizeInBasecamp::buildFromEnv(
             $app['session'],
-            new Costlocker\Integrations\Auth\PersistBasecampUser($app['orm.em'], $app['client.user'])
+            new Costlocker\Integrations\Database\PersistBasecampUser($app['orm.em'], $app['client.user'])
         );
         return $strategy($r);
     })
@@ -116,7 +116,7 @@ $app
 
 $app
     ->post('/settings', function (Request $r) use ($app) {
-        $uc = new \Costlocker\Integrations\Costlocker\UpdateSettings(
+        $uc = new \Costlocker\Integrations\Database\UpdateSettings(
             $app['orm.em'],
             $app['client.user'],
             new \Costlocker\Integrations\Costlocker\RegisterWebhook(
@@ -134,14 +134,14 @@ $app
     ->post('/disconnect', function (Request $r) use ($app) {
         $wasDisconnected = false;
         if ($r->request->get('user')) {
-            $uc = new Costlocker\Integrations\Auth\DisconnectBasecampAccount(
+            $uc = new Costlocker\Integrations\Usecase\DisconnectBasecampAccount(
                 $app['orm.em'],
                 $app['client.user'],
                 $app['events.logger']
             );
             $wasDisconnected = $uc($r->request->get('user'));
         } elseif ($r->request->get('project')) {
-            $uc = new Costlocker\Integrations\Auth\DisconnectProject(
+            $uc = new Costlocker\Integrations\Usecase\DisconnectProject(
                 $app['db'],
                 $app['client.user'],
                 $app['events.logger']
@@ -161,20 +161,20 @@ $app
     ->before($checkAuthorization('basecamp'));
 
 $pushEvent = function ($event, array $data) use ($app) {
-    $push = new \Costlocker\Integrations\Queue\PushSyncRequest($app['events.logger']);
+    $push = new \Costlocker\Integrations\Sync\Queue\PushSyncRequest($app['events.logger']);
     $push($event, $data);
     return new JsonResponse([], 200);
 };
     
 $app
     ->post('/basecamp', function (Request $r) use ($pushEvent) {
-        return $pushEvent(\Costlocker\Integrations\Database\Event::MANUAL_SYNC, $r->request->all());
+        return $pushEvent(\Costlocker\Integrations\Entities\Event::MANUAL_SYNC, $r->request->all());
     })
     ->before($checkAuthorization('basecamp'));
 
 $app
     ->post('/webhooks/handler', function (Request $r) use ($pushEvent) {
-        return $pushEvent(\Costlocker\Integrations\Database\Event::WEBHOOK_SYNC, json_decode($r->getContent(), true));
+        return $pushEvent(\Costlocker\Integrations\Entities\Event::WEBHOOK_SYNC, json_decode($r->getContent(), true));
     });
 
 return $app;

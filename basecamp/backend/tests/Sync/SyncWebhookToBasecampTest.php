@@ -1,10 +1,11 @@
 <?php
 
-namespace Costlocker\Integrations\Basecamp;
+namespace Costlocker\Integrations\Sync;
 
 use Mockery as m;
+use Costlocker\Integrations\Basecamp\BasecampFactory;
 use Costlocker\Integrations\Basecamp\Api\BasecampApi;
-use Costlocker\Integrations\Database\Event;
+use Costlocker\Integrations\Entities\Event;
 
 class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
 {

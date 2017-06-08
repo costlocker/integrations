@@ -1,14 +1,14 @@
 <?php
 
-namespace Costlocker\Integrations\Auth;
+namespace Costlocker\Integrations\Database;
 
 use League\OAuth2\Client\Token\AccessToken as OAuthToken;
-use Costlocker\Integrations\Database\CostlockerCompany;
-use Costlocker\Integrations\Database\CostlockerUser;
-use Costlocker\Integrations\Database\AccessToken;
+use Costlocker\Integrations\Entities\CostlockerCompany;
+use Costlocker\Integrations\Entities\CostlockerUser;
+use Costlocker\Integrations\Entities\AccessToken;
 use Doctrine\ORM\EntityManagerInterface;
 
-class PersistsCostlockerUser
+class PersistCostlockerUser
 {
     private $entityManager;
 

@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use FourteenFour\BasecampAuth\Provider\Basecamp;
+use Costlocker\Integrations\Database\PersistBasecampUser;
 
 class AuthorizeInBasecamp
 {

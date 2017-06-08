@@ -1,6 +1,8 @@
 <?php
 
-namespace Costlocker\Integrations\Basecamp;
+namespace Costlocker\Integrations\Sync;
+
+use Costlocker\Integrations\Basecamp\BasecampFactory;
 
 class SyncWebhookToBasecamp
 {

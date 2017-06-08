@@ -2,11 +2,12 @@
 
 namespace Costlocker\Integrations\Database;
 
-use Costlocker\Integrations\Basecamp\SyncDatabase;
 use Costlocker\Integrations\Auth\GetUser;
 use Doctrine\ORM\EntityManagerInterface;
-use Costlocker\Integrations\Database\CostlockerProject;
-use Costlocker\Integrations\Database\BasecampAccount;
+use Costlocker\Integrations\Entities\CostlockerProject;
+use Costlocker\Integrations\Entities\BasecampAccount;
+use Costlocker\Integrations\Entities\BasecampProject;
+use Costlocker\Integrations\Sync\SyncDatabase;
 
 class ProjectsDatabase implements SyncDatabase
 {
@@ -53,7 +54,7 @@ class ProjectsDatabase implements SyncDatabase
     {
         $dql =<<<DQL
             SELECT bp, ba
-            FROM Costlocker\Integrations\Database\BasecampProject bp
+            FROM Costlocker\Integrations\Entities\BasecampProject bp
             JOIN bp.costlockerProject cp
             JOIN bp.basecampAccount ba
             WHERE cp.id = :project

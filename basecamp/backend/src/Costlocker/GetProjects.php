@@ -4,7 +4,7 @@ namespace Costlocker\Integrations\Costlocker;
 
 use Costlocker\Integrations\CostlockerClient;
 use Costlocker\Integrations\Basecamp\BasecampFactory;
-use Costlocker\Integrations\Basecamp\SyncDatabase;
+use Costlocker\Integrations\Sync\SyncDatabase;
 
 class GetProjects
 {

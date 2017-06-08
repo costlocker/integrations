@@ -1,11 +1,11 @@
 <?php
 
-namespace Costlocker\Integrations\Auth;
+namespace Costlocker\Integrations\Usecase;
 
 use Doctrine\DBAL\Connection;
 use Costlocker\Integrations\Auth\GetUser;
-use Costlocker\Integrations\Queue\EventsLogger;
-use Costlocker\Integrations\Database\Event;
+use Costlocker\Integrations\Events\EventsLogger;
+use Costlocker\Integrations\Entities\Event;
 
 class DisconnectProject
 {

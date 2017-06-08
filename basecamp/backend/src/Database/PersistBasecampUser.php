@@ -1,10 +1,10 @@
 <?php
 
-namespace Costlocker\Integrations\Auth;
+namespace Costlocker\Integrations\Database;
 
 use League\OAuth2\Client\Token\AccessToken as OAuthToken;
-use Costlocker\Integrations\Database\BasecampUser;
-use Costlocker\Integrations\Database\AccessToken;
+use Costlocker\Integrations\Entities\BasecampUser;
+use Costlocker\Integrations\Entities\AccessToken;
 use Costlocker\Integrations\Auth\GetUser;
 use Doctrine\ORM\EntityManagerInterface;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Costlocker\Integrations\Database;
+namespace Costlocker\Integrations\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -45,7 +45,7 @@ class CostlockerCompany
 
     public function getSettings()
     {
-        $request = new \Costlocker\Integrations\Basecamp\SyncRequest();
+        $request = new \Costlocker\Integrations\Sync\SyncRequest();
         return ($this->settings ?: []) + $request->toSettings() + [
             'isCostlockerWebhookEnabled' => $this->urlWebhook ? true : false,
         ];

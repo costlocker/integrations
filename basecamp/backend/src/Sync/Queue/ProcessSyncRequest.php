@@ -1,12 +1,13 @@
 <?php
 
-namespace Costlocker\Integrations\Queue;
+namespace Costlocker\Integrations\Sync\Queue;
 
 use Silex\Application;
 use Doctrine\ORM\EntityManagerInterface;
 use Costlocker\Integrations\Auth\GetUser;
-use Costlocker\Integrations\Database\Event;
-use Costlocker\Integrations\Basecamp\SyncResult;
+use Costlocker\Integrations\Entities\Event;
+use Costlocker\Integrations\Sync\SyncResult;
+use Costlocker\Integrations\Events\EventsRepository;
 
 class ProcessSyncRequest
 {
@@ -74,13 +75,13 @@ class ProcessSyncRequest
     private function getSynchronizer($eventType)
     {
         if ($eventType == Event::MANUAL_SYNC) {
-            return new \Costlocker\Integrations\Basecamp\SyncProjectToBasecamp(
+            return new \Costlocker\Integrations\Sync\SyncProjectToBasecamp(
                 $this->app['client.costlocker'],
                 $this->app['client.basecamp'],
                 $this->app['database']
             );
         } elseif ($eventType == Event::WEBHOOK_SYNC) {
-            return new \Costlocker\Integrations\Basecamp\SyncWebhookToBasecamp(
+            return new \Costlocker\Integrations\Sync\SyncWebhookToBasecamp(
                 $this->app['client.basecamp'],
                 $this->app['database']
             );

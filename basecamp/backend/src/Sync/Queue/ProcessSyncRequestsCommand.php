@@ -1,6 +1,6 @@
 <?php
 
-namespace Costlocker\Integrations\Queue;
+namespace Costlocker\Integrations\Sync\Queue;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

@@ -5,9 +5,9 @@ namespace Costlocker\Integrations\Auth;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
-use Costlocker\Integrations\Database\CostlockerUser;
-use Costlocker\Integrations\Database\BasecampUser;
-use Costlocker\Integrations\Database\BasecampAccount;
+use Costlocker\Integrations\Entities\CostlockerUser;
+use Costlocker\Integrations\Entities\BasecampUser;
+use Costlocker\Integrations\Entities\BasecampAccount;
 
 class GetUser
 {
@@ -78,7 +78,7 @@ class GetUser
         }
         $dql =<<<DQL
             SELECT cu, bu, ba
-            FROM Costlocker\Integrations\Database\CostlockerUser cu
+            FROM Costlocker\Integrations\Entities\CostlockerUser cu
             JOIN cu.basecampUsers bu
             JOIN bu.accounts ba
             WHERE cu.costlockerCompany = :company

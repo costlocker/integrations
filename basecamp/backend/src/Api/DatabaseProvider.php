@@ -36,15 +36,15 @@ class DatabaseProvider implements ServiceProviderInterface
             ],
         ]);
         $app->register(new DoctrineOrmServiceProvider, [
-            'orm.proxies_dir' => __DIR__ . '/../var/proxies',
+            'orm.proxies_dir' => "{$this->projectDir}/var/proxies",
             'orm.strategy.naming' => new \Doctrine\ORM\Mapping\UnderscoreNamingStrategy(),
             'orm.em.options' => [
                 'mappings' => [
                     [
                         'type' => 'annotation',
-                        'namespace' => \Costlocker\Integrations\Database::class,
+                        'namespace' => \Costlocker\Integrations\Entities::class,
                         'use_simple_annotation_reader' => false,
-                        'path' => "{$this->projectDir}/src/Database",
+                        'path' => "{$this->projectDir}/src/Entities",
                     ],
                 ],
             ],

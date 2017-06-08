@@ -1,8 +1,8 @@
 <?php
 
-namespace Costlocker\Integrations\Basecamp;
+namespace Costlocker\Integrations\Sync;
 
-use Costlocker\Integrations\Database\Event;
+use Costlocker\Integrations\Entities\Event;
 
 class SyncResult
 {
@@ -11,7 +11,7 @@ class SyncResult
     public $settings;
 
     public $basecampProjectId;
-    /** @var \Costlocker\Integrations\Database\BasecampProject */
+    /** @var \Costlocker\Integrations\Entities\BasecampProject */
     public $mappedProject;
     public $error;
 

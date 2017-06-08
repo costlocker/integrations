@@ -1,6 +1,6 @@
 <?php
 
-namespace Costlocker\Integrations\Database;
+namespace Costlocker\Integrations\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;

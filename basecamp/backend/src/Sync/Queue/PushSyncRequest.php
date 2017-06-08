@@ -1,8 +1,9 @@
 <?php
 
-namespace Costlocker\Integrations\Queue;
+namespace Costlocker\Integrations\Sync\Queue;
 
-use Costlocker\Integrations\Database\Event;
+use Costlocker\Integrations\Entities\Event;
+use Costlocker\Integrations\Events\EventsLogger;
 
 class PushSyncRequest
 {

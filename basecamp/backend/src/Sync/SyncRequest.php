@@ -1,6 +1,6 @@
 <?php
 
-namespace Costlocker\Integrations\Basecamp;
+namespace Costlocker\Integrations\Sync;
 
 class SyncRequest
 {
