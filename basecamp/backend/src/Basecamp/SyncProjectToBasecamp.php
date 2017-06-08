@@ -3,6 +3,7 @@
 namespace Costlocker\Integrations\Basecamp;
 
 use Costlocker\Integrations\CostlockerClient;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class SyncProjectToBasecamp
 {
@@ -15,8 +16,21 @@ class SyncProjectToBasecamp
         $this->synchronizer = new Synchronizer($b, $db);
     }
 
-    public function __invoke(SyncRequest $config)
+    public function __invoke(array $jsonRequest)
     {
+        $json = new ParameterBag($jsonRequest);
+
+        $config = new SyncRequest();
+        $config->account = $json->get('account');
+        $config->costlockerProject = $json->get('costlockerProject');
+        $isProjectLinked = $json->get('mode') == 'add';
+        $config->updatedBasecampProject = $isProjectLinked ? $json->get('basecampProject') : null;
+        $config->areTodosEnabled = $json->get('areTodosEnabled');
+        if ($config->areTodosEnabled) {
+            $config->isDeletingTodosEnabled = $json->get('isDeletingTodosEnabled');
+            $config->isRevokeAccessEnabled = $json->get('isRevokeAccessEnabled');
+        }
+
         $project = $this->findProjectInCostlocker($config->costlockerProject);
 
         $r = new SyncProjectRequest();

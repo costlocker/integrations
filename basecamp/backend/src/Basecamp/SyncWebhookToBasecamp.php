@@ -13,7 +13,7 @@ class SyncWebhookToBasecamp
         $this->synchronizer = new Synchronizer($b, $db);
     }
 
-    public function __invoke($jsonEvents)
+    public function __invoke(array $jsonEvents)
     {
         $projects = $this->jsonEventsToProject($jsonEvents);
         $results = [];
@@ -32,9 +32,8 @@ class SyncWebhookToBasecamp
         return $results;
     }
 
-    private function jsonEventsToProject($jsonEvents)
+    private function jsonEventsToProject(array $json )
     {
-        $json = json_decode($jsonEvents, true);
         $projects = [];
         foreach ($json['data'] as $event) {
             if ($event['event'] != 'peoplecosts.change') {

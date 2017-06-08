@@ -20,15 +20,20 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
         $this->costlocker = m::mock(CostlockerClient::class);
         $this->basecamp = m::mock(BasecampApi::class);
         $this->database = new InMemoryDatabase();
-        $this->request = new SyncRequest();
-        $this->request->account = 'irrelevant basecamp account';
-        $this->request->costlockerProject = 'irrelevant id';
+        $this->request = [
+            'account' => 'irrelevant basecamp account',
+            'costlockerProject' => 'irrelevant id',
+            'areTodosEnabled' => true,
+        ];
     }
 
     /** @dataProvider provideCreate */
     public function testCreateProject($updatedBasecampProject, $basecampId)
     {
-        $this->request->updatedBasecampProject = $updatedBasecampProject;
+        $this->request += [
+            'mode' => 'add',
+            'basecampProject' => $updatedBasecampProject,
+        ];
         $this->givenCostlockerProject('one-person.json');
         $this->basecamp->shouldReceive('createProject')
             ->times($updatedBasecampProject ? 0 : 1)
@@ -90,7 +95,7 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
     public function testCreateProjectWithoutTodolists()
     {
         $basecampId = 'irrelevant project';
-        $this->request->areTodosEnabled = false;
+        $this->request['areTodosEnabled'] = false;
         $this->givenCostlockerProject('one-person.json');
         $this->basecamp->shouldReceive('createProject')->once()->andReturn($basecampId);
         $this->basecamp->shouldReceive('grantAccess')->never();
@@ -207,8 +212,10 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
                 ],
             ]
         );
-        $this->request->isDeletingTodosEnabled = true;
-        $this->request->isRevokeAccessEnabled = true;
+        $this->request += [
+            'isDeletingTodosEnabled' => true,
+            'isRevokeAccessEnabled' => true,
+        ];
         $this->givenCostlockerProject('one-person.json');
         $this->basecamp->shouldReceive('projectExists')->once();
         $this->basecamp->shouldReceive('grantAccess')->once();
@@ -290,8 +297,10 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
                 ],
             ]
         );
-        $this->request->isDeletingTodosEnabled = true;
-        $this->request->isRevokeAccessEnabled = true;
+        $this->request += [
+            'isDeletingTodosEnabled' => true,
+            'isRevokeAccessEnabled' => true,
+        ];
         $this->givenCostlockerProject('empty-project.json');
         $this->basecamp->shouldReceive('projectExists')->once();
         $this->basecamp->shouldReceive('getPeople')->once()

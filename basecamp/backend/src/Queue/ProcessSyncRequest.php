@@ -44,10 +44,17 @@ class ProcessSyncRequest
             'request' => $requestEvent->data,
         ];
 
-        if ($requestEvent->data['type'] == Event::MANUAL_SYNC) {
-            $this->manualSync($requestEvent->data['request'], $event);
-        } elseif ($requestEvent->data['type'] == Event::WEBHOOK_SYNC) {
-            $this->webhookSync($requestEvent->data['request'], $event);
+        try {
+            $strategy = $this->getSynchronizer($requestEvent->data['type']);
+            if ($strategy) {
+                $result = $strategy($requestEvent->data['request']);
+                $event->markStatus(Event::RESULT_SUCCESS, $result);
+            }
+        } catch (\Exception $e) {
+            $event->markStatus(Event::RESULT_FAILURE, [
+                'exception' => get_class($e),
+                'error' => $e->getMessage(),
+            ]);
         }
 
         $requestEvent->updatedAt = new \DateTime();
@@ -56,50 +63,19 @@ class ProcessSyncRequest
         $this->entityManager->flush();
     }
 
-    private function manualSync(array $jsonRequest, Event $event)
+    private function getSynchronizer($eventType)
     {
-        $json = new \Symfony\Component\HttpFoundation\ParameterBag($jsonRequest);
-        $request = new \Costlocker\Integrations\Basecamp\SyncRequest();
-        $request->account = $json->get('account');
-        $request->costlockerProject = $json->get('costlockerProject');
-        $isProjectLinked = $json->get('mode') == 'add';
-        $request->updatedBasecampProject = $isProjectLinked ? $json->get('basecampProject') : null;
-        $request->areTodosEnabled = $json->get('areTodosEnabled');
-        if ($request->areTodosEnabled) {
-            $request->isDeletingTodosEnabled = $json->get('isDeletingTodosEnabled');
-            $request->isRevokeAccessEnabled = $json->get('isRevokeAccessEnabled');
-        }
-
-        try {
-            $strategy = new \Costlocker\Integrations\Basecamp\SyncProjectToBasecamp(
+        if ($eventType == Event::MANUAL_SYNC) {
+            return new \Costlocker\Integrations\Basecamp\SyncProjectToBasecamp(
                 $this->app['client.costlocker'],
                 $this->app['client.basecamp'],
                 $this->app['database']
             );
-            $result = $strategy($request);
-            $event->markStatus(Event::RESULT_SUCCESS, $result);
-        } catch (\Exception $e) {
-            $event->markStatus(Event::RESULT_FAILURE, [
-                'exception' => get_class($e),
-                'error' => $e->getMessage(),
-            ]);
-        }
-    }
-
-    private function webhookSync(array $webhook, Event $event)
-    {
-        try {
-            $strategy = new \Costlocker\Integrations\Basecamp\SyncWebhookToBasecamp(
+        } elseif ($eventType == Event::WEBHOOK_SYNC) {
+            return new \Costlocker\Integrations\Basecamp\SyncWebhookToBasecamp(
                 $this->app['client.basecamp'],
                 $this->app['database']
             );
-            $data = $strategy(json_encode($webhook));
-            $event->markStatus(Event::RESULT_SUCCESS, $data);
-        } catch (\Exception $e) {
-            $event->markStatus(Event::RESULT_FAILURE, [
-                'exception' => get_class($e),
-                'error' => $e->getMessage(),
-            ]);
         }
     }
 }

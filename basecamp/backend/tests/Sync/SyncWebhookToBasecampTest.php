@@ -246,7 +246,8 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
 
     private function givenWebhook($file)
     {
-        $this->request = file_get_contents(__DIR__ . "/fixtures/webhooks/{$file}");
+        $json = file_get_contents(__DIR__ . "/fixtures/webhooks/{$file}");
+        $this->request = json_decode($json, true);
     }
 
     private function whenProjectIsMapped($basecampId, array $activities = [])
