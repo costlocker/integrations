@@ -39,15 +39,10 @@ class SyncProjectToBasecamp
         $r->isCompleteProjectSynchronized = true;
         $r->createProject = function ($createBasecampProject) use ($project, $config) {
             $name = "{$project['client']['name']} | {$project['name']}";
-            return [
-                'id' => $config->updatedBasecampProject ?: $createBasecampProject($name),
-                'costlocker_id' => $project['id'],
-                'activities' => [],
-                'isCreated' => true
-            ];
+            return $config->updatedBasecampProject ?: $createBasecampProject($name);
         };
 
-        return $this->synchronizer->__invoke($r, $config);
+        return [$this->synchronizer->__invoke($r, $config)];
     }
 
     private function findProjectInCostlocker($costlockerId)

@@ -6,6 +6,7 @@ use Silex\Application;
 use Doctrine\ORM\EntityManagerInterface;
 use Costlocker\Integrations\Auth\GetUser;
 use Costlocker\Integrations\Database\Event;
+use Costlocker\Integrations\Basecamp\SyncResult;
 
 class ProcessSyncRequest
 {
@@ -43,14 +44,18 @@ class ProcessSyncRequest
         $event->data = [
             'request' => $requestEvent->data,
         ];
+        $events = [];
 
         try {
             $strategy = $this->getSynchronizer($requestEvent->data['type']);
             if ($strategy) {
-                $result = $strategy($requestEvent->data['request']);
-                $event->markStatus(Event::RESULT_SUCCESS, $result);
+                $results = $strategy($requestEvent->data['request']);
+                foreach ($results as $result) {
+                    $events[] = $this->buildProjectEvent($event, $result);
+                }
             }
         } catch (\Exception $e) {
+            $events[] = $event;
             $event->markStatus(Event::RESULT_FAILURE, [
                 'exception' => get_class($e),
                 'error' => $e->getMessage(),
@@ -58,8 +63,11 @@ class ProcessSyncRequest
         }
 
         $requestEvent->updatedAt = new \DateTime();
-        $this->entityManager->persist($event);
-        $this->entityManager->persist($event);
+
+        $this->entityManager->persist($requestEvent);
+        foreach ($events as $e) {
+            $this->entityManager->persist($e);
+        }
         $this->entityManager->flush();
     }
 
@@ -77,5 +85,13 @@ class ProcessSyncRequest
                 $this->app['database']
             );
         }
+    }
+
+    private function buildProjectEvent(Event $event, SyncResult $result)
+    {
+        $projectEvent = clone $event;
+        $projectEvent->basecampProject = $result->mappedProject;
+        $projectEvent->markStatus($result->getResultStatus(), $result->toArray());
+        return $projectEvent;
     }
 }

@@ -6,6 +6,7 @@ use Mockery as m;
 use GuzzleHttp\Psr7\Response;
 use Costlocker\Integrations\CostlockerClient;
 use Costlocker\Integrations\Basecamp\Api\BasecampApi;
+use Costlocker\Integrations\Database\Event;
 
 class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
 {
@@ -344,7 +345,7 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
         );
         $this->givenCostlockerProject('empty-project.json');
         $this->basecamp->shouldReceive('projectExists')->andThrow(Api\BasecampAccessException::class);
-        $this->synchronize();
+        $this->synchronize(Event::RESULT_FAILURE);
         assertThat($this->database->findProjects(1), is(emptyArray()));
     }
 
@@ -367,13 +368,16 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
         return $people;
     }
 
-    private function synchronize()
+    private function synchronize($expectedStatus = Event::RESULT_SUCCESS)
     {
         $basecampFactory = m::mock(BasecampFactory::class);
         $basecampFactory->shouldReceive('__invoke')->andReturn($this->basecamp);
         $basecampFactory->shouldReceive('getAccount')->andReturn([]);
         $uc = new SyncProjectToBasecamp($this->costlocker, $basecampFactory, $this->database);
-        $uc($this->request);
+        $results = $uc($this->request);
+        if ($results) {
+            assertThat($results[0]->getResultStatus(), is($expectedStatus));
+        }
     }
 
     public function tearDown()

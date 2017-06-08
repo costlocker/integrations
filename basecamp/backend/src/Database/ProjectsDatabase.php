@@ -45,6 +45,8 @@ class ProjectsDatabase implements SyncDatabase
         $this->entityManager->persist($costlockerProject);
         $this->entityManager->persist($basecampProject);
         $this->entityManager->flush();
+
+        return $basecampProject;
     }
 
     public function findProjects($costlockerProjectId)

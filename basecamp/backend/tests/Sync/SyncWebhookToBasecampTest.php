@@ -4,6 +4,7 @@ namespace Costlocker\Integrations\Basecamp;
 
 use Mockery as m;
 use Costlocker\Integrations\Basecamp\Api\BasecampApi;
+use Costlocker\Integrations\Database\Event;
 
 class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +23,7 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
     {
         $this->givenWebhook('create-activity-and-persons.json');
         $this->basecamp->shouldReceive('grantAccess')->never();
-        $this->synchronize();
+        $this->synchronize(Event::RESULT_FAILURE);
     }
 
     public function testConvertNewActivityAndTaskToTodolistsAndTodos()
@@ -85,7 +86,7 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
         $this->whenProjectIsMapped($basecampId, [], ['areTodosEnabled' => false]);
         $this->basecamp->shouldReceive('projectExists')->once();
         $this->basecamp->shouldReceive('grantAccess')->never();
-        $this->synchronize();
+        $this->synchronize(Event::RESULT_NOCHANGE);
         $this->assertEquals(
             [
                 'id' => $basecampId,
@@ -313,13 +314,16 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
             ]);
     }
 
-    private function synchronize()
+    private function synchronize($expectedStatus = Event::RESULT_SUCCESS)
     {
         $basecampFactory = m::mock(BasecampFactory::class);
         $basecampFactory->shouldReceive('__invoke')->andReturn($this->basecamp);
         $basecampFactory->shouldReceive('getAccount')->andReturn([]);
         $uc = new SyncWebhookToBasecamp($basecampFactory, $this->database);
-        $uc($this->request);
+        $results = $uc($this->request);
+        if ($results) {
+            assertThat($results[0]->getResultStatus(), is($expectedStatus));
+        }
     }
 
     public function tearDown()

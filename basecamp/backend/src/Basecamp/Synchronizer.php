@@ -18,47 +18,35 @@ class Synchronizer
 
     public function __invoke(SyncProjectRequest $r, SyncRequest $config)
     {
+        $result = new SyncResult($r, $config);
         $this->basecamp = $this->basecampFactory->__invoke($config->account);
         $bcProject = $this->upsertProject($r);
 
         if (!$bcProject) {
-            return "{$r->costlockerId} is not mapped";
+            $result->error = "{$r->costlockerId} is not mapped";
+            return $result;
         }
 
         list($people, $activities) = $this->analyzeProjectItems($bcProject, $r);
 
-        $bcProjectId = $bcProject['id'];
+        $result->basecampProjectId = $bcProject['id'];
+        $result->wasProjectCreated = $bcProject['isCreated'];
+
         if ($this->checkDeletedProject($bcProject)) {
-            return [
-                'basecamp' => 'project was deleted'
-            ];
+            $result->error = "Project was deleted in Basecamp";
+            return $result;
         }
+
         if ($config->areTodosEnabled) {
-            $grantedPeople = $this->grantAccess($bcProjectId, $people);
-            $bcProject['basecampPeople'] = $this->basecamp->getPeople($bcProjectId);
-            $todolists = $this->createTodolists($bcProject, $activities);
-            $delete = $this->deleteLegacyEntitiesInBasecamp($bcProject, $people, $activities, $config);
-        } else {
-            $grantedPeople = [];
-            $todolists = [];
-            $delete = [];
+            $result->grantedPeople = $this->grantAccess($result->basecampProjectId, $people);
+            $bcProject['basecampPeople'] = $this->basecamp->getPeople($result->basecampProjectId);
+            $result->todolists = $this->createTodolists($bcProject, $activities);
+            $result->deleteSummary = $this->deleteLegacyEntitiesInBasecamp($bcProject, $people, $activities, $config);
         }
 
-        $this->updateMapping($bcProject, $todolists, $delete, $config);
+        $this->updateMapping($bcProject, $result);
 
-        return [
-            'request' => get_object_vars($config),
-            'costlocker' => [
-                'id' => $r->costlockerId,
-                'items' => $r->projectItems,
-            ],
-            'basecamp' => [
-                'id' => $bcProjectId,
-                'people' => $grantedPeople,
-                'activities' => $todolists,
-                'delete' => $delete,
-            ],
-        ];
+        return $result;
     }
 
     private function upsertProject(SyncProjectRequest $r)
@@ -67,11 +55,20 @@ class Synchronizer
         if ($existingProject) {
             return ['isCreated' => false, 'costlocker_id' => $r->costlockerId] + $existingProject;
         }
-        return $r->createProject->__invoke(
+        $projectId = $r->createProject->__invoke(
             function ($name) {
                 return $this->basecamp->createProject($name, null, null);
             }
         );
+        if ($projectId) {
+            return [
+                'id' => $projectId,
+                'costlocker_id' => $r->costlockerId,
+                'activities' => [],
+                'isCreated' => true
+            ];
+        }
+        return null;
     }
 
     private function analyzeProjectItems(array $bcProject, SyncProjectRequest $request)
@@ -292,45 +289,43 @@ class Synchronizer
         return $deleted;
     }
 
-    private function updateMapping(array $bcProject, array $todolists, array $deleteSummary, SyncRequest $config)
+    private function updateMapping(array $bcProject, SyncResult $result)
     {
-        if ($config->areTodosEnabled) {
-            foreach ($todolists as $activityId => $activity) {
-                if (!array_key_exists($activityId, $bcProject['activities'])) {
-                    $bcProject['activities'][$activityId] = [];
-                }
-                $bcProject['activities'][$activityId] += [
-                    'id' => $activity['id'],
-                    'tasks' => [],
-                    'persons' => [],
-                ];
-                foreach (['tasks', 'persons'] as $type) {
-                    foreach ($activity[$type] as $taskId => $mappedTodo) {
-                        $bcProject['activities'][$activityId][$type][$taskId] = $mappedTodo;
-                    }
-                }
+        foreach ($result->todolists as $activityId => $activity) {
+            if (!array_key_exists($activityId, $bcProject['activities'])) {
+                $bcProject['activities'][$activityId] = [];
             }
-
-            foreach ($deleteSummary['activities'] as $activity) {
-                unset($bcProject['activities'][$activity]);
-            }
+            $bcProject['activities'][$activityId] += [
+                'id' => $activity['id'],
+                'tasks' => [],
+                'persons' => [],
+            ];
             foreach (['tasks', 'persons'] as $type) {
-                foreach ($deleteSummary[$type] as $activityId => $tasks) {
-                    foreach ($tasks as $taskId) {
-                        unset($bcProject['activities'][$activityId][$type][$taskId]);
-                    }
+                foreach ($activity[$type] as $taskId => $mappedTodo) {
+                    $bcProject['activities'][$activityId][$type][$taskId] = $mappedTodo;
                 }
             }
         }
 
-        $this->database->upsertProject(
+        foreach ($result->deleteSummary['activities'] ?? [] as $activity) {
+            unset($bcProject['activities'][$activity]);
+        }
+        foreach (['tasks', 'persons'] as $type) {
+            foreach ($result->deleteSummary[$type] ?? [] as $activityId => $tasks) {
+                foreach ($tasks as $taskId) {
+                    unset($bcProject['activities'][$activityId][$type][$taskId]);
+                }
+            }
+        }
+
+        $result->mappedProject = $this->database->upsertProject(
             $bcProject['costlocker_id'],
             [
                 'id' => $bcProject['id'],
                 'account' => $this->basecampFactory->getAccount(),
                 'activities' => $bcProject['activities'],
             ],
-            $config->toSettings()
+            $result->settings
         );
     }
 }
