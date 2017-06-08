@@ -47,7 +47,7 @@ class CostlockerCompany
     {
         $request = new \Costlocker\Integrations\Basecamp\SyncRequest();
         return ($this->settings ?: []) + $request->toSettings() + [
-            'areWebhooksEnabled' => false,
+            'isCostlockerWebhookEnabled' => $this->urlWebhook ? true : false,
         ];
     }
 }

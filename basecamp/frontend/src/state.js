@@ -19,7 +19,7 @@ const appState = immstruct({
     areTodosEnabled: true,
     isDeletingTodosEnabled: false,
     isRevokeAccessEnabled: false,
-    areWebhooksEnabled: false,
+    isCostlockerWebhookEnabled: false,
   },
   sync: {
     account: null,

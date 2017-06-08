@@ -38,13 +38,15 @@ export default function Projects({ settings, form }) {
           </div>
           <h4>Webhooks</h4>
           <div className="form-group">
-            <label>Costlocker</label>
             <div>
               <label className="checkbox-inline">
-                <input type="checkbox" name="areWebhooksEnabled"
-                  onChange={form.set('areWebhooksEnabled')} checked={form.get('areWebhooksEnabled')}
-                  /> Update project in Basecamp when personnel costs are edited in Costlocker
+                <input type="checkbox" disabled
+                  onChange={form.set('isCostlockerWebhookEnabled')} checked={form.get('isCostlockerWebhookEnabled')}
+                  /> Costlocker webhook
               </label>
+              <p className="help-block">
+                Webhook is automatically registered and validated after you save settings.
+              </p>
             </div>
           </div>
           <button type="submit" className="btn btn-primary">Save settings</button>

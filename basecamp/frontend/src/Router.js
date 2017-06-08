@@ -178,7 +178,7 @@ export const states = [
         submit: (e) => {
           e.preventDefault();
           pushToApi(`/settings`, appState.cursor(['companySettings']).deref())
-            .then((r) => redirectToRoute('settings'))
+            .then((r) => appState.cursor(['companySettings']).set('isCostlockerWebhookEnabled', true))
             .catch((e) => alert('Save has failed'));
         }
       }}
