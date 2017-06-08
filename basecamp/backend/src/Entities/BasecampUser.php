@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="bc_user")
+ * @ORM\Table(name="bc_users")
  */
 class BasecampUser
 {

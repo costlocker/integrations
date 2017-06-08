@@ -89,7 +89,7 @@ DQL;
     public function deleteProject($costlockerProjectId, $basecampProjectId)
     {
         $sql =<<<SQL
-            UPDATE bc_project
+            UPDATE bc_projects
             SET deleted_at = NOW()
             WHERE cl_project_id = :cl AND bc_project_id = :bc
 SQL;

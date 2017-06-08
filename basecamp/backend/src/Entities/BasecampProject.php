@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="bc_project")
+ * @ORM\Table(name="bc_projects")
  */
 class BasecampProject
 {

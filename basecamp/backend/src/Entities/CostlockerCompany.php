@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="cl_company")
+ * @ORM\Table(name="cl_companies")
  */
 class CostlockerCompany
 {

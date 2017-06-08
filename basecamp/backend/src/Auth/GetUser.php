@@ -121,8 +121,8 @@ DQL;
     {
         $sql =<<<SQL
             SELECT access_token
-            FROM oauth2_token
-            WHERE costlocker_user_id = :cl AND basecamp_user_id IS NULL
+            FROM oauth2_tokens
+            WHERE cl_user_id = :cl AND bc_user_id IS NULL
             ORDER BY id DESC
             LIMIT 1
 SQL;
@@ -137,10 +137,10 @@ SQL;
     {
         $sql =<<<SQL
             SELECT access_token
-            FROM oauth2_token
-            JOIN bc_account ON oauth2_token.basecamp_user_id = bc_account.basecamp_user_id
-            WHERE bc_account.id = :id
-            ORDER BY oauth2_token.id DESC
+            FROM oauth2_tokens
+            JOIN bc_accounts ON oauth2_tokens.bc_user_id = bc_accounts.bc_user_id
+            WHERE bc_accounts.id = :id
+            ORDER BY oauth2_tokens.id DESC
             LIMIT 1
 SQL;
         $params = [

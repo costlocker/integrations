@@ -23,13 +23,13 @@ class DisconnectProject
     public function __invoke($projectId)
     {
         $sql =<<<SQL
-            UPDATE bc_project
+            UPDATE bc_projects
             SET deleted_at = NOW()
             WHERE cl_project_id = :project
               AND deleted_at IS NULL
               AND cl_project_id IN (
                 SELECT id
-                FROM cl_project
+                FROM cl_projects
                 WHERE cl_company_id = :company
               )
             RETURNING id

@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="bc_account")
+ * @ORM\Table(name="bc_accounts")
  */
 class BasecampAccount
 {
@@ -38,7 +38,7 @@ class BasecampAccount
 
     /**
      * @ORM\ManyToOne(targetEntity="BasecampUser")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(name="bc_user_id", nullable=false, onDelete="CASCADE")
      */
     public $basecampUser;
 }
