@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use League\OAuth2\Client\Provider\GenericProvider;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Costlocker\Integrations\Database\PersistCostlockerUser;
 
 class AuthorizeInCostlocker
@@ -70,8 +71,10 @@ class AuthorizeInCostlocker
                 $this->session->set('costlocker', ['userId' => $costlockerId]);
                 $this->session->set('basecamp', ['userId' => $basecampId]);
                 return new RedirectResponse($this->appUrl);
-            } catch (\Exception $e) {
+            } catch (IdentityProviderException $e) {
                 return $this->sendError($e->getMessage());
+            } catch (\Exception $e) {
+                return $this->sendError('Internal server error');
             }
         }
     }
@@ -80,6 +83,6 @@ class AuthorizeInCostlocker
     {
         $this->session->remove('costlocker');
         $this->session->remove('costlockerLogin');
-        return new RedirectResponse("{$this->appUrl}?clLoginError={$errorMessage}");
+        return new RedirectResponse("{$this->appUrl}?loginError={$errorMessage}");
     }
 }

@@ -68,7 +68,7 @@ appState.on('next-animation-frame', function (newStructure, oldStructure, keyPat
 export const states = [
   {
     name: 'homepage',
-    url: '/?clLoginError',
+    url: '/?loginError',
     redirectTo: 'projects',
   },
   {
@@ -86,19 +86,20 @@ export const states = [
   },
   {
     name: 'login',
-    url: '/login?clLoginError',
+    url: '/login?loginError',
     component: (props) => <Login
       costlockerAuth={appState.cursor(['auth', 'costlocker']).deref()}
       loginUrls={loginUrls}
-      clLoginError={props.transition.params().clLoginError} />,
+      loginError={props.transition.params().loginError} />,
   },
   {
     name: 'accounts',
-    url: '/accounts',
+    url: '/accounts?loginError',
     component: (props) => <Accounts
       basecampUser={appState.cursor(['auth', 'basecamp']).deref()}
       costlockerUser={appState.cursor(['auth', 'costlocker']).deref()}
       users={appState.cursor(['auth', 'settings']).deref().users}
+      loginError={props.transition.params().loginError}
       disconnect={(id) =>
         pushToApi(`/disconnect`, { user: id })
           .then(() => fetchUser())
@@ -211,7 +212,7 @@ const hooks = [
       }
     },
     callback: (transition: any) =>
-      transition.router.stateService.target('login', undefined, { location: true }),
+      transition.router.stateService.target('login', transition.params(), { location: true }),
     priority: 10,
   },
   {

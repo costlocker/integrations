@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use League\OAuth2\Client\Provider\AbstractProvider;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use FourteenFour\BasecampAuth\Provider\Basecamp;
 use Costlocker\Integrations\Database\PersistBasecampUser;
 
@@ -25,7 +26,7 @@ class AuthorizeInBasecamp
                 'redirectUri' => getenv('BASECAMP_REDIRECT_URL'),
             ]),
             $p,
-            getenv('APP_FRONTED_URL')
+            getenv('APP_FRONTED_URL') . 'accounts'
         );
     }
 
@@ -56,8 +57,10 @@ class AuthorizeInBasecamp
                     'userId' => $this->persistUser->__invoke($basecampUser, $accessToken),
                 ]);
                 return new RedirectResponse($this->appUrl);
-            } catch (\Exception $e) {
+            } catch (IdentityProviderException $e) {
                 return $this->sendError($e->getMessage());
+            } catch (\Exception $e) {
+                return $this->sendError('Internal server error');
             }
         }
     }
@@ -65,6 +68,6 @@ class AuthorizeInBasecamp
     private function sendError($errorMessage)
     {
         $this->session->remove('basecamp');
-        return new RedirectResponse("{$this->appUrl}?clBasecampError={$errorMessage}");
+        return new RedirectResponse("{$this->appUrl}?loginError={$errorMessage}");
     }
 }

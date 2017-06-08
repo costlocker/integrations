@@ -3,7 +3,7 @@ import React from 'react';
 import OAuthLogin from './OAuthLogin';
 import { ExternalLink, Button } from '../ui/Components';
 
-export default function Login({ basecampUser, costlockerUser, loginUrls, users, disconnect }) {
+export default function Login({ basecampUser, costlockerUser, loginUrls, loginError, users, disconnect }) {
   return (
     <div>
       <div className="row">
@@ -83,7 +83,7 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, users, 
             title={basecampUser
               ? <span>Connect another Basecamp account</span>
               : 'Login to Basecamp'}
-            loginError='' loginUrl={loginUrls.basecamp} />
+            loginError={loginError} loginUrl={loginUrls.basecamp} />
         </div>
       </div>
     </div>
