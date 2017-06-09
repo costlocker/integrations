@@ -9,5 +9,10 @@ $console->addCommands([
         new Costlocker\Integrations\Sync\Queue\ProcessSyncRequest($app),
         $app['logger']
     ),
+    new \Costlocker\Integrations\Database\RefreshAccessTokensCommand(
+        new \Costlocker\Integrations\Database\RefreshAccessTokens(
+            $app['orm.em']
+        )
+    )
 ]);
 $console->run();
