@@ -12,6 +12,7 @@ const appState = immstruct({
   },
   basecamp: {
     projects: [],
+    companies: [],
   },
   currentState: '', // helper for active menu items
   events: null,
@@ -25,6 +26,7 @@ const appState = immstruct({
     account: null,
     costlockerProject: '',
     basecampProject: '',
+    basecampClassicCompanyId: '',
     areTodosEnabled: true,
     isDeletingTodosEnabled: false,
     isRevokeAccessEnabled: false,

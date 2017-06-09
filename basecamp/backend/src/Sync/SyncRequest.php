@@ -7,6 +7,7 @@ class SyncRequest
     public $costlockerProject;
     public $account;
     public $updatedBasecampProject;
+    public $basecampClassicCompanyId;
 
     public $areTodosEnabled = true;
     public $isDeletingTodosEnabled = false;

@@ -19,7 +19,7 @@ const BasecampAccountSelect = ({ title, accounts, syncForm }) => (
   </div>
 );
 
-export default function Sync({ costlockerProjects, basecampProjects, basecampAccounts, syncForm }) {
+export default function Sync({ costlockerProjects, basecampProjects, basecampCompanies, basecampAccounts, syncForm }) {
   if (!costlockerProjects) {
     return <span>Loading...</span>;
   } else if (!costlockerProjects.length) {
@@ -76,6 +76,21 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampAcc
           </select>
         </div>
         <BasecampAccountSelect title='Choose a Basecamp acccount to export it to' accounts={basecampAccounts} syncForm={syncForm} />
+        {isBasecampProjectCreated && basecampCompanies.length &&
+        <div className="form-group">
+          <label htmlFor="basecampClassicCompanyId">Choose a Basecamp company (client)</label>
+          <select
+            className="form-control" name="basecampClassicCompanyId" id="basecampClassicCompanyId"
+            value={syncForm.get('basecampClassicCompanyId')} onChange={syncForm.set('basecampClassicCompanyId')}
+          >
+            {basecampCompanies.map(company => (
+              <option key={company.id} value={company.id}>
+                {company.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        }
         <div className="form-group">
           <label>How would you like to add this project to the Basecamp</label>
           <div className="radio">

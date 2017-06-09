@@ -23,7 +23,10 @@ class GetProjects
         $account = $costlockerUser->getUser($r->query->get('account'));
         if ($account instanceof BasecampUser) {
             $basecamp = $this->basecampFactory->__invoke($account->id);
-            return $basecamp->getProjects();
+            return [
+                'projects' => $basecamp->getProjects(),
+                'companies' => $basecamp->getCompanies(),
+            ];
         } else {
             return [];
         }

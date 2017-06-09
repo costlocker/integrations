@@ -26,6 +26,7 @@ class SyncProjectToBasecamp
         $config->costlockerProject = $json->get('costlockerProject');
         $isProjectLinked = $json->get('mode') == 'add';
         $config->updatedBasecampProject = $isProjectLinked ? $json->get('basecampProject') : null;
+        $config->basecampClassicCompanyId = $json->get('basecampClassicCompanyId');
         $config->areTodosEnabled = $json->get('areTodosEnabled');
         if ($config->areTodosEnabled) {
             $config->isDeletingTodosEnabled = $json->get('isDeletingTodosEnabled');
@@ -43,7 +44,7 @@ class SyncProjectToBasecamp
             $name =
                 "{$project['client']['name']} | {$project['name']}" .
                 ($projectId ? " [{$projectId}]" : '');
-            return $config->updatedBasecampProject ?: $createBasecampProject($name);
+            return $config->updatedBasecampProject ?: $createBasecampProject($name, $config->basecampClassicCompanyId);
         };
 
         return [$this->synchronizer->__invoke($r, $config)];

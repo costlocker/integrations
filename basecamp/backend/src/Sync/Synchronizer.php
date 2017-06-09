@@ -60,8 +60,8 @@ class Synchronizer
             return ['isCreated' => false, 'costlocker_id' => $r->costlockerId] + $existingProject;
         }
         $projectId = $r->createProject->__invoke(
-            function ($name) {
-                return $this->basecamp->createProject($name, null, null);
+            function ($name, $basecampClassicCompanyId = null) {
+                return $this->basecamp->createProject($name, $basecampClassicCompanyId, null);
             }
         );
         if ($projectId) {

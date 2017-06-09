@@ -54,7 +54,9 @@ appState.on('next-animation-frame', function (newStructure, oldStructure, keyPat
   const accountId = newStructure.getIn(['sync', 'account']);
   if (oldId !== accountId && accountId) {
     fetchFromApi(`/basecamp?account=${accountId}`)
-      .then(projects => appState.cursor(['basecamp']).set('projects', projects));
+      .then(data => appState.cursor(['basecamp']).update(
+        bc => bc.set('projects', data.projects).set('companies', data.companies)
+      ));
   }
 });
 
@@ -106,6 +108,7 @@ export const states = [
     component: (props) => <Sync
       costlockerProjects={appState.cursor(['costlocker', 'projects']).deref()}
       basecampProjects={appState.cursor(['basecamp', 'projects']).deref()}
+      basecampCompanies={appState.cursor(['basecamp', 'companies']).deref()}
       basecampAccounts={appState.cursor(['auth', 'settings']).deref().accounts}
       syncForm={{
         editedProject: props.transition.params().clProject,
