@@ -53,6 +53,14 @@ $app['client.basecamp'] = function ($app) {
     return new \Costlocker\Integrations\Basecamp\BasecampFactory($app['client.user']);
 };
 
+$app['oauth.basecamp'] = function () {
+    return new \FourteenFour\BasecampAuth\Provider\Basecamp([
+        'clientId' => getenv('BASECAMP_CLIENT_ID'),
+        'clientSecret' => getenv('BASECAMP_CLIENT_SECRET'),
+        'redirectUri' => getenv('BASECAMP_REDIRECT_URL'),
+    ]);
+};
+
 $app['client.user'] = function ($app) {
     return new Costlocker\Integrations\Auth\GetUser($app['session'], $app['orm.em']);
 };
@@ -94,10 +102,12 @@ $app
             Costlocker\Integrations\Basecamp\Api\Connect::BASECAMP_BCX_TYPE,
             Costlocker\Integrations\Basecamp\Api\Connect::BASECAMP_V3_TYPE,
         ];
-        $strategy = Costlocker\Integrations\Auth\AuthorizeInBasecamp::buildFromEnv(
+        $strategy = new Costlocker\Integrations\Auth\AuthorizeInBasecamp(
             $app['session'],
+            $app['oauth.basecamp'],
             new Costlocker\Integrations\Database\PersistBasecampUser($app['orm.em'], $app['client.user'], $allowedProducts),
-            $app['logger']
+            $app['logger'],
+            getenv('APP_FRONTED_URL')
         );
         return $strategy($r);
     })

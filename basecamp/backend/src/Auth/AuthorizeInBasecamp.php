@@ -7,7 +7,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
-use FourteenFour\BasecampAuth\Provider\Basecamp;
 use Costlocker\Integrations\Database\PersistBasecampUser;
 use Psr\Log\LoggerInterface;
 
@@ -18,23 +17,13 @@ class AuthorizeInBasecamp
     private $persistUser;
     private $logger;
 
-    public static function buildFromEnv(SessionInterface $s, PersistBasecampUser $p, LoggerInterface $l)
-    {
-        return new self(
-            $s,
-            new Basecamp([
-                'clientId' => getenv('BASECAMP_CLIENT_ID'),
-                'clientSecret' => getenv('BASECAMP_CLIENT_SECRET'),
-                'redirectUri' => getenv('BASECAMP_REDIRECT_URL'),
-            ]),
-            $p,
-            $l,
-            getenv('APP_FRONTED_URL')
-        );
-    }
-
-    public function __construct(SessionInterface $s, AbstractProvider $p, PersistBasecampUser $db, LoggerInterface $l, $appUrl)
-    {
+    public function __construct(
+        SessionInterface $s,
+        AbstractProvider $p,
+        PersistBasecampUser $db,
+        LoggerInterface $l,
+        $appUrl
+    ) {
         $this->session = $s;
         $this->provider = $p;
         $this->persistUser = $db;
