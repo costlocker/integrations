@@ -47,6 +47,7 @@ class EventsToJson
                     'date' => $date->format('Y-m-d H:i:s'),
                     'user' => $e->costlockerUser ? $e->costlockerUser->data : null,
                     'status' => $statuses[$e->event] ?? null,
+                    'error' => $e->data['result']['basecamp']['error'] ?? null,
                 ];
             },
             $events

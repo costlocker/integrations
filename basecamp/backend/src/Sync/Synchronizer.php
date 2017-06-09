@@ -36,7 +36,7 @@ class Synchronizer
         $result->wasProjectCreated = $bcProject['isCreated'];
 
         if ($this->checkDeletedProject($bcProject)) {
-            $result->error = "Project was deleted in Basecamp";
+            $result->error = "Project {$result->basecampProjectId} is not available in Basecamp";
             $result->mappedProject = $this->database->findBasecampProject($r->costlockerId);
             return $result;
         }

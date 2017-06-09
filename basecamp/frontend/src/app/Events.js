@@ -35,7 +35,10 @@ export default function Projects({ events, refresh }) {
               };
               return <tr key={event.id} className={statusToCssClass[event.status]}>
                 <td>{event.date}</td>
-                <td>{event.description}</td>
+                <td>
+                  {event.description}<br />
+                  {event.error ? <span className="text-muted">{event.error}</span> : ''}
+                </td>
                 <td>{event.user
                   ? <div>
                       <strong>{event.user.person.first_name} {event.user.person.last_name} </strong>
