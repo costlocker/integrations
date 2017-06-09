@@ -39,8 +39,7 @@ class AccessToken
     public $costlockerUser;
 
     /**
-     * @ORM\ManyToOne(targetEntity="BasecampUser")
-     * @ORM\JoinColumn(name="bc_user_id", nullable=true, onDelete="CASCADE")
+     * @ORM\Column(type="integer", name="bc_identity_id", nullable=true)
      */
-    public $basecampUser;
+    public $basecampIdentityId;
 }

@@ -41,11 +41,7 @@ class CostlockerUser
 
     /**
      * @var BasecampUser[]
-     * @ORM\ManyToMany(targetEntity="BasecampUser")
-     * @ORM\JoinTable(name="bc_cl_users",
-     *   joinColumns={@ORM\JoinColumn(name="cl_id", referencedColumnName="id")},
-     *   inverseJoinColumns={@ORM\JoinColumn(name="bc_id", referencedColumnName="id")}
-     * )
+     * @ORM\OneToMany(targetEntity="BasecampUser", mappedBy="costlockerUser")
      */
     public $basecampUsers;
 
@@ -54,29 +50,12 @@ class CostlockerUser
         $this->basecampUsers = new ArrayCollection();
     }
 
-    public function addBasecampUser(BasecampUser $user)
-    {
-        if ($this->getUser($user->id)) {
-            return;
-        }
-        $this->basecampUsers->add($user);
-    }
-
-    private function getUser($id)
+    public function getUser($id)
     {
         return $this->basecampUsers
             ->filter(function (BasecampUser $u) use ($id) {
-                return $u->id == $id;
+                return $u->id == $id && !$u->deletedAt;
             })
             ->first();
-    }
-
-    public function removeUser($id)
-    {
-        $user = $this->getUser($id);
-        if ($user) {
-            return $this->basecampUsers->removeElement($user);
-        }
-        return false;
     }
 }

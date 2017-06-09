@@ -325,7 +325,7 @@ class Synchronizer
             $bcProject['costlocker_id'],
             [
                 'id' => $bcProject['id'],
-                'account' => $this->basecampFactory->getAccount(),
+                'account' => $result->syncConfig->account,
                 'activities' => $bcProject['activities'],
             ],
             $result->settings

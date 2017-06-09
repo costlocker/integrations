@@ -281,7 +281,7 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
                 'id' => $basecampId,
                 'activities' => $activities,
                 'account' => [
-                    'id' => 'irrelevant id',
+                    'id' => [], // should be int id, but it's asserted in assertEquals due to legacy
                 ],
                 'settings' => $settings + $defaultSettings->toSettings(),
             ]

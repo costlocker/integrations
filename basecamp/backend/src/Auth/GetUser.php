@@ -26,12 +26,14 @@ class GetUser
     {
         $clUser = $this->getCostlockerUser();
         $bcUser = $this->getBasecampUser();
+        $connectedAccounts = $this->getConnectedUsersAndAccounts();
         return new JsonResponse([
             'costlocker' => $clUser->data,
             'basecamp' => $bcUser->data,
             'settings' => [
+                'accounts' => $connectedAccounts[$clUser->id]['accounts'] ?? [],
                 'sync' => $clUser->costlockerCompany ? $clUser->costlockerCompany->getSettings() : null,
-                'users' => $this->getConnectedUsersAndAccounts()
+                'users' => array_values($connectedAccounts),
             ],
         ]);
     }
@@ -80,41 +82,34 @@ class GetUser
             SELECT cu, bu, ba
             FROM Costlocker\Integrations\Entities\CostlockerUser cu
             JOIN cu.basecampUsers bu
-            JOIN bu.accounts ba
-            WHERE cu.costlockerCompany = :company
+            JOIN bu.basecampAccount ba
+            WHERE cu.costlockerCompany = :company AND bu.deletedAt IS NULL
 DQL;
         $params = [
             'company' => $costlockerUser->costlockerCompany->id,
         ];
-        return array_map(
-            function (CostlockerUser $u) {
-                return [
-                    'person' => $u->data['person'],
-                    'accounts' => array_reduce(
-                        array_map(
-                            function (BasecampUser $b) {
-                                return array_map(
-                                    function (BasecampAccount $a) use ($b) {
-                                        return [
-                                            'id' => $a->id,
-                                            'name' => $a->name,
-                                            'product' => $a->product,
-                                            'urlApp' => $a->urlApp,
-                                            'identity' => $b->data['identity'],
-                                        ];
-                                    },
-                                    $b->accounts->toArray()
-                                );
-                            },
-                            $u->basecampUsers->toArray()
-                        ),
-                        'array_merge',
-                        []
+        $entities = $this->entityManager->createQuery($dql)->execute($params);
+
+        $users = [];
+        foreach ($entities as $u) {
+            $users[$u->id] = [
+                'person' => $u->data['person'],
+                'accounts' =>
+                    array_map(
+                        function (BasecampUser $b) {
+                            return [
+                                'id' => $b->id,
+                                'name' => $b->basecampAccount->name,
+                                'product' => $b->basecampAccount->product,
+                                'urlApp' => $b->basecampAccount->urlApp,
+                                'identity' => $b->data,
+                            ];
+                        },
+                        $u->basecampUsers->toArray()
                     ),
-                ];
-            },
-            $this->entityManager->createQuery($dql)->execute($params)
-        );
+            ];
+        }
+        return $users;
     }
 
     public function getCostlockerAccessToken()
@@ -122,7 +117,7 @@ DQL;
         $sql =<<<SQL
             SELECT access_token
             FROM oauth2_tokens
-            WHERE cl_user_id = :cl AND bc_user_id IS NULL
+            WHERE cl_user_id = :cl AND bc_identity_id IS NULL
             ORDER BY id DESC
             LIMIT 1
 SQL;
@@ -133,27 +128,37 @@ SQL;
         return $query->fetchColumn();
     }
 
-    public function getBasecampAccessToken($accountId)
+    public function getBasecampAccessToken($basecampUserId)
     {
         $sql =<<<SQL
             SELECT access_token
             FROM oauth2_tokens
-            JOIN bc_accounts ON oauth2_tokens.bc_user_id = bc_accounts.bc_user_id
-            WHERE bc_accounts.id = :id
+            JOIN cl_users ON oauth2_tokens.cl_user_id = cl_users.id
+            JOIN bc_cl_users ON bc_cl_users.cl_user_id = cl_users.id
+            WHERE bc_cl_users.id = :id AND bc_cl_users.deleted_at IS NULL
+              AND bc_cl_users.bc_identity_id = oauth2_tokens.bc_identity_id
             ORDER BY oauth2_tokens.id DESC
             LIMIT 1
 SQL;
         $params = [
-            'id' => $accountId,
+            'id' => $basecampUserId,
         ];
         $query = $this->entityManager->getConnection()->executeQuery($sql, $params);
         return $query->fetchColumn();
     }
 
-    public function getBasecampAccount($accountId)
+    public function getBasecampAccount($basecampUserId)
     {
-        return $this->entityManager
-            ->getRepository(BasecampAccount::class)
-            ->find($accountId) ?: new BasecampAccount();
+        $dql =<<<DQL
+            SELECT ba
+            FROM Costlocker\Integrations\Entities\BasecampAccount ba
+            JOIN ba.costlockerUsers bu
+            WHERE bu.id = :id AND bu.deletedAt IS NULL
+DQL;
+        $params = [
+            'id' => $basecampUserId,
+        ];
+        $entities = $this->entityManager->createQuery($dql)->execute($params);
+        return $entities ? array_shift($entities) : new BasecampAccount();
     }
 }

@@ -24,7 +24,7 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
         $this->basecamp = m::mock(BasecampApi::class);
         $this->database = new InMemoryDatabase();
         $this->request = [
-            'account' => 'irrelevant basecamp account',
+            'account' => [], // should be int id, but it's asserted in assertEquals due to legacy
             'costlockerProject' => 'irrelevant id',
             'areTodosEnabled' => true,
         ];

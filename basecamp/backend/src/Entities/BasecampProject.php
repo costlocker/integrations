@@ -29,11 +29,11 @@ class BasecampProject
     public $basecampProject;
 
     /**
-     * @var BasecampAccount
-     * @ORM\ManyToOne(targetEntity="BasecampAccount")
-     * @ORM\JoinColumn(name="bc_account_id", nullable=false, onDelete="RESTRICT")
+     * @var BasecampUser
+     * @ORM\ManyToOne(targetEntity="BasecampUser")
+     * @ORM\JoinColumn(name="bc_user_id", nullable=true, onDelete="RESTRICT")
      */
-    public $basecampAccount;
+    public $basecampUser;
 
     /**
      * @ORM\Column(type="json_array")

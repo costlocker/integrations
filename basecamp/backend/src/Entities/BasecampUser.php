@@ -3,19 +3,24 @@
 namespace Costlocker\Integrations\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="bc_users")
+ * @ORM\Table(name="bc_cl_users")
  */
 class BasecampUser
 {
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;
+
+    /**
+     * @ORM\Column(type="integer", name="bc_identity_id")
+     */
+    public $basecampIdentityId;
 
     /**
      * @ORM\Column(type="json_array")
@@ -23,34 +28,19 @@ class BasecampUser
     public $data;
 
     /**
-     * @ORM\OneToMany(targetEntity="BasecampAccount", mappedBy="basecampUser", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="CostlockerUser", inversedBy="basecampUsers")
+     * @ORM\JoinColumn(name="cl_user_id", nullable=false, referencedColumnName="id", onDelete="CASCADE")
      */
-    public $accounts;
+    public $costlockerUser;
 
-    public function __construct()
-    {
-        $this->accounts = new ArrayCollection();
-    }
+    /**
+     * @ORM\ManyToOne(targetEntity="BasecampAccount")
+     * @ORM\JoinColumn(name="bc_account_id", nullable=false, referencedColumnName="id", onDelete="CASCADE")
+     */
+    public $basecampAccount;
 
-    public function upsertAccount($id)
-    {
-        $account = $this->getAccount($id);
-        if ($account) {
-            return $account;
-        }
-
-        $newAccount = new BasecampAccount();
-        $newAccount->id = $id;
-        $newAccount->basecampUser = $this;
-        $this->accounts->add($newAccount);
-        return $newAccount;
-    }
-
-    public function getAccount($id)
-    {
-        $accounts = $this->accounts->filter(function (BasecampAccount $ac) use ($id) {
-            return $ac->id == $id;
-        });
-        return $accounts->first();
-    }
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    public $deletedAt;
 }

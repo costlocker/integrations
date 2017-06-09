@@ -29,7 +29,7 @@ class EventsToJson
                 if ($isRequest) {
                     $description = "Request {$mapping[$e->data['type']]}";
                 } elseif ($e->event == Event::DISCONNECT_BASECAMP) {
-                    $description .= " #{$e->data['basecamp']}";
+                    $description .= " {$e->data['basecamp']}";
                 } elseif ($e->event == Event::DISCONNECT_PROJECT) {
                     $description .= " #{$e->data['project']}";
                 } elseif ($e->basecampProject) {

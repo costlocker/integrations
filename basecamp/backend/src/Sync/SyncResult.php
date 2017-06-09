@@ -7,7 +7,8 @@ use Costlocker\Integrations\Entities\Event;
 class SyncResult
 {
     private $projectRequest;
-    private $syncConfig;
+    /** @var SyncRequest */
+    public $syncConfig;
     public $settings;
 
     public $basecampProjectId;

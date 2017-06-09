@@ -15,7 +15,7 @@ const CostlockerUser = ({ user }) => {
 const BasecampUser = ({ user }) => {
   if (user) {
     return <span>
-      {user.identity.first_name} {user.identity.last_name} ({user.identity.email_address})
+      {user.first_name} {user.last_name} ({user.email_address})
     </span>;
   } else {
     return <em>Not logged in Basecamp</em>;

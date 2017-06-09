@@ -5,8 +5,8 @@ namespace Costlocker\Integrations\Database;
 use Costlocker\Integrations\Auth\GetUser;
 use Doctrine\ORM\EntityManagerInterface;
 use Costlocker\Integrations\Entities\CostlockerProject;
-use Costlocker\Integrations\Entities\BasecampAccount;
 use Costlocker\Integrations\Entities\BasecampProject;
+use Costlocker\Integrations\Entities\BasecampUser;
 use Costlocker\Integrations\Sync\SyncDatabase;
 
 class ProjectsDatabase implements SyncDatabase
@@ -39,9 +39,9 @@ class ProjectsDatabase implements SyncDatabase
         $basecampProject = $costlockerProject->upsertProject($mapping['id']);
         $basecampProject->mapping = $mapping['activities'];
         $basecampProject->settings = $settings;
-        $basecampProject->basecampAccount = $this->entityManager
-            ->getRepository(BasecampAccount::class)
-            ->find($mapping['account']['id']);
+        $basecampProject->basecampUser = $this->entityManager
+            ->getRepository(BasecampUser::class)
+            ->find($mapping['account']);
 
         $this->entityManager->persist($costlockerProject);
         $this->entityManager->persist($basecampProject);
@@ -53,12 +53,13 @@ class ProjectsDatabase implements SyncDatabase
     public function findProjects($costlockerProjectId)
     {
         $dql =<<<DQL
-            SELECT bp, ba
+            SELECT bp, bu, ba
             FROM Costlocker\Integrations\Entities\BasecampProject bp
             JOIN bp.costlockerProject cp
-            JOIN bp.basecampAccount ba
+            JOIN bp.basecampUser bu
+            JOIN bu.basecampAccount ba
             WHERE cp.id = :project
-              AND bp.deletedAt IS NULL
+              AND bp.deletedAt IS NULL AND bu.deletedAt IS NULL
             ORDER BY bp.id DESC
 DQL;
         $params = [
@@ -76,10 +77,11 @@ DQL;
                     'activities' => $p->mapping,
                     'settings' => $p->settings,
                     'account' => [
-                        'id' => $p->basecampAccount->id,
-                        'name' => $p->basecampAccount->name,
-                        'product' => $p->basecampAccount->product,
-                        'href' => $p->basecampAccount->urlApi,
+                        'id' => $p->basecampUser->id,
+                        'name' => $p->basecampUser->basecampAccount->name,
+                        'product' => $p->basecampUser->basecampAccount->product,
+                        'href' => $p->basecampUser->basecampAccount->urlApi,
+                        'identity' => $p->basecampUser->data,
                     ],
                 ];
             },

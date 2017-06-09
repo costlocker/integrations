@@ -34,7 +34,7 @@ export default function Projects({ allProjects, disconnect }) {
                   {project.basecamps.map(basecamp => (
                     <div key={basecamp.id}>
                       <em>
-                        {basecamp.account.name} ({basecamp.account.product})
+                        {basecamp.account.name} ({basecamp.account.product}, {basecamp.account.identity.email_address})
                       </em>
                       &nbsp;&nbsp;
                       <ExternalLink url={basecamp.url} />

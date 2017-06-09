@@ -154,7 +154,7 @@ $app
 
 $app
     ->get('/basecamp', function (Request $r) use ($app) {
-        $strategy = new Costlocker\Integrations\Basecamp\GetProjects($app['client.basecamp']);
+        $strategy = new Costlocker\Integrations\Basecamp\GetProjects($app['client.basecamp'], $app['client.user']);
         $data = $strategy($r);
         return new JsonResponse($data);
     })

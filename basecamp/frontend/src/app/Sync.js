@@ -28,8 +28,13 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampAcc
           Costlocker project:
           <strong>{editedProject.name}</strong> <span className="label label-default">{editedProject.client.name}</span></li>
         <li>
-          Basecamp project:
-           <strong>{connectedBasecamp.name}</strong> <span className="label label-default">{connectedBasecamp.account.product}</span>
+          Basecamp account:
+           <strong>{connectedBasecamp.account.name}</strong> <span className="label label-default">{connectedBasecamp.account.product}</span>
+        </li>
+        <li>
+          Basecamp person:
+          &nbsp;<strong>{connectedBasecamp.account.identity.first_name} {connectedBasecamp.account.identity.last_name}</strong>
+          &nbsp;<span className="label label-default">{connectedBasecamp.account.identity.email_address}</span>
         </li>
       </ul>
       ) : (
@@ -56,7 +61,7 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampAcc
           >
             {basecampAccounts.map(account => (
               <option key={account.id} value={account.id}>
-                {account.name}
+                {account.name} ({account.identity.email_address})
               </option>
             ))}
           </select>

@@ -5,6 +5,7 @@ namespace Costlocker\Integrations\Database;
 use League\OAuth2\Client\Token\AccessToken as OAuthToken;
 use Costlocker\Integrations\Entities\BasecampUser;
 use Costlocker\Integrations\Entities\AccessToken;
+use Costlocker\Integrations\Entities\BasecampAccount;
 use Costlocker\Integrations\Auth\GetUser;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -22,39 +23,60 @@ class PersistBasecampUser
     public function __invoke(array $apiUser, OAuthToken $apiToken)
     {
         $clUser = $this->getUser->getCostlockerUser();
-
-        $user = $this->findUserInDb($apiUser['identity']['id']) ?: new BasecampUser();
-        $user->id = $apiUser['identity']['id'];
-        $user->data = $apiUser;
-        $clUser->addBasecampUser($user);
+        $basecampUserId = null;
 
         foreach ($apiUser['accounts'] as $apiAccount) {
-            $account = $user->upsertAccount($apiAccount['id']);
+            // shared account
+            $account = $this->findAccountInDb($apiAccount['id']) ?: new BasecampAccount();
+            $account->id = $apiAccount['id'];
             $account->name = $apiAccount['name'];
             $account->product = $apiAccount['product'];
             $account->urlApi = $apiAccount['href'];
             $account->urlApp = $apiAccount['app_href'];
+            $this->entityManager->persist($account);
+
+            // connect user + account
+            $basecampUser = $this->findUserInDb($clUser->id, $account->id, $apiUser['identity']['id'])
+                ?: new BasecampUser();
+            $basecampUser->basecampIdentityId = $apiUser['identity']['id'];
+            $basecampUser->data = $apiUser['identity'];
+            $basecampUser->basecampAccount = $account;
+            $basecampUser->costlockerUser = $clUser;
+            $basecampUser->deletedAt = null;
+            $this->entityManager->persist($basecampUser);
+            if (!$basecampUserId) {
+                $basecampUserId = $basecampUser->id;
+            }
         }
 
         $token = new AccessToken();
         $token->costlockerUser = $clUser;
-        $token->basecampUser = $user;
+        $token->basecampIdentityId = $apiUser['identity']['id'];
         $token->accessToken = $apiToken->getToken();
         $token->refreshToken = $apiToken->getRefreshToken();
         $token->expiresAt = \DateTime::createFromFormat('U', $apiToken->getExpires());
 
-        $this->entityManager->persist($clUser);
-        $this->entityManager->persist($user);
         $this->entityManager->persist($token);
         $this->entityManager->flush();
 
-        return $user->id;
+        return $basecampUserId;
     }
 
-    private function findUserInDb($id)
+    private function findAccountInDb($id)
+    {
+        return $this->entityManager
+            ->getRepository(BasecampAccount::class)
+            ->find($id);
+    }
+
+    private function findUserInDb($clUserId, $bcAccountId, $bcIdentityId)
     {
         return $this->entityManager
             ->getRepository(BasecampUser::class)
-            ->find($id);
+            ->findOneBy([
+                'costlockerUser' => $clUserId,
+                'basecampAccount' => $bcAccountId,
+                'basecampIdentityId' => $bcIdentityId,
+            ]);
     }
 }

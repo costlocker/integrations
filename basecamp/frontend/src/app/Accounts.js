@@ -67,7 +67,7 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, loginEr
                 </td>
                 <td>{account.name} <ExternalLink url={account.urlApp} /></td>
                 <td>{account.product}</td>
-                <td>{isCurrentUser ? <Button action={() => disconnect(account.identity.id)} title='Disconnect' className="btn btn-sm btn-danger" /> : ''}</td>
+                <td>{isCurrentUser ? <Button action={() => disconnect(account.id)} title='Disconnect' className="btn btn-sm btn-danger" /> : ''}</td>
               </tr>;
             }))}
             </tbody>

@@ -22,7 +22,7 @@ const fetchUser = () =>
           .setIn(['auth', 'costlocker'], user.costlocker)
           .setIn(['auth', 'basecamp'], user.basecamp)
           .setIn(['auth', 'settings'], user.settings)
-          .setIn(['sync', 'account'], user.basecamp ? user.basecamp.accounts[0].id : null)
+          .setIn(['sync', 'account'], user.settings.accounts && user.settings.accounts.length ? user.settings.accounts[0].id : null)
           .setIn(['companySettings'], user.settings ? Map(user.settings.sync) : null)
       );
     })
@@ -34,10 +34,7 @@ if (isNotLoggedInCostlocker()) {
 
 const fetchProjects = () =>
    fetchFromApi('/costlocker')
-    .then(projects => appState.cursor()
-      .setIn(['costlocker', 'projects'], projects)
-      .setIn(['sync', 'costlockerProject'], projects[0].id)
-    );
+    .then(projects => appState.cursor(['costlocker']).set('projects', projects));
 
 const loadCostlockerProjects = [
   {
@@ -57,11 +54,7 @@ appState.on('next-animation-frame', function (newStructure, oldStructure, keyPat
   const accountId = newStructure.getIn(['sync', 'account']);
   if (oldId !== accountId) {
     fetchFromApi(`/basecamp?account=${accountId}`)
-      .then(projects => appState.cursor().update(
-        auth => auth
-          .setIn(['basecamp', 'projects'], projects)
-          .setIn(['sync', 'basecampProject'], projects[0].id)
-      ));
+      .then(projects => appState.cursor(['basecamp']).set('projects', projects));
   }
 });
 
@@ -113,7 +106,7 @@ export const states = [
     component: (props) => <Sync
       costlockerProjects={appState.cursor(['costlocker', 'projects']).deref()}
       basecampProjects={appState.cursor(['basecamp', 'projects']).deref()}
-      basecampAccounts={appState.cursor(['auth', 'basecamp']).deref().accounts}
+      basecampAccounts={appState.cursor(['auth', 'settings']).deref().accounts}
       syncForm={{
         editedProject: props.transition.params().clProject,
         get: (type) => appState.cursor(['sync', type]).deref(),

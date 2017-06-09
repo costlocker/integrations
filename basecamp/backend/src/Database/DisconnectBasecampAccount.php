@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Costlocker\Integrations\Auth\GetUser;
 use Costlocker\Integrations\Events\EventsLogger;
 use Costlocker\Integrations\Entities\Event;
+use Costlocker\Integrations\Entities\BasecampUser;
 
 class DisconnectBasecampAccount
 {
@@ -23,14 +24,21 @@ class DisconnectBasecampAccount
     public function __invoke($userId)
     {
         $costlockerUser = $this->getUser->getCostlockerUser();
-        $wasDeleted = $costlockerUser->removeUser($userId);
-        $this->entityManager->persist($costlockerUser);
-        $this->entityManager->flush();
-        $this->getUser->checkDisconnectedBasecampUser($userId);
+        $basecampUser = $costlockerUser->getUser($userId);
+        $wasDeleted = $basecampUser ? true : false;
+        $accountName = $userId;
+
+        if ($basecampUser instanceof BasecampUser) {
+            $accountName = $basecampUser->data['email_address'] ?? $userId;
+            $basecampUser->deletedAt = new \DateTime();
+            $this->entityManager->persist($basecampUser);
+            $this->entityManager->flush();
+            $this->getUser->checkDisconnectedBasecampUser($userId);
+        }
 
         $this->logger->__invoke(
             Event::DISCONNECT_BASECAMP,
-            ['costlocker' => $costlockerUser->id, 'basecamp' => $userId, 'result' => $wasDeleted]
+            ['costlocker' => $costlockerUser->id, 'basecamp' => $accountName, 'result' => $wasDeleted]
         );
         return $wasDeleted;
     }
