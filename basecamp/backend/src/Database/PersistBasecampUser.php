@@ -13,11 +13,13 @@ class PersistBasecampUser
 {
     private $entityManager;
     private $getUser;
+    private $allowedProducts;
 
-    public function __construct(EntityManagerInterface $em, GetUser $u)
+    public function __construct(EntityManagerInterface $em, GetUser $u, array $allowedProducts)
     {
         $this->entityManager = $em;
         $this->getUser = $u;
+        $this->allowedProducts = $allowedProducts;
     }
 
     public function __invoke(array $apiUser, OAuthToken $apiToken)
@@ -26,6 +28,9 @@ class PersistBasecampUser
         $basecampUserId = null;
 
         foreach ($apiUser['accounts'] as $apiAccount) {
+            if (!in_array($apiAccount['product'], $this->allowedProducts)) {
+                continue;
+            }
             // shared account
             $account = $this->findAccountInDb($apiAccount['id']) ?: new BasecampAccount();
             $account->id = $apiAccount['id'];

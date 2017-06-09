@@ -89,9 +89,14 @@ $app
 
 $app
     ->get('/oauth/basecamp', function (Request $r) use ($app) {
+        $allowedProducts = [
+            Costlocker\Integrations\Basecamp\Api\Connect::BASECAMP_CLASSIC_TYPE,
+            Costlocker\Integrations\Basecamp\Api\Connect::BASECAMP_BCX_TYPE,
+            Costlocker\Integrations\Basecamp\Api\Connect::BASECAMP_V3_TYPE,
+        ];
         $strategy = Costlocker\Integrations\Auth\AuthorizeInBasecamp::buildFromEnv(
             $app['session'],
-            new Costlocker\Integrations\Database\PersistBasecampUser($app['orm.em'], $app['client.user']),
+            new Costlocker\Integrations\Database\PersistBasecampUser($app['orm.em'], $app['client.user'], $allowedProducts),
             $app['logger']
         );
         return $strategy($r);
