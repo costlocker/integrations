@@ -26,14 +26,13 @@ class GetUser
     {
         $clUser = $this->getCostlockerUser();
         $bcUser = $this->getBasecampUser();
-        $connectedAccounts = $this->getConnectedUsersAndAccounts();
         return new JsonResponse([
             'costlocker' => $clUser->data,
             'basecamp' => $bcUser->data,
             'settings' => [
-                'accounts' => $connectedAccounts[$clUser->id]['accounts'] ?? [],
                 'sync' => $clUser->costlockerCompany ? $clUser->costlockerCompany->getSettings() : null,
-                'users' => array_values($connectedAccounts),
+                'myAccount' => $bcUser->id,
+                'accounts' => $this->getConnectedUsersAndAccounts($clUser),
             ],
         ]);
     }
@@ -72,7 +71,7 @@ class GetUser
         }
     }
 
-    private function getConnectedUsersAndAccounts()
+    private function getConnectedUsersAndAccounts(CostlockerUser $loggedUser)
     {
         $costlockerUser = $this->getCostlockerUser();
         if (!$costlockerUser->id) {
@@ -90,26 +89,31 @@ DQL;
         ];
         $entities = $this->entityManager->createQuery($dql)->execute($params);
 
-        $users = [];
-        foreach ($entities as $u) {
-            $users[$u->id] = [
-                'person' => $u->data['person'],
-                'accounts' =>
-                    array_map(
-                        function (BasecampUser $b) {
+        return array_reduce(
+            array_map(
+                function (CostlockerUser $u) use ($loggedUser) {
+                    return array_map(
+                        function (BasecampUser $b) use ($u, $loggedUser) {
                             return [
-                                'id' => $b->id,
-                                'name' => $b->basecampAccount->name,
-                                'product' => $b->basecampAccount->product,
-                                'urlApp' => $b->basecampAccount->urlApp,
-                                'identity' => $b->data,
+                                'isMyAccount' => $u->id == $loggedUser->id,
+                                'person' => $u->data['person'],
+                                'account' => [
+                                    'id' => $b->id,
+                                    'name' => $b->basecampAccount->name,
+                                    'product' => $b->basecampAccount->product,
+                                    'urlApp' => $b->basecampAccount->urlApp,
+                                    'identity' => $b->data,
+                                ],
                             ];
                         },
                         $u->basecampUsers->toArray()
-                    ),
-            ];
-        }
-        return $users;
+                    );
+                },
+                $entities
+            ),
+            'array_merge',
+            []
+        );
     }
 
     public function getCostlockerAccessToken()

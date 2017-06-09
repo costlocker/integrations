@@ -59,11 +59,14 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampAcc
             className="form-control" name="account" id="account"
             value={syncForm.get('account')} onChange={syncForm.set('account')}
           >
-            {basecampAccounts.map(account => (
-              <option key={account.id} value={account.id}>
-                {account.name} ({account.identity.email_address})
-              </option>
-            ))}
+            {basecampAccounts.map(personAccount => {
+              if (!personAccount.isMyAccount && personAccount.account.id != syncForm.get('account')) {
+                return null;
+              }
+              return <option key={personAccount.account.id} value={personAccount.account.id}>
+                {personAccount.account.name} ({personAccount.account.identity.email_address})
+              </option>;
+            })}
           </select>
         </div>
         <div className="form-group">

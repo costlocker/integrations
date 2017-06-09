@@ -22,8 +22,8 @@ const fetchUser = () =>
           .setIn(['auth', 'costlocker'], user.costlocker)
           .setIn(['auth', 'basecamp'], user.basecamp)
           .setIn(['auth', 'settings'], user.settings)
-          .setIn(['sync', 'account'], user.settings.accounts && user.settings.accounts.length ? user.settings.accounts[0].id : null)
-          .setIn(['companySettings'], user.settings ? Map(user.settings.sync) : null)
+          .setIn(['sync', 'account'], user.settings.myAccount)
+          .setIn(['companySettings'], Map(user.settings.sync))
       );
     })
     .catch(e => console.log('Anonymous user'));
@@ -52,7 +52,7 @@ const loadEvents = () => fetchFromApi('/events').then(events => appState.cursor(
 appState.on('next-animation-frame', function (newStructure, oldStructure, keyPath) {
   const oldId = oldStructure.getIn(['sync', 'account']);
   const accountId = newStructure.getIn(['sync', 'account']);
-  if (oldId !== accountId) {
+  if (oldId !== accountId && accountId) {
     fetchFromApi(`/basecamp?account=${accountId}`)
       .then(projects => appState.cursor(['basecamp']).set('projects', projects));
   }
@@ -91,7 +91,7 @@ export const states = [
     component: (props) => <Accounts
       basecampUser={appState.cursor(['auth', 'basecamp']).deref()}
       costlockerUser={appState.cursor(['auth', 'costlocker']).deref()}
-      users={appState.cursor(['auth', 'settings']).deref().users}
+      accounts={appState.cursor(['auth', 'settings']).deref().accounts}
       loginError={props.transition.params().loginError}
       disconnect={(id) =>
         pushToApi(`/disconnect`, { user: id })
@@ -151,6 +151,7 @@ export const states = [
             .set('mode', 'create')
             .set('costlockerProject', '')
             .set('basecampProject', '')
+            .set('account', appState.cursor(['auth', 'settings']).myAccount)
             .set('areTodosEnabled', companySettings.get('areTodosEnabled'))
             .set('isDeletingTodosEnabled', companySettings.get('isDeletingTodosEnabled'))
             .set('isRevokeAccessEnabled', companySettings.get('isRevokeAccessEnabled'))

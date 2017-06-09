@@ -3,7 +3,7 @@ import React from 'react';
 import OAuthLogin from './OAuthLogin';
 import { ExternalLink, Button } from '../ui/Components';
 
-export default function Login({ basecampUser, costlockerUser, loginUrls, loginError, users, disconnect }) {
+export default function Login({ basecampUser, costlockerUser, loginUrls, loginError, accounts, disconnect }) {
   return (
     <div>
       <div className="row">
@@ -30,7 +30,7 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, loginEr
       <div className="row">
         <div className="col-sm-12">
           <h4>Connected Accounts</h4>
-          {users.length ? (
+          {accounts.length ? (
           <table className="table table-striped table-condensed">
             <thead>
               <tr>
@@ -46,19 +46,19 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, loginEr
               </tr>
             </thead>
             <tbody>
-            {users.map(user => user.accounts.map(account => {
-              const isCurrentUser = user.person.email === costlockerUser.person.email;
-              const labelCss = isCurrentUser ? 'label label-info' : 'label label-default';
+            {accounts.map(personAccount => {
+              const labelCss = personAccount.isMyAccount ? 'label label-info' : 'label label-default';
+              const account = personAccount.account;
               return <tr key={account.id}>
-                {isCurrentUser ? (
+                {personAccount.isMyAccount ? (
                 <th>
-                  {user.person.first_name} {user.person.last_name}&nbsp;
-                  <span className={labelCss}>{user.person.email}</span>
+                  {personAccount.person.first_name} {personAccount.person.last_name}&nbsp;
+                  <span className={labelCss}>{personAccount.person.email}</span>
                 </th>
                 ) : (
                 <td>
-                  {user.person.first_name} {user.person.last_name}&nbsp;
-                  <span className={labelCss}>{user.person.email}</span>
+                  {personAccount.person.first_name} {personAccount.person.last_name}&nbsp;
+                  <span className={labelCss}>{personAccount.person.email}</span>
                 </td>
                 )}
                 <td>
@@ -67,9 +67,9 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, loginEr
                 </td>
                 <td>{account.name} <ExternalLink url={account.urlApp} /></td>
                 <td>{account.product}</td>
-                <td>{isCurrentUser ? <Button action={() => disconnect(account.id)} title='Disconnect' className="btn btn-sm btn-danger" /> : ''}</td>
+                <td>{personAccount.isMyAccount ? <Button action={() => disconnect(account.id)} title='Disconnect' className="btn btn-sm btn-danger" /> : ''}</td>
               </tr>;
-            }))}
+            })}
             </tbody>
           </table>
           ) : (
