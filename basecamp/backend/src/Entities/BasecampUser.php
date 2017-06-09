@@ -43,4 +43,9 @@ class BasecampUser
      * @ORM\Column(type="datetime", nullable=true)
      */
     public $deletedAt;
+
+    public function isActive()
+    {
+        return !$this->deletedAt;
+    }
 }

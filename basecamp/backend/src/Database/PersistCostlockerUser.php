@@ -40,7 +40,7 @@ class PersistCostlockerUser
 
         return [
             $user->id,
-            count($user->basecampUsers) ? $user->basecampUsers->first()->id : null,
+            count($user->basecampUsers) ? $user->getActiveUsers()->first()->id : null,
         ];
     }
 

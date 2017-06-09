@@ -60,7 +60,7 @@ class GetUser
             $userId = $this->session->get('basecamp')['userId'] ?? 0;
             $user = $this->entityManager->getRepository(BasecampUser::class)
                 ->find($userId);
-            $this->basecampUser = $user;
+            $this->basecampUser = $user && $user->isActive() ? $user : null;
         }
         return $this->basecampUser ?: new BasecampUser();
     }

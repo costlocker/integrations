@@ -52,10 +52,18 @@ class CostlockerUser
 
     public function getUser($id)
     {
-        return $this->basecampUsers
+        return $this->getActiveUsers()
             ->filter(function (BasecampUser $u) use ($id) {
-                return $u->id == $id && !$u->deletedAt;
+                return $u->id == $id;
             })
             ->first();
+    }
+
+    public function getActiveUsers()
+    {
+        return $this->basecampUsers
+            ->filter(function (BasecampUser $u) {
+                return $u->isActive();
+            });
     }
 }
