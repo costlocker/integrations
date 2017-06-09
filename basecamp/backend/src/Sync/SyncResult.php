@@ -57,10 +57,6 @@ class SyncResult
                 'project' => get_object_vars($this->projectRequest),
                 'settings' => $this->settings,
             ],
-            'costlocker' => [
-                'id' => $this->projectRequest->costlockerId,
-                'items' => $this->projectRequest->projectItems,
-            ],
             'basecamp' => [
                 'id' => $this->basecampProjectId,
                 'wasProjectCreated' => $this->wasProjectCreated,
