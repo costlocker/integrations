@@ -129,7 +129,8 @@ export const states = [
         resolveFn: ($transition$) => {
           const params = $transition$.params();
           if (params.clProject) {
-            const projects = appState.cursor(['costlocker', 'projects']).deref().filter(p => p.id == params.clProject);
+            const allProjects = appState.cursor(['costlocker', 'projects']).deref();
+            const projects = allProjects ? allProjects.filter(p => p.id == params.clProject) : [];
             if (projects.length) {
               const editedProject = projects[0];
               const basecampProject = editedProject.basecamps[0];

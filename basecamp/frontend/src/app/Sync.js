@@ -1,5 +1,24 @@
 import React from 'react';
 
+const BasecampAccountSelect = ({ title, accounts, syncForm }) => (
+  <div className="form-group">
+    <label htmlFor="account">{title}</label>
+    <select
+      className="form-control" name="account" id="account"
+      value={syncForm.get('account')} onChange={syncForm.set('account')}
+    >
+      {accounts.map(personAccount => {
+        if (!personAccount.isMyAccount && personAccount.account.id != syncForm.get('account')) {
+          return null;
+        }
+        return <option key={personAccount.account.id} value={personAccount.account.id}>
+          {personAccount.account.name} ({personAccount.account.identity.email_address})
+        </option>;
+      })}
+    </select>
+  </div>
+);
+
 export default function Sync({ costlockerProjects, basecampProjects, basecampAccounts, syncForm }) {
   if (!costlockerProjects) {
     return <span>Loading...</span>;
@@ -23,20 +42,23 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampAcc
     <h1>{isExistingProjectEdited ? 'Edit project' : 'Connect Costlocker project to Basecamp'}</h1>
     <form className="form" onSubmit={syncForm.submit}>
       {editedProject ? (
-      <ul>
-        <li>
-          Costlocker project:
-          <strong>{editedProject.name}</strong> <span className="label label-default">{editedProject.client.name}</span></li>
-        <li>
-          Basecamp account:
-           <strong>{connectedBasecamp.account.name}</strong> <span className="label label-default">{connectedBasecamp.account.product}</span>
-        </li>
-        <li>
-          Basecamp person:
-          &nbsp;<strong>{connectedBasecamp.account.identity.first_name} {connectedBasecamp.account.identity.last_name}</strong>
-          &nbsp;<span className="label label-default">{connectedBasecamp.account.identity.email_address}</span>
-        </li>
-      </ul>
+      <div>
+        <ul>
+          <li>
+            Costlocker project:
+            <strong>{editedProject.name}</strong> <span className="label label-default">{editedProject.client.name}</span></li>
+          <li>
+            Basecamp account:
+            <strong>{connectedBasecamp.account.name}</strong> <span className="label label-default">{connectedBasecamp.account.product}</span>
+          </li>
+          <li>
+            Basecamp person:
+            &nbsp;<strong>{connectedBasecamp.account.identity.first_name} {connectedBasecamp.account.identity.last_name}</strong>
+            &nbsp;<span className="label label-default">{connectedBasecamp.account.identity.email_address}</span>
+          </li>
+        </ul>
+        <BasecampAccountSelect title='Change a connected Basecamp acccount' accounts={basecampAccounts} syncForm={syncForm} />
+      </div>
       ) : (
       <div>
         <div className="form-group">
@@ -53,22 +75,7 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampAcc
             ))}
           </select>
         </div>
-        <div className="form-group">
-          <label htmlFor="account">Choose a Basecamp acccount to export it to</label>
-          <select
-            className="form-control" name="account" id="account"
-            value={syncForm.get('account')} onChange={syncForm.set('account')}
-          >
-            {basecampAccounts.map(personAccount => {
-              if (!personAccount.isMyAccount && personAccount.account.id != syncForm.get('account')) {
-                return null;
-              }
-              return <option key={personAccount.account.id} value={personAccount.account.id}>
-                {personAccount.account.name} ({personAccount.account.identity.email_address})
-              </option>;
-            })}
-          </select>
-        </div>
+        <BasecampAccountSelect title='Choose a Basecamp acccount to export it to' accounts={basecampAccounts} syncForm={syncForm} />
         <div className="form-group">
           <label>How would you like to add this project to the Basecamp</label>
           <div className="radio">
@@ -78,7 +85,6 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampAcc
               Create a new project in Basecamp
             </label>
           </div>
-          {basecampProjects.length &&
           <div className="radio">
             <label>
               <input type="radio" name="mode" value="add"
@@ -86,9 +92,8 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampAcc
               Add to an existing project in Basecamp
             </label>
           </div>
-          }
         </div>
-        {availableBasecampProjects.length && !isBasecampProjectCreated &&
+        {!isBasecampProjectCreated &&
         <div className="form-group">
           <label htmlFor="basecampProject">Basecamp project</label>
           <select
