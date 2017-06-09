@@ -268,7 +268,10 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
     private function givenWebhook($file)
     {
         $json = file_get_contents(__DIR__ . "/fixtures/webhooks/{$file}");
-        $this->request = json_decode($json, true);
+        $this->request = [
+            'headers' => [], // should verify that webhook is from costlocker
+            'body' => json_decode($json, true)
+        ];
     }
 
     private function whenProjectIsMapped($basecampId, array $activities = [], array $settings = [])

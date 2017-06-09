@@ -15,9 +15,9 @@ class SyncWebhookToBasecamp
         $this->synchronizer = new Synchronizer($b, $db);
     }
 
-    public function __invoke(array $jsonEvents)
+    public function __invoke(array $webhook)
     {
-        $projects = $this->jsonEventsToProject($jsonEvents);
+        $projects = $this->jsonEventsToProject($webhook['body']);
         $results = [];
         foreach ($projects as $id => $items) {
             $config = $this->getProjectSettings($id);
