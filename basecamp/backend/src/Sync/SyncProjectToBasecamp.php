@@ -39,7 +39,10 @@ class SyncProjectToBasecamp
         $r->projectItems = $project['items'];
         $r->isCompleteProjectSynchronized = true;
         $r->createProject = function ($createBasecampProject) use ($project, $config) {
-            $name = "{$project['client']['name']} | {$project['name']}";
+            $projectId = $project['project_id']['id'] ?? null;
+            $name =
+                "{$project['client']['name']} | {$project['name']}" .
+                ($projectId ? " [{$projectId}]" : '');
             return $config->updatedBasecampProject ?: $createBasecampProject($name);
         };
 
