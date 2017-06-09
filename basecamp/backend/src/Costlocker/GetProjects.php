@@ -21,7 +21,7 @@ class GetProjects
 
     public function __invoke()
     {
-        $response = $this->client->__invoke('/projects');
+        $response = $this->client->__invoke('/projects?state=running');
         $projects = [];
         foreach (json_decode($response->getBody(), true)['data'] as $rawProject) {
             $projects[] = [
