@@ -28,19 +28,13 @@ class RefreshAccessTokensCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $mode = $input->getOption('execute') ? 'Refresh tokens' : 'Find expired tokens';
-        $output->writeln([
-            "<info>Mode:</info> <comment>{$mode}</comment>",
-        ]);
-
-        $tokens = $this->usecase->__invoke(
+        $this->usecase->__invoke(
             $input->getOption('expiration'),
-            $input->getOption('execute')
+            !$input->getOption('execute'),
+            function (array $token, $result, $isError = false) use ($output) {
+                $mode = $isError ? 'error' : 'info';
+                $output->writeln("<{$mode}>{$result}</{$mode}>: " . json_encode($token));
+            }
         );
-
-        $output->writeln([
-            '<info>Expired active accounts</info>',
-            json_encode($tokens, JSON_PRETTY_PRINT),
-        ]);
     }
 }

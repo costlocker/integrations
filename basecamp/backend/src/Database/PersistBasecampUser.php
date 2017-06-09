@@ -54,12 +54,9 @@ class PersistBasecampUser
             }
         }
 
-        $token = new AccessToken();
+        $token = new AccessToken($apiToken);
         $token->costlockerUser = $clUser;
         $token->basecampIdentityId = $apiUser['identity']['id'];
-        $token->accessToken = $apiToken->getToken();
-        $token->refreshToken = $apiToken->getRefreshToken();
-        $token->expiresAt = \DateTime::createFromFormat('U', $apiToken->getExpires());
 
         $this->entityManager->persist($token);
         $this->entityManager->flush();

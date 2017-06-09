@@ -27,11 +27,8 @@ class PersistCostlockerUser
         $user->costlockerCompany = $company;
         $user->data = $apiUser;
 
-        $token = new AccessToken();
+        $token = new AccessToken($apiToken);
         $token->costlockerUser = $user;
-        $token->accessToken = $apiToken->getToken();
-        $token->refreshToken = $apiToken->getRefreshToken();
-        $token->expiresAt = \DateTime::createFromFormat('U', $apiToken->getExpires());
 
         $this->entityManager->persist($company);
         $this->entityManager->persist($user);

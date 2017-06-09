@@ -54,7 +54,7 @@ $app['client.basecamp'] = function ($app) {
 };
 
 $app['oauth.basecamp'] = function () {
-    return new \FourteenFour\BasecampAuth\Provider\Basecamp([
+    return new Costlocker\Integrations\Auth\Provider\BasecampOAuthProvider([
         'clientId' => getenv('BASECAMP_CLIENT_ID'),
         'clientSecret' => getenv('BASECAMP_CLIENT_SECRET'),
         'redirectUri' => getenv('BASECAMP_REDIRECT_URL'),
