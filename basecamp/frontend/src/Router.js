@@ -148,11 +148,12 @@ export const states = [
           }
 
           const companySettings = appState.cursor(['companySettings']).deref();
+          const myAccount = appState.cursor(['auth', 'settings']).myAccount;
           appState.cursor(['sync']).update(sync => sync
             .set('mode', 'create')
             .set('costlockerProject', '')
             .set('basecampProject', '')
-            .set('account', appState.cursor(['auth', 'settings']).myAccount)
+            .set('account', myAccount ? myAccount : sync.get('account'))
             .set('areTodosEnabled', companySettings.get('areTodosEnabled'))
             .set('isDeletingTodosEnabled', companySettings.get('isDeletingTodosEnabled'))
             .set('isRevokeAccessEnabled', companySettings.get('isRevokeAccessEnabled'))
