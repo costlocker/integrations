@@ -9,14 +9,16 @@ use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use FourteenFour\BasecampAuth\Provider\Basecamp;
 use Costlocker\Integrations\Database\PersistBasecampUser;
+use Psr\Log\LoggerInterface;
 
 class AuthorizeInBasecamp
 {
     private $session;
     private $provider;
     private $persistUser;
+    private $logger;
 
-    public static function buildFromEnv(SessionInterface $s, PersistBasecampUser $p)
+    public static function buildFromEnv(SessionInterface $s, PersistBasecampUser $p, LoggerInterface $l)
     {
         return new self(
             $s,
@@ -26,15 +28,17 @@ class AuthorizeInBasecamp
                 'redirectUri' => getenv('BASECAMP_REDIRECT_URL'),
             ]),
             $p,
+            $l,
             getenv('APP_FRONTED_URL')
         );
     }
 
-    public function __construct(SessionInterface $s, AbstractProvider $p, PersistBasecampUser $db, $appUrl)
+    public function __construct(SessionInterface $s, AbstractProvider $p, PersistBasecampUser $db, LoggerInterface $l, $appUrl)
     {
         $this->session = $s;
         $this->provider = $p;
         $this->persistUser = $db;
+        $this->logger = $l;
         $this->appUrl = $appUrl;
     }
 
@@ -60,6 +64,7 @@ class AuthorizeInBasecamp
             } catch (IdentityProviderException $e) {
                 return $this->sendError($e->getMessage());
             } catch (\Exception $e) {
+                $this->logger->error($e);
                 return $this->sendError('Internal server error');
             }
         }

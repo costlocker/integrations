@@ -8,6 +8,7 @@ use Costlocker\Integrations\Auth\GetUser;
 use Costlocker\Integrations\Entities\Event;
 use Costlocker\Integrations\Sync\SyncResult;
 use Costlocker\Integrations\Events\EventsRepository;
+use Psr\Log\LoggerInterface;
 
 class ProcessSyncRequest
 {
@@ -18,6 +19,8 @@ class ProcessSyncRequest
     private $getUser;
     /** @var EventsRepository */
     private $repository;
+    /** @var LoggerInterface */
+    private $logger;
 
     public function __construct(Application $app)
     {
@@ -25,6 +28,7 @@ class ProcessSyncRequest
         $this->entityManager = $app['orm.em'];
         $this->getUser = $app['client.user'];
         $this->repository = $app['database.events'];
+        $this->logger = $app['logger'];
     }
 
     public function __invoke()
@@ -61,6 +65,7 @@ class ProcessSyncRequest
                 'exception' => get_class($e),
                 'error' => $e->getMessage(),
             ]);
+            $this->logger->error($e);
         }
 
         $requestEvent->updatedAt = new \DateTime();

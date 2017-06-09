@@ -6,20 +6,23 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Psr\Log\LoggerInterface;
 
 class ProcessSyncRequestsCommand extends Command
 {
     private $usecase;
+    private $logger;
 
     /** @var OutputInterface */
     private $output;
     private $isVerboseMode;
     private $isInfiniteLoop = true;
 
-    public function __construct(ProcessSyncRequest $uc)
+    public function __construct(ProcessSyncRequest $uc, LoggerInterface $l)
     {
         parent::__construct();
         $this->usecase = $uc;
+        $this->logger = $l;
     }
 
     protected function configure()
@@ -38,7 +41,6 @@ class ProcessSyncRequestsCommand extends Command
         $delayInMillis = $input->getOption('delay');
         $delayInMicros = $delayInMillis * 1000;
         $this->writeln([
-            'Enable converting errors to exceptions',
             'Starting infinite loop...',
             '',
         ]);
@@ -59,6 +61,7 @@ class ProcessSyncRequestsCommand extends Command
                 get_class($e),
             ]);
             $this->isInfiniteLoop = false;
+            $this->logger->critical($e);
         }
     }
 

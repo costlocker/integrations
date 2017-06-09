@@ -6,7 +6,8 @@ $app = require __DIR__ . '/../app/app.php';
 $console = $app['console'];
 $console->addCommands([
     new Costlocker\Integrations\Sync\Queue\ProcessSyncRequestsCommand(
-        new Costlocker\Integrations\Sync\Queue\ProcessSyncRequest($app)
+        new Costlocker\Integrations\Sync\Queue\ProcessSyncRequest($app),
+        $app['logger']
     ),
 ]);
 $console->run();

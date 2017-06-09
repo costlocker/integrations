@@ -8,14 +8,16 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use League\OAuth2\Client\Provider\GenericProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Costlocker\Integrations\Database\PersistCostlockerUser;
+use Psr\Log\LoggerInterface;
 
 class AuthorizeInCostlocker
 {
     private $session;
     private $provider;
     private $persistUser;
+    private $logger;
 
-    public static function buildFromEnv(SessionInterface $s, PersistCostlockerUser $p)
+    public static function buildFromEnv(SessionInterface $s, PersistCostlockerUser $p, LoggerInterface $l)
     {
         $costlockerHost = getenv('CL_HOST');
         return new self(
@@ -29,15 +31,17 @@ class AuthorizeInCostlocker
                 'urlResourceOwnerDetails' => "{$costlockerHost}/api-public/v2/me",
             ]),
             $p,
+            $l,
             getenv('APP_FRONTED_URL')
         );
     }
 
-    public function __construct(SessionInterface $s, GenericProvider $p, PersistCostlockerUser $db, $appUrl)
+    public function __construct(SessionInterface $s, GenericProvider $p, PersistCostlockerUser $db, LoggerInterface $l, $appUrl)
     {
         $this->session = $s;
         $this->provider = $p;
         $this->persistUser = $db;
+        $this->logger = $l;
         $this->appUrl = $appUrl;
     }
 
@@ -74,6 +78,7 @@ class AuthorizeInCostlocker
             } catch (IdentityProviderException $e) {
                 return $this->sendError($e->getMessage());
             } catch (\Exception $e) {
+                $this->logger->error($e);
                 return $this->sendError('Internal server error');
             }
         }
