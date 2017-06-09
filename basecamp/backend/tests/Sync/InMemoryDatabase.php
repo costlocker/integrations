@@ -17,13 +17,13 @@ class InMemoryDatabase implements SyncDatabase
         $this->mapping[$costockerProjectId][$mapping['id']] = $mapping;
     }
 
+    public function findBasecampProject($costockerProjectId)
+    {
+        return null;
+    }
+
     public function findProjects($costlockerProjectId)
     {
         return $this->mapping[$costlockerProjectId] ?? [];
-    }
-
-    public function deleteProject($costlockerProjectId, $basecampProjectId)
-    {
-        unset($this->mapping[$costlockerProjectId][$basecampProjectId]);
     }
 }

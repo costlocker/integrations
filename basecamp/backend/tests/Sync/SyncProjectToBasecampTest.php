@@ -336,19 +336,17 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testDeleteMappingForProjectDeletedInBasecamp()
+    public function testProjectDeletedInBasecampIsNotDeletedInDatabase()
     {
-        $this->database->upsertProject(
-            1,
-            [
-                'id' => 'id of deleted project in basecamp',
-                'activities' => [],
-            ]
-        );
+        $mapping = [
+            'id' => 'id of deleted project in basecamp',
+            'activities' => [],
+        ];
+        $this->database->upsertProject(1, $mapping);
         $this->givenCostlockerProject('empty-project.json');
         $this->basecamp->shouldReceive('projectExists')->andThrow(BasecampAccessException::class);
         $this->synchronize(Event::RESULT_FAILURE);
-        assertThat($this->database->findProjects(1), is(emptyArray()));
+        assertThat($this->database->findProject(1), is($mapping));
     }
 
     private function givenCostlockerProject($file)

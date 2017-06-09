@@ -37,6 +37,7 @@ class Synchronizer
 
         if ($this->checkDeletedProject($bcProject)) {
             $result->error = "Project was deleted in Basecamp";
+            $result->mappedProject = $this->database->findBasecampProject($r->costlockerId);
             return $result;
         }
 
@@ -165,7 +166,6 @@ class Synchronizer
         try {
             $this->basecamp->projectExists($bcProject['id']);
         } catch (BasecampException $e) {
-            $this->database->deleteProject($bcProject['costlocker_id'], $bcProject['id']);
             return true;
         }
     }

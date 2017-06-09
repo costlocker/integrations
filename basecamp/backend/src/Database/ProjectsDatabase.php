@@ -50,7 +50,7 @@ class ProjectsDatabase implements SyncDatabase
         return $basecampProject;
     }
 
-    public function findProjects($costlockerProjectId)
+    public function findBasecampProject($costlockerProjectId)
     {
         $dql =<<<DQL
             SELECT bp, bu, ba
@@ -69,7 +69,12 @@ DQL;
         $entities = $this->entityManager->createQuery($dql)
             ->setMaxResults(1)
             ->execute($params);
+        return array_shift($entities);
+    }
 
+    public function findProjects($costlockerProjectId)
+    {
+        $entity = $this->findBasecampProject($costlockerProjectId);
         return array_map(
             function (BasecampProject $p) {
                 return [
@@ -85,21 +90,7 @@ DQL;
                     ],
                 ];
             },
-            $entities
+            $entity ? [$entity] : []
         );
-    }
-
-    public function deleteProject($costlockerProjectId, $basecampProjectId)
-    {
-        $sql =<<<SQL
-            UPDATE bc_projects
-            SET deleted_at = NOW()
-            WHERE cl_project_id = :cl AND bc_project_id = :bc
-SQL;
-        $params = [
-            'cl' => $costlockerProjectId,
-            'bc' => $basecampProjectId,
-        ];
-        $this->entityManager->getConnection()->executeQuery($sql, $params);
     }
 }

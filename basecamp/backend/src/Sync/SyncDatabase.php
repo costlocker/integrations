@@ -8,7 +8,7 @@ interface SyncDatabase
 
     public function findProject($costockerProjectId);
 
-    public function upsertProject($costockerProjectId, array $mapping, array $settings = []);
+    public function findBasecampProject($costockerProjectId);
 
-    public function deleteProject($costlockerProjectId, $basecampProjectId);
+    public function upsertProject($costockerProjectId, array $mapping, array $settings = []);
 }
