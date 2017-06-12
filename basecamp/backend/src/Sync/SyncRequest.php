@@ -10,7 +10,7 @@ class SyncRequest
     public $basecampClassicCompanyId;
 
     public $areTodosEnabled = true;
-    public $isDeletingTodosEnabled = false;
+    public $isDeletingTodosEnabled = true;
     public $isRevokeAccessEnabled = false;
 
     public function isDeleteDisabled()
