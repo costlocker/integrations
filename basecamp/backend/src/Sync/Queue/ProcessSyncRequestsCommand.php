@@ -7,28 +7,27 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Psr\Log\LoggerInterface;
+use Costlocker\Integrations\Entities\Event;
 
 class ProcessSyncRequestsCommand extends Command
 {
     private $usecase;
-    private $logger;
 
     /** @var OutputInterface */
     private $output;
     private $isVerboseMode;
     private $isInfiniteLoop = true;
 
-    public function __construct(ProcessSyncRequest $uc, LoggerInterface $l)
+    public function __construct(ProcessSyncRequests $uc)
     {
         parent::__construct();
         $this->usecase = $uc;
-        $this->logger = $l;
     }
 
     protected function configure()
     {
         $this
-            ->setName('queue')
+            ->setName('queue:daemon')
             ->setDescription('Process synchronization requests')
             ->addOption('delay', 'd', InputOption::VALUE_OPTIONAL, 'Delay in milliseconds', 1000);
     }
@@ -53,8 +52,12 @@ class ProcessSyncRequestsCommand extends Command
     public function executeCommand()
     {
         try {
-            $processedEvents = $this->usecase->__invoke($this);
-            $this->writeln("<comment>Processed events</comment> {$processedEvents}", $processedEvents > 0);
+            $processedEvents = $this->usecase->__invoke(function ($eventId, $status) {
+                $this->writeln("<comment>{$eventId}</comment> {$status}");
+            });
+            if (!$processedEvents) {
+                $this->writeln('No events available', false);
+            }
         } catch (\Exception $e) {
             $this->writeln([
                 "<error>{$e->getMessage()}</error>",

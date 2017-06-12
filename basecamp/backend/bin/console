@@ -6,6 +6,12 @@ $app = require __DIR__ . '/../app/app.php';
 $console = $app['console'];
 $console->addCommands([
     new Costlocker\Integrations\Sync\Queue\ProcessSyncRequestsCommand(
+        new Costlocker\Integrations\Sync\Queue\ProcessSyncRequests(
+            $app['database.events'],
+            __DIR__ . '/console queue:event --id '
+        )
+    ),
+    new Costlocker\Integrations\Sync\Queue\ProcessSyncRequestCommand(
         new Costlocker\Integrations\Sync\Queue\ProcessSyncRequest($app),
         $app['logger']
     ),

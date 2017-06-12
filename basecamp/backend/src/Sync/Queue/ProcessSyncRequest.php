@@ -31,13 +31,13 @@ class ProcessSyncRequest
         $this->logger = $app['logger'];
     }
 
-    public function __invoke()
+    public function __invoke($eventId)
     {
-        $events = $this->repository->findUnprocessedEvents();
-        foreach ($events as $event) {
-            $this->processEvent($event);
+        $event = $this->repository->findSyncRequest($eventId);
+        if ($event) {
+            return $this->processEvent($event);
         }
-        return count($events);
+        return 0;
     }
 
     private function processEvent(Event $requestEvent)
@@ -75,6 +75,8 @@ class ProcessSyncRequest
             $this->entityManager->persist($e);
         }
         $this->entityManager->flush();
+
+        return count($events);
     }
 
     private function getSynchronizer($eventType)

@@ -19,16 +19,32 @@ class EventsRepository
 
     public function findUnprocessedEvents()
     {
+        $sql =<<<SQL
+            SELECT e.id
+            FROM events e
+            WHERE e.event = :request AND e.updated_at IS NULL
+SQL;
+        $params = [
+            'request' => Event::SYNC_REQUEST,
+        ];
+        return $this->entityManager->getConnection()->executeQuery($sql, $params)
+            ->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    public function findSyncRequest($eventId)
+    {
         $dql =<<<DQL
             SELECT e, u
             FROM Costlocker\Integrations\Entities\Event e
             LEFT JOIN e.costlockerUser u
-            WHERE e.event = :request AND e.updatedAt IS NULL
+            WHERE e.event = :request AND e.id = :id
 DQL;
         $params = [
             'request' => Event::SYNC_REQUEST,
+            'id' => $eventId
         ];
-        return $this->entityManager->createQuery($dql)->execute($params);
+        $entities = $this->entityManager->createQuery($dql)->execute($params);
+        return array_shift($entities);
     }
 
     public function findLatestEvents()

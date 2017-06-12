@@ -29,7 +29,8 @@
         "knplabs/console-service-provider": "^2.0",
         "doctrine/dbal": "^2.5",
         "doctrine/migrations": "^1.5",
-        "dflydev/doctrine-orm-service-provider": "^2.0"
+        "dflydev/doctrine-orm-service-provider": "^2.0",
+        "symfony/process": "^3.3"
     },
     "require-dev": {
         "phpunit/phpunit": "~5",
