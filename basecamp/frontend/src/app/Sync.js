@@ -19,6 +19,25 @@ const BasecampAccountSelect = ({ title, accounts, syncForm }) => (
   </div>
 );
 
+const BasecampCompaniesSelect = ({ basecampCompanies, isBasecampProjectCreated, syncForm }) => {
+  if (!isBasecampProjectCreated || !basecampCompanies.length) {
+    return null;
+  }
+  return <div className="form-group">
+      <label htmlFor="basecampClassicCompanyId">Choose a Basecamp company (client)</label>
+      <select
+        className="form-control" name="basecampClassicCompanyId" id="basecampClassicCompanyId"
+        value={syncForm.get('basecampClassicCompanyId')} onChange={syncForm.set('basecampClassicCompanyId')}
+      >
+        {basecampCompanies.map(company => (
+          <option key={company.id} value={company.id}>
+            {company.name}
+          </option>
+        ))}
+      </select>
+    </div>;
+};
+
 export default function Sync({ costlockerProjects, basecampProjects, basecampCompanies, basecampAccounts, syncForm }) {
   if (!costlockerProjects) {
     return <span>Loading...</span>;
@@ -76,21 +95,7 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampCom
           </select>
         </div>
         <BasecampAccountSelect title='Choose a Basecamp acccount to export it to' accounts={basecampAccounts} syncForm={syncForm} />
-        {isBasecampProjectCreated && basecampCompanies.length &&
-        <div className="form-group">
-          <label htmlFor="basecampClassicCompanyId">Choose a Basecamp company (client)</label>
-          <select
-            className="form-control" name="basecampClassicCompanyId" id="basecampClassicCompanyId"
-            value={syncForm.get('basecampClassicCompanyId')} onChange={syncForm.set('basecampClassicCompanyId')}
-          >
-            {basecampCompanies.map(company => (
-              <option key={company.id} value={company.id}>
-                {company.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        }
+        <BasecampCompaniesSelect basecampCompanies={basecampCompanies} syncForm={syncForm} isBasecampProjectCreated={isBasecampProjectCreated} />
         <div className="form-group">
           <label>How would you like to add this project to the Basecamp</label>
           <div className="radio">
