@@ -120,7 +120,8 @@ class Synchronizer
                         'task_id' => $taskId,
                         'person_id' => $personId,
                         'name' => $item['task']['name'],
-                        'email' => $personsMap[$item['item']['person_id']],
+                        'email' => isset($item['person']['email'])
+                            ? $item['person']['email'] : $personsMap[$item['item']['person_id']],
                     ];
                     unset($activities[$item['item']['activity_id']]['upsert']['persons'][$personId]);
                 }

@@ -1,0 +1,55 @@
+{  
+    "meta": {  
+        "events": {  
+            "peoplecosts.change": 1
+        }
+    },
+    "links": {  
+        "webhook": {  
+            "webhook": "https://new.costlocker.com/api-public/v2/webhooks/ef739517-2c84-438d-91a4-8c01982552fe",
+            "example": "https://new.costlocker.com/api-public/v2/webhooks/ef739517-2c84-438d-91a4-8c01982552fe/test"
+        }
+    },
+    "data": [  
+        {  
+            "event": "peoplecosts.change",
+            "data": [
+                {  
+                    "id": "1",
+                    "items": [  
+                        {  
+                            "action": "upsert",
+                            "item": {  
+                                "type": "task",
+                                "activity_id": "1",
+                                "person_id": "6",
+                                "task_id": "971"
+                            },
+                            "hours": {  
+                                "budget": 0
+                            },
+                            "task": {  
+                                "name": "Renamed task"
+                            },
+                            "activity": {  
+                                "name": "Development"
+                            },
+                            "person": {  
+                                "email": "john@example.com",
+                                "first_name": "John",
+                                "last_name": "Doe"
+                            }
+                        }
+                    ],
+                    "links": {  
+                        "project": "https://new.costlocker.com/api-public/v2/projects/705",
+                        "peoplecosts": "https://new.costlocker.com/api-public/v2/projects/705?types=peoplecosts",
+                        "billing": "https://new.costlocker.com/api-public/v2/projects/705?types=billing",
+                        "expenses": "https://new.costlocker.com/api-public/v2/projects/705?types=expenses",
+                        "discounts": "https://new.costlocker.com/api-public/v2/projects/705?types=discounts"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -156,6 +156,43 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testIgnoreChangeInTaskName()
+    {
+        $basecampId = 'irrelevant project';
+        $this->givenWebhook('update-task-name.json');
+        $originalMapping = [
+            1 => [
+                'id' => $basecampId,
+                'tasks' => [
+                    971 => [
+                        'id' => $basecampId,
+                        'person_id' => 1,
+                        'name' => 'Homepage',
+                    ],
+                ],
+                'persons' => [
+                ],
+            ],
+        ];
+        $this->whenProjectIsMapped($basecampId, $originalMapping);
+        $this->basecamp->shouldReceive('projectExists')->once();
+        $this->basecamp->shouldReceive('grantAccess')->never(); // grantAccess only for item=person
+        $this->basecamp->shouldReceive('getPeople')->once()
+            ->andReturn($this->givenBasecampPeople([1 => 'john@example.com']));
+        $this->givenBasecampTodolist($basecampId, []);
+        $this->basecamp->shouldReceive('createTodolist')->never();
+        $this->basecamp->shouldReceive('createTodo')->never();
+        $this->synchronize(Event::RESULT_NOCHANGE);
+        $this->assertEquals(
+            [
+                'id' => $basecampId,
+                'account' => [],
+                'activities' => $originalMapping,
+            ],
+            $this->database->findProject(1)
+        );
+    }
+
     public function testDeleteTask()
     {
         $basecampId = 'irrelevant project';
