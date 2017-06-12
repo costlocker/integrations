@@ -32,7 +32,7 @@ class SyncResult
     {
         if ($this->error) {
             return Event::RESULT_FAILURE;
-        } elseif ($this->wasProjectCreated || $this->grantedPeople || $this->todolists || $this->wasSomethingDeleted()) {
+        } elseif ($this->wasProjectCreated || $this->todolists || $this->wasSomethingDeleted()) {
             return Event::RESULT_SUCCESS;
         } else {
             return Event::RESULT_NOCHANGE;

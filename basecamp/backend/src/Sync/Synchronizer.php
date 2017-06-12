@@ -194,13 +194,18 @@ class Synchronizer
                 'tasks' => [],
                 'persons' => [],
             ];
-            foreach ($activity['upsert']['tasks'] as $id => $task) {
-                $todos['tasks'][$id] = $this->upsertTodo($bcProject, $bcTodolist, $task);
+            foreach (array_keys($todos) as $type) {
+                foreach ($activity['upsert'][$type] as $id => $task) {
+                    $todo = $this->upsertTodo($bcProject, $bcTodolist, $task);
+                    if (!$todo['isCreated']) {
+                        continue;
+                    }
+                    $todos[$type][$id] = $todo;
+                }
             }
-            foreach ($activity['upsert']['persons'] as $id => $personWithoutTasks) {
-                $todos['persons'][$id] = $this->upsertTodo($bcProject, $bcTodolist, $personWithoutTasks);
+            if ($bcTodolist['isCreated'] || $todos['tasks'] || $todos['persons']) {
+                $mapping[$activityId] = ['id' => $bcTodolist['id']] + $todos;
             }
-            $mapping[$activityId] = ['id' => $bcTodolist['id']] + $todos;
         }
         return $mapping;
     }
@@ -208,28 +213,30 @@ class Synchronizer
     private function upsertTodolist(array $bcProject, array $activity)
     {
         if (array_key_exists($activity['id'], $bcProject['activities'])) {
-            return $bcProject['activities'][$activity['id']];
+            return $bcProject['activities'][$activity['id']] + ['isCreated' => false];
         }
         return [
             'id' => $this->basecamp->createTodolist($bcProject['id'], $activity['name']),
             'tasks' => [],
             'persons' => [],
+            'isCreated' => true,
         ];
     }
 
     private function upsertTodo(array $bcProject, array $bcTodolist, array $task)
     {
         if (array_key_exists($task['task_id'], $bcTodolist['tasks'])) {
-            return $bcTodolist['tasks'][$task['task_id']];
+            return $bcTodolist['tasks'][$task['task_id']] + ['isCreated' => false];
         }
         if (!$task['task_id'] && array_key_exists($task['person_id'], $bcTodolist['persons'])) {
-            return $bcTodolist['persons'][$task['person_id']];
+            return $bcTodolist['persons'][$task['person_id']] + ['isCreated' => false];
         }
         $assignee = $bcProject['basecampPeople'][$task['email']]->id;
         return [
             'id' => $this->basecamp->createTodo($bcProject['id'], $bcTodolist['id'], $task['name'], $assignee),
             'person_id' => $task['person_id'],
             'name' => $task['name'],
+            'isCreated' => true,
         ];
     }
 
@@ -305,7 +312,12 @@ class Synchronizer
             ];
             foreach (['tasks', 'persons'] as $type) {
                 foreach ($activity[$type] as $taskId => $mappedTodo) {
-                    $bcProject['activities'][$activityId][$type][$taskId] = $mappedTodo;
+                    unset($mappedTodo['isCreated']);
+                    $bcProject['activities'][$activityId][$type][$taskId] = [
+                        'id' => $mappedTodo['id'],
+                        'person_id' => $mappedTodo['person_id'],
+                        'name' => $mappedTodo['name'],
+                    ];
                 }
             }
         }
