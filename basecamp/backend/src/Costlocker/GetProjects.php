@@ -55,7 +55,7 @@ class GetProjects
             (object) [
                 'bc__product_type' => $account['product'],
                 'bc__account_href' => $account['href'],
-                'bc__account_id' => $account['id'],
+                'bc__account_id' => $account['basecampId'],
             ],
             $projectId
         );

@@ -83,6 +83,7 @@ DQL;
                     'settings' => $p->settings,
                     'account' => [
                         'id' => $p->basecampUser->id,
+                        'basecampId' => $p->basecampUser->basecampAccount->id,
                         'name' => $p->basecampUser->basecampAccount->name,
                         'product' => $p->basecampUser->basecampAccount->product,
                         'href' => $p->basecampUser->basecampAccount->urlApi,
