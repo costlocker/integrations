@@ -79,6 +79,19 @@ $checkAuthorization = function ($service) use ($app) {
     };
 };
 
+$getWebhookUrl = function (Request $r) {
+    return $r->getUriForPath('/webhooks/handler');
+};
+
+$app
+    ->get('/', function (Request $r) use ($getWebhookUrl) {
+        $json = new JsonResponse([
+            'webhookUrl' => $getWebhookUrl($r),
+        ]);
+        $json->setEncodingOptions(JSON_UNESCAPED_SLASHES);
+        return $json;
+    });
+
 $app
     ->get('/user', function () use ($app) {
         $app['client.check']->verifyTokens();
@@ -132,14 +145,14 @@ $app
     ->before($checkAuthorization('costlocker'));
 
 $app
-    ->post('/settings', function (Request $r) use ($app) {
+    ->post('/settings', function (Request $r) use ($app, $getWebhookUrl) {
         $uc = new \Costlocker\Integrations\Database\UpdateSettings(
             $app['orm.em'],
             $app['client.user'],
             new \Costlocker\Integrations\Costlocker\RegisterWebhook(
                 $app['client.costlocker'],
                 $app['events.logger'],
-                "{$r->getSchemeAndHttpHost()}/api/webhooks/handler"
+                $getWebhookUrl($r)
             )
         );
         $uc($r->request->all());
