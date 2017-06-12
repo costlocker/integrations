@@ -42,3 +42,25 @@ cp .env.example .env
   RewriteEngine On
 </VirtualHost>
 ```
+
+### Docker
+
+```bash
+# create empty directory if you have db dir in subdirectory
+# otherwise: directory "/var/lib/postgresql/data" exists but is not empty
+mkdir backend/var/database
+
+# build
+docker-compose -f docker-compose.yml up --build -d
+
+# create user - don' use "postgres" user for your app
+
+# create DB
+docker exec -it basecamp_postgres_1 createdb costlocker_basecamp -e -E utf8 -U postgres -W
+
+# run migrations
+docker exec -it basecamp-costlocker /app/backend/bin/console migrations:migrate
+
+# run daemon
+docker exec -it basecamp-costlocker /app/backend/bin/console queue:daemon
+```
