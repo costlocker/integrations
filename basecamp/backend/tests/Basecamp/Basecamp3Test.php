@@ -25,6 +25,11 @@ class Basecamp3Test extends \Tests\Basecamp\GivenBasecampConnect
         ];
     }
 
+    public function testSynchronizationFromBasecamp()
+    {
+        assertThat($this->api->canBeSynchronizedFromBasecamp(), is(true));
+    }
+
     public function testGetCompanies()
     {
         assertThat($this->api->getCompanies(), is(emptyArray()));

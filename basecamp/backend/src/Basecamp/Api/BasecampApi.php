@@ -4,6 +4,11 @@ namespace Costlocker\Integrations\Basecamp\Api;
 
 interface BasecampApi
 {
+    /**
+     * Is supported = hasWebhooks && detailedInformationAboutAssignee
+     * @return bool
+     */
+    public function canBeSynchronizedFromBasecamp();
 
     /**
      *

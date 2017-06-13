@@ -25,6 +25,11 @@ HEADERS
         ];
     }
 
+    public function testSynchronizationFromBasecamp()
+    {
+        assertThat($this->api->canBeSynchronizedFromBasecamp(), is(false));
+    }
+
     public function testGetCompanies()
     {
         $this->whenApiReturns('companies');

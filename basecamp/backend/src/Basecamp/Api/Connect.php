@@ -41,6 +41,11 @@ class Connect implements BasecampApi
         $this->currentApi = new $apiImplementation($this->client, $accountUrl, $accessToken);
     }
 
+    public function canBeSynchronizedFromBasecamp()
+    {
+        return $this->currentApi instanceof Basecamp3Api;
+    }
+
     public function getCompanies()
     {
         return $this->currentApi->getCompanies();
