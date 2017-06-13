@@ -65,6 +65,18 @@ $app['oauth.basecamp'] = function () {
     ]);
 };
 
+$app['oauth.costlocker'] = function () {
+    $costlockerHost = getenv('CL_HOST');
+    return new \League\OAuth2\Client\Provider\GenericProvider([
+        'clientId' => getenv('CL_CLIENT_ID'),
+        'clientSecret' => getenv('CL_CLIENT_SECRET'),
+        'redirectUri' => null,
+        'urlAuthorize' => "{$costlockerHost}/api-public/oauth2/authorize",
+        'urlAccessToken' => "{$costlockerHost}/api-public/oauth2/access_token",
+        'urlResourceOwnerDetails' => "{$costlockerHost}/api-public/v2/me",
+    ]);
+};
+
 $app['client.user'] = function ($app) {
     return new Costlocker\Integrations\Auth\GetUser($app['session'], $app['orm.em']);
 };
@@ -104,10 +116,12 @@ $app
 
 $app
     ->get('/oauth/costlocker', function (Request $r) use ($app) {
-        $strategy = Costlocker\Integrations\Auth\AuthorizeInCostlocker::buildFromEnv(
+        $strategy = new Costlocker\Integrations\Auth\AuthorizeInCostlocker(
             $app['session'],
+            $app['oauth.costlocker'],
             new Costlocker\Integrations\Database\PersistCostlockerUser($app['orm.em']),
-            $app['logger']
+            $app['logger'],
+            getenv('APP_FRONTED_URL')
         );
         return $strategy($r);
     });

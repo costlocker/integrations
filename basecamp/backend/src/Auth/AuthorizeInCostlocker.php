@@ -17,25 +17,6 @@ class AuthorizeInCostlocker
     private $persistUser;
     private $logger;
 
-    public static function buildFromEnv(SessionInterface $s, PersistCostlockerUser $p, LoggerInterface $l)
-    {
-        $costlockerHost = getenv('CL_HOST');
-        return new self(
-            $s,
-            new GenericProvider([
-                'clientId' => getenv('CL_CLIENT_ID'),
-                'clientSecret' => getenv('CL_CLIENT_SECRET'),
-                'redirectUri' => null,
-                'urlAuthorize' => "{$costlockerHost}/api-public/oauth2/authorize",
-                'urlAccessToken' => "{$costlockerHost}/api-public/oauth2/access_token",
-                'urlResourceOwnerDetails' => "{$costlockerHost}/api-public/v2/me",
-            ]),
-            $p,
-            $l,
-            getenv('APP_FRONTED_URL')
-        );
-    }
-
     public function __construct(SessionInterface $s, GenericProvider $p, PersistCostlockerUser $db, LoggerInterface $l, $appUrl)
     {
         $this->session = $s;
