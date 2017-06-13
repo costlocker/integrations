@@ -51,7 +51,7 @@ class SyncResult
 
     public function toArray()
     {
-        return [
+        $data = [
             'request' => [
                 'sync' => get_object_vars($this->syncConfig),
                 'project' => get_object_vars($this->projectRequest),
@@ -66,5 +66,10 @@ class SyncResult
                 'error' => $this->error,
             ],
         ];
+        // dont save doctrine entity...
+        if ($this->projectRequest->costlockerUser) {
+            $data['request']['project']['costlockerUser'] = $this->projectRequest->costlockerUser->id;
+        }
+        return $data;
     }
 }

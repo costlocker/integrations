@@ -72,8 +72,7 @@ class SyncWebhookToBasecamp
             foreach ($createdProjects as $id) {
                 $config = $this->getCompanySettings($id, $company);
 
-                $r = new SyncProjectRequest();
-                $r->isCompleteProjectSynchronized = true;
+                $r = SyncProjectRequest::completeSynchronization($company->defaultCostlockerUser);
                 $results[] = [$r, $config];
             }
         }

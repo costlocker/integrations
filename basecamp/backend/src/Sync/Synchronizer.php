@@ -5,19 +5,22 @@ namespace Costlocker\Integrations\Sync;
 use Costlocker\Integrations\CostlockerClient;
 use Costlocker\Integrations\Basecamp\BasecampFactory;
 use Costlocker\Integrations\Basecamp\Api\BasecampException;
+use Costlocker\Integrations\Auth\GetUser;
 
 class Synchronizer
 {
     private $costlocker;
     private $basecampFactory;
+    private $getUser;
 
     /** @var \Costlocker\Integrations\Basecamp\Api\BasecampApi */
     private $basecamp;
     private $database;
 
-    public function __construct(CostlockerClient $c, BasecampFactory $b, SyncDatabase $db)
+    public function __construct(CostlockerClient $c, GetUser $u, BasecampFactory $b, SyncDatabase $db)
     {
         $this->costlocker = $c;
+        $this->getUser = $u;
         $this->basecampFactory = $b;
         $this->database = $db;
     }
@@ -67,6 +70,7 @@ class Synchronizer
 
     private function loadProjectFromCostlocker(SyncProjectRequest $r, SyncRequest $config)
     {
+        $this->getUser->overrideCostlockerUser($r->costlockerUser);
         $project = $this->findProjectInCostlocker($config->costlockerProject);
         $r->costlockerId = $project['id'];
         $r->projectItems = $project['items'];

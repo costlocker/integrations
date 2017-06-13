@@ -3,6 +3,7 @@
 namespace Costlocker\Integrations\Sync;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Costlocker\Integrations\Entities\CostlockerUser;
 
 class SyncProjectToBasecamp
 {
@@ -13,7 +14,7 @@ class SyncProjectToBasecamp
         $this->synchronizer = $s;
     }
 
-    public function __invoke(array $jsonRequest)
+    public function __invoke(array $jsonRequest, CostlockerUser $user = null)
     {
         $json = new ParameterBag($jsonRequest);
 
@@ -29,8 +30,7 @@ class SyncProjectToBasecamp
             $config->isRevokeAccessEnabled = $json->get('isRevokeAccessEnabled');
         }
 
-        $r = new SyncProjectRequest();
-        $r->isCompleteProjectSynchronized = true;
+        $r = SyncProjectRequest::completeSynchronization($user);
 
         return [$this->synchronizer->__invoke($r, $config)];
     }
