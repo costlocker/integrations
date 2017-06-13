@@ -6,6 +6,7 @@ use Mockery as m;
 use Costlocker\Integrations\Entities\Event;
 use Costlocker\Integrations\Database\CompaniesRepository;
 use Costlocker\Integrations\Entities\CostlockerCompany;
+use Costlocker\Integrations\Entities\BasecampUser;
 
 class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
 {
@@ -15,6 +16,7 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
     {
         parent::setUp();
         $this->company = new CostlockerCompany();
+        $this->company->defaultBasecampUser = new BasecampUser();
     }
 
     protected function createSynchronizer(Synchronizer $s)
@@ -280,7 +282,7 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
     {
         $this->givenCostlockerWebhook('unmapped-webhook.json');
         $this->shouldNotCreatePeopleOrTodosInBasecamp();
-        $this->synchronize();
+        $this->synchronize(null);
     }
 
     public function testIgnoreWebhookThatIsMappedToNoCompany()
@@ -288,6 +290,57 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
         $this->company = null;
         $this->givenCostlockerWebhook('delete-activity.json');
         $this->shouldNotCreatePeopleOrTodosInBasecamp();
-        $this->synchronize();
+        $this->synchronize(null);
+    }
+
+    public function testCreateProjectWhenCreatingAllowedInCompanySettings()
+    {
+        $this->company->settings['isCreatingBasecampProjectEnabled'] = true;
+        $this->company->settings['areTodosEnabled'] = false;
+        $basecampId = 'irrelevant project';
+        $this->givenCostlockerWebhook('create-project.json');
+        $this->givenCostlockerProject('one-person.json');
+        $this->shouldCreateProject()->once()->andReturn($basecampId);
+        $this->shouldNotCreatePeopleOrTodosInBasecamp();
+        $this->synchronize(Event::RESULT_SUCCESS);
+        $this->assertMappingIsNotEmpty();
+    }
+
+    /** @dataProvider provideCompany */
+    public function testDontCreateProjectWhenCompanyIs($loadCompany)
+    {
+        $this->company = $loadCompany($this->company);
+        $this->givenCostlockerWebhook('create-project.json');
+        $this->shouldCreateProject()->never();
+        $this->synchronize(null);
+    }
+
+    public function provideCompany()
+    {
+        return [
+            'no company' => [
+                function () {
+                    return null;
+                }
+            ],
+            'disabled creating project' => [
+                function (CostlockerCompany $c) {
+                    $c->settings['isCreatingBasecampProjectEnabled'] = false;
+                    return $c;
+                }
+            ],
+            'no basecamp account is selected' => [
+                function (CostlockerCompany $c) {
+                    $c->defaultBasecampUser = null;
+                    return $c;
+                }
+            ],
+            'disconnected basecamp account' => [
+                function (CostlockerCompany $c) {
+                    $c->defaultBasecampUser->deletedAt = new \DateTime();
+                    return $c;
+                }
+            ],
+        ];
     }
 }

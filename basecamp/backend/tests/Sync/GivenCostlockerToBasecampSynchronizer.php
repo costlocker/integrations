@@ -174,6 +174,8 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
         $results = $uc($this->request);
         if ($results) {
             assertThat($results[0]->getResultStatus(), is($expectedStatus));
+        } elseif ($expectedStatus) {
+            $this->fail("One project should be synchronized with status '{$expectedStatus}'");
         }
     }
 

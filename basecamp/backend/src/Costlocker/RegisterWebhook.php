@@ -30,7 +30,10 @@ class RegisterWebhook
             '/webhooks',
             [
                 'url' => $this->webhookUrl,
-                'events' => ['peoplecosts.change'],
+                'events' => [
+                    'projects.create',
+                    'peoplecosts.change',
+                ],
             ]
         );
         $json = json_decode($response->getBody(), true);

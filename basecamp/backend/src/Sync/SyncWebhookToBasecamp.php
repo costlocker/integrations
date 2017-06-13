@@ -3,6 +3,7 @@
 namespace Costlocker\Integrations\Sync;
 
 use Costlocker\Integrations\Database\CompaniesRepository;
+use Costlocker\Integrations\Entities\CostlockerCompany;
 
 class SyncWebhookToBasecamp
 {
@@ -28,6 +29,7 @@ class SyncWebhookToBasecamp
     private function jsonEventsToRequests(array $json )
     {
         $updatedProjects = [];
+        $createdProjects = [];
 
         $webhookUrl = $json['links']['webhook']['webhook'] ?? '';
         $company = $this->repository->findCompanyByWebhook($webhookUrl);
@@ -37,15 +39,18 @@ class SyncWebhookToBasecamp
         }
         
         foreach ($json['data'] as $event) {
-            if ($event['event'] != 'peoplecosts.change') {
-                continue;
-            }
-            foreach ($event['data'] as $projectUpdate) {
-                $id = $projectUpdate['id'];
-                $updatedProjects[$id] = array_merge(
-                    $updatedProjects[$id] ?? [],
-                    $projectUpdate['items']
-                );
+            if ($event['event'] == 'peoplecosts.change') {
+                foreach ($event['data'] as $projectUpdate) {
+                    $id = $projectUpdate['id'];
+                    $updatedProjects[$id] = array_merge(
+                        $updatedProjects[$id] ?? [],
+                        $projectUpdate['items']
+                    );
+                }
+            } elseif ($event['event'] == 'projects.create') {
+                foreach ($event['data'] as $createdProject) {
+                    $createdProjects[] = $createdProject['id'];
+                }
             }
         }
 
@@ -62,6 +67,17 @@ class SyncWebhookToBasecamp
             };
             $results[] = [$r, $config];
         }
+
+        if ($company->isCreatingBasecampProjectEnabled()) {
+            foreach ($createdProjects as $id) {
+                $config = $this->getCompanySettings($id, $company);
+
+                $r = new SyncProjectRequest();
+                $r->isCompleteProjectSynchronized = true;
+                $results[] = [$r, $config];
+            }
+        }
+
         return $results;
     }
 
@@ -81,6 +97,22 @@ class SyncWebhookToBasecamp
                     $config->{$option} = $project['settings'][$option];
                 }
             }
+        }
+
+        return $config;
+    }
+
+    private function getCompanySettings($costlockerId, CostlockerCompany $company)
+    {
+        $settings = $company->getSettings();
+
+        $config = new SyncRequest();
+        $config->account = $settings['account'];
+        $config->costlockerProject = $costlockerId;
+        $config->areTodosEnabled = $settings['areTodosEnabled'];
+        if ($config->areTodosEnabled) {
+            $config->isDeletingTodosEnabled = $settings['isDeletingTodosEnabled'];
+            $config->isRevokeAccessEnabled = $settings['isRevokeAccessEnabled'];
         }
 
         return $config;

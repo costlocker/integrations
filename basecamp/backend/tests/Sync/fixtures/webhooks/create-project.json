@@ -1,52 +1,56 @@
 {
-  "meta": {
-    "events": {
-      "timeentries.create": 1,
-      "timeentries.update": 1
-    }
-  },
-  "links": {
-    "webhook": {
-      "webhook": "https://new.costlocker.com/api-public/v2/webhooks/dd76b5e0-5b74-4a68-b0ad-db6efbed7b9c",
-      "example": "https://new.costlocker.com/api-public/v2/webhooks/dd76b5e0-5b74-4a68-b0ad-db6efbed7b9c/test"
-    }
-  },
-  "data": [
-    {
-      "event": "projects.create",
-      "data": [
-        {
-          "id": 1,
-          "name": "Website",
-          "client": {
-            "id": 1,
-            "name": "ACME"
-          },
-          "dates": {
-            "date_start": "2017-05-10",
-            "date_end": "2017-06-10"
-          },
-          "tags": [
+   "meta":{
+      "events":{
+         "projects.create":1
+      }
+   },
+   "links":{
+      "webhook":{
+         "webhook":"https://new.costlocker.com/api-public/v2/webhooks/dd76b5e0-5b74-4a68-b0ad-db6efbed7b9c",
+         "example":"https://new.costlocker.com/api-public/v2/webhooks/dd76b5e0-5b74-4a68-b0ad-db6efbed7b9c/test"
+      }
+   },
+   "data":[
+      {
+         "event":"projects.create",
+         "data":[
             {
-              "name": "Billable"
+               "id":1,
+               "name":"Website",
+               "state":"running",
+               "client":{
+                  "id":1,
+                  "name":"ACME"
+               },
+               "dates":{
+                  "date_start":"2017-06-13",
+                  "date_end":"2017-07-13"
+               },
+               "project_id":{
+                  "id":null,
+                  "is_generated":false
+               },
+               "tags":[
+                  {
+                     "name":"Billable"
+                  }
+               ],
+               "responsible_people":[
+                  {
+                     "email":"john@example.com",
+                     "first_name":"John",
+                     "last_name":"Doe"
+                  }
+               ],
+               "links":{
+                  "project":"http://app.costlocker.local/api-public/v2/projects/1",
+                  "peoplecosts":"http://app.costlocker.local/api-public/v2/projects/1?types=peoplecosts",
+                  "billing":"http://app.costlocker.local/api-public/v2/projects/1?types=billing",
+                  "expenses":"http://app.costlocker.local/api-public/v2/projects/1?types=expenses",
+                  "discounts":"http://app.costlocker.local/api-public/v2/projects/1?types=discounts"
+               }
             }
-          ],
-          "responsible_people": [
-            {
-              "email": "john@example.com",
-              "first_name": "John",
-              "last_name": "Doe"
-            }
-          ],
-          "links": {
-            "project": "https://new.costlocker.com/api-public/v2/projects/1",
-            "peoplecosts": "https://new.costlocker.com/api-public/v2/projects/1?types=peoplecosts",
-            "billing": "https://new.costlocker.com/api-public/v2/projects/1?types=billing",
-            "expenses": "https://new.costlocker.com/api-public/v2/projects/1?types=expenses",
-            "discounts": "https://new.costlocker.com/api-public/v2/projects/1?types=discounts"
-          }
-        }
-      ]
-    }
-  ]
+         ]
+      }
+   ]
 }
