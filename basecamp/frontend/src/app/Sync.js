@@ -1,4 +1,5 @@
 import React from 'react';
+import { Set } from 'immutable';
 
 const BasecampAccountSelect = ({ title, accounts, syncForm }) => (
   <div className="form-group">
@@ -57,6 +58,19 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampCom
     ? basecampProjects.filter(p => p.id == availableCostlockerProjects[0].basecamps[0].id)
     : basecampProjects;
 
+
+  const areMultipleCostlockerProjectsAllowed = isBasecampProjectCreated;
+  let selectedCostlockerProjects = syncForm.get('costlockerProject').toJS();
+  if (!areMultipleCostlockerProjectsAllowed) {
+    selectedCostlockerProjects = selectedCostlockerProjects.length ? selectedCostlockerProjects[0] : '';
+  }
+  let setCostlockerProject = (e) => {
+    const projectId = e.target.value;
+    syncForm.updateCostlockerProjects(
+      set => (set.includes(projectId) ? set.delete(projectId) : set.add(projectId))
+    );
+  };
+
   return <div>
     <h1>{isExistingProjectEdited ? 'Edit project' : 'Connect Costlocker project to Basecamp'}</h1>
     <form className="form" onSubmit={syncForm.submit}>
@@ -81,10 +95,11 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampCom
       ) : (
       <div>
         <div className="form-group">
-          <label htmlFor="costlockerProject">Costlocker project</label>
+          <label htmlFor="costlockerProject">Costlocker project(s)</label>
           <select required
             className="form-control" name="costlockerProject" id="costlockerProject"
-            value={syncForm.get('costlockerProject')} onChange={syncForm.set('costlockerProject')}
+            multiple={areMultipleCostlockerProjectsAllowed} size={areMultipleCostlockerProjectsAllowed ? 10 : null}
+            value={selectedCostlockerProjects} onChange={setCostlockerProject}
           >
             <option></option>
             {availableCostlockerProjects.map(project => (

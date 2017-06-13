@@ -91,6 +91,7 @@ class SyncProjectToBasecampTest extends GivenCostlockerToBasecampSynchronizer
     {
         $basecampId = 'irrelevant project';
         $this->request['areTodosEnabled'] = false;
+        $this->request['costlockerProject'] = ['first id'];
         $this->givenCostlockerProject('one-person.json');
         $this->shouldCreateProject()->once()->andReturn($basecampId);
         $this->shouldNotCreatePeopleOrTodosInBasecamp();

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Map } from 'immutable';
+import { Map, Set } from 'immutable';
 
 import { appState, isNotLoggedInCostlocker, isNotLoggedInBasecamp } from './state';
 import { fetchFromApi, pushToApi, loginUrls } from './api';
@@ -117,6 +117,7 @@ export const states = [
           type,
           e.target.type === 'checkbox' ? e.target.checked : e.target.value
         ),
+        updateCostlockerProjects: (updater) => appState.cursor(['sync', 'costlockerProject']).update(updater),
         submit: (e) => {
           e.preventDefault();
           pushToApi(`/basecamp`, appState.cursor(['sync']).deref())
@@ -139,7 +140,7 @@ export const states = [
               const basecampProject = editedProject.basecamps[0];
               appState.cursor(['sync']).update(sync => sync
                 .set('mode', 'edit')
-                .set('costlockerProject', editedProject.id)
+                .set('costlockerProject', Set([editedProject.id]))
                 .set('basecampProject', basecampProject.id)
                 .set('account', basecampProject.account.id)
                 .set('areTodosEnabled', basecampProject.settings.areTodosEnabled)
@@ -154,7 +155,7 @@ export const states = [
           const myAccount = appState.cursor(['auth', 'settings']).myAccount;
           appState.cursor(['sync']).update(sync => sync
             .set('mode', 'create')
-            .set('costlockerProject', '')
+            .set('costlockerProject', Set())
             .set('basecampProject', '')
             .set('account', myAccount ? myAccount : sync.get('account'))
             .set('areTodosEnabled', companySettings.get('areTodosEnabled'))

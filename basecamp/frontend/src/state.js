@@ -1,4 +1,5 @@
 import immstruct from 'immstruct';
+import { Set } from 'immutable';
 
 const appState = immstruct({
   auth: {
@@ -27,7 +28,7 @@ const appState = immstruct({
   },
   sync: {
     account: null,
-    costlockerProject: '',
+    costlockerProject: Set(),
     basecampProject: '',
     basecampClassicCompanyId: '',
     areTodosEnabled: true,
