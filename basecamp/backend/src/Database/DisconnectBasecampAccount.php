@@ -1,6 +1,6 @@
 <?php
 
-namespace Costlocker\Integrations\Usecase;
+namespace Costlocker\Integrations\Database;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Costlocker\Integrations\Auth\GetUser;

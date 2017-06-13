@@ -168,14 +168,14 @@ $app
     ->post('/disconnect', function (Request $r) use ($app) {
         $wasDisconnected = false;
         if ($r->request->get('user')) {
-            $uc = new Costlocker\Integrations\Usecase\DisconnectBasecampAccount(
+            $uc = new Costlocker\Integrations\Database\DisconnectBasecampAccount(
                 $app['orm.em'],
                 $app['client.user'],
                 $app['events.logger']
             );
             $wasDisconnected = $uc($r->request->get('user'));
         } elseif ($r->request->get('project')) {
-            $uc = new Costlocker\Integrations\Usecase\DisconnectProject(
+            $uc = new Costlocker\Integrations\Database\DisconnectProject(
                 $app['db'],
                 $app['client.user'],
                 $app['events.logger']
