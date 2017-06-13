@@ -11,7 +11,7 @@ use Costlocker\Integrations\Entities\Event;
 
 abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_TestCase
 {
-    protected $costlocker;
+    private $costlocker;
     private $basecamp;
     private $database;
 
@@ -169,7 +169,7 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
         $basecampFactory->shouldReceive('__invoke')->andReturn($this->basecamp);
         $basecampFactory->shouldReceive('getAccount')->andReturn([]);
 
-        $synchronizer = new Synchronizer($basecampFactory, $this->database);
+        $synchronizer = new Synchronizer($this->costlocker, $basecampFactory, $this->database);
         $uc = $this->createSynchronizer($synchronizer);
         $results = $uc($this->request);
         if ($results) {

@@ -82,15 +82,13 @@ class ProcessSyncRequest
     private function getSynchronizer($eventType)
     {
         $synchronizer = new \Costlocker\Integrations\Sync\Synchronizer(
+            $this->app['client.costlocker'],
             $this->app['client.basecamp'],
             $this->app['database']
         );
 
         if ($eventType == Event::MANUAL_SYNC) {
-            return new \Costlocker\Integrations\Sync\SyncProjectToBasecamp(
-                $this->app['client.costlocker'],
-                $synchronizer
-            );
+            return new \Costlocker\Integrations\Sync\SyncProjectToBasecamp($synchronizer);
         } elseif ($eventType == Event::WEBHOOK_SYNC) {
             return new \Costlocker\Integrations\Sync\SyncWebhookToBasecamp(
                 $this->app['database.companies'],

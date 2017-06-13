@@ -2,17 +2,14 @@
 
 namespace Costlocker\Integrations\Sync;
 
-use Costlocker\Integrations\CostlockerClient;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class SyncProjectToBasecamp
 {
-    private $costlocker;
     private $synchronizer;
 
-    public function __construct(CostlockerClient $c, Synchronizer $s)
+    public function __construct(Synchronizer $s)
     {
-        $this->costlocker = $c;
         $this->synchronizer = $s;
     }
 
@@ -32,26 +29,9 @@ class SyncProjectToBasecamp
             $config->isRevokeAccessEnabled = $json->get('isRevokeAccessEnabled');
         }
 
-        $project = $this->findProjectInCostlocker($config->costlockerProject);
-
         $r = new SyncProjectRequest();
-        $r->costlockerId = $project['id'];
-        $r->projectItems = $project['items'];
         $r->isCompleteProjectSynchronized = true;
-        $r->createProject = function ($createBasecampProject) use ($project, $config) {
-            $projectId = $project['project_id']['id'] ?? null;
-            $name =
-                "{$project['client']['name']} | {$project['name']}" .
-                ($projectId ? " [{$projectId}]" : '');
-            return $config->updatedBasecampProject ?: $createBasecampProject($name, $config->basecampClassicCompanyId);
-        };
 
         return [$this->synchronizer->__invoke($r, $config)];
-    }
-
-    private function findProjectInCostlocker($costlockerId)
-    {
-        $response = $this->costlocker->__invoke("/projects/{$costlockerId}?types=peoplecosts");
-        return json_decode($response->getBody(), true)['data'];
     }
 }

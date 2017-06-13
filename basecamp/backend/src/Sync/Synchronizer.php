@@ -2,19 +2,22 @@
 
 namespace Costlocker\Integrations\Sync;
 
+use Costlocker\Integrations\CostlockerClient;
 use Costlocker\Integrations\Basecamp\BasecampFactory;
 use Costlocker\Integrations\Basecamp\Api\BasecampException;
 
 class Synchronizer
 {
+    private $costlocker;
     private $basecampFactory;
 
     /** @var \Costlocker\Integrations\Basecamp\Api\BasecampApi */
     private $basecamp;
     private $database;
 
-    public function __construct(BasecampFactory $b, SyncDatabase $db)
+    public function __construct(CostlockerClient $c, BasecampFactory $b, SyncDatabase $db)
     {
+        $this->costlocker = $c;
         $this->basecampFactory = $b;
         $this->database = $db;
     }
@@ -26,6 +29,10 @@ class Synchronizer
 
     public function __invoke(SyncProjectRequest $r, SyncRequest $config)
     {
+        if ($r->isCompleteProjectSynchronized) {
+            $this->loadProjectFromCostlocker($r, $config);
+        }
+
         $result = new SyncResult($r, $config);
         $this->basecamp = $this->basecampFactory->__invoke($config->account);
         $bcProject = $this->upsertProject($r);
@@ -56,6 +63,26 @@ class Synchronizer
         $this->updateMapping($bcProject, $result);
 
         return $result;
+    }
+
+    private function loadProjectFromCostlocker(SyncProjectRequest $r, SyncRequest $config)
+    {
+        $project = $this->findProjectInCostlocker($config->costlockerProject);
+        $r->costlockerId = $project['id'];
+        $r->projectItems = $project['items'];
+        $r->createProject = function ($createBasecampProject) use ($project, $config) {
+            $projectId = $project['project_id']['id'] ?? null;
+            $name =
+                "{$project['client']['name']} | {$project['name']}" .
+                ($projectId ? " [{$projectId}]" : '');
+            return $config->updatedBasecampProject ?: $createBasecampProject($name, $config->basecampClassicCompanyId);
+        };
+    }
+
+    private function findProjectInCostlocker($costlockerId)
+    {
+        $response = $this->costlocker->__invoke("/projects/{$costlockerId}?types=peoplecosts");
+        return json_decode($response->getBody(), true)['data'];
     }
 
     private function upsertProject(SyncProjectRequest $r)

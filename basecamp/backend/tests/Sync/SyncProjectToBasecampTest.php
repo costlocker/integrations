@@ -19,7 +19,7 @@ class SyncProjectToBasecampTest extends GivenCostlockerToBasecampSynchronizer
 
     protected function createSynchronizer(Synchronizer $s)
     {
-        return new SyncProjectToBasecamp($this->costlocker, $s);
+        return new SyncProjectToBasecamp($s);
     }
 
     /** @dataProvider provideCreate */
