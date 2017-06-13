@@ -6,6 +6,8 @@ use Mockery as m;
 use Costlocker\Integrations\Basecamp\BasecampFactory;
 use Costlocker\Integrations\Basecamp\Api\BasecampApi;
 use Costlocker\Integrations\Entities\Event;
+use Costlocker\Integrations\Database\CompaniesRepository;
+use Costlocker\Integrations\Entities\CostlockerCompany;
 
 class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,11 +15,13 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
     private $database;
 
     private $request;
+    private $company;
 
     protected function setUp()
     {
         $this->basecamp = m::mock(BasecampApi::class);
         $this->database = new InMemoryDatabase();
+        $this->company = new CostlockerCompany();
     }
 
     public function testIgnoreUnmappedProject()
@@ -302,6 +306,14 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
         $this->synchronize();
     }
 
+    public function testIgnoreWebhookThatIsMappedToNoCompany()
+    {
+        $this->company = null;
+        $this->givenWebhook('delete-activity.json');
+        $this->basecamp->shouldReceive('grantAccess')->never();
+        $this->synchronize();
+    }
+
     private function givenWebhook($file)
     {
         $json = file_get_contents(__DIR__ . "/fixtures/webhooks/{$file}");
@@ -360,7 +372,11 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
         $basecampFactory = m::mock(BasecampFactory::class);
         $basecampFactory->shouldReceive('__invoke')->andReturn($this->basecamp);
         $basecampFactory->shouldReceive('getAccount')->andReturn([]);
-        $uc = new SyncWebhookToBasecamp($basecampFactory, $this->database);
+
+        $repository = m::mock(CompaniesRepository::class);
+        $repository->shouldReceive('findCompanyByWebhook')->andReturn($this->company);
+
+        $uc = new SyncWebhookToBasecamp($repository, $basecampFactory, $this->database);
         $results = $uc($this->request);
         if ($results) {
             assertThat($results[0]->getResultStatus(), is($expectedStatus));

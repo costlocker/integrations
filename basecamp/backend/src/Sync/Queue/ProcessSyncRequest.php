@@ -89,6 +89,7 @@ class ProcessSyncRequest
             );
         } elseif ($eventType == Event::WEBHOOK_SYNC) {
             return new \Costlocker\Integrations\Sync\SyncWebhookToBasecamp(
+                $this->app['database.companies'],
                 $this->app['client.basecamp'],
                 $this->app['database']
             );

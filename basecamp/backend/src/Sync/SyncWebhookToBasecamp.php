@@ -3,14 +3,17 @@
 namespace Costlocker\Integrations\Sync;
 
 use Costlocker\Integrations\Basecamp\BasecampFactory;
+use Costlocker\Integrations\Database\CompaniesRepository;
 
 class SyncWebhookToBasecamp
 {
+    private $repository;
     private $database;
     private $synchronizer;
 
-    public function __construct(BasecampFactory $b, SyncDatabase $db)
+    public function __construct(CompaniesRepository $r, BasecampFactory $b, SyncDatabase $db)
     {
+        $this->repository = $r;
         $this->database = $db;
         $this->synchronizer = new Synchronizer($b, $db);
     }
@@ -37,6 +40,14 @@ class SyncWebhookToBasecamp
     private function jsonEventsToProject(array $json )
     {
         $projects = [];
+
+        $webhookUrl = $json['links']['webhook']['webhook'] ?? '';
+        $company = $this->repository->findCompanyByWebhook($webhookUrl);
+
+        if (!$company) {
+            return $projects;
+        }
+        
         foreach ($json['data'] as $event) {
             if ($event['event'] != 'peoplecosts.change') {
                 continue;
