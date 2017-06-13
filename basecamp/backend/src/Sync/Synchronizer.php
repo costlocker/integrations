@@ -19,6 +19,11 @@ class Synchronizer
         $this->database = $db;
     }
 
+    public function findProject($costlockerId)
+    {
+        return $this->database->findProject($costlockerId);
+    }
+
     public function __invoke(SyncProjectRequest $r, SyncRequest $config)
     {
         $result = new SyncResult($r, $config);

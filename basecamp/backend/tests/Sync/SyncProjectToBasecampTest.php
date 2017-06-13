@@ -2,32 +2,24 @@
 
 namespace Costlocker\Integrations\Sync;
 
-use Mockery as m;
-use GuzzleHttp\Psr7\Response;
-use Costlocker\Integrations\CostlockerClient;
-use Costlocker\Integrations\Basecamp\BasecampFactory;
-use Costlocker\Integrations\Basecamp\Api\BasecampApi;
 use Costlocker\Integrations\Basecamp\Api\BasecampAccessException;
 use Costlocker\Integrations\Entities\Event;
 
-class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
+class SyncProjectToBasecampTest extends GivenCostlockerToBasecampSynchronizer
 {
-    private $costlocker;
-    private $basecamp;
-    private $database;
-
-    private $request;
-
-    protected function setUp()
+    public function setUp()
     {
-        $this->costlocker = m::mock(CostlockerClient::class);
-        $this->basecamp = m::mock(BasecampApi::class);
-        $this->database = new InMemoryDatabase();
+        parent::setUp();
         $this->request = [
             'account' => [], // should be int id, but it's asserted in assertEquals due to legacy
             'costlockerProject' => 'irrelevant id',
             'areTodosEnabled' => true,
         ];
+    }
+
+    protected function createSynchronizer(Synchronizer $s)
+    {
+        return new SyncProjectToBasecamp($this->costlocker, $s);
     }
 
     /** @dataProvider provideCreate */
@@ -38,28 +30,29 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
             'basecampProject' => $updatedBasecampProject,
         ];
         $this->givenCostlockerProject('one-person.json');
-        $this->basecamp->shouldReceive('createProject')
+        $this->shouldCreateProject()
             ->times($updatedBasecampProject ? 0 : 1)
             ->with('ACME | Website', null, null)
             ->andReturn($basecampId);
-        $this->basecamp->shouldReceive('grantAccess')->once()
-            ->with($basecampId, [
+        $this->shouldLoadBasecampPeople(
+            [
                 'John Doe (john@example.com)' => 'john@example.com',
                 'Peter Nobody (peter@example.com)' => 'peter@example.com',
-            ]);
-        $this->basecamp->shouldReceive('getPeople')->once()
-            ->andReturn($this->givenBasecampPeople([1 => 'john@example.com', 2 => 'peter@example.com']));
-        $this->basecamp->shouldReceive('createTodolist')->once()
-            ->with($basecampId, 'Development')
-            ->andReturn($basecampId);
-        $this->basecamp->shouldReceive('createTodo')->once()
-            ->with($basecampId, $basecampId, 'Homepage', 1)
-            ->andReturn($basecampId);
-        $this->basecamp->shouldReceive('createTodo')->once()
-            ->with($basecampId, $basecampId, 'Development', 2)
-            ->andReturn($basecampId);
+            ],
+            $basecampId,
+            false
+        );
+        $this->shouldCreateTodos(
+            [
+                'Development' => [
+                    'Homepage' => 1,
+                    'Development' => 2,
+                ],
+            ],
+            $basecampId
+        );
         $this->synchronize();
-        $this->assertEquals(
+        $this->assertMappingIs(
             [
                 'id' => $basecampId,
                 'account' => [],
@@ -82,8 +75,7 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
                         ],
                     ]
                 ],
-            ],
-            $this->database->findProject(1)
+            ]
         );
     }
 
@@ -100,56 +92,43 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
         $basecampId = 'irrelevant project';
         $this->request['areTodosEnabled'] = false;
         $this->givenCostlockerProject('one-person.json');
-        $this->basecamp->shouldReceive('createProject')->once()->andReturn($basecampId);
-        $this->basecamp->shouldReceive('grantAccess')->never();
+        $this->shouldCreateProject()->once()->andReturn($basecampId);
+        $this->shouldNotCreatePeopleOrTodosInBasecamp();
         $this->synchronize();
-        $this->assertEquals(
-            [
-                'id' => $basecampId,
-                'account' => [],
-                'activities' => [],
-            ],
-            $this->database->findProject(1)
-        );
+        $this->assertNoMappingInDatabase($basecampId);
     }
 
     public function testPartialUpdate()
     {
         $basecampId = 'existing id';
-        $this->database->upsertProject(
-            1,
+        $this->whenProjectIsMapped(
+            $basecampId,
             [
-                'id' => $basecampId,
-                'activities' => [
-                    1 => [
-                        'id' => $basecampId,
-                        'tasks' => [
-                            885 => [
-                                'id' => $basecampId,
-                                'person_id' => 1,
-                                'name' => 'Homepage',
-                            ],
+                1 => [
+                    'id' => $basecampId,
+                    'tasks' => [
+                        885 => [
+                            'id' => $basecampId,
+                            'person_id' => 1,
+                            'name' => 'Homepage',
                         ],
-                        'persons' => [
-                        ],
+                    ],
+                    'persons' => [
                     ],
                 ],
             ]
         );
         $this->givenCostlockerProject('one-person.json');
-        $this->basecamp->shouldReceive('projectExists')->once();
-        $this->basecamp->shouldReceive('createProject')->never();
-        $this->basecamp->shouldReceive('grantAccess')->once()
-            ->with($basecampId, [
+        $this->shouldLoadBasecampPeople(
+            [
                 'John Doe (john@example.com)' => 'john@example.com',
                 'Peter Nobody (peter@example.com)' => 'peter@example.com',
-            ]);
-        $this->basecamp->shouldReceive('getPeople')->once()
-            ->andReturn($this->givenBasecampPeople([1 => 'john@example.com', 2 => 'peter@example.com']));
-        $this->basecamp->shouldReceive('createTodolist')->never();
-        $this->basecamp->shouldReceive('createTodo')->once()->andReturn('new id');
+            ],
+            $basecampId
+        );
+        $this->shouldCreateTodo()->andReturn('new id');
         $this->synchronize();
-        $this->assertEquals(
+        $this->assertMappingIs(
             [
                 'id' => $basecampId,
                 'account' => [],
@@ -172,44 +151,40 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
                         ],
                     ]
                 ],
-            ],
-            $this->database->findProject(1)
+            ]
         );
     }
 
     public function testPartialDelete()
     {
         $basecampId = 'irrelevant project';
-        $this->database->upsertProject(
-            1,
+        $this->whenProjectIsMapped(
+            $basecampId,
             [
-                'id' => $basecampId,
-                'activities' => [
-                    1 => [
-                        'id' => $basecampId,
-                        'tasks' => [
-                            885 => [
-                                'id' => $basecampId,
-                                'person_id' => 1,
-                                'name' => '',
-                            ],
-                            900 => [
-                                'id' => 'deleted todo',
-                                'person_id' => 1,
-                                'name' => '',
-                            ],
-                            901 => [
-                                'id' => 'unknown todo',
-                                'person_id' => 1,
-                                'name' => '',
-                            ],
+                1 => [
+                    'id' => $basecampId,
+                    'tasks' => [
+                        885 => [
+                            'id' => $basecampId,
+                            'person_id' => 1,
+                            'name' => '',
                         ],
-                        'persons' => [
-                            885 => [
-                                'id' => $basecampId,
-                                'person_id' => 1,
-                                'name' => '',
-                            ],
+                        900 => [
+                            'id' => 'deleted todo',
+                            'person_id' => 1,
+                            'name' => '',
+                        ],
+                        901 => [
+                            'id' => 'unknown todo',
+                            'person_id' => 1,
+                            'name' => '',
+                        ],
+                    ],
+                    'persons' => [
+                        885 => [
+                            'id' => $basecampId,
+                            'person_id' => 1,
+                            'name' => '',
                         ],
                     ],
                 ],
@@ -220,21 +195,17 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
             'isRevokeAccessEnabled' => true,
         ];
         $this->givenCostlockerProject('one-person.json');
-        $this->basecamp->shouldReceive('projectExists')->once();
-        $this->basecamp->shouldReceive('grantAccess')->once();
-        $this->basecamp->shouldReceive('getPeople')->once()
-            ->andReturn($this->givenBasecampPeople([1 => 'john@example.com', 2 => 'peter@example.com']));
-        $this->basecamp->shouldReceive('getTodolists')->once()
-            ->andReturn([
-                $basecampId => (object) [
-                    'todoitems' => [
-                        'deleted todo' => (object) ['assignee_id' => null],
-                    ],
-                ],
-            ]);
-        $this->basecamp->shouldReceive('deleteTodo')->once()->with(m::any(), 'deleted todo');
+        $this->shouldLoadBasecampPeople(
+            [
+                'John Doe (john@example.com)' => 'john@example.com',
+                'Peter Nobody (peter@example.com)' => 'peter@example.com',
+            ],
+            $basecampId
+        );
+        $this->givenBasecampTodolists([$basecampId => ['deleted todo']]);
+        $this->shouldDeleteTodos([['deleted todo']]);
         $this->synchronize();
-        $this->assertEquals(
+        $this->assertMappingIs(
             [
                 'id' => $basecampId,
                 'account' => [],
@@ -257,46 +228,42 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
                         ],
                     ],
                 ],
-            ],
-            $this->database->findProject(1)
+            ]
         );
     }
 
     public function testFullDelete()
     {
         $basecampId = 'irrelevant project';
-        $this->database->upsertProject(
-            1,
+        $this->whenProjectIsMapped(
+            $basecampId,
             [
-                'id' => $basecampId,
-                'activities' => [
-                    1 => [
-                        'id' => 'non-empty todolist',
-                        'tasks' => [
-                            885 => [
-                                'id' => 'existing todo',
-                                'person_id' => 1,
-                                'name' => '',
-                            ],
-                        ],
-                        'persons' => [
-                            885 => [
-                                'id' => 'unknown basecamp id',
-                                'person_id' => 885,
-                                'name' => '',
-                            ],
+                1 => [
+                    'id' => 'non-empty todolist',
+                    'tasks' => [
+                        885 => [
+                            'id' => 'existing todo',
+                            'person_id' => 1,
+                            'name' => '',
                         ],
                     ],
-                    2 => [
-                        'id' => 'empty todolist',
-                        'tasks' => [],
-                        'persons' => [],
+                    'persons' => [
+                        885 => [
+                            'id' => 'unknown basecamp id',
+                            'person_id' => 885,
+                            'name' => '',
+                        ],
                     ],
-                    3 => [
-                        'id' => 'todolist not in BC',
-                        'tasks' => [],
-                        'persons' => [],
-                    ],
+                ],
+                2 => [
+                    'id' => 'empty todolist',
+                    'tasks' => [],
+                    'persons' => [],
+                ],
+                3 => [
+                    'id' => 'todolist not in BC',
+                    'tasks' => [],
+                    'persons' => [],
                 ],
             ]
         );
@@ -305,83 +272,32 @@ class SyncProjectToBasecampTest extends \PHPUnit_Framework_TestCase
             'isRevokeAccessEnabled' => true,
         ];
         $this->givenCostlockerProject('empty-project.json');
-        $this->basecamp->shouldReceive('projectExists')->once();
-        $this->basecamp->shouldReceive('getPeople')->once()
-            ->andReturn($this->givenBasecampPeople([1 => 'john@example.com', 2 => 'peter@example.com']));
-        $this->basecamp->shouldReceive('getTodolists')->once()
-            ->andReturn([
-                'non-empty todolist' => (object) [
-                    'todoitems' => [
-                        'existing todo' => (object) ['assignee_id' => null],
-                        'todo manually created in BC (non-empty todolist is not deleted)' =>
-                            (object) ['assignee_id' => 2],
-                    ],
-                ],
-                'empty todolist' => (object) [
-                    'todoitems' => [],
-                ],
-            ]);
-        $this->basecamp->shouldReceive('deleteTodolist')->once()->with(m::any(), 'empty todolist');
-        $this->basecamp->shouldReceive('deleteTodo')->once()->with(m::any(), 'existing todo');
-        $this->basecamp->shouldReceive('revokeAccess')->once();
-        $this->synchronize();
-        $this->assertEquals(
+        $this->shouldLoadBasecampPeople(
             [
-                'id' => $basecampId,
-                'account' => [],
-                'activities' => [],
-                // non-empty todolist is not deleted in BC, but it is removed from mapping
-            ],
-            $this->database->findProject(1)
+                'John Doe (john@example.com)' => 'john@example.com',
+                'Peter Nobody (peter@example.com)' => 'peter@example.com',
+            ]
         );
+        $this->givenBasecampTodolists([
+            'non-empty todolist' => [
+                'existing todo',
+                'todo manually created in BC (non-empty todolist is not deleted)' => 2,
+            ],
+            'empty todolist' => [],
+        ]);
+        $this->shouldDeleteTodos(['empty todolist' => ['existing todo']]);
+        $this->shouldRevokeAccessToOnePerson();
+        $this->synchronize();
+        // non-empty todolist is not deleted in BC, but it is removed from mapping
+        $this->assertNoMappingInDatabase($basecampId);
     }
 
     public function testProjectDeletedInBasecampIsNotDeletedInDatabase()
     {
-        $mapping = [
-            'id' => 'id of deleted project in basecamp',
-            'activities' => [],
-        ];
-        $this->database->upsertProject(1, $mapping);
+        $this->whenProjectIsMapped('id of deleted project in basecamp');
         $this->givenCostlockerProject('empty-project.json');
-        $this->basecamp->shouldReceive('projectExists')->andThrow(BasecampAccessException::class);
+        $this->whenProjectExistsInBasecamp()->andThrow(BasecampAccessException::class);
         $this->synchronize(Event::RESULT_FAILURE);
-        assertThat($this->database->findProject(1), is($mapping));
-    }
-
-    private function givenCostlockerProject($file)
-    {
-        $json = file_get_contents(__DIR__ . "/fixtures/{$file}");
-        $this->costlocker->shouldReceive('__invoke')->andReturn(new Response(200, [], $json));
-    }
-
-    private function givenBasecampPeople(array $emails)
-    {
-        $people = [];
-        foreach ($emails as $id => $email) {
-            $people[$email] = (object) [
-                'id' => $id,
-                'name' => $email,
-                'admin' => false,
-            ];
-        }
-        return $people;
-    }
-
-    private function synchronize($expectedStatus = Event::RESULT_SUCCESS)
-    {
-        $basecampFactory = m::mock(BasecampFactory::class);
-        $basecampFactory->shouldReceive('__invoke')->andReturn($this->basecamp);
-        $basecampFactory->shouldReceive('getAccount')->andReturn([]);
-        $uc = new SyncProjectToBasecamp($this->costlocker, $basecampFactory, $this->database);
-        $results = $uc($this->request);
-        if ($results) {
-            assertThat($results[0]->getResultStatus(), is($expectedStatus));
-        }
-    }
-
-    public function tearDown()
-    {
-        m::close();
+        $this->assertMappingIsNotEmpty();
     }
 }

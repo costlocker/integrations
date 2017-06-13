@@ -2,27 +2,55 @@
 
 namespace Costlocker\Integrations\Sync;
 
-use Costlocker\Integrations\Basecamp\BasecampFactory;
 use Costlocker\Integrations\Database\CompaniesRepository;
 
 class SyncWebhookToBasecamp
 {
     private $repository;
-    private $database;
     private $synchronizer;
 
-    public function __construct(CompaniesRepository $r, BasecampFactory $b, SyncDatabase $db)
+    public function __construct(CompaniesRepository $r, Synchronizer $s)
     {
         $this->repository = $r;
-        $this->database = $db;
-        $this->synchronizer = new Synchronizer($b, $db);
+        $this->synchronizer = $s;
     }
 
     public function __invoke(array $webhook)
     {
-        $projects = $this->jsonEventsToProject($webhook['body']);
+        $requests = $this->jsonEventsToRequests($webhook['body']);
         $results = [];
-        foreach ($projects as $id => $items) {
+        foreach ($requests as list($r, $config)) {
+            $results[] = $this->synchronizer->__invoke($r, $config);
+        }
+        return $results;
+    }
+
+    private function jsonEventsToRequests(array $json )
+    {
+        $updatedProjects = [];
+
+        $webhookUrl = $json['links']['webhook']['webhook'] ?? '';
+        $company = $this->repository->findCompanyByWebhook($webhookUrl);
+
+        if (!$company) {
+            return [];
+        }
+        
+        foreach ($json['data'] as $event) {
+            if ($event['event'] != 'peoplecosts.change') {
+                continue;
+            }
+            foreach ($event['data'] as $projectUpdate) {
+                $id = $projectUpdate['id'];
+                $updatedProjects[$id] = array_merge(
+                    $updatedProjects[$id] ?? [],
+                    $projectUpdate['items']
+                );
+            }
+        }
+
+        $results = [];
+        foreach ($updatedProjects as $id => $items) {
             $config = $this->getProjectSettings($id);
 
             $r = new SyncProjectRequest();
@@ -32,40 +60,14 @@ class SyncWebhookToBasecamp
             $r->createProject = function () {
                 return null; // creating new project in webhook is not supported
             };
-            $results[] = $this->synchronizer->__invoke($r, $config);
+            $results[] = [$r, $config];
         }
         return $results;
     }
 
-    private function jsonEventsToProject(array $json )
-    {
-        $projects = [];
-
-        $webhookUrl = $json['links']['webhook']['webhook'] ?? '';
-        $company = $this->repository->findCompanyByWebhook($webhookUrl);
-
-        if (!$company) {
-            return $projects;
-        }
-        
-        foreach ($json['data'] as $event) {
-            if ($event['event'] != 'peoplecosts.change') {
-                continue;
-            }
-            foreach ($event['data'] as $projectUpdate) {
-                $id = $projectUpdate['id'];
-                $projects[$id] = array_merge(
-                    $projects[$id] ?? [],
-                    $projectUpdate['items']
-                );
-            }
-        }
-        return $projects;
-    }
-
     private function getProjectSettings($costlockerId)
     {
-        $project = $this->database->findProject($costlockerId);
+        $project = $this->synchronizer->findProject($costlockerId);
 
         $config = new SyncRequest();
         $config->costlockerProject = $costlockerId;

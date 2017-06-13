@@ -2,7 +2,6 @@
 
 namespace Costlocker\Integrations\Sync;
 
-use Costlocker\Integrations\Basecamp\BasecampFactory;
 use Costlocker\Integrations\CostlockerClient;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
@@ -11,10 +10,10 @@ class SyncProjectToBasecamp
     private $costlocker;
     private $synchronizer;
 
-    public function __construct(CostlockerClient $c, BasecampFactory $b, SyncDatabase $db)
+    public function __construct(CostlockerClient $c, Synchronizer $s)
     {
         $this->costlocker = $c;
-        $this->synchronizer = new Synchronizer($b, $db);
+        $this->synchronizer = $s;
     }
 
     public function __invoke(array $jsonRequest)
