@@ -7,6 +7,7 @@ use Costlocker\Integrations\Entities\Event;
 use Costlocker\Integrations\Database\CompaniesRepository;
 use Costlocker\Integrations\Entities\CostlockerCompany;
 use Costlocker\Integrations\Entities\BasecampUser;
+use Costlocker\Integrations\Entities\CostlockerUser;
 
 class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
 {
@@ -17,6 +18,7 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
         parent::setUp();
         $this->company = new CostlockerCompany();
         $this->company->defaultBasecampUser = new BasecampUser();
+        $this->company->defaultCostlockerUser = new CostlockerUser();
     }
 
     protected function createSynchronizer(Synchronizer $s)
@@ -309,6 +311,7 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
     /** @dataProvider provideCompany */
     public function testDontCreateProjectWhenCompanyIs($loadCompany)
     {
+        $this->company->settings['isCreatingBasecampProjectEnabled'] = true;
         $this->company = $loadCompany($this->company);
         $this->givenCostlockerWebhook('create-project.json');
         $this->shouldCreateProject()->never();
@@ -326,6 +329,12 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
             'disabled creating project' => [
                 function (CostlockerCompany $c) {
                     $c->settings['isCreatingBasecampProjectEnabled'] = false;
+                    return $c;
+                }
+            ],
+            'no costlocker account is selected' => [
+                function (CostlockerCompany $c) {
+                    $c->defaultCostlockerUser = null;
                     return $c;
                 }
             ],

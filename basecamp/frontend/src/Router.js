@@ -93,7 +93,7 @@ export const states = [
     component: (props) => <Accounts
       basecampUser={appState.cursor(['auth', 'basecamp']).deref()}
       costlockerUser={appState.cursor(['auth', 'costlocker']).deref()}
-      accounts={appState.cursor(['auth', 'settings']).deref().accounts}
+      accounts={appState.cursor(['auth', 'settings']).deref().accounts.basecamp}
       loginError={props.transition.params().loginError}
       disconnect={(id) =>
         pushToApi(`/disconnect`, { user: id })
@@ -109,7 +109,7 @@ export const states = [
       costlockerProjects={appState.cursor(['costlocker', 'projects']).deref()}
       basecampProjects={appState.cursor(['basecamp', 'projects']).deref()}
       basecampCompanies={appState.cursor(['basecamp', 'companies']).deref()}
-      basecampAccounts={appState.cursor(['auth', 'settings']).deref().accounts}
+      basecampAccounts={appState.cursor(['auth', 'settings']).deref().accounts.basecamp}
       syncForm={{
         editedProject: props.transition.params().clProject,
         get: (type) => appState.cursor(['sync', type]).deref(),
@@ -169,7 +169,7 @@ export const states = [
     name: 'settings',
     url: '/settings',
     component: (props) => <Settings
-      basecampAccounts={appState.cursor(['auth', 'settings']).deref().accounts}
+      accounts={appState.cursor(['auth', 'settings']).deref().accounts}
       form={{
         get: (type) => appState.cursor(['companySettings', type]).deref(),
         set: (type) => (e) => appState.cursor(['companySettings']).set(

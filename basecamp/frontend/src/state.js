@@ -23,6 +23,7 @@ const appState = immstruct({
     isCostlockerWebhookEnabled: false,
     isCreatingBasecampProjectEnabled: false,
     account: null,
+    costlockerUser: null,
   },
   sync: {
     account: null,

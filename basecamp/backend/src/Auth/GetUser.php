@@ -89,7 +89,7 @@ DQL;
         ];
         $entities = $this->entityManager->createQuery($dql)->execute($params);
 
-        return array_reduce(
+        $basecampUsers = array_reduce(
             array_map(
                 function (CostlockerUser $u) use ($loggedUser) {
                     return array_map(
@@ -114,6 +114,13 @@ DQL;
             'array_merge',
             []
         );
+        $costlockerUsers = array_map(
+            function (CostlockerUser $u) {
+                return $u->data['person'];
+            },
+            $entities
+        );
+        return ['basecamp' => $basecampUsers, 'costlocker' => $costlockerUsers];
     }
 
     public function getCostlockerAccessToken()

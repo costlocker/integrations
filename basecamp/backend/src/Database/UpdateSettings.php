@@ -6,6 +6,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Costlocker\Integrations\Auth\GetUser;
 use Costlocker\Integrations\Costlocker\RegisterWebhook;
 use Costlocker\Integrations\Entities\BasecampUser;
+use Costlocker\Integrations\Entities\CostlockerUser;
+use Costlocker\Integrations\Entities\CostlockerCompany;
 
 class UpdateSettings
 {
@@ -25,6 +27,7 @@ class UpdateSettings
         $company = $this->getUser->getCostlockerUser()->costlockerCompany;
         $company->settings = $settings;
         $company->defaultBasecampUser = $this->findBasecampUser($settings['account']);
+        $company->defaultCostlockerUser = $this->findCostlockerUser($company, $settings['costlockerUser']);
 
         $this->registerWebhook->__invoke($company);
         $this->entityManager->persist($company);
@@ -36,5 +39,12 @@ class UpdateSettings
         return $this->entityManager
             ->getRepository(BasecampUser::class)
             ->find((int) $id);
+    }
+
+    private function findCostlockerUser(CostlockerCompany $c, $email)
+    {
+        return $this->entityManager
+            ->getRepository(CostlockerUser::class)
+            ->findOneBy(['costlockerCompany' => $c->id, 'email' => $email]);
     }
 }
