@@ -297,7 +297,7 @@ class SyncWebhookToBasecampTest extends \PHPUnit_Framework_TestCase
 
     public function testIgnoreOtherEvents()
     {
-        $this->givenWebhook('create-project.json');
+        $this->givenWebhook('unmapped-webhook.json');
         $this->basecamp->shouldReceive('grantAccess')->never();
         $this->synchronize();
     }

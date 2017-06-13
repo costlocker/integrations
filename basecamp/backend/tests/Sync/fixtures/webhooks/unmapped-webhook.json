@@ -1,0 +1,39 @@
+{
+   "meta":{
+      "events":{
+         "timeentries.create":1
+      }
+   },
+   "links":{
+      "webhook":{
+         "webhook":"http://app.costlocker.local/api-public/v2/webhooks/dd76b5e0-5b74-4a68-b0ad-db6efbed7b9c",
+         "example":"http://app.costlocker.local/api-public/v2/webhooks/dd76b5e0-5b74-4a68-b0ad-db6efbed7b9c/test"
+      }
+   },
+   "data":[
+      {
+         "event":"timeentries.create",
+         "data":[
+            {
+               "uuid":"51ac7f89-77a2-4679-8308-96eb12c6283e",
+               "date":"2017-06-13 04:06:32",
+               "duration":3600,
+               "description":"Init project",
+               "assignment":{
+                  "person_id":1,
+                  "project_id":1,
+                  "activity_id":1,
+                  "task_id":1
+               },
+               "names":{
+                  "person_fullname":"John Doe",
+                  "project_name":"Website",
+                  "client_name":"ACME",
+                  "activity_name":"Design",
+                  "task_name":"Homepage"
+               }
+            }
+         ]
+      }
+   ]
+}
