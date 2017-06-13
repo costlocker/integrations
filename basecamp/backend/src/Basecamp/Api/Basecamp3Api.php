@@ -133,6 +133,7 @@ class Basecamp3Api extends ExternalApi
                     'creator_name' => strval($todoitem->creator->name),
                     'assignee_id' => $assignee ? intval($assignee->id) : NULL,
                     'assignee_name' => $assignee ? strval($assignee->name) : NULL,
+                    'assignee' => $assignee ? $this->assigneeToPerson($assignee) : null,
                 );
             }
 
@@ -143,6 +144,16 @@ class Basecamp3Api extends ExternalApi
         }
 
         return $todolists;
+    }
+
+    private function assigneeToPerson(\stdClass $assignee)
+    {
+        $names = explode(' ', $assignee->name, 2) + ['', ''];
+        return [
+            'email' => $assignee->email_address,
+            'first_name' => $names[0],
+            'last_name' => $names[1],
+        ];
     }
 
     public function createTodolist($bcProjectId, $name)

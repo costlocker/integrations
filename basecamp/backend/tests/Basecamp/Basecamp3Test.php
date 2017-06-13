@@ -85,6 +85,11 @@ class Basecamp3Test extends \Tests\Basecamp\GivenBasecampConnect
                             'creator_name' => 'John Doe',
                             'assignee_id' => 149087659,
                             'assignee_name' => 'Jason Fried',
+                            'assignee' => [
+                                'email' => 'sharon@honchodesign.com',
+                                'first_name' => 'Jason',
+                                'last_name' => 'Fried',
+                            ],
                         ]
                     ]
                 ]
