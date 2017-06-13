@@ -18,7 +18,10 @@ $console->addCommands([
     new \Costlocker\Integrations\Database\RefreshAccessTokensCommand(
         new \Costlocker\Integrations\Database\RefreshAccessTokens(
             $app['orm.em'],
-            $app['oauth.basecamp'],
+            [
+                'basecamp' => $app['oauth.basecamp'],
+                'costlocker' => $app['oauth.costlocker'],
+            ],
             $app['logger']
         )
     )
