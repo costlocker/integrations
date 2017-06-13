@@ -21,6 +21,8 @@ const appState = immstruct({
     isDeletingTodosEnabled: false,
     isRevokeAccessEnabled: false,
     isCostlockerWebhookEnabled: false,
+    isCreatingBasecampProjectEnabled: false,
+    account: null,
   },
   sync: {
     account: null,

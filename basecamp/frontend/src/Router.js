@@ -169,6 +169,7 @@ export const states = [
     name: 'settings',
     url: '/settings',
     component: (props) => <Settings
+      basecampAccounts={appState.cursor(['auth', 'settings']).deref().accounts}
       form={{
         get: (type) => appState.cursor(['companySettings', type]).deref(),
         set: (type) => (e) => appState.cursor(['companySettings']).set(

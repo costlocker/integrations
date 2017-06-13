@@ -37,6 +37,13 @@ class CostlockerCompany
      */
     public $projects;
 
+    /**
+     * @var BasecampUser
+     * @ORM\ManyToOne(targetEntity="BasecampUser")
+     * @ORM\JoinColumn(name="bc_user_id", nullable=true, onDelete="SET NULL")
+     */
+    public $defaultBasecampUser;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -47,7 +54,16 @@ class CostlockerCompany
     {
         $request = new \Costlocker\Integrations\Sync\SyncRequest();
         return [
-            'isCostlockerWebhookEnabled' => $this->urlWebhook ? true : false
+            'isCreatingBasecampProjectEnabled' => $this->isCreatingBasecampProjectEnabled(),
+            'account' => $this->defaultBasecampUser ? $this->defaultBasecampUser->id : null,
+            'isCostlockerWebhookEnabled' => $this->urlWebhook ? true : false,
         ] + ($this->settings ?: []) + $request->toSettings();
+    }
+
+    public function isCreatingBasecampProjectEnabled()
+    {
+        return $this->defaultBasecampUser
+            && $this->defaultBasecampUser->isActive()
+            && ($this->settings['isCreatingBasecampProjectEnabled'] ?? false);
     }
 }

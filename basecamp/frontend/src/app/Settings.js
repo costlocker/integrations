@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Projects({ settings, form }) {
+export default function Projects({ form, basecampAccounts }) {
   return <div>
     <div className="row">
       <div className="col-sm-12">
@@ -10,7 +10,7 @@ export default function Projects({ settings, form }) {
     <div className="row">
       <div className="col-sm-12">
         <form className="form" onSubmit={form.submit}>
-          <h4>Configuration of new projects</h4>
+          <h4>Default configuration</h4>
           <div className="form-group">
             <label>What is exported to Basecamp?</label>
             <div>
@@ -36,6 +36,33 @@ export default function Projects({ settings, form }) {
               </label>
             </div>
           </div>
+          <h4>New project in Costlocker</h4>
+          <div className="form-group">
+            <label>What should happen when a new project is created in the Costlocker?</label>
+            <div>
+              <label className="checkbox-inline">
+                <input type="checkbox" name="isCreatingBasecampProjectEnabled"
+                  onChange={form.set('isCreatingBasecampProjectEnabled')} checked={form.get('isCreatingBasecampProjectEnabled')}
+                  /> Create project in Basecamp
+              </label>
+            </div>
+          </div>
+          {form.get('isCreatingBasecampProjectEnabled') ? (
+          <div className="form-group">
+            <label htmlFor="account">Choose a Basecamp used for creating a new project</label>
+            <select
+              className="form-control" name="account" id="account"
+              value={form.get('account') ? form.get('account') : ''} onChange={form.set('account')}
+            >
+              <option></option>
+              {basecampAccounts.map(personAccount => {
+                return <option key={personAccount.account.id} value={personAccount.account.id}>
+                  {personAccount.account.name} ({personAccount.account.identity.email_address})
+                </option>;
+              })}
+            </select>
+          </div>
+          ) : null}
           <h4>Webhooks</h4>
           <div className="form-group">
             <div>
