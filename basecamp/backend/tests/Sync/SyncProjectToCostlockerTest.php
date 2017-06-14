@@ -98,7 +98,7 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
     public function testAddTaskToCostlocker()
     {
         $basecampId = 'irrelevant project';
-        $originalMapping = [
+        $this->whenProjectIsMapped($basecampId, [
             1 => [
                 'id' => $basecampId,
                 'tasks' => [
@@ -116,8 +116,7 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
                     ],
                 ],
             ],
-        ];
-        $this->whenProjectIsMapped($basecampId, $originalMapping);
+        ]);
         $this->givenCostlockerProject('one-person.json');
         $this->shouldLoadBasecampPeople(
             [
@@ -146,12 +145,20 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
                             'last_name' => 'Doe',
                         ],
                     ],
-                    'new todo in basecamp' => (object) [
+                    'new todo in basecamp (task)' => (object) [
                         'content' => 'basecamp todo',
                         'assignee' => [
                             'email' => 'john@example.com',
                             'first_name' => 'John',
                             'last_name' => 'Doe',
+                        ],
+                    ],
+                    'new todo in basecamp (person)' => (object) [
+                        'content' => 'basecamp todo2',
+                        'assignee' => [
+                            'email' => 'peter@example.com',
+                            'first_name' => 'Peter',
+                            'last_name' => 'Nobody',
                         ],
                     ],
                     'ignore todo without assignee' => (object) [
@@ -163,7 +170,7 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
         ]);
         $this->costlocker->shouldReceive('__invoke')
             ->with('/projects', m::on(function ($data) {
-                assertThat($data['items'], is(arrayWithSize(1)));
+                assertThat($data['items'], is(arrayWithSize(2)));
                 return true;
             }))
             ->andReturn(
@@ -179,7 +186,16 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
                                         'person_id' => 1,
                                         'task_id' => 123,
                                     ],
-                                ]
+                                ],
+                                [
+                                    'action' => 'upsert',
+                                    'item' => [
+                                        'type' => 'task',
+                                        'activity_id' => 1,
+                                        'person_id' => 885,
+                                        'task_id' => 456,
+                                    ],
+                                ],
                             ],  
                         ],
                     ],
@@ -190,20 +206,31 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
             [
                 'id' => $basecampId,
                 'account' => [],
-                'activities' => array_replace_recursive(
-                    $originalMapping,
-                    [
-                        1 => [
-                            'tasks' => [
-                                123 => [
-                                    'id' => 'new todo in basecamp',
-                                    'person_id' => 1,
-                                    'name' => 'basecamp todo',
-                                ],
-                            ]
+                'activities' => [
+                    1 => [
+                        'id' => $basecampId,
+                        'tasks' => [
+                            885 => [
+                                'id' => 'todo created in costlocker (task)',
+                                'person_id' => 1,
+                                'name' => 'task todo',
+                            ],
+                            123 => [
+                                'id' => 'new todo in basecamp (task)',
+                                'person_id' => 1,
+                                'name' => 'basecamp todo',
+                            ],
+                            456 => [
+                                'id' => 'new todo in basecamp (person)',
+                                'person_id' => 885,
+                                'name' => 'basecamp todo2',
+                            ],
                         ],
-                    ]
-                ),
+                        'persons' => [
+                            // person task is deleted in Costlocker
+                        ],
+                    ],
+                ],
             ]
         );
     }

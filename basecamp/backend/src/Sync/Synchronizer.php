@@ -443,6 +443,10 @@ class Synchronizer
                     'name' => $tasksUpdate[$index]['task'],
                     'isCreated' => true,
                 ]);
+                // existing person activity without task is automatically deleted in API
+                if (isset($bcProject['activities'][$activityId]['persons'][$ids['person_id']])) {
+                    $changelog->deleteTask($activityId, 'persons', $ids['person_id']);
+                }
             } else {
                 if ($ids['type'] == 'task') {
                     $changelog->deleteTask($activityId, 'tasks', $ids['task_id']);
