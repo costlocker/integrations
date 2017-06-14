@@ -27,15 +27,13 @@ class SyncResult
 
     public function getResultStatus()
     {
-        if (
-            $this->costlockerChangelog->error ||
-            $this->basecampChangelog->error
-        ) {
+        $hasError = $this->costlockerChangelog->error || $this->basecampChangelog->error;
+        $hasSucceed = $this->costlockerChangelog->wasSomethingChanged() || $this->basecampChangelog->wasSomethingChanged();
+        if ($hasSucceed && $hasError) {
+            return Event::RESULT_PARTIAL_SUCCESS;
+        } elseif ($hasError) {
             return Event::RESULT_FAILURE;
-        } elseif (
-            $this->costlockerChangelog->wasSomethingChanged() ||
-            $this->basecampChangelog->wasSomethingChanged()
-        ) {
+        } elseif ($hasSucceed) {
             return Event::RESULT_SUCCESS;
         } else {
             return Event::RESULT_NOCHANGE;

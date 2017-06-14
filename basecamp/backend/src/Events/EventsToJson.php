@@ -16,9 +16,11 @@ class EventsToJson
                     Event::WEBHOOK_SYNC | Event::RESULT_SUCCESS => 'Successful sync after webhook',
                     Event::WEBHOOK_SYNC | Event::RESULT_FAILURE => 'Failed sync after webhook',
                     Event::WEBHOOK_SYNC | Event::RESULT_NOCHANGE => 'No change after webhook sync',
+                    Event::WEBHOOK_SYNC | Event::RESULT_PARTIAL_SUCCESS => 'partial sync after webhook sync',
                     Event::MANUAL_SYNC | Event::RESULT_SUCCESS => 'Successful sync after user request',
                     Event::MANUAL_SYNC | Event::RESULT_FAILURE => 'Failed sync after user request',
                     Event::MANUAL_SYNC | Event::RESULT_NOCHANGE => 'No change after user request sync',
+                    Event::MANUAL_SYNC | Event::RESULT_PARTIAL_SUCCESS => 'partial sync after user request',
                     // disconnect should be successful 99%, so using results is not necessary
                     Event::DISCONNECT_BASECAMP => 'Disconnect basecamp account',
                     Event::DISCONNECT_PROJECT => 'Disconnect project',
@@ -39,6 +41,7 @@ class EventsToJson
                     ($e->event | Event::RESULT_SUCCESS) => 'success',
                     ($e->event | Event::RESULT_FAILURE) => 'failure',
                     ($e->event | Event::RESULT_NOCHANGE) => 'nochange',
+                    ($e->event | Event::RESULT_PARTIAL_SUCCESS) => 'partial',
                 ];
                 $date = $isRequest ? $e->createdAt : ($e->updatedAt ?: $e->createdAt);
                 return [
@@ -48,6 +51,10 @@ class EventsToJson
                     'user' => $e->costlockerUser ? $e->costlockerUser->data : null,
                     'status' => $statuses[$e->event] ?? null,
                     'error' => $e->data['result']['basecamp']['error'] ?? null,
+                    'changelog' => [
+                        'basecamp' => $e->data['result']['basecamp'] ?? null,
+                        'costlocker' => $e->data['result']['costlocker'] ?? null,
+                    ],
                 ];
             },
             $events

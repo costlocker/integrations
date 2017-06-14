@@ -32,12 +32,14 @@ export default function Projects({ events, refresh }) {
                 'success': 'success',
                 'failure': 'danger',
                 'nochange': 'warning',
+                'partial': 'info',
               };
               return <tr key={event.id} className={statusToCssClass[event.status]}>
                 <td>{event.date}</td>
                 <td>
                   {event.description}<br />
-                  {event.error ? <span className="text-muted">{event.error}</span> : ''}
+                  {event.error ? <span className="text-muted">{event.error}</span> : ''}<br />
+                  <pre style={{ width: '700px' }}>{JSON.stringify(event.changelog, null, 2)}</pre>
                 </td>
                 <td>{event.user
                   ? <div>
