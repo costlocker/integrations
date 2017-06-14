@@ -228,6 +228,8 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
                         ],
                         'persons' => [
                             // person task is deleted in Costlocker
+                            // but person todo (with activity name) remains in Basecamp
+                            // manual fix: delete task in BC or run full sync (task is imported to CL)
                         ],
                     ],
                 ],
