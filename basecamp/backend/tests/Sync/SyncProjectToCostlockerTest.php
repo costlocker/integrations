@@ -154,6 +154,10 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
                             'last_name' => 'Doe',
                         ],
                     ],
+                    'ignore todo without assignee' => (object) [
+                        'content' => 'unassigned todo',
+                        'assignee' => null,
+                    ],
                 ],
             ],
         ]);

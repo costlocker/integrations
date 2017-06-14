@@ -371,7 +371,8 @@ class Synchronizer
             foreach ($bcTodolist->todoitems as $todoId => $todo) {
                 if (
                     $this->findByBasecampId($bcProject['activities'][$activityId]['tasks'], $todoId) ||
-                    $this->findByBasecampId($bcProject['activities'][$activityId]['persons'], $todoId)
+                    $this->findByBasecampId($bcProject['activities'][$activityId]['persons'], $todoId) ||
+                    !$todo->assignee
                 ) {
                     continue;
                 }
