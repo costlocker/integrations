@@ -13,38 +13,33 @@ class SyncResult
     public $basecampProjectId;
     /** @var \Costlocker\Integrations\Entities\BasecampProject */
     public $mappedProject;
-    public $error;
 
-    public $wasProjectCreated = false;
-    public $grantedPeople = [];
-    public $todolists = [];
-    public $deleteSummary = [];
+    public $costlockerChangelog;
+    public $basecampChangelog;
 
     public function __construct(SyncProjectRequest $r, SyncRequest $c)
     {
         $this->projectRequest = $r;
         $this->syncConfig = $c;
+        $this->costlockerChangelog = new SyncChangelog();
+        $this->basecampChangelog = new SyncChangelog();
     }
 
     public function getResultStatus()
     {
-        if ($this->error) {
+        if (
+            $this->costlockerChangelog->error ||
+            $this->basecampChangelog->error
+        ) {
             return Event::RESULT_FAILURE;
-        } elseif ($this->wasProjectCreated || $this->todolists || $this->wasSomethingDeleted()) {
+        } elseif (
+            $this->costlockerChangelog->wasSomethingChanged() ||
+            $this->basecampChangelog->wasSomethingChanged()
+        ) {
             return Event::RESULT_SUCCESS;
         } else {
             return Event::RESULT_NOCHANGE;
         }
-    }
-
-    private function wasSomethingDeleted()
-    {
-        foreach ($this->deleteSummary as $deleted) {
-            if ($deleted) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public function getSettings()
@@ -60,14 +55,8 @@ class SyncResult
                 'project' => get_object_vars($this->projectRequest),
                 'settings' => $this->getSettings(),
             ],
-            'basecamp' => [
-                'id' => $this->basecampProjectId,
-                'wasProjectCreated' => $this->wasProjectCreated,
-                'people' => $this->grantedPeople,
-                'activities' => $this->todolists,
-                'delete' => $this->deleteSummary,
-                'error' => $this->error,
-            ],
+            'basecamp' => $this->basecampChangelog->toArray($this->basecampProjectId),
+            'costlocker' => $this->basecampChangelog->toArray($this->projectRequest->costlockerId),
         ];
         // dont save doctrine entity...
         if ($this->projectRequest->costlockerUser) {
