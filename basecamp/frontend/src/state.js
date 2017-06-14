@@ -25,6 +25,10 @@ const appState = immstruct({
     isCreatingBasecampProjectEnabled: false,
     account: null,
     costlockerUser: null,
+    // basecamp -> costlocker
+    areTasksEnabled: false,
+    isDeletingTasksEnabled: false,
+    isBasecampWebhookEnabled: false,
   },
   sync: {
     account: null,
@@ -35,6 +39,10 @@ const appState = immstruct({
     isDeletingTodosEnabled: false,
     isRevokeAccessEnabled: false,
     mode: 'create',
+    // basecamp -> costlocker
+    areTasksEnabled: false,
+    isDeletingTasksEnabled: false,
+    isBasecampWebhookEnabled: false,
   }
 });
 

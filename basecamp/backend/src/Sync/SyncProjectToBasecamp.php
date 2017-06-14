@@ -36,6 +36,11 @@ class SyncProjectToBasecamp
                 $config->isDeletingTodosEnabled = $json->get('isDeletingTodosEnabled');
                 $config->isRevokeAccessEnabled = $json->get('isRevokeAccessEnabled');
             }
+            $config->areTasksEnabled = $json->get('areTasksEnabled');
+            if ($config->areTasksEnabled) {
+                $config->isDeletingTasksEnabled = $json->get('isDeletingTasksEnabled');
+                $config->isBasecampWebhookEnabled = $json->get('isBasecampWebhookEnabled');
+            }
             $results[] = $this->synchronizer->__invoke($r, $config);
         }
 

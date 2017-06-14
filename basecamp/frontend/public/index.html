@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <style>
+      #root {
+        padding-bottom: 2em;
+      }
       .cover .progress {
         border-radius: 0;
       }
@@ -18,6 +21,12 @@
       }
       .navbar-brand img {
         height: 100%;
+      }
+      [data-unavailable] {
+        opacity: 0.6;
+      }
+      [data-unavailable] input {
+        pointer-events: none;
       }
     </style>
   </head>

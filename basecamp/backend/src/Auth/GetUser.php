@@ -103,6 +103,8 @@ DQL;
                                     'product' => $b->basecampAccount->product,
                                     'urlApp' => $b->basecampAccount->urlApp,
                                     'identity' => $b->data,
+                                    'canBeSynchronizedFromBasecamp' =>
+                                        $b->basecampAccount->product == \Costlocker\Integrations\Basecamp\Api\Connect::BASECAMP_V3_TYPE
                                 ],
                             ];
                         },

@@ -95,12 +95,15 @@ export default function Settings({ form, accounts }) {
             ) : null}
           </div>
           <div className="col-sm-6">
-            <h4>Basecamp <span className="label label-danger" title="Available only for Basecamp 3">3</span> &rarr; Costlocker</h4>
+            <h4 title="Available only for Basecamp 3">
+              Basecamp <span className="label label-danger">3</span> &rarr; Costlocker
+            </h4>
             <div className="form-group">
               <label>What is exported to Costlocker?</label>
               <div>
                 <label className="checkbox-inline">
-                  <input type="checkbox"
+                  <input type="checkbox" name="areTasksEnabled"
+                    onChange={form.set('areTasksEnabled')} checked={form.get('areTasksEnabled')}
                     /> Todo items are transformed to tasks under activity.
                 </label>
               </div>
@@ -109,7 +112,8 @@ export default function Settings({ form, accounts }) {
               <label>What should happen when something is deleted in the Basecamp?</label>
               <div>
                 <label className="checkbox-inline">
-                  <input type="checkbox"
+                  <input type="checkbox" name="isDeletingTasksEnabled"
+                    onChange={form.set('isDeletingTasksEnabled')} checked={form.get('isDeletingTasksEnabled')}
                     /> Delete tasks in Costlocker
                 </label>
               </div>
@@ -118,7 +122,8 @@ export default function Settings({ form, accounts }) {
               <label>Webhooks <ExternalLink url="https://m.signalvnoise.com/new-in-basecamp-3-webhooks-e3c9d26340c0" /></label>
               <div>
                 <label className="checkbox-inline">
-                  <input type="checkbox"
+                  <input type="checkbox" name="isBasecampWebhookEnabled"
+                    onChange={form.set('isBasecampWebhookEnabled')} checked={form.get('isBasecampWebhookEnabled')}
                     /> Allow real-time webhook synchronization
                 </label>
                 <p className="help-block">

@@ -1,5 +1,4 @@
 import React from 'react';
-import { Set } from 'immutable';
 
 const BasecampAccountSelect = ({ title, accounts, syncForm }) => (
   <div className="form-group">
@@ -54,6 +53,14 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampCom
   )
   const editedProject = syncForm.editedProject ? availableCostlockerProjects[0] : null;
   const connectedBasecamp = syncForm.editedProject ? editedProject.basecamps[0] : null;
+
+  const selectedBasecampAccounts = basecampAccounts
+    .filter(a => a.account.id == syncForm.get('account'));
+  const selectedBasecampAccount = selectedBasecampAccounts.length ? selectedBasecampAccounts[0] : null;
+  const canBeSynchronizedFromBasecamp = selectedBasecampAccount
+    ? selectedBasecampAccount.account.canBeSynchronizedFromBasecamp : false;
+  const optionalSetIfAvailable = (type) => (e) => canBeSynchronizedFromBasecamp ? syncForm.set(type)(e) : null;
+
   const availableBasecampProjects = isExistingProjectEdited
     ? basecampProjects.filter(p => p.id == availableCostlockerProjects[0].basecamps[0].id)
     : basecampProjects;
@@ -111,73 +118,117 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampCom
         </div>
         <BasecampAccountSelect title='Choose a Basecamp acccount to export it to' accounts={basecampAccounts} syncForm={syncForm} />
         <BasecampCompaniesSelect basecampCompanies={basecampCompanies} syncForm={syncForm} isBasecampProjectCreated={isBasecampProjectCreated} />
-        <div className="form-group">
-          <label>How would you like to add this project to the Basecamp</label>
-          <div className="radio">
-            <label>
-              <input type="radio" name="mode" value="create"
-                checked={isBasecampProjectCreated} onChange={syncForm.set('mode')} />
-              Create a new project in Basecamp
-            </label>
-          </div>
-          <div className="radio">
-            <label>
-              <input type="radio" name="mode" value="add"
-                checked={!isBasecampProjectCreated} onChange={syncForm.set('mode')} />
-              Add to an existing project in Basecamp
-            </label>
+        <div className="row">
+          <div className="col-sm-6">
+            <div className="form-group">
+              <label>How would you like to add this project to the Basecamp</label>
+              <div className="radio">
+                <label>
+                  <input type="radio" name="mode" value="create"
+                    checked={isBasecampProjectCreated} onChange={syncForm.set('mode')} />
+                  Create a new project in Basecamp
+                </label>
+              </div>
+              <div className="radio">
+                <label>
+                  <input type="radio" name="mode" value="add"
+                    checked={!isBasecampProjectCreated} onChange={syncForm.set('mode')} />
+                  Add to an existing project in Basecamp
+                </label>
+              </div>
+            </div>
+            {!isBasecampProjectCreated &&
+            <div className="form-group">
+              <label htmlFor="basecampProject">Basecamp project</label>
+              <select
+                className="form-control" name="basecampProject" id="basecampProject"
+                value={syncForm.get('basecampProject')} onChange={syncForm.set('basecampProject')}
+              >
+                <option></option>
+                {availableBasecampProjects.map(project => (
+                  <option key={project.id} value={project.id}>
+                    {project.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            }
           </div>
         </div>
-        {!isBasecampProjectCreated &&
-        <div className="form-group">
-          <label htmlFor="basecampProject">Basecamp project</label>
-          <select
-            className="form-control" name="basecampProject" id="basecampProject"
-            value={syncForm.get('basecampProject')} onChange={syncForm.set('basecampProject')}
-          >
-            <option></option>
-            {availableBasecampProjects.map(project => (
-              <option key={project.id} value={project.id}>
-                {project.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        }
       </div>
       )}
-      <div className="form-group">
-        <label>What is exported to Basecamp?</label>
-        <div>
-          <label className="checkbox-inline disabled">
-            <input type="checkbox" disabled defaultChecked={true}
-              /> Project name
-          </label>
-          <label className="checkbox-inline">
-            <input type="checkbox" name="areTodosEnabled"
-              onChange={syncForm.set('areTodosEnabled')} checked={syncForm.get('areTodosEnabled')}
-              /> Personnel costs are transformed to todolists
-          </label>
+      <div className="row">
+        <div className="col-sm-6">
+          <h4>Costlocker &rarr; Basecamp</h4>
+          <div className="form-group">
+            <label>What is exported to Basecamp?</label>
+            <div>
+              <label className="checkbox-inline disabled">
+                <input type="checkbox" disabled defaultChecked={true}
+                  /> Project name
+              </label>
+              <label className="checkbox-inline">
+                <input type="checkbox" name="areTodosEnabled"
+                  onChange={syncForm.set('areTodosEnabled')} checked={syncForm.get('areTodosEnabled')}
+                  /> Personnel costs are transformed to todolists
+              </label>
+            </div>
+          </div>
+          {syncForm.get('areTodosEnabled') &&
+          <div className="form-group">
+            <label>What should happen when something is deleted in the Costlocker?</label>
+            <div>
+              <label className="checkbox-inline">
+                <input type="checkbox" name="deleteTasks"
+                  onChange={syncForm.set('isDeletingTodosEnabled')} checked={syncForm.get('isDeletingTodosEnabled')}
+                  /> Delete todos
+              </label>
+              <label className="checkbox-inline">
+                <input type="checkbox" name="revokeAccess"
+                  onChange={syncForm.set('isRevokeAccessEnabled')} checked={syncForm.get('isRevokeAccessEnabled')}
+                  /> Revoke access to persons without todo
+              </label>
+            </div>
+          </div>
+          }
+        </div>
+        <div className="col-sm-6" data-unavailable={canBeSynchronizedFromBasecamp ? null : true}>
+          <h4 title="Available only for Basecamp 3">
+            Basecamp <span className="label label-danger">3</span> &rarr; Costlocker
+          </h4>
+          <div className="form-group">
+            <label>What is exported to Costlocker?</label>
+            <div>
+              <label className="checkbox-inline">
+                <input type="checkbox" name="areTasksEnabled"
+                  onChange={optionalSetIfAvailable('areTasksEnabled')} checked={syncForm.get('areTasksEnabled')}
+                  /> Todo items are transformed to tasks under activity.
+              </label>
+            </div>
+          </div>
+          <div className="form-group">
+            <label>What should happen when something is deleted in the Basecamp?</label>
+            <div>
+              <label className="checkbox-inline">
+                <input type="checkbox" name="isDeletingTasksEnabled"
+                  onChange={optionalSetIfAvailable('isDeletingTasksEnabled')} checked={syncForm.get('isDeletingTasksEnabled')}
+                  /> Delete tasks in Costlocker
+              </label>
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Webhooks</label>
+            <div>
+              <label className="checkbox-inline">
+                <input type="checkbox" name="isBasecampWebhookEnabled"
+                  onChange={optionalSetIfAvailable('isBasecampWebhookEnabled')} checked={syncForm.get('isBasecampWebhookEnabled')}
+                  /> Allow real-time webhook synchronization
+              </label>
+            </div>
+          </div>
         </div>
       </div>
-      {syncForm.get('areTodosEnabled') &&
-      <div className="form-group">
-        <label>What should happen when something is deleted in the Costlocker?</label>
-        <div>
-          <label className="checkbox-inline">
-            <input type="checkbox" name="deleteTasks"
-              onChange={syncForm.set('isDeletingTodosEnabled')} checked={syncForm.get('isDeletingTodosEnabled')}
-              /> Delete todos
-          </label>
-          <label className="checkbox-inline">
-            <input type="checkbox" name="revokeAccess"
-              onChange={syncForm.set('isRevokeAccessEnabled')} checked={syncForm.get('isRevokeAccessEnabled')}
-              /> Revoke access to persons without todo
-          </label>
-        </div>
-      </div>
-      }
-      <button type="submit" className="btn btn-primary">Synchronize</button>
+      <button type="submit" className="btn btn-primary btn-block">Synchronize</button>
     </form>
   </div>;
 };

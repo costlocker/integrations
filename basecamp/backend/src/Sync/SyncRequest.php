@@ -13,6 +13,10 @@ class SyncRequest
     public $isDeletingTodosEnabled = true;
     public $isRevokeAccessEnabled = false;
 
+    public $areTasksEnabled = false;
+    public $isDeletingTasksEnabled = false;
+    public $isBasecampWebhookEnabled = false;
+
     public function isDeleteDisabled()
     {
         return !$this->isDeletingTodosEnabled && !$this->isRevokeAccessEnabled;
@@ -21,9 +25,14 @@ class SyncRequest
     public function toSettings()
     {
         return [
+            // costlocker -> basecamp
             'areTodosEnabled' => $this->areTodosEnabled,
             'isDeletingTodosEnabled' => $this->isDeletingTodosEnabled,
             'isRevokeAccessEnabled' => $this->isRevokeAccessEnabled,
+            // basecamp -> costlocker
+            'areTasksEnabled' => $this->areTasksEnabled,
+            'isDeletingTasksEnabled' => $this->isDeletingTasksEnabled,
+            'isBasecampWebhookEnabled' => $this->isBasecampWebhookEnabled,
         ];
     }
 }
