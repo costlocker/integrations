@@ -12,7 +12,7 @@ use Costlocker\Integrations\Auth\GetUser;
 
 abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_TestCase
 {
-    private $costlocker;
+    protected $costlocker;
     protected $basecamp;
     protected $database;
 
@@ -28,7 +28,9 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
     protected function givenCostlockerProject($file)
     {
         $json = file_get_contents(__DIR__ . "/fixtures/{$file}");
-        $this->costlocker->shouldReceive('__invoke')->andReturn(new Response(200, [], $json));
+        $this->costlocker->shouldReceive('__invoke')
+            ->with(m::type('string'))
+            ->andReturn(new Response(200, [], $json));
     }
 
     protected function givenCostlockerWebhook($file)

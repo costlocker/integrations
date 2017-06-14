@@ -65,7 +65,7 @@ class Synchronizer
 
         if ($config->areTasksEnabled) {
             if ($this->basecamp->canBeSynchronizedFromBasecamp()) {
-                
+                $result->todolists = $this->createPeopleCosts($bcProject, $r);
             } else {
                 $config->areTasksEnabled = false;
                 $config->isDeletingTasksEnabled = false;
@@ -344,6 +344,89 @@ class Synchronizer
         }
 
         return $deleted;
+    }
+
+    private function createPeopleCosts(array $bcProject, SyncProjectRequest $config)
+    {
+        $mapping = [];
+
+        if ($bcProject['isCreated']) {
+            return $mapping;
+        }
+
+        $bcTodolists = $this->basecamp->getTodolists($bcProject['id']);
+        $newTasks = [];
+        foreach ($bcTodolists as $todolistId => $bcTodolist) {
+            $activityId = $this->findByBasecampId($bcProject['activities'], $todolistId);
+            if (!$activityId) {
+                continue;
+            }
+            foreach ($bcTodolist->todoitems as $todoId => $todo) {
+                if (
+                    $this->findByBasecampId($bcProject['activities'][$activityId]['tasks'], $todoId) ||
+                    $this->findByBasecampId($bcProject['activities'][$activityId]['persons'], $todoId)
+                ) {
+                    continue;
+                }
+                $newTasks[] = [
+                    'item' => [
+                        'type' => 'task',
+                        'activity_id' => $activityId,
+                    ],
+                    'person' => $todo->assignee + [
+                        'role' => 'EMPLOYEE',
+                        'salary' => [
+                            'payment' => 'hourly',
+                            'hourly_rate' => 0,
+                        ],
+                    ],
+                    'task' => $todo->content,
+                    'hours' => 0,
+                    'basecamp' => [
+                        'todo_id' => $todoId,
+                        'todolist_id' => $todolistId,
+                    ],
+                ];
+            }
+        }
+
+        if (!$newTasks) {
+            return $mapping;
+        }
+
+        $response = $this->costlocker->__invoke("/projects", [
+            'id' => $config->costlockerId,
+            'items' => $newTasks,
+        ]);
+        $createdTasks = json_decode($response->getBody(), true)['data'][0]['items'];
+
+        foreach ($createdTasks as $index => $createdItem) {
+            $ids = $createdItem['item'];
+            if (!array_key_exists($ids['activity_id'], $mapping)) {
+                $mapping[$ids['activity_id']] = [
+                    'id' => $newTasks[$index]['basecamp']['todolist_id'],
+                    'tasks' => [],
+                    'persons' => [],
+                ];
+            }
+            $mapping[$ids['activity_id']]['tasks'][$ids['task_id']] = [
+                'id' => $newTasks[$index]['basecamp']['todo_id'],
+                'person_id' => $ids['person_id'],
+                'name' => $newTasks[$index]['task'],
+                'isCreated' => true,
+            ];
+        }
+
+        return $mapping;
+    }
+
+    private function findByBasecampId(array $data, $todolistId)
+    {
+        foreach ($data as $costlockerId => $mapping) {
+            if ($mapping['id'] == $todolistId) {
+                return $costlockerId;
+            }
+        }
     }
 
     private function updateMapping(array $bcProject, SyncResult $result)
