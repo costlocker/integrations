@@ -424,6 +424,7 @@ class Synchronizer
             return [$mapping, $deleted];
         }
 
+        $this->getUser->overrideCostlockerUser($projectRequest->costlockerUser);
         $response = $this->costlocker->__invoke("/projects", [
             'id' => $projectRequest->costlockerId,
             'items' => $tasksUpdate,
