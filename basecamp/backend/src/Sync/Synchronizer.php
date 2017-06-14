@@ -65,7 +65,7 @@ class Synchronizer
 
         if ($config->areTasksEnabled) {
             if ($this->basecamp->canBeSynchronizedFromBasecamp()) {
-                list($result->todolists, $result->deleteSummary) = $this->synchronizePeopleCosts($bcProject, $config, $r);
+                list($result->todolists, $result->deleteSummary, $result->error) = $this->synchronizePeopleCosts($bcProject, $config, $r);
             } else {
                 $config->areTasksEnabled = false;
                 $config->isDeletingTasksEnabled = false;
@@ -355,9 +355,10 @@ class Synchronizer
             'persons' => [],
             'revoked' => [],
         ];
+        $error = null;
 
         if ($bcProject['isCreated']) {
-            return [$mapping, $deleted];
+            return [$mapping, $deleted, $error];
         }
 
         $bcTodolists = $this->basecamp->getTodolists($bcProject['id']);
@@ -421,7 +422,7 @@ class Synchronizer
         }
         
         if (!$tasksUpdate) {
-            return [$mapping, $deleted];
+            return [$mapping, $deleted, $error];
         }
 
         $this->getUser->overrideCostlockerUser($projectRequest->costlockerUser);
@@ -429,6 +430,11 @@ class Synchronizer
             'id' => $projectRequest->costlockerId,
             'items' => $tasksUpdate,
         ]);
+
+        if ($response->getStatusCode() != 200) {
+            return [$mapping, $deleted, "Costlocked failed ({$response->getBody()})"];
+        }
+        
         $createdTasks = json_decode($response->getBody(), true)['data'][0]['items'];
 
         foreach ($createdTasks as $index => $createdItem) {
@@ -456,7 +462,7 @@ class Synchronizer
             }
         }
 
-        return [$mapping, $deleted];
+        return [$mapping, $deleted, $error];
     }
 
     private function findByBasecampId(array $data, $todolistId)
