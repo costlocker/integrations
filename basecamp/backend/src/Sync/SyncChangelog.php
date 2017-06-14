@@ -91,4 +91,49 @@ class SyncChangelog
             'error' => $this->error,
         ];
     }
+
+    public static function arrayToStats($type, array $results)
+    {
+        if (!$results) {
+            return null;
+        }
+
+        $stats = [
+            'system' => $type,
+            'project' => [
+                'id' => $results['id'],
+                'createdCount' => (int) $results['wasProjectCreated'],
+            ],
+            'activities' => [
+                'createdCount' => 0,
+                'deletedCount' => count($results['delete']['activities']),
+            ],
+            'tasks' => [
+                'createdCount' => 0,
+                'deletedCount' => 0,
+            ],
+        ];
+        foreach ($results['activities'] ?? [] as $activity) {
+            $stats['activities']['createdCount'] += (bool) ($activity['isCreated'] ?? false);
+            foreach (['tasks', 'persons'] as $type) {
+                foreach ($activity[$type] as $task) {
+                    $stats['tasks']['createdCount'] += (bool) ($task['isCreated'] ?? false);
+                }
+            }
+        }
+        foreach (['tasks', 'persons'] as $type) {
+            foreach ($results['delete'][$type] as $activityTasks) {
+                $stats['tasks']['deletedCount'] += count($activityTasks);
+            }
+        }
+
+        $totalCounts =
+            $stats['project']['createdCount'] +
+            $stats['activities']['createdCount'] +
+            $stats['activities']['deletedCount'] +
+            $stats['tasks']['createdCount'] +
+            $stats['tasks']['deletedCount'];
+
+        return $totalCounts ? $stats : null;
+    }
 }

@@ -3,6 +3,7 @@
 namespace Costlocker\Integrations\Events;
 
 use Costlocker\Integrations\Entities\Event;
+use Costlocker\Integrations\Sync\SyncChangelog;
 
 class EventsToJson
 {
@@ -50,7 +51,14 @@ class EventsToJson
                     'date' => $date->format('Y-m-d H:i:s'),
                     'user' => $e->costlockerUser ? $e->costlockerUser->data : null,
                     'status' => $statuses[$e->event] ?? null,
-                    'error' => $e->data['result']['basecamp']['error'] ?? null,
+                    'errors' => array_values(array_filter([
+                        $e->data['result']['basecamp']['error'] ?? null,
+                        $e->data['result']['costlocker']['error'] ?? null,
+                    ])),
+                    'changelogs' => array_values(array_filter([
+                        SyncChangelog::arrayToStats('basecamp', $e->data['result']['basecamp'] ?? []),
+                        SyncChangelog::arrayToStats('costlocker', $e->data['result']['costlocker'] ?? []),
+                    ])),
                     'changelog' => [
                         'basecamp' => $e->data['result']['basecamp'] ?? null,
                         'costlocker' => $e->data['result']['costlocker'] ?? null,
