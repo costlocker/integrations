@@ -54,7 +54,7 @@ class SyncResult
                 'settings' => $this->getSettings(),
             ],
             'basecamp' => $this->basecampChangelog->toArray($this->basecampProjectId),
-            'costlocker' => $this->basecampChangelog->toArray($this->projectRequest->costlockerId),
+            'costlocker' => $this->costlockerChangelog->toArray($this->projectRequest->costlockerId),
         ];
         // dont save doctrine entity...
         if ($this->projectRequest->costlockerUser) {
