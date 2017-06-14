@@ -404,23 +404,38 @@ class Synchronizer
                     if (isset($bcTodolist->todoitems[$mappedTodo['id']])) {
                         continue;
                     }
-                    $tasksUpdate[] = [
-                        'action' => 'delete',
-                        'item' => [
-                            'type' => 'task',
-                            'activity_id' => $activityId,
-                            'person_id' => $mappedTodo['person_id'],
-                            'task_id' => $activityId,
-                        ],
-                        'basecamp' => [
-                            'todo_id' => $mappedTodo['id'],
-                            'todolist_id' => $todolistId,
-                        ],
-                    ];
+                    if ($type == 'tasks') {
+                        $tasksUpdate[] = [
+                            'action' => 'delete',
+                            'item' => [
+                                'type' => 'task',
+                                'activity_id' => $activityId,
+                                'person_id' => $mappedTodo['person_id'],
+                                'task_id' => $id,
+                            ],
+                            'basecamp' => [
+                                'todo_id' => $mappedTodo['id'],
+                                'todolist_id' => $todolistId,
+                            ],
+                        ];
+                    } else {
+                        $tasksUpdate[] = [
+                            'action' => 'delete',
+                            'item' => [
+                                'type' => 'person',
+                                'activity_id' => $activityId,
+                                'person_id' => $mappedTodo['person_id'],
+                            ],
+                            'basecamp' => [
+                                'todo_id' => $mappedTodo['id'],
+                                'todolist_id' => $todolistId,
+                            ],
+                        ];
+                    }
                 }
             }
         }
-        
+
         if (!$tasksUpdate) {
             return [$mapping, $deleted, $error];
         }
