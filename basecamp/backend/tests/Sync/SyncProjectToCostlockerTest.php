@@ -204,6 +204,92 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
         );
     }
 
+    public function testDeleteTaskInCostlocker()
+    {
+        $basecampId = 'irrelevant project';
+        $this->request['isDeletingTasksEnabled'] = true;
+        $originalMapping = [
+            1 => [
+                'id' => $basecampId,
+                'tasks' => [
+                    885 => [
+                        'id' => 'todo created in costlocker (task)',
+                        'person_id' => 1,
+                        'name' => 'task todo',
+                    ],
+                ],
+                'persons' => [
+                    885 => [
+                        'id' => 'todo created in costlocker (person)',
+                        'person_id' => 885,
+                        'name' => 'person todo',
+                    ],
+                ],
+            ],
+        ];
+        $this->whenProjectIsMapped($basecampId, $originalMapping);
+        $this->givenCostlockerProject('one-person.json');
+        $this->shouldLoadBasecampPeople(
+            [
+                'John Doe (john@example.com)' => 'john@example.com',
+                'Peter Nobody (peter@example.com)' => 'peter@example.com',
+            ],
+            $basecampId
+        );
+        $this->basecamp->shouldReceive('canBeSynchronizedFromBasecamp')->andReturn(true);
+        $this->basecamp->shouldReceive('getTodolists')->once()->andReturn([
+            $basecampId => (object) [
+                'todoitems' => [],
+            ],
+        ]);
+        $this->costlocker->shouldReceive('__invoke')
+            ->with('/projects', m::on(function ($data) {
+                assertThat($data['items'], is(arrayWithSize(2)));
+                return true;
+            }))
+            ->andReturn(
+                new Response(200, [], json_encode([
+                    'data' => [
+                        [
+                            'items' => [
+                                [
+                                    'action' => 'delete',
+                                    'item' => [
+                                        'type' => 'task',
+                                        'activity_id' => 1,
+                                        'person_id' => 1,
+                                        'task_id' => 885,
+                                    ],
+                                ],
+                                [
+                                    'action' => 'delete',
+                                    'item' => [
+                                        'type' => 'person',
+                                        'activity_id' => 1,
+                                        'person_id' => 885,
+                                    ],
+                                ],
+                            ],  
+                        ],
+                    ],
+                ]))
+            );
+        $this->synchronize(Event::RESULT_SUCCESS);
+        $this->assertMappingIs(
+            [
+                'id' => $basecampId,
+                'account' => [],
+                'activities' => [
+                    1 => [
+                        'id' => $basecampId,
+                        'tasks' => [],
+                        'persons' => [],
+                    ],
+                ],
+            ]
+        );
+    }
+
     public function testIgnoreOlderVersionOfBasecamp()
     {
         $this->request = [

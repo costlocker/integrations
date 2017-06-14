@@ -65,7 +65,7 @@ class Synchronizer
 
         if ($config->areTasksEnabled) {
             if ($this->basecamp->canBeSynchronizedFromBasecamp()) {
-                $result->todolists = $this->createPeopleCosts($bcProject, $r);
+                list($result->todolists, $result->deleteSummary) = $this->synchronizePeopleCosts($bcProject, $config, $r);
             } else {
                 $config->areTasksEnabled = false;
                 $config->isDeletingTasksEnabled = false;
@@ -346,16 +346,22 @@ class Synchronizer
         return $deleted;
     }
 
-    private function createPeopleCosts(array $bcProject, SyncProjectRequest $config)
+    private function synchronizePeopleCosts(array $bcProject, SyncRequest $config, SyncProjectRequest $projectRequest)
     {
         $mapping = [];
+        $deleted = [
+            'activities' => [],
+            'tasks' => [],
+            'persons' => [],
+            'revoked' => [],
+        ];
 
         if ($bcProject['isCreated']) {
-            return $mapping;
+            return [$mapping, $deleted];
         }
 
         $bcTodolists = $this->basecamp->getTodolists($bcProject['id']);
-        $newTasks = [];
+        $tasksUpdate = [];
         foreach ($bcTodolists as $todolistId => $bcTodolist) {
             $activityId = $this->findByBasecampId($bcProject['activities'], $todolistId);
             if (!$activityId) {
@@ -368,7 +374,7 @@ class Synchronizer
                 ) {
                     continue;
                 }
-                $newTasks[] = [
+                $tasksUpdate[] = [
                     'item' => [
                         'type' => 'task',
                         'activity_id' => $activityId,
@@ -388,15 +394,39 @@ class Synchronizer
                     ],
                 ];
             }
-        }
 
-        if (!$newTasks) {
-            return $mapping;
+            if (!$config->isDeletingTasksEnabled) {
+                continue;
+            }
+            foreach (['tasks', 'persons'] as $type) {
+                foreach ($bcProject['activities'][$activityId][$type] as $id => $mappedTodo) {
+                    if (isset($bcTodolist->todoitems[$mappedTodo['id']])) {
+                        continue;
+                    }
+                    $tasksUpdate[] = [
+                        'action' => 'delete',
+                        'item' => [
+                            'type' => 'task',
+                            'activity_id' => $activityId,
+                            'person_id' => $mappedTodo['person_id'],
+                            'task_id' => $activityId,
+                        ],
+                        'basecamp' => [
+                            'todo_id' => $mappedTodo['id'],
+                            'todolist_id' => $todolistId,
+                        ],
+                    ];
+                }
+            }
+        }
+        
+        if (!$tasksUpdate) {
+            return [$mapping, $deleted];
         }
 
         $response = $this->costlocker->__invoke("/projects", [
-            'id' => $config->costlockerId,
-            'items' => $newTasks,
+            'id' => $projectRequest->costlockerId,
+            'items' => $tasksUpdate,
         ]);
         $createdTasks = json_decode($response->getBody(), true)['data'][0]['items'];
 
@@ -404,20 +434,28 @@ class Synchronizer
             $ids = $createdItem['item'];
             if (!array_key_exists($ids['activity_id'], $mapping)) {
                 $mapping[$ids['activity_id']] = [
-                    'id' => $newTasks[$index]['basecamp']['todolist_id'],
+                    'id' => $tasksUpdate[$index]['basecamp']['todolist_id'],
                     'tasks' => [],
                     'persons' => [],
                 ];
             }
-            $mapping[$ids['activity_id']]['tasks'][$ids['task_id']] = [
-                'id' => $newTasks[$index]['basecamp']['todo_id'],
-                'person_id' => $ids['person_id'],
-                'name' => $newTasks[$index]['task'],
-                'isCreated' => true,
-            ];
+            if ($createdItem['action'] == 'upsert') {
+                $mapping[$ids['activity_id']]['tasks'][$ids['task_id']] = [
+                    'id' => $tasksUpdate[$index]['basecamp']['todo_id'],
+                    'person_id' => $ids['person_id'],
+                    'name' => $tasksUpdate[$index]['task'],
+                    'isCreated' => true,
+                ];
+            } else {
+                if ($ids['type'] == 'task') {
+                    $deleted['tasks'][$ids['activity_id']][$ids['task_id']] = $ids['task_id'];
+                } else {
+                    $deleted['persons'][$ids['activity_id']][$ids['person_id']] = $ids['person_id'];
+                }
+            }
         }
 
-        return $mapping;
+        return [$mapping, $deleted];
     }
 
     private function findByBasecampId(array $data, $todolistId)
