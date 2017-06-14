@@ -63,6 +63,16 @@ class Synchronizer
             $result->deleteSummary = $this->deleteLegacyEntitiesInBasecamp($bcProject, $people, $activities, $config);
         }
 
+        if ($config->areTasksEnabled) {
+            if ($this->basecamp->canBeSynchronizedFromBasecamp()) {
+                
+            } else {
+                $config->areTasksEnabled = false;
+                $config->isDeletingTasksEnabled = false;
+                $config->isBasecampWebhookEnabled = false;
+            }
+        }
+
         $this->updateMapping($bcProject, $result);
 
         return $result;
@@ -377,7 +387,7 @@ class Synchronizer
                 'account' => $result->syncConfig->account,
                 'activities' => $bcProject['activities'],
             ],
-            $result->settings
+            $result->getSettings()
         );
     }
 }

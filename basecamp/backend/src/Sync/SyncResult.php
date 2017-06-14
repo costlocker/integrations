@@ -9,7 +9,6 @@ class SyncResult
     private $projectRequest;
     /** @var SyncRequest */
     public $syncConfig;
-    public $settings;
 
     public $basecampProjectId;
     /** @var \Costlocker\Integrations\Entities\BasecampProject */
@@ -25,7 +24,6 @@ class SyncResult
     {
         $this->projectRequest = $r;
         $this->syncConfig = $c;
-        $this->settings = $c->toSettings();
     }
 
     public function getResultStatus()
@@ -49,13 +47,18 @@ class SyncResult
         return false;
     }
 
+    public function getSettings()
+    {
+        return $this->syncConfig->toSettings();
+    }
+
     public function toArray()
     {
         $data = [
             'request' => [
                 'sync' => get_object_vars($this->syncConfig),
                 'project' => get_object_vars($this->projectRequest),
-                'settings' => $this->settings,
+                'settings' => $this->getSettings(),
             ],
             'basecamp' => [
                 'id' => $this->basecampProjectId,

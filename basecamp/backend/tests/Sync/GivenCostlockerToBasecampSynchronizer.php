@@ -13,8 +13,8 @@ use Costlocker\Integrations\Auth\GetUser;
 abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_TestCase
 {
     private $costlocker;
-    private $basecamp;
-    private $database;
+    protected $basecamp;
+    protected $database;
 
     protected $request;
 
