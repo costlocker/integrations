@@ -59,10 +59,6 @@ class EventsToJson
                         SyncChangelog::arrayToStats('basecamp', $e->data['result']['basecamp'] ?? []),
                         SyncChangelog::arrayToStats('costlocker', $e->data['result']['costlocker'] ?? []),
                     ])),
-                    'changelog' => [
-                        'basecamp' => $e->data['result']['basecamp'] ?? null,
-                        'costlocker' => $e->data['result']['costlocker'] ?? null,
-                    ],
                 ];
             },
             $events
