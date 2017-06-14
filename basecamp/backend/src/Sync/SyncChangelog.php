@@ -4,7 +4,7 @@ namespace Costlocker\Integrations\Sync;
 
 class SyncChangelog
 {
-    public $wasProjectCreated = false;
+    public $isCreated = false;
     public $grantedPeople = [];
     public $createdActivities = [];
     public $deleteSummary = [
@@ -49,7 +49,7 @@ class SyncChangelog
 
     public function wasSomethingChanged()
     {
-        return $this->wasProjectCreated || $this->getcChangedActivities() || $this->wasSomethingDeleted();
+        return $this->isCreated || $this->getcChangedActivities() || $this->wasSomethingDeleted();
     }
 
     public function getcChangedActivities()
@@ -84,7 +84,7 @@ class SyncChangelog
     {
         return [
             'id' => $id,
-            'wasProjectCreated' => $this->wasProjectCreated,
+            'isCreated' => $this->isCreated,
             'people' => $this->grantedPeople,
             'activities' => $this->getcChangedActivities(),
             'delete' => $this->deleteSummary,
@@ -102,7 +102,7 @@ class SyncChangelog
             'system' => $type,
             'project' => [
                 'id' => $results['id'],
-                'createdCount' => (int) $results['wasProjectCreated'],
+                'createdCount' => (int) ($results['isCreated'] ?? false),
             ],
             'activities' => [
                 'createdCount' => 0,

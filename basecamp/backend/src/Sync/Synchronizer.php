@@ -48,7 +48,7 @@ class Synchronizer
         list($people, $activities) = $this->analyzeProjectItems($bcProject, $r);
 
         $result->basecampProjectId = $bcProject['id'];
-        $result->basecampChangelog->wasProjectCreated = $bcProject['isCreated'];
+        $result->basecampChangelog->isCreated = $bcProject['isCreated'];
 
         if ($this->checkDeletedProject($bcProject)) {
             $result->basecampChangelog->error = "Project {$result->basecampProjectId} is not available in Basecamp";
