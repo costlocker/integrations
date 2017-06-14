@@ -246,9 +246,6 @@ class Synchronizer
                     $changelog->addTask($activityId, $type, $id, $todo);
                 }
             }
-            if (!$changelog->isActivityChanged($activityId)) {
-                unset($changelog->createdActivities[$activityId]);
-            }
         }
     }
 

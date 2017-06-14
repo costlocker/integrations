@@ -47,16 +47,27 @@ class SyncChangelog
         $this->deleteSummary['revoked'][$email] = $email;
     }
 
-    public function isActivityChanged($activityId)
+    public function wasSomethingChanged()
+    {
+        return $this->wasProjectCreated || $this->getcChangedActivities() || $this->wasSomethingDeleted();
+    }
+
+    public function getcChangedActivities()
+    {
+        $activities = [];
+        foreach ($this->createdActivities as $activityId => $activity) {
+            if ($this->isActivityChanged($activityId)) {
+                $activities[$activityId] = $activity;
+            }
+        }
+        return $activities;
+    }
+
+    private function isActivityChanged($activityId)
     {
         return $this->createdActivities[$activityId]['isCreated']
             || $this->createdActivities[$activityId]['tasks']
             || $this->createdActivities[$activityId]['persons'];
-    }
-
-    public function wasSomethingChanged()
-    {
-        return $this->wasProjectCreated || $this->createdActivities || $this->wasSomethingDeleted();
     }
 
     private function wasSomethingDeleted()
@@ -75,7 +86,7 @@ class SyncChangelog
             'id' => $id,
             'wasProjectCreated' => $this->wasProjectCreated,
             'people' => $this->grantedPeople,
-            'activities' => $this->createdActivities,
+            'activities' => $this->getcChangedActivities(),
             'delete' => $this->deleteSummary,
             'error' => $this->error,
         ];
