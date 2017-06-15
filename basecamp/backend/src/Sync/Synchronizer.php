@@ -341,18 +341,20 @@ class Synchronizer
 
         $bcTodolists = $this->getBasecampTodolists($bcProject);
         $tasksUpdate = [];
+        $newActitivies = [];
         foreach ($bcTodolists as $todolistId => $bcTodolist) {
             $activityId = $this->findByBasecampId($bcProject['activities'], $todolistId);
             if (!$activityId && $config->isCreatingActivitiesEnabled) {
-                $activityId = $this->findExistingActivity($bcTodolist->name, $todolistId, $bcProject);
+                $activityId = $this->findExistingActivity($bcTodolist->name);
+                $newActitivies[] = $activityId;
             }
             if (!$activityId) {
                 continue;
             }
             foreach ($bcTodolist->todoitems as $todoId => $todo) {
                 if (
-                    $this->findByBasecampId($bcProject['activities'][$activityId]['tasks'], $todoId) ||
-                    $this->findByBasecampId($bcProject['activities'][$activityId]['persons'], $todoId) ||
+                    $this->findByBasecampId($bcProject['activities'][$activityId]['tasks'] ?? [], $todoId) ||
+                    $this->findByBasecampId($bcProject['activities'][$activityId]['persons'] ?? [], $todoId) ||
                     !$todo->assignee
                 ) {
                     continue;
@@ -382,7 +384,7 @@ class Synchronizer
                 continue;
             }
             foreach (['tasks', 'persons'] as $type) {
-                foreach ($bcProject['activities'][$activityId][$type] as $id => $mappedTodo) {
+                foreach ($bcProject['activities'][$activityId][$type] ?? [] as $id => $mappedTodo) {
                     if (isset($bcTodolist->todoitems[$mappedTodo['id']])) {
                         continue;
                     }
@@ -457,7 +459,11 @@ class Synchronizer
         foreach ($createdTasks as $index => $createdItem) {
             $ids = $createdItem['item'];
             $activityId = $ids['activity_id'];
-            $changelog->initActivity($activityId, $tasksUpdate[$index]['basecamp']['todolist_id']);
+            $changelog->initActivity(
+                $activityId,
+                $tasksUpdate[$index]['basecamp']['todolist_id'],
+                in_array($activityId, $newActitivies)
+            );
             if ($createdItem['action'] == 'upsert') {
                 $changelog->addTask($activityId, 'tasks', $ids['task_id'], [
                     'id' => $tasksUpdate[$index]['basecamp']['todo_id'],
@@ -490,7 +496,7 @@ class Synchronizer
         }
     }
 
-    private function findExistingActivity($activityName, $bcTodolistId, array &$bcProject)
+    private function findExistingActivity($activityName)
     {
         $normalizeName = function ($name) {
             return mb_strtolower($name, 'utf-8');
@@ -508,17 +514,7 @@ class Synchronizer
             }
         }
 
-        $activityId = $activities[$normalizeName($activityName)] ?? null;
-        if (!$activityId) {
-            return null;
-        }
-
-        $bcProject['activities'][$activityId] = [
-            'id' => $bcTodolistId,
-            'tasks' => [],
-            'persons' => [],
-        ];
-        return $activityId;
+        return $activities[$normalizeName($activityName)] ?? null;
     }
 
     private function updateMapping(array &$bcProject, SyncChangelog $changelog)
