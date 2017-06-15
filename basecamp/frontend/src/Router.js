@@ -148,6 +148,8 @@ export const states = [
                 .set('isRevokeAccessEnabled', basecampProject.settings.isRevokeAccessEnabled)
                 .set('areTasksEnabled', basecampProject.settings.areTasksEnabled)
                 .set('isDeletingTasksEnabled', basecampProject.settings.isDeletingTasksEnabled)
+                .set('isCreatingActivitiesEnabled', basecampProject.settings.isCreatingActivitiesEnabled)
+                .set('isDeletingActivitiesEnabled', basecampProject.settings.isDeletingActivitiesEnabled)
                 .set('isBasecampWebhookEnabled', basecampProject.settings.isBasecampWebhookEnabled)
               )
               return;
@@ -166,6 +168,8 @@ export const states = [
             .set('isRevokeAccessEnabled', companySettings.get('isRevokeAccessEnabled'))
             .set('areTasksEnabled', companySettings.get('areTasksEnabled'))
             .set('isDeletingTasksEnabled', companySettings.get('isDeletingTasksEnabled'))
+            .set('isCreatingActivitiesEnabled', companySettings.get('isCreatingActivitiesEnabled'))
+            .set('isDeletingActivitiesEnabled', companySettings.get('isDeletingActivitiesEnabled'))
             .set('isBasecampWebhookEnabled', companySettings.get('isBasecampWebhookEnabled'))
           );
         }
