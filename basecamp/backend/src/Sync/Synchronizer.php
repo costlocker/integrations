@@ -224,11 +224,13 @@ class Synchronizer
 
     private function grantAccess($bcProjectId, array $peopleFromCostlocker, SyncChangelog $changelog)
     {
+        $peopleEmails = [];
         foreach ($peopleFromCostlocker as $email => $fullname) {
-            $changelog->grantedPeople["{$fullname} ({$email})"] = $email;
+            $peopleEmails["{$fullname} ({$email})"] = $email;
         }
-        if ($changelog->grantedPeople) {
-            $this->basecamp->grantAccess($bcProjectId, $changelog->grantedPeople);
+        if ($peopleEmails) {
+            $this->basecamp->grantAccess($bcProjectId, $peopleEmails);
+            $changelog->grantAccess($peopleEmails);
         }
     }
 
@@ -519,7 +521,7 @@ class Synchronizer
 
     private function updateMapping(array &$bcProject, SyncChangelog $changelog)
     {
-        foreach ($changelog->createdActivities as $activityId => $activity) {
+        foreach ($changelog->getChangedActivities() as $activityId => $activity) {
             if (!array_key_exists($activityId, $bcProject['activities'])) {
                 $bcProject['activities'][$activityId] = [];
             }
@@ -540,11 +542,11 @@ class Synchronizer
             }
         }
 
-        foreach ($changelog->deleteSummary['activities'] ?? [] as $activity) {
+        foreach ($changelog->getDeleted('activities') as $activity) {
             unset($bcProject['activities'][$activity]);
         }
         foreach (['tasks', 'persons'] as $type) {
-            foreach ($changelog->deleteSummary[$type] ?? [] as $activityId => $tasks) {
+            foreach ($changelog->getDeleted($type) as $activityId => $tasks) {
                 foreach ($tasks as $taskId) {
                     unset($bcProject['activities'][$activityId][$type][$taskId]);
                 }

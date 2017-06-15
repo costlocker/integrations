@@ -5,20 +5,21 @@ namespace Costlocker\Integrations\Sync;
 class SyncChangelog
 {
     public $isCreated = false;
-    public $grantedPeople = [];
-    public $createdActivities = [];
-    public $deleteSummary = [
+    public $error;
+
+    private $grantedPeople = [];
+    private $changedActivities = [];
+    private $deleteSummary = [
         'activities' => [], // <activity_id> => <activity_id>
         'tasks' => [],      // <activity_id> => [<task_id> => <task_id>]
         'persons' => [],    // <activity_id> => [<person_id> => <person_id>]
         'revoked' => [],    // <email>       => <email>
     ];
-    public $error;
 
     public function initActivity($activityId, $bcTodolistId, $siCreated = false)
     {
-        if (!array_key_exists($activityId, $this->createdActivities)) {
-            $this->createdActivities[$activityId] = [
+        if (!array_key_exists($activityId, $this->changedActivities)) {
+            $this->changedActivities[$activityId] = [
                 'id' => $bcTodolistId,
                 'isCreated' => $siCreated,
                 'tasks' => [],
@@ -29,7 +30,7 @@ class SyncChangelog
 
     public function addTask($activityId, $type, $personOrTaskId, array $task)
     {
-        $this->createdActivities[$activityId][$type][$personOrTaskId] = $task;
+        $this->changedActivities[$activityId][$type][$personOrTaskId] = $task;
     }
 
     public function deleteActivity($activityId)
@@ -42,6 +43,16 @@ class SyncChangelog
         $this->deleteSummary[$type][$activityId][$personOrTaskId] = $personOrTaskId;
     }
 
+    public function getDeleted($type)
+    {
+        return $this->deleteSummary[$type] ?? [];
+    }
+
+    public function grantAccess(array $peopleEmails)
+    {
+        $this->grantedPeople = $peopleEmails;
+    }
+
     public function revokeAccess($email)
     {
         $this->deleteSummary['revoked'][$email] = $email;
@@ -49,13 +60,13 @@ class SyncChangelog
 
     public function wasSomethingChanged()
     {
-        return $this->isCreated || $this->getcChangedActivities() || $this->wasSomethingDeleted();
+        return $this->isCreated || $this->getChangedActivities() || $this->wasSomethingDeleted();
     }
 
-    public function getcChangedActivities()
+    public function getChangedActivities()
     {
         $activities = [];
-        foreach ($this->createdActivities as $activityId => $activity) {
+        foreach ($this->changedActivities as $activityId => $activity) {
             if ($this->isActivityChanged($activityId)) {
                 $activities[$activityId] = $activity;
             }
@@ -65,9 +76,9 @@ class SyncChangelog
 
     private function isActivityChanged($activityId)
     {
-        return $this->createdActivities[$activityId]['isCreated']
-            || $this->createdActivities[$activityId]['tasks']
-            || $this->createdActivities[$activityId]['persons'];
+        return $this->changedActivities[$activityId]['isCreated']
+            || $this->changedActivities[$activityId]['tasks']
+            || $this->changedActivities[$activityId]['persons'];
     }
 
     private function wasSomethingDeleted()
@@ -86,7 +97,7 @@ class SyncChangelog
             'id' => $id,
             'isCreated' => $this->isCreated,
             'people' => $this->grantedPeople,
-            'activities' => $this->getcChangedActivities(),
+            'activities' => $this->getChangedActivities(),
             'delete' => $this->deleteSummary,
             'error' => $this->error,
         ];
