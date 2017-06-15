@@ -239,6 +239,162 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
         );
     }
 
+    public function testAddActivityToCostlocker()
+    {
+        $basecampId = 'irrelevant project';
+        $this->request['isCreatingActivitiesEnabled'] = true;
+        $this->whenProjectIsMapped($basecampId, [
+            1 => [
+                'id' => $basecampId,
+                'tasks' => [
+                    885 => [
+                        'id' => 'todo created in costlocker (task)',
+                        'person_id' => 1,
+                        'name' => 'task todo',
+                    ],
+                ],
+                'persons' => [
+                    885 => [
+                        'id' => 'todo created in costlocker (person)',
+                        'person_id' => 885,
+                        'name' => 'person todo',
+                    ],
+                ],
+            ],
+        ]);
+        $this->givenCostlockerProject('one-person.json');
+        $this->shouldLoadBasecampPeople(
+            [
+                'John Doe (john@example.com)' => 'john@example.com',
+                'Peter Nobody (peter@example.com)' => 'peter@example.com',
+            ],
+            $basecampId
+        );
+        $this->basecamp->shouldReceive('canBeSynchronizedFromBasecamp')->andReturn(true);
+        $this->basecamp->shouldReceive('getTodolists')->once()->andReturn([
+            $basecampId => (object) [
+                'todoitems' => [
+                    'todo created in costlocker (task)' => (object) [
+                        'content' => 'task todo',
+                        'assignee' => [
+                            'email' => 'john@example.com',
+                            'first_name' => 'John',
+                            'last_name' => 'Doe',
+                        ],
+                    ],
+                    'todo created in costlocker (person)' => (object) [
+                        'content' => 'person todo',
+                        'assignee' => [
+                            'email' => 'peter@example.com',
+                            'first_name' => 'John',
+                            'last_name' => 'Doe',
+                        ],
+                    ],
+                ],
+            ],
+            'new todolist' => (object) [
+                'name' => 'design',
+                'todoitems' => [
+                    'new todo in basecamp (task)' => (object) [
+                        'content' => 'basecamp todo',
+                        'assignee' => [
+                            'email' => 'john@example.com',
+                            'first_name' => 'John',
+                            'last_name' => 'Doe',
+                        ],
+                    ],
+                    'new todo in basecamp (person)' => (object) [
+                        'content' => 'basecamp todo2',
+                        'assignee' => [
+                            'email' => 'peter@example.com',
+                            'first_name' => 'Peter',
+                            'last_name' => 'Nobody',
+                        ],
+                    ],
+                    'ignore todo without assignee' => (object) [
+                        'content' => 'unassigned todo',
+                        'assignee' => null,
+                    ],
+                ]
+            ],
+        ]);
+        $this->costlocker->shouldReceive('__invoke')
+            ->with('/projects', m::on(function ($data) {
+                assertThat($data['items'], is(arrayWithSize(2)));
+                return true;
+            }))
+            ->andReturn(
+                new Response(200, [], json_encode([
+                    'data' => [
+                        [
+                            'items' => [
+                                [
+                                    'action' => 'upsert',
+                                    'item' => [
+                                        'type' => 'task',
+                                        'activity_id' => 2,
+                                        'person_id' => 1,
+                                        'task_id' => 123,
+                                    ],
+                                ],
+                                [
+                                    'action' => 'upsert',
+                                    'item' => [
+                                        'type' => 'task',
+                                        'activity_id' => 2,
+                                        'person_id' => 885,
+                                        'task_id' => 456,
+                                    ],
+                                ],
+                            ],  
+                        ],
+                    ],
+                ]))
+            );
+        $this->synchronize(Event::RESULT_SUCCESS);
+        $this->assertMappingIs(
+            [
+                'id' => $basecampId,
+                'account' => [],
+                'activities' => [
+                    1 => [
+                        'id' => $basecampId,
+                        'tasks' => [
+                            885 => [
+                                'id' => 'todo created in costlocker (task)',
+                                'person_id' => 1,
+                                'name' => 'task todo',
+                            ],
+                        ],
+                        'persons' => [
+                            885 => [
+                                'id' => 'todo created in costlocker (person)',
+                                'person_id' => 885,
+                                'name' => 'person todo',
+                            ],
+                        ],
+                    ],
+                    2 => [
+                        'id' => 'new todolist',
+                        'tasks' => [
+                            123 => [
+                                'id' => 'new todo in basecamp (task)',
+                                'person_id' => 1,
+                                'name' => 'basecamp todo',
+                            ],
+                            456 => [
+                                'id' => 'new todo in basecamp (person)',
+                                'person_id' => 885,
+                                'name' => 'basecamp todo2',
+                            ],
+                        ],
+                        'persons' => [],
+                    ],
+                ],
+            ]
+        );
+    }
+
     public function testDeleteTaskInCostlocker()
     {
         $basecampId = 'irrelevant project';

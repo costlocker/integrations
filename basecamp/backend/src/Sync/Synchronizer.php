@@ -343,6 +343,9 @@ class Synchronizer
         $tasksUpdate = [];
         foreach ($bcTodolists as $todolistId => $bcTodolist) {
             $activityId = $this->findByBasecampId($bcProject['activities'], $todolistId);
+            if (!$activityId && $config->isCreatingActivitiesEnabled) {
+                $activityId = $this->findExistingActivity($bcTodolist->name, $todolistId, $bcProject);
+            }
             if (!$activityId) {
                 continue;
             }
@@ -485,6 +488,17 @@ class Synchronizer
                 return $costlockerId;
             }
         }
+    }
+
+    private function findExistingActivity($activityName, $bcTodolistId, array &$bcProject)
+    {
+        $activityId = 2;
+        $bcProject['activities'][$activityId] = [
+            'id' => $bcTodolistId,
+            'tasks' => [],
+            'persons' => [],
+        ];
+        return $activityId;
     }
 
     private function updateMapping(array &$bcProject, SyncChangelog $changelog)
