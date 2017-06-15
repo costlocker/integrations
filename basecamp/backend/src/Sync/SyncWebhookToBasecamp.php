@@ -48,19 +48,21 @@ class SyncWebhookToBasecamp
             'todolist_archived', 'todolist_created', 'todolist_name_changed', 
             'todolist_trashed', 'todolist_unarchived', 'todolist_untrashed',
         ];
-        if (!in_array($json['kind'] ?? '', $allowedWebhooks)) {
+        $webhook = [
+            'event' => $json['kind'],
+            'project' => $json['recording']['bucket']['id'],
+        ];
+
+        if (!in_array($webhook['event'] ?? '', $allowedWebhooks)) {
             return;
         }
 
-        $this->eventsLogger->__invoke(
-            Event::WEBHOOK_BASECAMP,
-            [
-                'basecamp' => [
-                    'event' => $json['kind'],
-                    'project' => $json['recording']['bucket']['id'],
-                ],
-            ]
-        );
+        $project = $this->synchronizer->findProjectByBasecampId($webhook['project']);
+        if (!$project) {
+            return;
+        }
+
+        $this->eventsLogger->__invoke(Event::WEBHOOK_BASECAMP, ['basecamp' => $webhook]);
     }
 
     private function processCostlockerWebhook(array $json)
@@ -116,7 +118,7 @@ class SyncWebhookToBasecamp
 
     private function getProjectSettings($costlockerId)
     {
-        $project = $this->synchronizer->findProject($costlockerId);
+        $project = $this->synchronizer->findProjectByCostlockerId($costlockerId);
 
         $config = new SyncRequest();
         $config->costlockerProject = $costlockerId;

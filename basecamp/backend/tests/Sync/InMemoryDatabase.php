@@ -2,9 +2,11 @@
 
 namespace Costlocker\Integrations\Sync;
 
+use Costlocker\Integrations\Entities\BasecampProject;
+
 class InMemoryDatabase implements SyncDatabase
 {
-    private $mapping;
+    private $mapping = [];
     public $lastSettings;
 
     public function findProject($costockerProjectId)
@@ -22,6 +24,17 @@ class InMemoryDatabase implements SyncDatabase
     public function findBasecampProject($costockerProjectId)
     {
         return null;
+    }
+
+    public function findBasecampProjectById($basecampProjectId)
+    {
+        foreach ($this->mapping as $projects) {
+            foreach (array_keys($projects) as $basecampId) {
+                if ($basecampId == $basecampProjectId) {
+                    return new BasecampProject();
+                }
+            }
+        }
     }
 
     public function findProjects($costlockerProjectId)

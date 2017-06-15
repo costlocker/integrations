@@ -10,5 +10,7 @@ interface SyncDatabase
 
     public function findBasecampProject($costockerProjectId);
 
+    public function findBasecampProjectById($basecampProjectId);
+
     public function upsertProject($costockerProjectId, array $mapping, array $settings = []);
 }

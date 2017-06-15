@@ -9,7 +9,10 @@ use Costlocker\Integrations\Entities\Event;
 
 class SyncWebhookToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
 {
+    const BASECAMP_ID = 123456;
+
     private $eventsLogger;
+    private $isBasecampProjectMappped = true;
 
     public function setUp()
     {
@@ -23,7 +26,7 @@ class SyncWebhookToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
         return new SyncWebhookToBasecamp($companiesRepository, $s, $this->eventsLogger);
     }
 
-    public function testLogBasecampEvent()
+    public function testPushBasecampWebhookToQueue()
     {
         $this->givenBasecampWebhook('todo_created.json');
         $this->eventsLogger->shouldReceive('__invoke')
@@ -33,17 +36,32 @@ class SyncWebhookToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
                 [
                     'basecamp' => [
                         'event' => 'todo_created',
-                        'project' => 3929343,
+                        'project' => self::BASECAMP_ID,
                     ],
                 ]
             );
-        $this->synchronize(null);
+        $this->processWebhook();
+    }
+
+    public function testIgnoreUnknownBasecampProject()
+    {
+        $this->givenBasecampWebhook('todo_created.json');
+        $this->isBasecampProjectMappped = false;
+        $this->processWebhook();
     }
 
     public function testIgnoreUnrelatedBasecampWebhooks()
     {
         $this->givenBasecampWebhook('message_created.json');
         $this->eventsLogger->shouldReceive('__invoke')->never();
+        $this->processWebhook();
+    }
+
+    protected function processWebhook()
+    {
+        if ($this->isBasecampProjectMappped) {
+            $this->whenProjectIsMapped(self::BASECAMP_ID);
+        }
         $this->synchronize(null);
     }
 

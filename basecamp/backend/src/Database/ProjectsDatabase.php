@@ -52,18 +52,28 @@ class ProjectsDatabase implements SyncDatabase
 
     public function findBasecampProject($costlockerProjectId)
     {
+        return $this->findProjectEntity('cl_project_id', $costlockerProjectId);
+    }
+
+    public function findBasecampProjectById($basecampProjectId)
+    {
+        return $this->findProjectEntity('bc_project_id', $basecampProjectId);
+    }
+
+    private function findProjectEntity($column, $projectId)
+    {
         $dql =<<<DQL
             SELECT bp, bu, ba
             FROM Costlocker\Integrations\Entities\BasecampProject bp
             JOIN bp.costlockerProject cp
             JOIN bp.basecampUser bu
             JOIN bu.basecampAccount ba
-            WHERE cp.id = :project
+            WHERE bp.{$column} = :project
               AND bp.deletedAt IS NULL AND bu.deletedAt IS NULL
             ORDER BY bp.id DESC
 DQL;
         $params = [
-            'project' => $costlockerProjectId,
+            'project' => $projectId,
         ];
 
         $entities = $this->entityManager->createQuery($dql)
