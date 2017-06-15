@@ -22,6 +22,8 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
             // basecamp -> costlocker
             'areTasksEnabled' => true,
             'isDeletingTasksEnabled' => false,
+            'isCreatingActivitiesEnabled' => false,
+            'isDeletingActivitiesEnabled' => false,
             'isBasecampWebhookEnabled' => false,
         ];
     }
@@ -379,6 +381,8 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
         $this->request = [
             'areTasksEnabled' => true,
             'isDeletingTasksEnabled' => true,
+            'isCreatingActivitiesEnabled' => true,
+            'isDeletingActivitiesEnabled' => true,
             'isBasecampWebhookEnabled' => true,
         ] + $this->request;
         $this->whenProjectIsMapped('irrelevant basecamp project id', []);
@@ -393,6 +397,8 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
                 'isRevokeAccessEnabled' => false,
                 'areTasksEnabled' => false,
                 'isDeletingTasksEnabled' => false,
+                'isCreatingActivitiesEnabled' => false,
+                'isDeletingActivitiesEnabled' => false,
                 'isBasecampWebhookEnabled' => false,
             ],
             $this->database->lastSettings

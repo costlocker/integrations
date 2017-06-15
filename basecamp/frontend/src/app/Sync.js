@@ -203,6 +203,11 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampCom
                 <input type="checkbox" name="areTasksEnabled"
                   onChange={optionalSetIfAvailable('areTasksEnabled')} checked={syncForm.get('areTasksEnabled')}
                   /> Todo items are transformed to tasks under activity.
+              </label><br />
+              <label className="checkbox-inline">
+                <input type="checkbox" name="isCreatingActivitiesEnabled"
+                  onChange={optionalSetIfAvailable('isCreatingActivitiesEnabled')} checked={syncForm.get('isCreatingActivitiesEnabled')}
+                  /> New todolists are transformed to an activity (if the activity already exists in Costlocker, no new activity is created).
               </label>
             </div>
           </div>
@@ -213,6 +218,11 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampCom
                 <input type="checkbox" name="isDeletingTasksEnabled"
                   onChange={optionalSetIfAvailable('isDeletingTasksEnabled')} checked={syncForm.get('isDeletingTasksEnabled')}
                   /> Delete tasks in Costlocker
+              </label>
+              <label className="checkbox-inline">
+                <input type="checkbox" name="isDeletingActivitiesEnabled"
+                  onChange={syncForm.set('isDeletingActivitiesEnabled')} checked={syncForm.get('isDeletingActivitiesEnabled')}
+                  /> Delete activities in Costlocker
               </label>
             </div>
           </div>

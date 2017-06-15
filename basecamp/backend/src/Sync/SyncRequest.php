@@ -15,6 +15,8 @@ class SyncRequest
 
     public $areTasksEnabled = false;
     public $isDeletingTasksEnabled = false;
+    public $isCreatingActivitiesEnabled = false;
+    public $isDeletingActivitiesEnabled = false;
     public $isBasecampWebhookEnabled = false;
 
     public function isDeleteDisabled()
@@ -32,6 +34,8 @@ class SyncRequest
             // basecamp -> costlocker
             'areTasksEnabled' => $this->areTasksEnabled,
             'isDeletingTasksEnabled' => $this->isDeletingTasksEnabled,
+            'isCreatingActivitiesEnabled' => $this->isCreatingActivitiesEnabled,
+            'isDeletingActivitiesEnabled' => $this->isDeletingActivitiesEnabled,
             'isBasecampWebhookEnabled' => $this->isBasecampWebhookEnabled,
         ];
     }

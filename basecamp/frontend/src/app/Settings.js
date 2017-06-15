@@ -105,6 +105,11 @@ export default function Settings({ form, accounts }) {
                   <input type="checkbox" name="areTasksEnabled"
                     onChange={form.set('areTasksEnabled')} checked={form.get('areTasksEnabled')}
                     /> Todo items are transformed to tasks under activity.
+                </label><br />
+                <label className="checkbox-inline">
+                  <input type="checkbox" name="isCreatingActivitiesEnabled"
+                    onChange={form.set('isCreatingActivitiesEnabled')} checked={form.get('isCreatingActivitiesEnabled')}
+                    /> New todolists are transformed to an activity (if the activity already exists in Costlocker, no new activity is created).
                 </label>
               </div>
             </div>
@@ -115,6 +120,11 @@ export default function Settings({ form, accounts }) {
                   <input type="checkbox" name="isDeletingTasksEnabled"
                     onChange={form.set('isDeletingTasksEnabled')} checked={form.get('isDeletingTasksEnabled')}
                     /> Delete tasks in Costlocker
+                </label>
+                <label className="checkbox-inline">
+                  <input type="checkbox" name="isDeletingActivitiesEnabled"
+                    onChange={form.set('isDeletingActivitiesEnabled')} checked={form.get('isDeletingActivitiesEnabled')}
+                    /> Delete activities in Costlocker
                 </label>
               </div>
             </div>

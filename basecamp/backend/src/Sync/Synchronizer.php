@@ -71,6 +71,8 @@ class Synchronizer
             } else {
                 $config->areTasksEnabled = false;
                 $config->isDeletingTasksEnabled = false;
+                $config->isCreatingActivitiesEnabled = false;
+                $config->isDeletingActivitiesEnabled = false;
                 $config->isBasecampWebhookEnabled = false;
             }
         }
