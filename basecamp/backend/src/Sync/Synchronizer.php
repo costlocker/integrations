@@ -414,6 +414,25 @@ class Synchronizer
             }
         }
 
+        if ($config->isDeletingActivitiesEnabled) {
+            foreach ($bcProject['activities'] as $activityId => $activity) {
+                $todolistId = $activity['id'];
+                if (isset($bcTodolists[$todolistId])) {
+                    continue;
+                }
+                $tasksUpdate[] = [
+                    'action' => 'delete',
+                    'item' => [
+                        'type' => 'activity',
+                        'activity_id' => $activityId,
+                    ],
+                    'basecamp' => [
+                        'todolist_id' => $todolistId,
+                    ],
+                ];
+            }
+        }
+
         if (!$tasksUpdate) {
             return;
         }
@@ -447,7 +466,9 @@ class Synchronizer
                     $changelog->deleteTask($activityId, 'persons', $ids['person_id']);
                 }
             } else {
-                if ($ids['type'] == 'task') {
+                if ($ids['type'] == 'activity') {
+                    $changelog->deleteActivity($activityId);
+                } elseif ($ids['type'] == 'task') {
                     $changelog->deleteTask($activityId, 'tasks', $ids['task_id']);
                 } else {
                     $changelog->deleteTask($activityId, 'persons', $ids['person_id']);
