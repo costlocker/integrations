@@ -18,7 +18,7 @@ class InMemoryDatabase implements SyncDatabase
     public function upsertProject($costockerProjectId, array $mapping, array $settings = [])
     {
         $this->mapping[$costockerProjectId][$mapping['id']] = $mapping;
-        $this->lastSettings = $settings;
+        $this->lastSettings = $settings ?: $mapping['settings'];
     }
 
     public function findBasecampProject($costockerProjectId)
@@ -31,7 +31,9 @@ class InMemoryDatabase implements SyncDatabase
         foreach ($this->mapping as $projects) {
             foreach (array_keys($projects) as $basecampId) {
                 if ($basecampId == $basecampProjectId) {
-                    return new BasecampProject();
+                    $p = new BasecampProject();
+                    $p->settings = $this->lastSettings;
+                    return $p;
                 }
             }
         }

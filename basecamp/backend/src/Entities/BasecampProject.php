@@ -59,4 +59,10 @@ class BasecampProject
     {
         $this->createdAt = new \DateTime();
     }
+
+    public function isBasecampSynchronizationDisabled()
+    {
+        $isEnabled = $this->settings['areTasksEnabled'] ?? false;
+        return !$isEnabled;
+    }
 }

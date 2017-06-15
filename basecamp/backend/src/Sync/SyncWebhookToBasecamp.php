@@ -58,7 +58,7 @@ class SyncWebhookToBasecamp
         }
 
         $project = $this->synchronizer->findProjectByBasecampId($webhook['project']);
-        if (!$project) {
+        if (!$project || $project->isBasecampSynchronizationDisabled()) {
             return;
         }
 

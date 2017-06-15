@@ -13,6 +13,7 @@ class SyncWebhookToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
 
     private $eventsLogger;
     private $isBasecampProjectMappped = true;
+    private $isBasecampSynchronizationAllowed = true;
 
     public function setUp()
     {
@@ -50,6 +51,13 @@ class SyncWebhookToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
         $this->processWebhook();
     }
 
+    public function testIgnoreProjectWithDisabledSync()
+    {
+        $this->givenBasecampWebhook('todo_created.json');
+        $this->isBasecampSynchronizationAllowed = false;
+        $this->processWebhook();
+    }
+
     public function testIgnoreUnrelatedBasecampWebhooks()
     {
         $this->givenBasecampWebhook('message_created.json');
@@ -60,7 +68,11 @@ class SyncWebhookToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
     protected function processWebhook()
     {
         if ($this->isBasecampProjectMappped) {
-            $this->whenProjectIsMapped(self::BASECAMP_ID);
+            $this->whenProjectIsMapped(
+                self::BASECAMP_ID,
+                [],
+                ['areTasksEnabled' => $this->isBasecampSynchronizationAllowed]
+            );
         }
         $this->synchronize(null);
     }
