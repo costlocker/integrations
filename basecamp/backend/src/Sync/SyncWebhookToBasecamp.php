@@ -62,9 +62,6 @@ class SyncWebhookToBasecamp
             $r->costlockerId = $id;
             $r->projectItems = $items;
             $r->isCompleteProjectSynchronized = false;
-            $r->createProject = function () {
-                return null; // creating new project in webhook is not supported
-            };
             $results[] = [$r, $config];
         }
 

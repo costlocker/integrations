@@ -14,8 +14,6 @@ class SyncProjectRequest
     public $costlockerUser;
     /** @var bool */
     public $isCompleteProjectSynchronized;
-    /** @var callable */
-    public $createProject;
 
     public static function completeSynchronization(CostlockerUser $user = null)
     {

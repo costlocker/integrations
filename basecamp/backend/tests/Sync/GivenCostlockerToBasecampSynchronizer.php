@@ -90,7 +90,9 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
                 'todoitems' => $items,
             ];
         }
-        $this->basecamp->shouldReceive('getTodolists')->once()->andReturn($basecamp);
+        $this->basecamp->shouldReceive('getTodolists')
+            ->atMost()->once()
+            ->andReturn($basecamp);
     }
 
     protected function shouldCreateProject()
@@ -113,7 +115,8 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
             $this->basecamp->shouldReceive('grantAccess')->never();
         }
 
-        $this->basecamp->shouldReceive('getPeople')->once()
+        $this->basecamp->shouldReceive('getPeople')
+            ->atMost()->once()
             ->andReturn($this->givenBasecampPeople($basecampPeople));
         if ($isExistingProject) {
             $this->whenProjectExistsInBasecamp();
