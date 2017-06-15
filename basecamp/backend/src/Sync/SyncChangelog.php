@@ -4,6 +4,7 @@ namespace Costlocker\Integrations\Sync;
 
 class SyncChangelog
 {
+    public $projectId;
     public $isCreated = false;
     public $error;
 
@@ -91,10 +92,10 @@ class SyncChangelog
         return false;
     }
 
-    public function toArray($id)
+    public function toArray()
     {
         return [
-            'id' => $id,
+            'id' => $this->projectId,
             'isCreated' => $this->isCreated,
             'people' => $this->grantedPeople,
             'activities' => $this->getChangedActivities(),

@@ -6,15 +6,15 @@ use Costlocker\Integrations\Entities\Event;
 
 class SyncResult
 {
+    /** @var SyncProjectRequest */
     private $projectRequest;
     /** @var SyncRequest */
     public $syncConfig;
-
-    public $basecampProjectId;
     /** @var \Costlocker\Integrations\Entities\BasecampProject */
     public $mappedProject;
-
+    /** @var SyncChangelog */
     public $costlockerChangelog;
+    /** @var SyncChangelog */
     public $basecampChangelog;
 
     public function __construct(SyncProjectRequest $r, SyncRequest $c)
@@ -53,8 +53,8 @@ class SyncResult
                 'project' => get_object_vars($this->projectRequest),
                 'settings' => $this->getSettings(),
             ],
-            'basecamp' => $this->basecampChangelog->toArray($this->basecampProjectId),
-            'costlocker' => $this->costlockerChangelog->toArray($this->projectRequest->costlockerId),
+            'basecamp' => $this->basecampChangelog->toArray(),
+            'costlocker' => $this->costlockerChangelog->toArray(),
         ];
         // dont save doctrine entity...
         if ($this->projectRequest->costlockerUser) {

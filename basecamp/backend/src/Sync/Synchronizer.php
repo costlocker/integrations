@@ -39,10 +39,12 @@ class Synchronizer
 
         list($people, $activities) = $this->analyzeProjectItems($r);
 
-        $this->basecamp->addBasecampProjectStatus($result);
+        $this->basecamp->addBasecampProjectStatus($result->basecampChangelog);
+        $result->costlockerChangelog->projectId = $r->costlockerId;
 
         if ($this->basecamp->isDeleted()) {
-            $result->basecampChangelog->error = "Project {$result->basecampProjectId} is not available in Basecamp";
+            $result->basecampChangelog->error =
+                "Project {$result->basecampChangelog->projectId} is not available in Basecamp";
             $result->mappedProject = $this->database->findBasecampProject($r->costlockerId);
             return $result;
         }
@@ -67,7 +69,7 @@ class Synchronizer
             }
         }
 
-        $this->saveProject($result, $r->costlockerId, $result->basecampProjectId);
+        $this->saveProject($result);
 
         return $result;
     }
@@ -386,12 +388,12 @@ class Synchronizer
         }
     }
 
-    private function saveProject(SyncResult $result, $costlockerId, $basecampId)
+    private function saveProject(SyncResult $result)
     {
         $result->mappedProject = $this->database->upsertProject(
-            $costlockerId,
+            $result->costlockerChangelog->projectId,
             [
-                'id' => $basecampId,
+                'id' => $result->basecampChangelog->projectId,
                 'account' => $result->syncConfig->account,
                 'activities' => $this->basecamp->getMappedActivities(),
             ],

@@ -46,10 +46,10 @@ class SynchronizedBasecamp
         return $this->bcProject['activities'];
     }
 
-    public function addBasecampProjectStatus(SyncResult $result)
+    public function addBasecampProjectStatus(SyncChangelog $changelog)
     {
-        $result->basecampProjectId = $this->bcProject['id'];
-        $result->basecampChangelog->isCreated = $this->bcProject['isCreated'];
+        $changelog->projectId = $this->bcProject['id'];
+        $changelog->isCreated = $this->bcProject['isCreated'];
     }
 
     public function isDeleted()
