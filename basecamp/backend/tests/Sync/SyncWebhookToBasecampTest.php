@@ -4,6 +4,7 @@ namespace Costlocker\Integrations\Sync;
 
 use Mockery as m;
 use Costlocker\Integrations\Entities\Event;
+use Costlocker\Integrations\Events\EventsLogger;
 use Costlocker\Integrations\Database\CompaniesRepository;
 use Costlocker\Integrations\Entities\CostlockerCompany;
 use Costlocker\Integrations\Entities\BasecampUser;
@@ -25,7 +26,8 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
     {
         $repository = m::mock(CompaniesRepository::class);
         $repository->shouldReceive('findCompanyByWebhook')->andReturn($this->company);
-        return new SyncWebhookToBasecamp($repository, $s);
+        $events = m::mock(EventsLogger::class);
+        return new SyncWebhookToBasecamp($repository, $s, $events);
     }
 
     public function testIgnoreUnmappedProject()
@@ -351,5 +353,10 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
                 }
             ],
         ];
+    }
+
+    protected function givenCostlockerWebhook($file)
+    {
+        parent::givenWebhook($file, []);
     }
 }

@@ -16,6 +16,7 @@ class Event
     const DISCONNECT_BASECAMP = 0x40;
     const DISCONNECT_PROJECT = 0x80;
     const REGISTER_WEBHOOK = 0x100;
+    const WEBHOOK_BASECAMP = 0x200;
 
     const RESULT_SUCCESS = 0x1;
     const RESULT_FAILURE = 0x2;

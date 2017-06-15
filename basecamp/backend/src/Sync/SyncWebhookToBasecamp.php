@@ -4,21 +4,30 @@ namespace Costlocker\Integrations\Sync;
 
 use Costlocker\Integrations\Database\CompaniesRepository;
 use Costlocker\Integrations\Entities\CostlockerCompany;
+use Costlocker\Integrations\Events\EventsLogger;
+use Costlocker\Integrations\Entities\Event;
 
 class SyncWebhookToBasecamp
 {
     private $repository;
     private $synchronizer;
+    private $eventsLogger;
 
-    public function __construct(CompaniesRepository $r, Synchronizer $s)
+    public function __construct(CompaniesRepository $r, Synchronizer $s, EventsLogger $e)
     {
         $this->repository = $r;
         $this->synchronizer = $s;
+        $this->eventsLogger = $e;
     }
 
     public function __invoke(array $webhook)
     {
-        $requests = $this->jsonEventsToRequests($webhook['body']);
+        if ($this->isBasecampWebhook($webhook['headers'])) {
+            $this->processBasecampWebhook($webhook['body']);
+            return [];
+        }
+
+        $requests = $this->processCostlockerWebhook($webhook['body']);
         $results = [];
         foreach ($requests as list($r, $config)) {
             $results[] = $this->synchronizer->__invoke($r, $config);
@@ -26,7 +35,35 @@ class SyncWebhookToBasecamp
         return $results;
     }
 
-    private function jsonEventsToRequests(array $json )
+    private function isBasecampWebhook(array $headers)
+    {
+        return in_array('Basecamp3 Webhook', (array) ($headers['user-agent'] ?? []));
+    }
+
+    private function processBasecampWebhook(array $json)
+    {
+        $allowedWebhooks = [
+            'todo_archived', 'todo_assignment_changed', 'todo_content_changed', 'todo_created',
+            'todo_trashed', 'todo_unarchived', 'todo_untrashed',
+            'todolist_archived', 'todolist_created', 'todolist_name_changed', 
+            'todolist_trashed', 'todolist_unarchived', 'todolist_untrashed',
+        ];
+        if (!in_array($json['kind'] ?? '', $allowedWebhooks)) {
+            return;
+        }
+
+        $this->eventsLogger->__invoke(
+            Event::WEBHOOK_BASECAMP,
+            [
+                'basecamp' => [
+                    'event' => $json['kind'],
+                    'project' => $json['recording']['bucket']['id'],
+                ],
+            ]
+        );
+    }
+
+    private function processCostlockerWebhook(array $json)
     {
         $updatedProjects = [];
         $createdProjects = [];

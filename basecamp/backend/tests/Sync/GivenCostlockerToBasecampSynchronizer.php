@@ -35,11 +35,11 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
             ->andReturn(new Response(200, [], $json));
     }
 
-    protected function givenCostlockerWebhook($file)
+    protected function givenWebhook($file, $headers)
     {
         $json = file_get_contents(__DIR__ . "/fixtures/webhooks/{$file}");
         $this->request = [
-            'headers' => [], // should verify that webhook is from costlocker
+            'headers' => $headers, // should verify that webhook is from costlocker
             'body' => json_decode($json, true)
         ];
     }

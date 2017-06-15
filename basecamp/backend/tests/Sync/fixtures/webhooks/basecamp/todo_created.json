@@ -1,0 +1,67 @@
+{
+    "id": 838509977,
+    "kind": "todo_created",
+    "details": {},
+    "created_at": "2017-06-15T10:16:07.367+02:00",
+    "recording": {
+        "id": 554174808,
+        "status": "active",
+        "created_at": "2017-06-15T10:16:07.350+02:00",
+        "updated_at": "2017-06-15T10:16:07.356+02:00",
+        "type": "Todo",
+        "url": "https://3.basecampapi.com/3763761/buckets/3929343/todos/554174808.json",
+        "app_url": "https://3.basecamp.com/3763761/buckets/3929343/todos/554174808",
+        "parent": {
+            "id": 554174775,
+            "title": "new list",
+            "type": "Todolist",
+            "url": "https://3.basecampapi.com/3763761/buckets/3929343/todolists/554174775.json",
+            "app_url": "https://3.basecamp.com/3763761/buckets/3929343/todolists/554174775"
+        },
+        "bucket": {
+            "id": 3929343,
+            "name": "kamil | autoid [1700002]",
+            "type": "Project"
+        },
+        "creator": {
+            "id": 12553523,
+            "attachable_sgid": "BAh7CEkiCGdpZAY6BkVUSSIpZ2lkOi8vYmMzL1BlcnNvbi8xMjU1MzUyMz9leHBpcmVzX2luBjsAVEkiDHB1cnBvc2UGOwBUSSIPYXR0YWNoYWJsZQY7AFRJIg9leHBpcmVzX2F0BjsAVDA=--c6a9736f02afeeacf8444a8584f5645769fbbd07",
+            "name": "John",
+            "email_address": "zdenek.drahos+sync@atoto.cz",
+            "personable_type": "User",
+            "title": "Developer",
+            "bio": "",
+            "created_at": "2017-06-02T09:31:45.638Z",
+            "updated_at": "2017-06-07T11:32:36.764Z",
+            "admin": true,
+            "owner": true,
+            "time_zone": "Europe/Amsterdam",
+            "avatar_url": "https://3.basecamp-static.com/3763761/people/BAhpAzONvw==--f48cd8366b201a2214259b0fc77208361be6ca43/avatar-64-x4",
+            "company": {
+                "id": 918223,
+                "name": "CL Demo"
+            }
+        },
+        "title": "new todo",
+        "content": "new todo"
+    },
+    "creator": {
+        "id": 12553523,
+        "attachable_sgid": "BAh7CEkiCGdpZAY6BkVUSSIpZ2lkOi8vYmMzL1BlcnNvbi8xMjU1MzUyMz9leHBpcmVzX2luBjsAVEkiDHB1cnBvc2UGOwBUSSIPYXR0YWNoYWJsZQY7AFRJIg9leHBpcmVzX2F0BjsAVDA=--c6a9736f02afeeacf8444a8584f5645769fbbd07",
+        "name": "John",
+        "email_address": "zdenek.drahos+sync@atoto.cz",
+        "personable_type": "User",
+        "title": "Developer",
+        "bio": "",
+        "created_at": "2017-06-02T09:31:45.638Z",
+        "updated_at": "2017-06-07T11:32:36.764Z",
+        "admin": true,
+        "owner": true,
+        "time_zone": "Europe/Amsterdam",
+        "avatar_url": "https://3.basecamp-static.com/3763761/people/BAhpAzONvw==--f48cd8366b201a2214259b0fc77208361be6ca43/avatar-64-x4",
+        "company": {
+            "id": 918223,
+            "name": "CL Demo"
+        }
+    }
+}
