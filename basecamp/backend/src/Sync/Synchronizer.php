@@ -16,6 +16,7 @@ class Synchronizer
     /** @var \Costlocker\Integrations\Basecamp\Api\BasecampApi */
     private $basecamp;
     private $database;
+    private $todolistsCache = [];
 
     public function __construct(CostlockerClient $c, GetUser $u, BasecampFactory $b, SyncDatabase $db)
     {
@@ -288,7 +289,7 @@ class Synchronizer
             return;
         }
 
-        $bcTodolists = $this->basecamp->getTodolists($bcProject['id']);
+        $bcTodolists = $this->getBasecampTodolists($bcProject);
 
         if ($config->isDeletingTodosEnabled) {
             foreach ($activities as $activityId => $activity) {
@@ -338,7 +339,7 @@ class Synchronizer
             return;
         }
 
-        $bcTodolists = $this->basecamp->getTodolists($bcProject['id']);
+        $bcTodolists = $this->getBasecampTodolists($bcProject);
         $tasksUpdate = [];
         foreach ($bcTodolists as $todolistId => $bcTodolist) {
             $activityId = $this->findByBasecampId($bcProject['activities'], $todolistId);
@@ -520,6 +521,14 @@ class Synchronizer
             }
         }
         return $bcProject;
+    }
+
+    private function getBasecampTodolists(array $bcProject)
+    {
+        if (!array_key_exists($bcProject['id'], $this->todolistsCache)) {
+            $this->todolistsCache[$bcProject['id']] = $this->basecamp->getTodolists($bcProject['id']);
+        }
+        return $this->todolistsCache[$bcProject['id']];
     }
 
     private function saveProject(array $bcProject, SyncResult $result)

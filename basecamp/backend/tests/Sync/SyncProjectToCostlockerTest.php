@@ -243,6 +243,7 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
     {
         $basecampId = 'irrelevant project';
         $this->request['isDeletingTasksEnabled'] = true;
+        $this->request['isDeletingTodosEnabled'] = true;
         $originalMapping = [
             1 => [
                 'id' => $basecampId,
