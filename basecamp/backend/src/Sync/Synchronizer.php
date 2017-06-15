@@ -492,7 +492,27 @@ class Synchronizer
 
     private function findExistingActivity($activityName, $bcTodolistId, array &$bcProject)
     {
-        $activityId = 2;
+        $normalizeName = function ($name) {
+            return mb_strtolower($name, 'utf-8');
+        };
+        static $activities = [];
+        if (!$activities) {
+            $allActivities = json_decode(
+                $this->costlocker->__invoke('/v1/Simple_Activities')->getBody(),
+                true
+            );
+            foreach ($allActivities as $activity) {
+                if (!$activity['deactivated']) {
+                    $activities[$normalizeName($activity['name'])] = $activity['id'];
+                }
+            }
+        }
+
+        $activityId = $activities[$normalizeName($activityName)] ?? null;
+        if (!$activityId) {
+            return null;
+        }
+
         $bcProject['activities'][$activityId] = [
             'id' => $bcTodolistId,
             'tasks' => [],

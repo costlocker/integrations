@@ -29,7 +29,9 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
     {
         $json = file_get_contents(__DIR__ . "/fixtures/{$file}");
         $this->costlocker->shouldReceive('__invoke')
-            ->with(m::type('string'))
+            ->with(m::on(function ($path) {
+                return is_int(strpos($path, '/projects/'));
+            }))
             ->andReturn(new Response(200, [], $json));
     }
 

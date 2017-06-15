@@ -319,6 +319,13 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
             ],
         ]);
         $this->costlocker->shouldReceive('__invoke')
+            ->once()
+            ->with('/v1/Simple_Activities')
+            ->andReturn(new Response(200, [], json_encode([
+                ['id' => 1, "name" => 'Development', 'deactivated' => false],
+                ['id' => 2, "name" => 'Design', 'deactivated' => false],
+            ])));
+        $this->costlocker->shouldReceive('__invoke')
             ->with('/projects', m::on(function ($data) {
                 assertThat($data['items'], is(arrayWithSize(2)));
                 return true;

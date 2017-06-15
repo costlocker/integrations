@@ -36,6 +36,12 @@ class CostlockerClient
 
     public function getUrl($path)
     {
-        return is_int(strpos($path, 'api-public/')) ? $path : "{$this->domain}/api-public/v2{$path}";
+        if (is_int(strpos($path, 'api-public/'))) {
+            return $path;
+        } elseif (is_int(strpos($path, '/v1/'))) {
+            return "{$this->domain}/api-public{$path}";
+        } else {
+            return "{$this->domain}/api-public/v2{$path}";
+        }
     }
 }
