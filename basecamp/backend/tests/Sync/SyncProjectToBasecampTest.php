@@ -7,6 +7,8 @@ use Costlocker\Integrations\Entities\Event;
 
 class SyncProjectToBasecampTest extends GivenCostlockerToBasecampSynchronizer
 {
+    protected $eventType = Event::MANUAL_SYNC;
+
     public function setUp()
     {
         parent::setUp();
@@ -15,11 +17,6 @@ class SyncProjectToBasecampTest extends GivenCostlockerToBasecampSynchronizer
             'costlockerProject' => 'irrelevant id',
             'areTodosEnabled' => true,
         ];
-    }
-
-    protected function createSynchronizer(Synchronizer $s)
-    {
-        return new SyncProjectToBasecamp($s);
     }
 
     /** @dataProvider provideCreate */

@@ -18,7 +18,12 @@ $console->addCommands([
         $app['logger']
     ),
     new Costlocker\Integrations\Sync\Queue\ProcessSyncRequestCommand(
-        new Costlocker\Integrations\Sync\Queue\ProcessSyncRequest($app),
+        new Costlocker\Integrations\Sync\Queue\ProcessSyncRequest(
+            $app['database.events'],
+            new \Costlocker\Integrations\Sync\ProcessEvent($app),
+            $app['orm.em'],
+            $app['logger']
+        ),
         $app['logger']
     ),
     new \Costlocker\Integrations\Database\RefreshAccessTokensCommand(

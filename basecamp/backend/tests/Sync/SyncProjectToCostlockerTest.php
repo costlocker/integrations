@@ -8,6 +8,8 @@ use GuzzleHttp\Psr7\Response;
 
 class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
 {
+    protected $eventType = Event::MANUAL_SYNC;
+
     public function setUp()
     {
         parent::setUp();
@@ -26,11 +28,6 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
             'isDeletingActivitiesEnabled' => false,
             'isBasecampWebhookEnabled' => false,
         ];
-    }
-
-    protected function createSynchronizer(Synchronizer $s)
-    {
-        return new SyncProjectToBasecamp($s);
     }
 
     public function testNoChangeInBasecamp()

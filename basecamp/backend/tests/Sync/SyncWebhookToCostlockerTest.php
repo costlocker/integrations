@@ -8,17 +8,14 @@ use Costlocker\Integrations\Entities\Event;
 
 class SyncWebhookToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
 {
+    protected $eventType = Event::WEBHOOK_BASECAMP;
+
     public function setUp()
     {
         parent::setUp();
         $this->request = [
             'costlockerProject' => 1,
         ];
-    }
-
-    protected function createSynchronizer(Synchronizer $s)
-    {
-        return new SyncProjectToCostlocker($this->database, $s);
     }
 
     public function testPushChangesToCostlockerButNoChangeInBasecamp()

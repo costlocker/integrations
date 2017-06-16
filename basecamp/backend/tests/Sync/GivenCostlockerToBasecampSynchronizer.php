@@ -10,6 +10,7 @@ use Costlocker\Integrations\Basecamp\Api\BasecampApi;
 use Costlocker\Integrations\Entities\Event;
 use Costlocker\Integrations\Auth\GetUser;
 use Costlocker\Integrations\Events\EventsLogger;
+use Costlocker\Integrations\Database\CompaniesRepository;
 
 abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_TestCase
 {
@@ -17,7 +18,9 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
     protected $basecamp;
     protected $database;
     protected $eventsLogger;
+    protected $companies;
 
+    protected $eventType;
     protected $request;
 
     public function setUp()
@@ -26,6 +29,7 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
         $this->basecamp = m::mock(BasecampApi::class);
         $this->database = new InMemoryDatabase();
         $this->eventsLogger = m::mock(EventsLogger::class);
+        $this->companies = m::mock(CompaniesRepository::class);
     }
 
     protected function givenCostlockerProject($file)
@@ -179,9 +183,21 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
         $basecamps = m::mock(BasecampAdapter::class);
         $basecamps->shouldReceive('buildClient')->andReturn($this->basecamp);
 
-        $synchronizer = new Synchronizer($this->costlocker, $user, $basecamps, $this->database, $this->eventsLogger, '');
-        $uc = $this->createSynchronizer($synchronizer);
-        $results = $uc($this->request);
+        $event = new Event();
+        $event->data = [
+            'type' => $this->eventType,
+            'request' => ['webhookUrl' => ''] + $this->request,
+        ];
+
+        $uc = new ProcessEvent([
+            'client.costlocker' => $this->costlocker,
+            'client.user' => $user,
+            'client.basecamp' => $basecamps,
+            'database' => $this->database,
+            'events.logger' => $this->eventsLogger,
+            'database.companies' => $this->companies,
+        ]);
+        $results = $uc($event);
         if (is_string($expectedStatus)) {
             assertThat($results, containsString($expectedStatus));
         } elseif ($results) {
@@ -211,8 +227,6 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
         assertThat($project->basecampProject, is($expectedMapping['id']));
         assertThat($project->mapping, is($expectedMapping['activities']));
     }
-
-    abstract protected function createSynchronizer(Synchronizer $s);
 
     public function tearDown()
     {

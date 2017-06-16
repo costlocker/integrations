@@ -3,21 +3,15 @@
 namespace Costlocker\Integrations\Sync;
 
 use Mockery as m;
-use Costlocker\Integrations\Database\CompaniesRepository;
 use Costlocker\Integrations\Entities\Event;
 
 class ProcessBasecampWebhookTest extends GivenCostlockerToBasecampSynchronizer
 {
+    protected $eventType = Event::WEBHOOK_SYNC;
     const BASECAMP_ID = 123456;
 
     private $isBasecampProjectMappped = true;
     private $isBasecampSynchronizationAllowed = true;
-    
-    protected function createSynchronizer(Synchronizer $s)
-    {
-        $companiesRepository = m::mock(CompaniesRepository::class);
-        return new SyncWebhookToBasecamp($companiesRepository, $this->database, $s, $this->eventsLogger);
-    }
 
     public function testPushBasecampWebhookToQueue()
     {

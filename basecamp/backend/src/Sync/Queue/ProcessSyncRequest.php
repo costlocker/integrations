@@ -2,29 +2,26 @@
 
 namespace Costlocker\Integrations\Sync\Queue;
 
-use Silex\Application;
 use Doctrine\ORM\EntityManagerInterface;
 use Costlocker\Integrations\Entities\Event;
 use Costlocker\Integrations\Sync\SyncResult;
 use Costlocker\Integrations\Events\EventsRepository;
+use Costlocker\Integrations\Sync\ProcessEvent;
 use Psr\Log\LoggerInterface;
 
 class ProcessSyncRequest
 {
-    private $app;
-    /** @var EntityManagerInterface */
-    private $entityManager;
-    /** @var EventsRepository */
     private $repository;
-    /** @var LoggerInterface */
+    private $processEvent;
+    private $entityManager;
     private $logger;
 
-    public function __construct(Application $app)
+    public function __construct(EventsRepository $r, ProcessEvent $p, EntityManagerInterface $em, LoggerInterface $l)
     {
-        $this->app = $app;
-        $this->entityManager = $app['orm.em'];
-        $this->repository = $app['database.events'];
-        $this->logger = $app['logger'];
+        $this->repository = $r;
+        $this->processEvent = $p;
+        $this->entityManager = $em;
+        $this->logger = $l;
     }
 
     public function __invoke($eventId)
@@ -46,16 +43,13 @@ class ProcessSyncRequest
         $events = [];
 
         try {
-            $strategy = $this->getSynchronizer($requestEvent->data['type'], $requestEvent->data['request']['webhookUrl']);
-            if ($strategy) {
-                $results = $strategy($requestEvent->data['request'], $requestEvent->costlockerUser);
-                if (is_array($results)) {
-                    foreach ($results as $result) {
-                        $events[] = $this->buildProjectEvent($event, $result);
-                    }
-                } elseif (is_string($results)) {
-                    $requestEvent->markStatus(Event::RESULT_FAILURE, ['error' => $results]);
+            $results = $this->processEvent->__invoke($requestEvent);
+            if (is_array($results)) {
+                foreach ($results as $result) {
+                    $events[] = $this->buildProjectEvent($event, $result);
                 }
+            } elseif (is_string($results)) {
+                $requestEvent->markStatus(Event::RESULT_FAILURE, ['error' => $results]);
             }
         } catch (\Exception $e) {
             $events[] = $event;
@@ -75,31 +69,6 @@ class ProcessSyncRequest
         $this->entityManager->flush();
 
         return count($events);
-    }
-
-    private function getSynchronizer($eventType, $webhookUrl)
-    {
-        $synchronizer = new \Costlocker\Integrations\Sync\Synchronizer(
-            $this->app['client.costlocker'],
-            $this->app['client.user'],
-            $this->app['client.basecamp'],
-            $this->app['database'],
-            $this->app['events.logger'],
-            $webhookUrl
-        );
-
-        if ($eventType == Event::MANUAL_SYNC) {
-            return new \Costlocker\Integrations\Sync\SyncProjectToBasecamp($synchronizer);
-        } elseif ($eventType == Event::WEBHOOK_BASECAMP) {
-            return new \Costlocker\Integrations\Sync\SyncProjectToCostlocker($this->app['database'], $synchronizer);
-        } elseif ($eventType == Event::WEBHOOK_SYNC) {
-            return new \Costlocker\Integrations\Sync\SyncWebhookToBasecamp(
-                $this->app['database.companies'],
-                $this->app['database'],
-                $synchronizer,
-                $this->app['events.logger']
-            );
-        }
     }
 
     private function buildProjectEvent(Event $event, SyncResult $result)
