@@ -100,7 +100,7 @@ $checkAuthorization = function ($service) use ($app) {
 };
 
 $getWebhookUrl = function (Request $r) {
-    return $r->getUriForPath('/webhooks/handler');
+    return getenv('BASECAMP_WEBHOOK_URL') ?: $r->getUriForPath('/webhooks/handler');
 };
 
 $app
