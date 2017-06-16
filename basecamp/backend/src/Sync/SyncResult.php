@@ -16,6 +16,7 @@ class SyncResult
     public $costlockerChangelog;
     /** @var SyncChangelog */
     public $basecampChangelog;
+    public $webhookError;
 
     public function __construct(SyncProjectRequest $r, SyncRequest $c)
     {
@@ -55,6 +56,9 @@ class SyncResult
             ],
             'basecamp' => $this->basecampChangelog->toArray(),
             'costlocker' => $this->costlockerChangelog->toArray(),
+            'webhooks' => [
+                'error' => $this->webhookError,
+            ],
         ];
         // dont save doctrine entity...
         if ($this->projectRequest->costlockerUser) {

@@ -252,20 +252,17 @@ class SynchronizedBasecamp
             return;
         }
 
-        try {
-            $project->basecampWebhook = $this->client->registerWebhook(
-                $project->basecampProject,
-                $this->webhookUrl,
-                $project->settings['isBasecampWebhookEnabled'],
-                $project->basecampWebhook
-            );
+        $project->basecampWebhook = $this->client->registerWebhook(
+            $project->basecampProject,
+            $this->webhookUrl,
+            $project->settings['isBasecampWebhookEnabled'],
+            $project->basecampWebhook
+        );
 
-            $this->logger->__invoke(
-                Event::REGISTER_BASECAMP_WEBHOOK,
-                ['webhook' => $project->basecampWebhook],
-                $project
-            );
-        } catch (\Exception $ex) {
-        }
+        $this->logger->__invoke(
+            Event::REGISTER_BASECAMP_WEBHOOK,
+            ['webhook' => $project->basecampWebhook],
+            $project
+        );
     }
 }

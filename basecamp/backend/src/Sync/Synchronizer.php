@@ -412,8 +412,12 @@ class Synchronizer
         );
 
         if ($result->projectRequest->isCompleteProjectSynchronized && $result->mappedProject) {
-            $this->costlocker->registerWebhook($result->mappedProject);
-            $this->basecamp->registerWebhook($result->mappedProject);
+            try {
+                $this->costlocker->registerWebhook($result->mappedProject);
+                $this->basecamp->registerWebhook($result->mappedProject);
+            } catch (\Exception $e) {
+                $result->webhookError = $e->getMessage();
+            }
         }
     }
 }

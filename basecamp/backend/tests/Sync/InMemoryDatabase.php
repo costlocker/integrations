@@ -8,6 +8,7 @@ class InMemoryDatabase implements SyncDatabase
 {
     private $mapping = [];
     public $lastSettings;
+    public $shouldRegisterWebhooks;
 
     public function findProject($costockerProjectId)
     {
@@ -19,6 +20,9 @@ class InMemoryDatabase implements SyncDatabase
     {
         $this->mapping[$costockerProjectId][$mapping['id']] = $mapping;
         $this->lastSettings = $settings ?: $mapping['settings'];
+        if ($this->shouldRegisterWebhooks) {
+            return $this->stubBasecampProject($costockerProjectId, $mapping);
+        }
     }
 
     public function findBasecampProject($costockerProjectId)

@@ -3,6 +3,7 @@
 namespace Costlocker\Integrations\Sync;
 
 use Mockery as m;
+use GuzzleHttp\Psr7\Response;
 use Costlocker\Integrations\Entities\Event;
 use Costlocker\Integrations\Events\EventsLogger;
 use Costlocker\Integrations\Database\CompaniesRepository;
@@ -306,8 +307,22 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
         $this->givenCostlockerProject('one-person.json');
         $this->shouldCreateProject()->once()->andReturn($basecampId);
         $this->shouldNotCreatePeopleOrTodosInBasecamp();
+        $this->shouldRegisterWebhooks();
         $this->synchronize(Event::RESULT_SUCCESS);
         $this->assertMappingIsNotEmpty();
+    }
+
+    private function shouldRegisterWebhooks()
+    {
+        $this->database->shouldRegisterWebhooks = true;
+        $this->basecamp->shouldReceive('registerWebhook')->once();
+        $this->costlocker->shouldReceive('__invoke')
+            ->with('/webhooks', m::on(function ($data) {
+                assertThat($data['events'], is(arrayWithSize(2)));
+                return true;
+            }))
+            ->andReturn(new Response(200));
+        $this->eventsLogger->shouldReceive('__invoke')->twice();
     }
 
     /** @dataProvider provideCompany */

@@ -4,6 +4,7 @@ namespace Costlocker\Integrations\Sync;
 
 use Costlocker\Integrations\CostlockerClient;
 use Costlocker\Integrations\Auth\GetUser;
+use Costlocker\Integrations\Entities\Event;
 use Costlocker\Integrations\Events\EventsLogger;
 use Costlocker\Integrations\Entities\BasecampProject;
 
