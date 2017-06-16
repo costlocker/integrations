@@ -4,6 +4,7 @@ namespace Costlocker\Integrations\Database;
 
 use Costlocker\Integrations\Auth\GetUser;
 use Doctrine\ORM\EntityManagerInterface;
+use Costlocker\Integrations\Entities\CostlockerCompany;
 use Costlocker\Integrations\Entities\CostlockerProject;
 use Costlocker\Integrations\Entities\BasecampUser;
 use Costlocker\Integrations\Sync\SyncDatabase;
@@ -88,5 +89,15 @@ class ProjectsDatabase implements SyncDatabase
             WHERE {$extraCondition} bp.deletedAt IS NULL AND bu.deletedAt IS NULL
             ORDER BY bp.id DESC
 DQL;
+    }
+
+    /** @return CostlockerCompany */
+    public function findCompanyByWebhook($webhookUrl)
+    {
+        if (!$webhookUrl) {
+            return null;
+        }
+        return $this->entityManager->getRepository(CostlockerCompany::class)
+            ->findOneBy(['urlWebhook' => $webhookUrl]);
     }
 }

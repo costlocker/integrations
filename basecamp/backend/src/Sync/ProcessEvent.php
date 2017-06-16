@@ -36,7 +36,6 @@ class ProcessEvent
             return new SyncProjectToCostlocker($this->services['database'], $synchronizer);
         } elseif ($eventType == Event::WEBHOOK_SYNC) {
             return new SyncWebhookToBasecamp(
-                $this->services['database.companies'],
                 $this->services['database'],
                 $synchronizer,
                 $this->services['events.logger']

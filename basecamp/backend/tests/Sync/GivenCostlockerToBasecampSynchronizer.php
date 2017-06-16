@@ -10,7 +10,6 @@ use Costlocker\Integrations\Basecamp\Api\BasecampApi;
 use Costlocker\Integrations\Entities\Event;
 use Costlocker\Integrations\Auth\GetUser;
 use Costlocker\Integrations\Events\EventsLogger;
-use Costlocker\Integrations\Database\CompaniesRepository;
 
 abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_TestCase
 {
@@ -18,7 +17,6 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
     protected $basecamp;
     protected $database;
     protected $eventsLogger;
-    protected $companies;
 
     protected $eventType;
     protected $request;
@@ -29,7 +27,6 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
         $this->basecamp = m::mock(BasecampApi::class);
         $this->database = new InMemoryDatabase();
         $this->eventsLogger = m::mock(EventsLogger::class);
-        $this->companies = m::mock(CompaniesRepository::class);
     }
 
     protected function givenCostlockerProject($file)
@@ -195,7 +192,6 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
             'client.basecamp' => $basecamps,
             'database' => $this->database,
             'events.logger' => $this->eventsLogger,
-            'database.companies' => $this->companies,
         ]);
         $results = $uc($event);
         if (is_string($expectedStatus)) {

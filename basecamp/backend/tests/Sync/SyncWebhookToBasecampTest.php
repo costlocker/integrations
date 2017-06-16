@@ -6,21 +6,10 @@ use Mockery as m;
 use GuzzleHttp\Psr7\Response;
 use Costlocker\Integrations\Entities\Event;
 use Costlocker\Integrations\Entities\CostlockerCompany;
-use Costlocker\Integrations\Entities\BasecampUser;
-use Costlocker\Integrations\Entities\CostlockerUser;
 
 class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
 {
     protected $eventType = Event::WEBHOOK_SYNC;
-    private $company;
-
-    public function setUp()
-    {
-        parent::setUp();
-        $this->company = new CostlockerCompany();
-        $this->company->defaultBasecampUser = new BasecampUser();
-        $this->company->defaultCostlockerUser = new CostlockerUser();
-    }
 
     public function testIgnoreUnmappedProject()
     {
@@ -279,7 +268,7 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
 
     public function testIgnoreWebhookThatIsMappedToNoCompany()
     {
-        $this->company = null;
+        $this->database->company = null;
         $this->givenCostlockerWebhook('delete-activity.json');
         $this->shouldNotCreatePeopleOrTodosInBasecamp();
         $this->synchronize(null);
@@ -287,8 +276,8 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
 
     public function testCreateProjectWhenCreatingAllowedInCompanySettings()
     {
-        $this->company->settings['isCreatingBasecampProjectEnabled'] = true;
-        $this->company->settings['areTodosEnabled'] = false;
+        $this->database->company->settings['isCreatingBasecampProjectEnabled'] = true;
+        $this->database->company->settings['areTodosEnabled'] = false;
         $basecampId = 'irrelevant project';
         $this->givenCostlockerWebhook('create-project.json');
         $this->givenCostlockerProject('one-person.json');
@@ -315,8 +304,8 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
     /** @dataProvider provideCompany */
     public function testDontCreateProjectWhenCompanyIs($loadCompany)
     {
-        $this->company->settings['isCreatingBasecampProjectEnabled'] = true;
-        $this->company = $loadCompany($this->company);
+        $this->database->company->settings['isCreatingBasecampProjectEnabled'] = true;
+        $this->database->company = $loadCompany($this->database->company);
         $this->givenCostlockerWebhook('create-project.json');
         $this->shouldCreateProject()->never();
         $this->synchronize(null);
@@ -355,12 +344,6 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
                 }
             ],
         ];
-    }
-
-    protected function synchronize($expectedStatus = Event::RESULT_SUCCESS)
-    {
-        $this->companies->shouldReceive('findCompanyByWebhook')->andReturn($this->company);
-        parent::synchronize($expectedStatus);
     }
 
     protected function givenCostlockerWebhook($file)

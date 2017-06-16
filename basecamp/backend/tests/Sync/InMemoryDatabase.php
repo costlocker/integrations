@@ -2,13 +2,24 @@
 
 namespace Costlocker\Integrations\Sync;
 
+use Costlocker\Integrations\Entities\CostlockerCompany;
+use Costlocker\Integrations\Entities\CostlockerUser;
+use Costlocker\Integrations\Entities\BasecampUser;
 use Costlocker\Integrations\Entities\BasecampProject;
 
 class InMemoryDatabase implements SyncDatabase
 {
     private $mapping = [];
+    public $company;
     public $lastSettings;
     public $shouldRegisterWebhooks;
+
+    public function __construct()
+    {
+        $this->company = new CostlockerCompany();
+        $this->company->defaultBasecampUser = new BasecampUser();
+        $this->company->defaultCostlockerUser = new CostlockerUser();
+    }
 
     public function upsertProject($costockerProjectId, array $update)
     {
@@ -45,7 +56,12 @@ class InMemoryDatabase implements SyncDatabase
         $p->basecampUser->basecampAccount = new \Costlocker\Integrations\Entities\BasecampAccount();
         $p->costlockerProject = new \Costlocker\Integrations\Entities\CostlockerProject();
         $p->costlockerProject->id = $costlockerId;
-        $p->costlockerProject->costlockerCompany = new \Costlocker\Integrations\Entities\CostlockerCompany();
+        $p->costlockerProject->costlockerCompany = $this->company;
         return $p;
+    }
+
+    public function findCompanyByWebhook($webhookUrl)
+    {
+        return $this->company;
     }
 }

@@ -34,10 +34,6 @@ $app['database.events'] = function ($app) {
     );
 };
 
-$app['database.companies'] = function ($app) {
-    return new Costlocker\Integrations\Database\CompaniesRepository($app['orm.em']);
-};
-
 $app['events.logger'] = function ($app) {
     return new \Costlocker\Integrations\Events\EventsLogger(
         $app['orm.em'],
