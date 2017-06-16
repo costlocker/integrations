@@ -31,6 +31,8 @@ class EventsToJson
                     Event::DISCONNECT_BASECAMP => 'Disconnect basecamp account',
                     Event::DISCONNECT_PROJECT => 'Disconnect project',
                     Event::REGISTER_WEBHOOK => 'Register costlocker webhook',
+                    Event::REGISTER_COSTLOCKER_WEBHOOK => 'Register costlocker webhook',
+                    Event::REGISTER_BASECAMP_WEBHOOK => 'Register basecamp webhook',
                 ];
                 $isRequest = $e->event == Event::SYNC_REQUEST;
                 $description = $mapping[$e->event] ?? '';
