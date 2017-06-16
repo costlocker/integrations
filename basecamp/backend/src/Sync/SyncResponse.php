@@ -40,14 +40,13 @@ class SyncResponse
 
     public function getSettings()
     {
-        return $this->request->toSettings();
+        return $this->request->settings->toArray();
     }
 
     public function toArray()
     {
         $data = [
             'request' => get_object_vars($this->request),
-            'settings' => $this->getSettings(),
             'basecamp' => $this->basecampChangelog->toArray(),
             'costlocker' => $this->costlockerChangelog->toArray(),
             'webhooks' => [

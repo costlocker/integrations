@@ -29,20 +29,8 @@ class ProcessManualRequest
                 $request->updatedBasecampProject = $isProjectLinked ? $json->get('basecampProject') : null;
                 $request->basecampClassicCompanyId = $json->get('basecampClassicCompanyId');
             }
-
-            $request->areTodosEnabled = $json->get('areTodosEnabled');
-            if ($request->areTodosEnabled) {
-                $request->isDeletingTodosEnabled = $json->get('isDeletingTodosEnabled');
-                $request->isRevokeAccessEnabled = $json->get('isRevokeAccessEnabled');
-            }
-
-            $request->areTasksEnabled = $json->get('areTasksEnabled');
-            if ($request->areTasksEnabled) {
-                $request->isDeletingTasksEnabled = $json->get('isDeletingTasksEnabled');
-                $request->isCreatingActivitiesEnabled = $json->get('isCreatingActivitiesEnabled');
-                $request->isDeletingActivitiesEnabled = $json->get('isDeletingActivitiesEnabled');
-                $request->isBasecampWebhookEnabled = $json->get('isBasecampWebhookEnabled');
-            }
+            $request->settings->loadCostlockerSettings($jsonRequest);
+            $request->settings->loadBasecampSettings($jsonRequest);
 
             $results[] = $this->synchronizer->__invoke($request);
         }

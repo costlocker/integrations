@@ -107,7 +107,7 @@ class ProcessApiWebhook
             $r->costlockerId = $id;
             $r->projectItems = $items;
             $r->isCompleteProjectSynchronized = false;
-            $this->loadProjectSettings($r);
+            $this->loadUpdatedProjectSettings($r);
             $requests[] = $r;
         }
 
@@ -115,7 +115,7 @@ class ProcessApiWebhook
             foreach ($createdProjects as $id) {
                 $r = SyncRequest::completeSynchronization($company->defaultCostlockerUser);
                 $r->costlockerId = $id;
-                $this->loadCompanySettings($r, $company);
+                $this->loadCreatedProjectSettings($r, $company);
                 $requests[] = $r;
             }
         }
@@ -123,31 +123,22 @@ class ProcessApiWebhook
         return $requests;
     }
 
-    private function loadProjectSettings(SyncRequest $request)
+    private function loadUpdatedProjectSettings(SyncRequest $request)
     {
         $project = $this->database->findByCostlockerId($request->costlockerId);
-        $request->isRevokeAccessEnabled = false; // always override (not all people are loaded)
 
         if ($project instanceof \Costlocker\Integrations\Entities\BasecampProject) {
             $request->account = $project->basecampUser->id;
-            $options = ['areTodosEnabled', 'isDeletingTodosEnabled'];
-            foreach ($options as $option) {
-                if (array_key_exists($option, $project->settings)) {
-                    $request->{$option} = $project->settings[$option];
-                }
-            }
+            $request->settings->loadCostlockerSettings($project->settings);
         }
+        $request->settings->disableUpdatingCostlocker();
     }
 
-    private function loadCompanySettings(SyncRequest $request, CostlockerCompany $company)
+    private function loadCreatedProjectSettings(SyncRequest $request, CostlockerCompany $company)
     {
         $settings = $company->getSettings();
-
         $request->account = $settings['account'];
-        $request->areTodosEnabled = $settings['areTodosEnabled'];
-        if ($request->areTodosEnabled) {
-            $request->isDeletingTodosEnabled = $settings['isDeletingTodosEnabled'];
-            $request->isRevokeAccessEnabled = $settings['isRevokeAccessEnabled'];
-        }
+        $request->settings->loadCostlockerSettings($settings);
+        $request->settings->loadBasecampSettings($settings);
     }
 }

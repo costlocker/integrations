@@ -20,7 +20,7 @@ class Synchronizer
 
     public function __invoke(SyncRequest $r)
     {
-        $this->basecamp->init($r->account);
+        $this->basecamp->init($r);
         $this->costlocker->init($r);
 
         $result = new SyncResponse($r);
@@ -43,23 +43,19 @@ class Synchronizer
             return $result;
         }
 
-        if ($r->areTodosEnabled) {
+        if ($r->settings->areTodosEnabled) {
             $this->grantAccess($people, $result->basecampChangelog);
             $this->createTodolists($activities, $result->basecampChangelog);
             $this->deleteLegacyEntitiesInBasecamp($people, $activities, $r, $result->basecampChangelog);
             $this->basecamp->applyChanges($result->basecampChangelog);
         }
 
-        if ($r->areTasksEnabled) {
+        if ($r->settings->areTasksEnabled) {
             if ($this->basecamp->canBeSynchronizedFromBasecamp()) {
-                $this->synchronizePeopleCosts($r, $result->costlockerChangelog);
+                $this->synchronizePeopleCosts($r->settings, $result->costlockerChangelog);
                 $this->basecamp->applyChanges($result->costlockerChangelog);
             } else {
-                $r->areTasksEnabled = false;
-                $r->isDeletingTasksEnabled = false;
-                $r->isCreatingActivitiesEnabled = false;
-                $r->isDeletingActivitiesEnabled = false;
-                $r->isBasecampWebhookEnabled = false;
+                $r->settings->areTasksEnabled = false;
             }
         }
 
@@ -208,13 +204,13 @@ class Synchronizer
     }
 
     private function deleteLegacyEntitiesInBasecamp(
-        array $peopleFromCostlocker, array $activities, SyncRequest $config, SyncChangelog $changelog
+        array $peopleFromCostlocker, array $activities, SyncRequest $request, SyncChangelog $changelog
     ) {
-        if ($this->basecamp->isCreated() || $config->isDeleteDisabled()) {
+        if ($this->basecamp->isCreated() || $request->settings->isDeleteDisabledInCostlocker()) {
             return;
         }
 
-        if ($config->isDeletingTodosEnabled) {
+        if ($request->settings->isDeletingTodosEnabled) {
             foreach ($activities as $activityId => $activity) {
                 foreach (['tasks', 'persons'] as $type) {
                     foreach ($activity['delete'][$type] as $id => $task) {
@@ -229,7 +225,7 @@ class Synchronizer
             }
         }
 
-        if ($config->isRevokeAccessEnabled) {
+        if ($request->isCompleteProjectSynchronized && $request->settings->isRevokeAccessEnabled) {
             $assignedIds = $this->basecamp->getAssignedIds();
 
             foreach ($this->basecamp->getBasecampPeople() as $email => $bcPerson) {
@@ -243,7 +239,7 @@ class Synchronizer
         }
     }
 
-    private function synchronizePeopleCosts(SyncRequest $config, SyncChangelog $changelog)
+    private function synchronizePeopleCosts(SyncSettings $settings, SyncChangelog $changelog)
     {
         if ($this->basecamp->isCreated()) {
             return;
@@ -253,7 +249,7 @@ class Synchronizer
         $newActitivies = [];
         foreach ($this->basecamp->getTodolists() as $todolistId => $bcTodolist) {
             $activityId = $this->basecamp->findMappedActivity($todolistId);
-            if (!$activityId && $config->isCreatingActivitiesEnabled) {
+            if (!$activityId && $settings->isCreatingActivitiesEnabled) {
                 $activityId = $this->costlocker->findExistingActivity($bcTodolist->name);
                 $newActitivies[] = $activityId;
             }
@@ -285,7 +281,7 @@ class Synchronizer
                 ];
             }
 
-            if (!$config->isDeletingTasksEnabled) {
+            if (!$settings->isDeletingTasksEnabled) {
                 continue;
             }
             foreach (['tasks', 'persons'] as $type) {
@@ -325,7 +321,7 @@ class Synchronizer
             }
         }
 
-        if ($config->isDeletingActivitiesEnabled) {
+        if ($settings->isDeletingActivitiesEnabled) {
             foreach ($this->basecamp->getDeletedActivities() as $activityId => $todolistId) {
                 $tasksUpdate[] = [
                     'action' => 'delete',

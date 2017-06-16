@@ -4,10 +4,10 @@ namespace Costlocker\Integrations\Entities;
 
 class BasecampProjectTest extends \PHPUnit_Framework_TestCase
 {
-    public function testDetectNewValue()
+    public function testDetectNewValueDifferentThanDefault()
     {
         $project = new BasecampProject();
-        $project->updateSettings(['isBasecampWebhookEnabled' => false]);
+        $project->updateSettings(['isBasecampWebhookEnabled' => true]);
         assertThat($project->isNotChangedSetting('isBasecampWebhookEnabled'), is(false));
     }
 

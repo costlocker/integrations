@@ -617,10 +617,10 @@ class BasecampProjectToCostlockerTest extends GivenSynchronizer
                 'isDeletingTodosEnabled' => false,
                 'isRevokeAccessEnabled' => false,
                 'areTasksEnabled' => false,
-                'isDeletingTasksEnabled' => false,
-                'isCreatingActivitiesEnabled' => false,
-                'isDeletingActivitiesEnabled' => false,
-                'isBasecampWebhookEnabled' => false,
+                'isDeletingTasksEnabled' => true,
+                'isCreatingActivitiesEnabled' => true,
+                'isDeletingActivitiesEnabled' => true,
+                'isBasecampWebhookEnabled' => true,
             ],
             $this->database->lastSettings
         );

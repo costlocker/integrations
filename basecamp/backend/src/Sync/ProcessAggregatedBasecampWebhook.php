@@ -28,15 +28,8 @@ class ProcessAggregatedBasecampWebhook
         $r->isCompleteProjectSynchronized = false;
         $r->costlockerUser = $project->costlockerProject->costlockerCompany->defaultCostlockerUser;
         $r->account = $project->basecampUser->id;
-        $options = [
-            'areTasksEnabled', 'isDeletingTasksEnabled', 'isCreatingActivitiesEnabled',
-            'isDeletingActivitiesEnabled', 'isBasecampWebhookEnabled'
-        ];
-        foreach ($options as $option) {
-            if (array_key_exists($option, $project->settings)) {
-                $r->{$option} = $project->settings[$option];
-            }
-        }
+        $r->settings->loadBasecampSettings($project->settings);
+        $r->settings->disableUpdatingBasecamp();
 
         return [$this->synchronizer->__invoke($r)];
     }

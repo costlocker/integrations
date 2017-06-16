@@ -8,6 +8,7 @@ use Costlocker\Integrations\Entities\BasecampProject;
 use Costlocker\Integrations\Events\EventsLogger;
 use Costlocker\Integrations\Entities\Event;
 use Costlocker\Integrations\Sync\SyncChangelog;
+use Costlocker\Integrations\Sync\SyncRequest;
 
 class Basecamp
 {
@@ -26,9 +27,9 @@ class Basecamp
         $this->webhookUrl = $webhookUrl;
     }
 
-    public function init($basecampAccount)
+    public function init(SyncRequest $r)
     {
-        $this->client = $this->factory->buildClient($basecampAccount);
+        $this->client = $this->factory->buildClient($r->account);
         $this->bcProject = null;
         $this->todolists = null;
     }

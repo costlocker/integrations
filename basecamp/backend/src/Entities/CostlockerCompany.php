@@ -4,6 +4,7 @@ namespace Costlocker\Integrations\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Costlocker\Integrations\Sync\SyncSettings;
 
 /**
  * @ORM\Entity
@@ -58,13 +59,13 @@ class CostlockerCompany
 
     public function getSettings()
     {
-        $request = new \Costlocker\Integrations\Sync\SyncRequest();
+        $request = new SyncSettings($this->settings);
         return [
             'isCreatingBasecampProjectEnabled' => $this->isCreatingBasecampProjectEnabled(),
             'account' => $this->defaultBasecampUser ? $this->defaultBasecampUser->id : null,
             'costlockerUser' => $this->defaultCostlockerUser ? $this->defaultCostlockerUser->email : null,
             'isCostlockerWebhookEnabled' => $this->urlWebhook ? true : false,
-        ] + ($this->settings ?: []) + $request->toSettings();
+        ] + $request->toArray();
     }
 
     public function isCreatingBasecampProjectEnabled()

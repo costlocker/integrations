@@ -3,6 +3,7 @@
 namespace Costlocker\Integrations\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
+use Costlocker\Integrations\Sync\SyncSettings;
 
 /**
  * @ORM\Entity
@@ -60,7 +61,7 @@ class BasecampProject
      */
     public $deletedAt;
 
-    private $previousSettings;
+    private $syncSettings;
 
     public function __construct()
     {
@@ -69,15 +70,16 @@ class BasecampProject
 
     public function updateSettings(array $settings)
     {
-        $this->previousSettings = $this->settings ?: [];
-        $this->settings = $settings;
+        if (!$this->syncSettings) {
+            $this->syncSettings = new SyncSettings($this->settings);
+        }
+        $this->syncSettings->update($settings);
+        $this->settings = $this->syncSettings->toArray();
     }
 
     public function isNotChangedSetting($setting)
     {
-        $old = $this->previousSettings[$setting] ?? null;
-        $new = $this->settings[$setting] ?? null;
-        return $old === $new;
+        return $this->syncSettings->isNotChangedSetting($setting);
     }
 
     public function isBasecampSynchronizationDisabled()

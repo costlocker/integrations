@@ -50,14 +50,12 @@ abstract class GivenSynchronizer extends \PHPUnit_Framework_TestCase
 
     protected function whenProjectIsMapped($basecampId, array $activities = [], array $settings = [])
     {
-        $defaultSettings = new SyncRequest();
-        $defaultSettings->isDeletingTodosEnabled = true;
         $this->database->upsertProject(
             1,
             [
                 'id' => $basecampId,
                 'activities' => $activities,
-                'settings' => $settings + $defaultSettings->toSettings(),
+                'settings' => (new SyncSettings($settings + ['isDeletingTodosEnabled' => true]))->toArray(),
             ]
         );
     }
