@@ -4,13 +4,12 @@ namespace Costlocker\Integrations\Sync;
 
 interface SyncDatabase
 {
-    public function findProjects($costlockerProjectId);
+    /** @return \Costlocker\Integrations\Entities\BasecampProject */
+    public function findByCostlockerId($id);
 
-    public function findProject($costockerProjectId);
+    /** @return \Costlocker\Integrations\Entities\BasecampProject */
+    public function findByBasecampId($id);
 
-    public function findBasecampProject($costockerProjectId);
-
-    public function findBasecampProjectById($basecampProjectId);
-
-    public function upsertProject($costockerProjectId, array $mapping, array $settings = []);
+    /** @return \Costlocker\Integrations\Entities\BasecampProject */
+    public function upsertProject($costockerProjectId, array $update);
 }

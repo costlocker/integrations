@@ -13,7 +13,7 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
         parent::setUp();
         $this->request = [
             // mapping
-            'account' => [], // should be int id, but it's asserted in assertEquals due to legacy
+            'account' => null,
             'costlockerProject' => 'irrelevant id',
             // costlocker -> basecamp sync
             'areTodosEnabled' => true,
@@ -91,7 +91,6 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
         $this->assertMappingIs(
             [
                 'id' => $basecampId,
-                'account' => [],
                 'activities' => $originalMapping,
             ]
         );
@@ -207,7 +206,6 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
         $this->assertMappingIs(
             [
                 'id' => $basecampId,
-                'account' => [],
                 'activities' => [
                     1 => [
                         'id' => $basecampId,
@@ -362,7 +360,6 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
         $this->assertMappingIs(
             [
                 'id' => $basecampId,
-                'account' => [],
                 'activities' => [
                     1 => [
                         'id' => $basecampId,
@@ -477,7 +474,6 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
         $this->assertMappingIs(
             [
                 'id' => $basecampId,
-                'account' => [],
                 'activities' => [
                     1 => [
                         'id' => $basecampId,
@@ -549,7 +545,6 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
         $this->assertMappingIs(
             [
                 'id' => $basecampId,
-                'account' => [],
                 'activities' => [],
             ]
         );
@@ -600,7 +595,6 @@ class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
         $this->assertMappingIs(
             [
                 'id' => $basecampId,
-                'account' => [],
                 'activities' => $originalMapping,
             ]
         );

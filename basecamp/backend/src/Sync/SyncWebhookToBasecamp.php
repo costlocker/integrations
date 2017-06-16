@@ -10,12 +10,14 @@ use Costlocker\Integrations\Entities\Event;
 class SyncWebhookToBasecamp
 {
     private $repository;
+    private $database;
     private $synchronizer;
     private $eventsLogger;
 
-    public function __construct(CompaniesRepository $r, Synchronizer $s, EventsLogger $e)
+    public function __construct(CompaniesRepository $r, SyncDatabase $db, Synchronizer $s, EventsLogger $e)
     {
         $this->repository = $r;
+        $this->database = $db;
         $this->synchronizer = $s;
         $this->eventsLogger = $e;
     }
@@ -53,7 +55,7 @@ class SyncWebhookToBasecamp
         }
 
         $basecampId = $json['recording']['bucket']['id'];
-        $project = $this->synchronizer->findProjectByBasecampId($basecampId);
+        $project = $this->database->findByBasecampId($basecampId);
         if (!$project || $project->isBasecampSynchronizationDisabled()) {
             return "Unmapped or disabled basecamp synchronization";
         }
@@ -122,18 +124,18 @@ class SyncWebhookToBasecamp
 
     private function getProjectSettings($costlockerId)
     {
-        $project = $this->synchronizer->findProjectByCostlockerId($costlockerId);
+        $project = $this->database->findByCostlockerId($costlockerId);
 
         $config = new SyncRequest();
         $config->costlockerProject = $costlockerId;
         $config->isRevokeAccessEnabled = false; // always override (not all people are loaded)
 
-        if ($project) {
-            $config->account = $project['account']['id'] ?? $config->account;
+        if ($project instanceof \Costlocker\Integrations\Entities\BasecampProject) {
+            $config->account = $project->basecampUser->id;
             $options = ['areTodosEnabled', 'isDeletingTodosEnabled'];
             foreach ($options as $option) {
-                if (array_key_exists($option, $project['settings'])) {
-                    $config->{$option} = $project['settings'][$option];
+                if (array_key_exists($option, $project->settings)) {
+                    $config->{$option} = $project->settings[$option];
                 }
             }
         }

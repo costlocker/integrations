@@ -42,9 +42,13 @@ class SynchronizedBasecamp
         ];
     }
 
-    public function useExistingProject(array $existingProject)
+    public function useExistingProject(BasecampProject $p)
     {
-        $this->bcProject = ['isCreated' => false] + $existingProject;
+        $this->bcProject = [
+            'id' => $p->basecampProject,
+            'activities' => $p->mapping,
+            'isCreated' => false,
+        ];
     }
 
     public function getMappedActivities()

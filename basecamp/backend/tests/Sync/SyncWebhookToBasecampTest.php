@@ -28,7 +28,7 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
         $repository = m::mock(CompaniesRepository::class);
         $repository->shouldReceive('findCompanyByWebhook')->andReturn($this->company);
         $events = m::mock(EventsLogger::class);
-        return new SyncWebhookToBasecamp($repository, $s, $events);
+        return new SyncWebhookToBasecamp($repository, $this->database, $s, $events);
     }
 
     public function testIgnoreUnmappedProject()
@@ -64,7 +64,6 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
         $this->assertMappingIs(
             [
                 'id' => $basecampId,
-                'account' => [],
                 'activities' => [
                     1 => [
                         'id' => $basecampId,
@@ -132,7 +131,6 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
         $this->assertMappingIs(
             [
                 'id' => $basecampId,
-                'account' => [],
                 'activities' => [
                     1 => [
                         'id' => $basecampId,
@@ -187,7 +185,6 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
         $this->assertMappingIs(
             [
                 'id' => $basecampId,
-                'account' => [],
                 'activities' => $originalMapping,
             ]
         );
@@ -228,7 +225,6 @@ class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
         $this->assertMappingIs(
             [
                 'id' => $basecampId,
-                'account' => [],
                 'activities' => [
                     1 => [
                         'id' => $basecampId,

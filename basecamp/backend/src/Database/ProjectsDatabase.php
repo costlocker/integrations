@@ -5,7 +5,6 @@ namespace Costlocker\Integrations\Database;
 use Costlocker\Integrations\Auth\GetUser;
 use Doctrine\ORM\EntityManagerInterface;
 use Costlocker\Integrations\Entities\CostlockerProject;
-use Costlocker\Integrations\Entities\BasecampProject;
 use Costlocker\Integrations\Entities\BasecampUser;
 use Costlocker\Integrations\Sync\SyncDatabase;
 
@@ -20,13 +19,7 @@ class ProjectsDatabase implements SyncDatabase
         $this->getUser = $u;
     }
 
-    public function findProject($costockerProjectId)
-    {
-        $projects = $this->findProjects($costockerProjectId);
-        return reset($projects);
-    }
-
-    public function upsertProject($costockerProjectId, array $mapping, array $settings = [])
+    public function upsertProject($costockerProjectId, array $update)
     {
         $costlockerProject = $this->entityManager->getRepository(CostlockerProject::class)
             ->find($costockerProjectId) ?: new CostlockerProject();
@@ -36,12 +29,12 @@ class ProjectsDatabase implements SyncDatabase
             $costlockerProject->costlockerCompany = $this->getUser->getCostlockerUser()->costlockerCompany;
         }
         
-        $basecampProject = $costlockerProject->upsertProject($mapping['id']);
-        $basecampProject->mapping = $mapping['activities'];
-        $basecampProject->updateSettings($settings);
+        $basecampProject = $costlockerProject->upsertProject($update['id']);
+        $basecampProject->mapping = $update['activities'];
+        $basecampProject->updateSettings($update['settings']);
         $basecampProject->basecampUser = $this->entityManager
             ->getRepository(BasecampUser::class)
-            ->find($mapping['account']);
+            ->find($update['account']);
 
         $this->entityManager->persist($costlockerProject);
         $this->entityManager->persist($basecampProject);
@@ -50,14 +43,14 @@ class ProjectsDatabase implements SyncDatabase
         return $basecampProject;
     }
 
-    public function findBasecampProject($costlockerProjectId)
+    public function findByCostlockerId($id)
     {
-        return $this->findProjectEntity('costlockerProject', $costlockerProjectId);
+        return $this->findProjectEntity('costlockerProject', $id);
     }
 
-    public function findBasecampProjectById($basecampProjectId)
+    public function findByBasecampId($id)
     {
-        return $this->findProjectEntity('basecampProject', $basecampProjectId);
+        return $this->findProjectEntity('basecampProject', $id);
     }
 
     private function findProjectEntity($column, $projectId)
@@ -80,28 +73,5 @@ DQL;
             ->setMaxResults(1)
             ->execute($params);
         return array_shift($entities);
-    }
-
-    public function findProjects($costlockerProjectId)
-    {
-        $entity = $this->findBasecampProject($costlockerProjectId);
-        return array_map(
-            function (BasecampProject $p) {
-                return [
-                    'id' => $p->basecampProject,
-                    'activities' => $p->mapping,
-                    'settings' => $p->settings,
-                    'account' => [
-                        'id' => $p->basecampUser->id,
-                        'basecampId' => $p->basecampUser->basecampAccount->id,
-                        'name' => $p->basecampUser->basecampAccount->name,
-                        'product' => $p->basecampUser->basecampAccount->product,
-                        'href' => $p->basecampUser->basecampAccount->urlApi,
-                        'identity' => $p->basecampUser->data,
-                    ],
-                ];
-            },
-            $entity ? [$entity] : []
-        );
     }
 }

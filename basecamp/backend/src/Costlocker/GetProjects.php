@@ -26,7 +26,7 @@ class GetProjects
         foreach (json_decode($response->getBody(), true)['data'] as $rawProject) {
             $basecamps = [];
             // fixme: fetch in loop
-            $project = $this->database->findBasecampProject($rawProject['id']);
+            $project = $this->database->findByCostlockerId($rawProject['id']);
             if ($project) {
                 $basecamps[] = [
                     'id' => $project->id,

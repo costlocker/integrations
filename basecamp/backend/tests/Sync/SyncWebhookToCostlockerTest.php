@@ -18,7 +18,7 @@ class SyncWebhookToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
 
     protected function createSynchronizer(Synchronizer $s)
     {
-        return new SyncProjectToCostlocker($s);
+        return new SyncProjectToCostlocker($this->database, $s);
     }
 
     public function testPushChangesToCostlockerButNoChangeInBasecamp()
@@ -86,7 +86,6 @@ class SyncWebhookToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
         $this->assertMappingIs(
             [
                 'id' => $basecampId,
-                'account' => null,
                 'activities' => [
                     1 => [
                         'id' => $basecampId,

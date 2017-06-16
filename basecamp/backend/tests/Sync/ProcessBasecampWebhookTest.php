@@ -16,7 +16,7 @@ class ProcessBasecampWebhookTest extends GivenCostlockerToBasecampSynchronizer
     protected function createSynchronizer(Synchronizer $s)
     {
         $companiesRepository = m::mock(CompaniesRepository::class);
-        return new SyncWebhookToBasecamp($companiesRepository, $s, $this->eventsLogger);
+        return new SyncWebhookToBasecamp($companiesRepository, $this->database, $s, $this->eventsLogger);
     }
 
     public function testPushBasecampWebhookToQueue()

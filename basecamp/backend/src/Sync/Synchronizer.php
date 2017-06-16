@@ -20,21 +20,6 @@ class Synchronizer
         $this->database = $db;
     }
 
-    public function findProjectByCostlockerId($costlockerId)
-    {
-        return $this->database->findProject($costlockerId);
-    }
-
-    public function findBasecampProjectByCostlockerId($costlockerId)
-    {
-        return $this->database->findBasecampProject($costlockerId);
-    }
-
-    public function findProjectByBasecampId($basecampId)
-    {
-        return $this->database->findBasecampProjectById($basecampId);
-    }
-
     public function __invoke(SyncProjectRequest $r, SyncRequest $config)
     {
         $this->basecamp->init($config->account);
@@ -56,7 +41,7 @@ class Synchronizer
         if ($this->basecamp->isDeleted()) {
             $result->basecampChangelog->error =
                 "Project {$result->basecampChangelog->projectId} is not available in Basecamp";
-            $result->mappedProject = $this->database->findBasecampProject($r->costlockerId);
+            $result->mappedProject = $this->database->findByCostlockerId($r->costlockerId);
             return $result;
         }
 
@@ -90,7 +75,7 @@ class Synchronizer
         $costlockerProject = $r->isCompleteProjectSynchronized
             ? $this->costlocker->loadProjectFromCostlocker($config->costlockerProject) : null;
 
-        $existingProject = $this->database->findProject($r->costlockerId);
+        $existingProject = $this->database->findByCostlockerId($r->costlockerId);
         if ($existingProject) {
             $this->basecamp->useExistingProject($existingProject);
             return;
@@ -407,8 +392,8 @@ class Synchronizer
                 'id' => $result->basecampChangelog->projectId,
                 'account' => $result->syncConfig->account,
                 'activities' => $this->basecamp->getMappedActivities(),
-            ],
-            $result->getSettings()
+                'settings' => $result->getSettings(),
+            ]
         );
 
         if ($result->projectRequest->isCompleteProjectSynchronized && $result->mappedProject) {

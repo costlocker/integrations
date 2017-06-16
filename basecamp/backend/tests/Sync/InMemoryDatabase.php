@@ -10,37 +10,27 @@ class InMemoryDatabase implements SyncDatabase
     public $lastSettings;
     public $shouldRegisterWebhooks;
 
-    public function findProject($costockerProjectId)
+    public function upsertProject($costockerProjectId, array $update)
     {
-        $basecampProjects = $this->mapping[$costockerProjectId] ?? [];
-        return reset($basecampProjects);
-    }
-
-    public function upsertProject($costockerProjectId, array $mapping, array $settings = [])
-    {
-        $this->mapping[$costockerProjectId][$mapping['id']] = $mapping;
-        $this->lastSettings = $settings ?: $mapping['settings'];
+        $this->mapping[$costockerProjectId] = $update;
+        $this->lastSettings = $update['settings'];
         if ($this->shouldRegisterWebhooks) {
-            return $this->stubBasecampProject($costockerProjectId, $mapping);
+            return $this->stubBasecampProject($costockerProjectId, $update);
         }
     }
 
-    public function findBasecampProject($costockerProjectId)
+    public function findByCostlockerId($id)
     {
-        foreach ($this->mapping as $costlockerId => $mappings) {
-            if ($costlockerId == $costockerProjectId) {
-                return $this->stubBasecampProject($costlockerId, reset($mappings));
-            }
+        if (isset($this->mapping[$id])) {
+            return $this->stubBasecampProject($id, $this->mapping[$id]);
         }
     }
 
-    public function findBasecampProjectById($basecampProjectId)
+    public function findByBasecampId($id)
     {
-        foreach ($this->mapping as $costlockerId => $projects) {
-            foreach ($projects as $basecampId => $mapping) {
-                if ($basecampId == $basecampProjectId) {
-                    return $this->stubBasecampProject($costlockerId, $mapping);
-                }
+        foreach ($this->mapping as $costlockerId => $mapping) {
+            if ($id == $mapping['id']) {
+                return $this->stubBasecampProject($costlockerId, $mapping);
             }
         }
     }
@@ -48,17 +38,14 @@ class InMemoryDatabase implements SyncDatabase
     private function stubBasecampProject($costlockerId, array $mapping)
     {
         $p = new BasecampProject();
-        $p->mapping = $mapping;
+        $p->basecampProject = $mapping['id'];
+        $p->mapping = $mapping['activities'];
         $p->updateSettings($this->lastSettings);
         $p->basecampUser = new \Costlocker\Integrations\Entities\BasecampUser();
+        $p->basecampUser->basecampAccount = new \Costlocker\Integrations\Entities\BasecampAccount();
         $p->costlockerProject = new \Costlocker\Integrations\Entities\CostlockerProject();
         $p->costlockerProject->id = $costlockerId;
         $p->costlockerProject->costlockerCompany = new \Costlocker\Integrations\Entities\CostlockerCompany();
         return $p;
-    }
-
-    public function findProjects($costlockerProjectId)
-    {
-        return $this->mapping[$costlockerProjectId] ?? [];
     }
 }

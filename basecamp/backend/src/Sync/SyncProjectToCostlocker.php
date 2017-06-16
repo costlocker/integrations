@@ -4,17 +4,19 @@ namespace Costlocker\Integrations\Sync;
 
 class SyncProjectToCostlocker
 {
+    private $database;
     private $synchronizer;
 
-    public function __construct(Synchronizer $s)
+    public function __construct(SyncDatabase $db, Synchronizer $s)
     {
+        $this->database = $db;
         $this->synchronizer = $s;
     }
 
     public function __invoke(array $json)
     {
         $costlockerId = $json['costlockerProject'];
-        $project = $this->synchronizer->findBasecampProjectByCostlockerId($costlockerId);
+        $project = $this->database->findByCostlockerId($costlockerId);
 
         if (!$project) {
             return [];

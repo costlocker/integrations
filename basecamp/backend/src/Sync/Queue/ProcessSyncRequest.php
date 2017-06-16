@@ -91,10 +91,11 @@ class ProcessSyncRequest
         if ($eventType == Event::MANUAL_SYNC) {
             return new \Costlocker\Integrations\Sync\SyncProjectToBasecamp($synchronizer);
         } elseif ($eventType == Event::WEBHOOK_BASECAMP) {
-            return new \Costlocker\Integrations\Sync\SyncProjectToCostlocker($synchronizer);
+            return new \Costlocker\Integrations\Sync\SyncProjectToCostlocker($this->app['database'], $synchronizer);
         } elseif ($eventType == Event::WEBHOOK_SYNC) {
             return new \Costlocker\Integrations\Sync\SyncWebhookToBasecamp(
                 $this->app['database.companies'],
+                $this->app['database'],
                 $synchronizer,
                 $this->app['events.logger']
             );

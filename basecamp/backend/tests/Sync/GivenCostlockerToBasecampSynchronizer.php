@@ -56,9 +56,6 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
             [
                 'id' => $basecampId,
                 'activities' => $activities,
-                'account' => [
-                    'id' => [], // should be int id, but it's asserted in assertEquals due to legacy
-                ],
                 'settings' => $settings + $defaultSettings->toSettings(),
             ]
         );
@@ -198,22 +195,21 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
     {
         $this->assertMappingIs([
             'id' => $basecampId,
-            'account' => [],
             'activities' => [],
         ]);
     }
 
     protected function assertMappingIsNotEmpty()
     {
-        assertThat($this->database->findProject(1), is(nonEmptyArray()));
+        $project = $this->database->findByCostlockerId(1);
+        assertThat($project, anInstanceOf(\Costlocker\Integrations\Entities\BasecampProject::class));
     }
 
     protected function assertMappingIs(array $expectedMapping)
     {
-        $this->assertEquals(
-            $expectedMapping,
-            $this->database->findProject(1)
-        );
+        $project = $this->database->findByCostlockerId(1);
+        assertThat($project->basecampProject, is($expectedMapping['id']));
+        assertThat($project->mapping, is($expectedMapping['activities']));
     }
 
     abstract protected function createSynchronizer(Synchronizer $s);
