@@ -1,0 +1,11 @@
+{
+    "id": 24532,
+    "active": true,
+    "created_at": "2017-06-16T07:33:56.170Z",
+    "updated_at": "2017-06-16T07:33:56.170Z",
+    "payload_url": "https://example.com/endpoint",
+    "types": ["Todo", "Todolist"],
+    "url": "https://3.basecampapi.com/3763761/buckets/3929343/webhooks/24532.json",
+    "app_url": "https://3.basecamp.com/3763761/buckets/3929343/webhooks/24532",
+    "recent_deliveries": []
+}

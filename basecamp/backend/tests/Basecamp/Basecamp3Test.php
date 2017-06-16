@@ -30,6 +30,30 @@ class Basecamp3Test extends \Tests\Basecamp\GivenBasecampConnect
         assertThat($this->api->canBeSynchronizedFromBasecamp(), is(true));
     }
 
+    public function testRegisterWebhook()
+    {
+        $url = 'irrelevant url';
+        $this->whenEntityIsCreated(
+            function () use ($url) {
+                return $this->api->registerWebhook($this->project, $url, false);
+            }
+        );
+        $this->assertCalledUrl("/buckets/{$this->project}/webhooks.json");
+        $this->assertRequestContains(json_encode([
+            'payload_url' => $url,
+            'types' => ['Todo', 'Todolist'],
+            'active' => false,
+        ]));
+    }
+
+    public function testUpdateWebhook()
+    {
+        $webhookId = 24532;
+        $this->whenEntityIsUpdated('webhook');
+        $this->api->registerWebhook($this->project, 'irrelevant url', true, $webhookId);
+        $this->assertCalledUrl("/buckets/{$this->project}/webhooks/{$webhookId}.json");
+    }
+
     public function testGetCompanies()
     {
         assertThat($this->api->getCompanies(), is(emptyArray()));

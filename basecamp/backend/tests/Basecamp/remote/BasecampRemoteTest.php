@@ -60,6 +60,12 @@ class BasecampRemoteTest extends \PHPUnit_Framework_TestCase
         $bcProjectId = $this->connect->createProject($testName, null, 'test description');
         $this->writeln('Created project', $bcProjectId);
 
+        $bcWebhookId = $this->connect->registerWebhook($bcProjectId, 'https://example.com/endpoint', true);
+        $this->writeln('Created webhook', $bcWebhookId);
+
+        $this->connect->registerWebhook($bcProjectId, 'https://example.com/endpoint', false, $bcWebhookId);
+        $this->writeln('Deactivated webhook', $bcWebhookId);
+
         $bcTodolistId = $this->connect->createTodolist($bcProjectId, $testName);
         $this->writeln('Created todolist', $bcTodolistId);
 

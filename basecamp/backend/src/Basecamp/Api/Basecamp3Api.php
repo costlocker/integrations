@@ -22,6 +22,21 @@ class Basecamp3Api extends ExternalApi
         return array();
     }
 
+    public function registerWebhook($bcProjectId, $webhookUrl, $isActive = true, $bcWebhookId = null)
+    {
+        $payload = [
+            'payload_url' => $webhookUrl,
+            'types' => ['Todo', 'Todolist'],
+            'active' => $isActive,
+        ];
+        if ($bcWebhookId) {
+            $response = $this->call('put', "/buckets/{$bcProjectId}/webhooks/{$bcWebhookId}.json", $payload);
+        } else {
+            $response = $this->call('post', "/buckets/{$bcProjectId}/webhooks.json", $payload);
+        }
+        return $this->getId($response);
+    }
+
     public function getProjects()
     {
         $response = $this->call('get', '/projects.json', self::DECODE_RESPONSE);

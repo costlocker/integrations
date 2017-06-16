@@ -10,6 +10,8 @@ interface BasecampApi
      */
     public function canBeSynchronizedFromBasecamp();
 
+    public function registerWebhook($bcProjectId, $webhookUrl, $isActive = true, $bcWebhookId = null);
+
     /**
      *
      * Produces a list of companies (clients). Basecamp Classic only

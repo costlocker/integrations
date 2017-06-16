@@ -30,6 +30,12 @@ HEADERS
         assertThat($this->api->canBeSynchronizedFromBasecamp(), is(false));
     }
 
+    public function testRegisterWebhook()
+    {
+        $this->setExpectedException(BasecampInvalidCallException::class);
+        $this->api->registerWebhook('123', 'irrelevant url');
+    }
+
     public function testGetCompanies()
     {
         $this->whenApiReturns('companies');

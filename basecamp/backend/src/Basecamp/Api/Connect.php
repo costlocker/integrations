@@ -46,6 +46,11 @@ class Connect implements BasecampApi
         return $this->currentApi instanceof Basecamp3Api;
     }
 
+    public function registerWebhook($bcProjectId, $webhookUrl, $isActive = true, $bcWebhookId = null)
+    {
+        return $this->currentApi->registerWebhook($bcProjectId, $webhookUrl, $isActive, $bcWebhookId);
+    }
+
     public function getCompanies()
     {
         return $this->currentApi->getCompanies();

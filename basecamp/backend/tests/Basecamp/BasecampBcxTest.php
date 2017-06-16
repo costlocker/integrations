@@ -28,6 +28,12 @@ class BasecampBcxTest extends \Tests\Basecamp\GivenBasecampConnect
         assertThat($this->api->canBeSynchronizedFromBasecamp(), is(false));
     }
 
+    public function testRegisterWebhook()
+    {
+        $this->setExpectedException(BasecampInvalidCallException::class);
+        $this->api->registerWebhook('123', 'irrelevant url');
+    }
+
     public function testGetCompanies()
     {
         assertThat($this->api->getCompanies(), is(emptyArray()));
