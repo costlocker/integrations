@@ -18,13 +18,13 @@ class Synchronizer
         $this->database = $db;
     }
 
-    public function __invoke(SyncProjectRequest $r, SyncRequest $config)
+    public function __invoke(SyncRequest $r)
     {
-        $this->basecamp->init($config->account);
+        $this->basecamp->init($r->account);
         $this->costlocker->init($r);
 
-        $result = new SyncResponse($r, $config);
-        $isNotMapped = $this->upsertProject($r, $config);
+        $result = new SyncResponse($r);
+        $isNotMapped = $this->upsertProject($r);
 
         if ($isNotMapped) {
             $result->basecampChangelog->error = "{$r->costlockerId} is not mapped";
@@ -43,23 +43,23 @@ class Synchronizer
             return $result;
         }
 
-        if ($config->areTodosEnabled) {
+        if ($r->areTodosEnabled) {
             $this->grantAccess($people, $result->basecampChangelog);
             $this->createTodolists($activities, $result->basecampChangelog);
-            $this->deleteLegacyEntitiesInBasecamp($people, $activities, $config, $result->basecampChangelog);
+            $this->deleteLegacyEntitiesInBasecamp($people, $activities, $r, $result->basecampChangelog);
             $this->basecamp->applyChanges($result->basecampChangelog);
         }
 
-        if ($config->areTasksEnabled) {
+        if ($r->areTasksEnabled) {
             if ($this->basecamp->canBeSynchronizedFromBasecamp()) {
-                $this->synchronizePeopleCosts($config, $result->costlockerChangelog);
+                $this->synchronizePeopleCosts($r, $result->costlockerChangelog);
                 $this->basecamp->applyChanges($result->costlockerChangelog);
             } else {
-                $config->areTasksEnabled = false;
-                $config->isDeletingTasksEnabled = false;
-                $config->isCreatingActivitiesEnabled = false;
-                $config->isDeletingActivitiesEnabled = false;
-                $config->isBasecampWebhookEnabled = false;
+                $r->areTasksEnabled = false;
+                $r->isDeletingTasksEnabled = false;
+                $r->isCreatingActivitiesEnabled = false;
+                $r->isDeletingActivitiesEnabled = false;
+                $r->isBasecampWebhookEnabled = false;
             }
         }
 
@@ -68,10 +68,10 @@ class Synchronizer
         return $result;
     }
 
-    private function upsertProject(SyncProjectRequest $r, SyncRequest $config)
+    private function upsertProject(SyncRequest $r)
     {
         $costlockerProject = $r->isCompleteProjectSynchronized
-            ? $this->costlocker->loadProjectFromCostlocker($config->costlockerProject) : null;
+            ? $this->costlocker->loadProjectFromCostlocker($r->costlockerId) : null;
 
         $existingProject = $this->database->findByCostlockerId($r->costlockerId);
         if ($existingProject) {
@@ -88,10 +88,10 @@ class Synchronizer
         $name =
             "{$costlockerProject['client']['name']} | {$costlockerProject['name']}" .
             ($customProjectId ? " [{$customProjectId}]" : '');
-        $this->basecamp->useNewProject($config->updatedBasecampProject, $name, $config->basecampClassicCompanyId);
+        $this->basecamp->useNewProject($r->updatedBasecampProject, $name, $r->basecampClassicCompanyId);
     }
 
-    private function analyzeProjectItems(SyncProjectRequest $request)
+    private function analyzeProjectItems(SyncRequest $request)
     {
         $persons = [];
         $personsMap = [];
@@ -388,13 +388,13 @@ class Synchronizer
             $result->costlockerChangelog->projectId,
             [
                 'id' => $result->basecampChangelog->projectId,
-                'account' => $result->syncConfig->account,
+                'account' => $result->request->account,
                 'activities' => $this->basecamp->getMappedActivities(),
                 'settings' => $result->getSettings(),
             ]
         );
 
-        if ($result->projectRequest->isCompleteProjectSynchronized && $result->mappedProject) {
+        if ($result->request->isCompleteProjectSynchronized && $result->mappedProject) {
             try {
                 $this->costlocker->registerWebhook($result->mappedProject);
                 $this->basecamp->registerWebhook($result->mappedProject);

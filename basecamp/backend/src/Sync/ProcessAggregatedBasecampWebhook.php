@@ -22,25 +22,22 @@ class ProcessAggregatedBasecampWebhook
             return [];
         }
 
-        $r = new SyncProjectRequest();
+        $r = new SyncRequest();
         $r->costlockerId = $costlockerId;
         $r->projectItems = []; // costlocker -> basecamp is disabled
         $r->isCompleteProjectSynchronized = false;
         $r->costlockerUser = $project->costlockerProject->costlockerCompany->defaultCostlockerUser;
-
-        $config = new SyncRequest();
-        $config->costlockerProject = $costlockerId;
-        $config->account = $project->basecampUser->id;
+        $r->account = $project->basecampUser->id;
         $options = [
             'areTasksEnabled', 'isDeletingTasksEnabled', 'isCreatingActivitiesEnabled',
             'isDeletingActivitiesEnabled', 'isBasecampWebhookEnabled'
         ];
         foreach ($options as $option) {
             if (array_key_exists($option, $project->settings)) {
-                $config->{$option} = $project->settings[$option];
+                $r->{$option} = $project->settings[$option];
             }
         }
 
-        return [$this->synchronizer->__invoke($r, $config)];
+        return [$this->synchronizer->__invoke($r)];
     }
 }

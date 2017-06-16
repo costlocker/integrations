@@ -6,10 +6,8 @@ use Costlocker\Integrations\Entities\Event;
 
 class SyncResponse
 {
-    /** @var SyncProjectRequest */
-    public $projectRequest;
     /** @var SyncRequest */
-    public $syncConfig;
+    public $request;
     /** @var \Costlocker\Integrations\Entities\BasecampProject */
     public $mappedProject;
     /** @var SyncChangelog */
@@ -18,10 +16,9 @@ class SyncResponse
     public $basecampChangelog;
     public $webhookError;
 
-    public function __construct(SyncProjectRequest $r, SyncRequest $c)
+    public function __construct(SyncRequest $r)
     {
-        $this->projectRequest = $r;
-        $this->syncConfig = $c;
+        $this->request = $r;
         $this->costlockerChangelog = new SyncChangelog();
         $this->basecampChangelog = new SyncChangelog();
     }
@@ -43,17 +40,14 @@ class SyncResponse
 
     public function getSettings()
     {
-        return $this->syncConfig->toSettings();
+        return $this->request->toSettings();
     }
 
     public function toArray()
     {
         $data = [
-            'request' => [
-                'sync' => get_object_vars($this->syncConfig),
-                'project' => get_object_vars($this->projectRequest),
-                'settings' => $this->getSettings(),
-            ],
+            'request' => get_object_vars($this->request),
+            'settings' => $this->getSettings(),
             'basecamp' => $this->basecampChangelog->toArray(),
             'costlocker' => $this->costlockerChangelog->toArray(),
             'webhooks' => [
@@ -61,8 +55,8 @@ class SyncResponse
             ],
         ];
         // dont save doctrine entity...
-        if ($this->projectRequest->costlockerUser) {
-            $data['request']['project']['costlockerUser'] = $this->projectRequest->costlockerUser->id;
+        if ($this->request->costlockerUser) {
+            $data['request']['costlockerUser'] = $this->request->costlockerUser->id;
         }
         return $data;
     }

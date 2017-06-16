@@ -67,8 +67,8 @@ class ProcessApiWebhook
     {
         $requests = $this->processCostlockerWebhook($json);
         $results = [];
-        foreach ($requests as list($r, $config)) {
-            $results[] = $this->synchronizer->__invoke($r, $config);
+        foreach ($requests as $r) {
+            $results[] = $this->synchronizer->__invoke($r);
         }
         return $results;
     }
@@ -101,63 +101,53 @@ class ProcessApiWebhook
             }
         }
 
-        $results = [];
+        $requests = [];
         foreach ($updatedProjects as $id => $items) {
-            $config = $this->getProjectSettings($id);
-
-            $r = new SyncProjectRequest();
+            $r = new SyncRequest();
             $r->costlockerId = $id;
             $r->projectItems = $items;
             $r->isCompleteProjectSynchronized = false;
-            $results[] = [$r, $config];
+            $this->loadProjectSettings($r);
+            $requests[] = $r;
         }
 
         if ($company->isCreatingBasecampProjectEnabled()) {
             foreach ($createdProjects as $id) {
-                $config = $this->getCompanySettings($id, $company);
-
-                $r = SyncProjectRequest::completeSynchronization($company->defaultCostlockerUser);
-                $results[] = [$r, $config];
+                $r = SyncRequest::completeSynchronization($company->defaultCostlockerUser);
+                $r->costlockerId = $id;
+                $this->loadCompanySettings($r, $company);
+                $requests[] = $r;
             }
         }
 
-        return $results;
+        return $requests;
     }
 
-    private function getProjectSettings($costlockerId)
+    private function loadProjectSettings(SyncRequest $request)
     {
-        $project = $this->database->findByCostlockerId($costlockerId);
-
-        $config = new SyncRequest();
-        $config->costlockerProject = $costlockerId;
-        $config->isRevokeAccessEnabled = false; // always override (not all people are loaded)
+        $project = $this->database->findByCostlockerId($request->costlockerId);
+        $request->isRevokeAccessEnabled = false; // always override (not all people are loaded)
 
         if ($project instanceof \Costlocker\Integrations\Entities\BasecampProject) {
-            $config->account = $project->basecampUser->id;
+            $request->account = $project->basecampUser->id;
             $options = ['areTodosEnabled', 'isDeletingTodosEnabled'];
             foreach ($options as $option) {
                 if (array_key_exists($option, $project->settings)) {
-                    $config->{$option} = $project->settings[$option];
+                    $request->{$option} = $project->settings[$option];
                 }
             }
         }
-
-        return $config;
     }
 
-    private function getCompanySettings($costlockerId, CostlockerCompany $company)
+    private function loadCompanySettings(SyncRequest $request, CostlockerCompany $company)
     {
         $settings = $company->getSettings();
 
-        $config = new SyncRequest();
-        $config->account = $settings['account'];
-        $config->costlockerProject = $costlockerId;
-        $config->areTodosEnabled = $settings['areTodosEnabled'];
-        if ($config->areTodosEnabled) {
-            $config->isDeletingTodosEnabled = $settings['isDeletingTodosEnabled'];
-            $config->isRevokeAccessEnabled = $settings['isRevokeAccessEnabled'];
+        $request->account = $settings['account'];
+        $request->areTodosEnabled = $settings['areTodosEnabled'];
+        if ($request->areTodosEnabled) {
+            $request->isDeletingTodosEnabled = $settings['isDeletingTodosEnabled'];
+            $request->isRevokeAccessEnabled = $settings['isRevokeAccessEnabled'];
         }
-
-        return $config;
     }
 }

@@ -7,7 +7,7 @@ use Costlocker\Integrations\Auth\GetUser;
 use Costlocker\Integrations\Entities\Event;
 use Costlocker\Integrations\Events\EventsLogger;
 use Costlocker\Integrations\Entities\BasecampProject;
-use Costlocker\Integrations\Sync\SyncProjectRequest;
+use Costlocker\Integrations\Sync\SyncRequest;
 
 class Costlocker
 {
@@ -16,7 +16,7 @@ class Costlocker
     private $logger;
     private $webhookUrl;
 
-    private $projectRequest;
+    private $request;
     private $activities;
 
     public function __construct(CostlockerClient $c, GetUser $u, EventsLogger $l, $webhookUrl)
@@ -27,10 +27,10 @@ class Costlocker
         $this->webhookUrl = $webhookUrl;
     }
 
-    public function init(SyncProjectRequest $r)
+    public function init(SyncRequest $r)
     {
         $this->getUser->overrideCostlockerUser($r->costlockerUser);
-        $this->projectRequest = $r;
+        $this->request = $r;
         $this->activities = null;
     }
 
@@ -39,15 +39,15 @@ class Costlocker
         $response = $this->client->__invoke("/projects/{$costlockerId}?types=peoplecosts");
         $project = json_decode($response->getBody(), true)['data'];
 
-        $this->projectRequest->costlockerId = $project['id'];
-        $this->projectRequest->projectItems = $project['items'];
+        $this->request->costlockerId = $project['id'];
+        $this->request->projectItems = $project['items'];
         return $project;
     }
 
     public function updateProject(array $updatedItems)
     {
         $response = $this->client->__invoke("/projects", [
-            'id' => $this->projectRequest->costlockerId,
+            'id' => $this->request->costlockerId,
             'items' => $updatedItems,
         ]);
         if ($response->getStatusCode() != 200) {
