@@ -7,21 +7,24 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Psr\Log\LoggerInterface;
-use Costlocker\Integrations\Entities\Event;
 
 class ProcessSyncRequestsCommand extends Command
 {
-    private $usecase;
+    private $processRequests;
+    private $agreggateWebhooks;
+    private $logger;
 
     /** @var OutputInterface */
     private $output;
     private $isVerboseMode;
     private $isInfiniteLoop = true;
 
-    public function __construct(ProcessSyncRequests $uc)
+    public function __construct(ProcessSyncRequests $p, AggregateBasecampWebhooks $w, LoggerInterface $l)
     {
         parent::__construct();
-        $this->usecase = $uc;
+        $this->processRequests = $p;
+        $this->agreggateWebhooks = $w;
+        $this->logger = $l;
     }
 
     protected function configure()
@@ -29,7 +32,8 @@ class ProcessSyncRequestsCommand extends Command
         $this
             ->setName('queue:daemon')
             ->setDescription('Process synchronization requests')
-            ->addOption('delay', 'd', InputOption::VALUE_OPTIONAL, 'Delay in milliseconds', 1000);
+            ->addOption('delay', 'd', InputOption::VALUE_OPTIONAL, 'Delay in milliseconds', 1000)
+            ->addOption('basecampDelay', 'b', InputOption::VALUE_OPTIONAL, 'Delay before processing BC webhook', 5);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -39,32 +43,49 @@ class ProcessSyncRequestsCommand extends Command
 
         $delayInMillis = $input->getOption('delay');
         $delayInMicros = $delayInMillis * 1000;
+        $basecampDelay = $input->getOption('basecampDelay');
         $this->writeln([
+            "<comment>Daemon delay</comment>: {$delayInMillis}ms",
+            "<comment>Basecamp webhook delay</comment>: {$basecampDelay}s",
             'Starting infinite loop...',
             '',
         ]);
         do {
-            $this->executeCommand();
+            try {
+                $this->processSyncRequests();
+                $this->aggregateBasecampWebhooks($basecampDelay);
+            } catch (\Exception $e) {
+                $this->writeln([
+                    "<error>{$e->getMessage()}</error>",
+                    get_class($e),
+                ]);
+                $this->isInfiniteLoop = false;
+                $this->logger->critical($e);
+            }
             usleep($delayInMicros);
         } while ($this->isInfiniteLoop);
     }
 
-    public function executeCommand()
+    private function processSyncRequests()
     {
-        try {
-            $processedEvents = $this->usecase->__invoke(function ($eventId, $status) {
-                $this->writeln("<comment>{$eventId}</comment> {$status}");
-            });
-            if (!$processedEvents) {
-                $this->writeln('No events available', false);
-            }
-        } catch (\Exception $e) {
+        $processedEvents = $this->processRequests->__invoke(function ($eventId, $status) {
+            $this->writeln("<comment>{$eventId}</comment> {$status}");
+        });
+        if (!$processedEvents) {
+            $this->writeln('No events available', false);
+        }
+    }
+
+    private function aggregateBasecampWebhooks($delay)
+    {
+        $events = $this->agreggateWebhooks->__invoke($delay);
+        if ($events) {
             $this->writeln([
-                "<error>{$e->getMessage()}</error>",
-                get_class($e),
+                '<comment>Aggregated basecamp webhooks</comment>',
+                json_encode($events)
             ]);
-            $this->isInfiniteLoop = false;
-            $this->logger->critical($e);
+        } else {
+            $this->writeln("No basecamp webhook available", false);
         }
     }
 

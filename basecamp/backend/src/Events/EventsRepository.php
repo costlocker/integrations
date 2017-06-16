@@ -31,6 +31,43 @@ SQL;
             ->fetchAll(\PDO::FETCH_COLUMN);
     }
 
+    public function findBasecampWebhooks($secondsDelay = 5)
+    {
+        $sql =<<<SQL
+            SELECT p.cl_project_id as id,
+                   array_to_json(array_agg(e.id)) as events,
+                   min(e.created_at) as min_event_date,
+                   max(e.created_at) as max_event_date
+            FROM events e
+            JOIN bc_projects p ON e.bc_project_id = p.id
+            WHERE e.event = :event
+              AND e.created_at < NOW() - INTERVAL '{$secondsDelay} seconds'
+              AND e.updated_at IS NULL
+            GROUP BY p.cl_project_id
+SQL;
+        $params = [
+            'event' => Event::WEBHOOK_BASECAMP,
+        ];
+        return $this->entityManager->getConnection()->executeQuery($sql, $params)
+            ->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function markEventsAsProcessed(array $ids)
+    {
+        $sql =<<<SQL
+            UPDATE events
+            SET updated_at = NOW()
+            WHERE id IN (:ids)
+SQL;
+        $params = [
+            'ids' => $ids,
+        ];
+        $types = [
+            'ids' => \Doctrine\DBAL\Connection::PARAM_INT_ARRAY,
+        ];
+        return $this->entityManager->getConnection()->executeQuery($sql, $params, $types);
+    }
+
     public function findSyncRequest($eventId)
     {
         $dql =<<<DQL

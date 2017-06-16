@@ -9,7 +9,13 @@ $console->addCommands([
         new Costlocker\Integrations\Sync\Queue\ProcessSyncRequests(
             $app['database.events'],
             __DIR__ . '/console queue:event --id '
-        )
+        ),
+        new \Costlocker\Integrations\Sync\Queue\AggregateBasecampWebhooks(
+            $app['database.events'],
+            $app['events.pushSyncRequest'],
+            $app['logger']
+        ),
+        $app['logger']
     ),
     new Costlocker\Integrations\Sync\Queue\ProcessSyncRequestCommand(
         new Costlocker\Integrations\Sync\Queue\ProcessSyncRequest($app),

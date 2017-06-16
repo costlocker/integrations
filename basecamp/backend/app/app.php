@@ -45,6 +45,10 @@ $app['events.logger'] = function ($app) {
     );
 };
 
+$app['events.pushSyncRequest'] = function ($app) {
+    return new \Costlocker\Integrations\Sync\Queue\PushSyncRequest($app['events.logger']);
+};
+
 $app['guzzle'] = function () {
     return new \GuzzleHttp\Client();
 };
@@ -209,8 +213,7 @@ $app
     ->before($checkAuthorization('basecamp'));
 
 $pushEvent = function ($event, array $data) use ($app) {
-    $push = new \Costlocker\Integrations\Sync\Queue\PushSyncRequest($app['events.logger']);
-    $push($event, $data);
+    $app['events.pushSyncRequest']($event, $data);
     return new JsonResponse([], 200);
 };
     
