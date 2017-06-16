@@ -35,10 +35,9 @@ class ProcessBasecampWebhookTest extends GivenCostlockerToBasecampSynchronizer
             ->with(
                 Event::WEBHOOK_BASECAMP,
                 [
-                    'basecamp' => [
-                        'event' => 'todo_created',
-                        'project' => self::BASECAMP_ID,
-                    ],
+                    'costlockerProject' => 1,
+                    'basecampProject' => self::BASECAMP_ID,
+                    'basecampEvent' => 'todo_created',
                 ],
                 m::type(\Costlocker\Integrations\Entities\BasecampProject::class)
             );

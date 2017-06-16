@@ -47,21 +47,26 @@ class SyncWebhookToBasecamp
             'todolist_archived', 'todolist_created', 'todolist_name_changed', 
             'todolist_trashed', 'todolist_unarchived', 'todolist_untrashed',
         ];
-        $webhook = [
-            'event' => $json['kind'],
-            'project' => $json['recording']['bucket']['id'],
-        ];
 
-        if (!in_array($webhook['event'] ?? '', $allowedWebhooks)) {
+        if (!in_array($json['kind'] ?? '', $allowedWebhooks)) {
             return "Not allowed basecamp event";
         }
 
-        $project = $this->synchronizer->findProjectByBasecampId($webhook['project']);
+        $basecampId = $json['recording']['bucket']['id'];
+        $project = $this->synchronizer->findProjectByBasecampId($basecampId);
         if (!$project || $project->isBasecampSynchronizationDisabled()) {
             return "Unmapped or disabled basecamp synchronization";
         }
 
-        $this->eventsLogger->__invoke(Event::WEBHOOK_BASECAMP, ['basecamp' => $webhook], $project);
+        $this->eventsLogger->__invoke(
+            Event::WEBHOOK_BASECAMP,
+            [
+                'costlockerProject' => $project->costlockerProject->id,
+                'basecampProject' => $basecampId,
+                'basecampEvent' => $json['kind'],
+            ],
+            $project
+        );
     }
 
     private function processCostlockerWebhook(array $json)

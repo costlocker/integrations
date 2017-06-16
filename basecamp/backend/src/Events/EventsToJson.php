@@ -41,7 +41,7 @@ class EventsToJson
                 } elseif ($e->event == Event::DISCONNECT_PROJECT) {
                     $description .= " #{$e->data['project']}";
                 } elseif ($e->event == Event::WEBHOOK_BASECAMP) {
-                    $description .= " '{$e->data['basecamp']['event']}' in project #{$e->data['basecamp']['project']}";
+                    $description .= " '{$e->data['basecampEvent']}' in project #{$e->basecampProject->costlockerProject->id}";
                 } elseif ($e->basecampProject) {
                     $description .= " #{$e->basecampProject->costlockerProject->id}";
                 }
