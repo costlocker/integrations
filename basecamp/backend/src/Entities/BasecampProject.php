@@ -36,6 +36,11 @@ class BasecampProject
     public $basecampUser;
 
     /**
+     * @ORM\Column(name="bc_webhook_id", type="integer", nullable=true)
+     */
+    public $basecampWebhook;
+
+    /**
      * @ORM\Column(type="json_array")
      */
     public $settings;

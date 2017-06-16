@@ -20,6 +20,8 @@ class Version20170613042714 extends AbstractMigration
         ');
         $this->addSql('CREATE INDEX IDX_52851F39E572ECDB ON cl_companies (bc_user_id)');
         $this->addSql('CREATE INDEX IDX_52851F39D5094834 ON cl_companies (cl_user_id)');
+
+        $this->addSql('ALTER TABLE bc_projects ADD bc_webhook_id INT DEFAULT NULL');
     }
 
     public function down(Schema $schema)
@@ -30,5 +32,7 @@ class Version20170613042714 extends AbstractMigration
         $this->addSql('DROP INDEX IDX_52851F39D5094834');
         $this->addSql('ALTER TABLE cl_companies DROP bc_user_id');
         $this->addSql('ALTER TABLE cl_companies DROP cl_user_id');
+
+        $this->addSql('ALTER TABLE bc_projects DROP bc_webhook_id');
     }
 }
