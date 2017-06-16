@@ -4,12 +4,6 @@ namespace Costlocker\Integrations\Basecamp\Api;
 
 interface BasecampApi
 {
-    /**
-     * Is supported = hasWebhooks && detailedInformationAboutAssignee
-     * @return bool
-     */
-    public function canBeSynchronizedFromBasecamp();
-
     public function registerWebhook($bcProjectId, $webhookUrl, $isActive = true, $bcWebhookId = null);
 
     /**
@@ -51,12 +45,6 @@ interface BasecampApi
      * @return array List of ids and names of active projects
      */
     public function getProjects();
-
-    /**
-     * @param stdClass $accountDetails row from identity table
-     * @return string
-     */
-    public function buildProjectUrl($accountDetails, $projectId);
 
     /**
      *

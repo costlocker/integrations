@@ -4,6 +4,7 @@ namespace Costlocker\Integrations\Costlocker;
 
 use Costlocker\Integrations\CostlockerClient;
 use Costlocker\Integrations\Basecamp\BasecampFactory;
+use Costlocker\Integrations\Entities\BasecampProject;
 use Costlocker\Integrations\Sync\SyncDatabase;
 
 class GetProjects
@@ -24,40 +25,34 @@ class GetProjects
         $response = $this->client->__invoke('/projects?state=running');
         $projects = [];
         foreach (json_decode($response->getBody(), true)['data'] as $rawProject) {
+            $basecamps = [];
+            // fixme: fetch in loop
+            $project = $this->database->findBasecampProject($rawProject['id']);
+            if ($project) {
+                $basecamps[] = [
+                    'id' => $project->id,
+                    'settings' => $project->settings,
+                    'account' => [
+                        'id' => $project->basecampUser->id,
+                        'basecampId' => $project->basecampUser->basecampAccount->id,
+                        'name' => $project->basecampUser->basecampAccount->name,
+                        'product' => $project->basecampUser->basecampAccount->product,
+                        'href' => $project->basecampUser->basecampAccount->urlApi,
+                        'identity' => $project->basecampUser->data,
+                    ],
+                    'url' => $this->basecampFactory->buildProjectUrl($project),
+                ];
+            }
             $projects[] = [
                 'id' => $rawProject['id'],
                 'name' => $rawProject['name'],
                 'client' => $rawProject['client'],
-                'basecamps' => array_values(array_map(
-                    function (array $mapping) {
-                        return [
-                            'id' => $mapping['id'],
-                            'account' => $mapping['account'],
-                            'url' => $this->buildProjectUrl($mapping['account'], $mapping['id']),
-                            'settings' => $mapping['settings'],
-                        ];
-                    },
-                    // fixme: fetch in loop
-                    $this->database->findProjects($rawProject['id'])
-                )),
+                'basecamps' => $basecamps,
             ];
         }
         usort($projects, function (array $a, array $b) {
             return count($b['basecamps']) - count($a['basecamps']);
         });
         return $projects;
-    }
-
-    private function buildProjectUrl(array $account, $projectId)
-    {
-        $basecamp = $this->basecampFactory->__invoke($account['id']);
-        return $basecamp->buildProjectUrl(
-            (object) [
-                'bc__product_type' => $account['product'],
-                'bc__account_href' => $account['href'],
-                'bc__account_id' => $account['basecampId'],
-            ],
-            $projectId
-        );
     }
 }

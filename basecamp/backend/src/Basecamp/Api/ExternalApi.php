@@ -28,17 +28,9 @@ abstract class ExternalApi implements BasecampApi
         return $this->callApi->__invoke($method, $endpoint, $params);
     }
 
-    public function canBeSynchronizedFromBasecamp()
-    {
-    }
-
     public function registerWebhook($bcProjectId, $webhookUrl, $isActive = true, $bcWebhookId = null)
     {
         throw new BasecampInvalidCallException('Not supported');
-    }
-
-    public function buildProjectUrl($accountDetails, $projectId)
-    {
     }
 
     /**

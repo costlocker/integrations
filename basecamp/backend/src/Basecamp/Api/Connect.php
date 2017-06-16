@@ -46,6 +46,17 @@ class Connect implements BasecampApi
         return $this->currentApi instanceof Basecamp3Api;
     }
 
+    public function buildProjectUrl($accountDetails, $projectId)
+    {
+        if ($accountDetails->bc__product_type == Connect::BASECAMP_CLASSIC_TYPE) {
+            return $accountDetails->bc__account_href . '/projects/' . $projectId;
+        } elseif ($accountDetails->bc__product_type == Connect::BASECAMP_V3_TYPE) {
+            return 'https://3.basecamp.com/' . $accountDetails->bc__account_id . '/projects/' . $projectId;
+        } else {
+            return 'https://basecamp.com/' . $accountDetails->bc__account_id . '/projects/' . $projectId;
+        }
+    }
+
     public function registerWebhook($bcProjectId, $webhookUrl, $isActive = true, $bcWebhookId = null)
     {
         return $this->currentApi->registerWebhook($bcProjectId, $webhookUrl, $isActive, $bcWebhookId);
@@ -59,18 +70,6 @@ class Connect implements BasecampApi
     public function getProjects()
     {
         return $this->currentApi->getProjects();
-    }
-
-    public function buildProjectUrl($accountDetails, $projectId)
-    {
-        // keep leaked detail from Service only in this class (could load app_url from project detail in bcx and bc3)
-        if ($accountDetails->bc__product_type == Connect::BASECAMP_CLASSIC_TYPE) {
-            return $accountDetails->bc__account_href . '/projects/' . $projectId;
-        } elseif ($accountDetails->bc__product_type == Connect::BASECAMP_V3_TYPE) {
-            return 'https://3.basecamp.com/' . $accountDetails->bc__account_id . '/projects/' . $projectId;
-        } else {
-            return 'https://basecamp.com/' . $accountDetails->bc__account_id . '/projects/' . $projectId;
-        }
     }
 
     public function projectExists($bcProjectId)
