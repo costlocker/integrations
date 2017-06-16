@@ -4,7 +4,8 @@ namespace Costlocker\Integrations\Costlocker;
 
 use Costlocker\Integrations\CostlockerClient;
 use Costlocker\Integrations\Basecamp\BasecampAdapter;
-use Costlocker\Integrations\Sync\SyncDatabase;
+use Costlocker\Integrations\Entities\BasecampProject;
+use Costlocker\Integrations\Database\ProjectsDatabase;
 
 class GetProjects
 {
@@ -12,7 +13,7 @@ class GetProjects
     private $basecamps;
     private $database;
 
-    public function __construct(CostlockerClient $c, BasecampAdapter $b, SyncDatabase $db)
+    public function __construct(CostlockerClient $c, BasecampAdapter $b, ProjectsDatabase $db)
     {
         $this->client = $c;
         $this->basecamps = $b;
@@ -21,25 +22,25 @@ class GetProjects
 
     public function __invoke()
     {
+        $mappedProjects = $this->database->findAll();
         $response = $this->client->__invoke('/projects?state=running');
         $projects = [];
         foreach (json_decode($response->getBody(), true)['data'] as $rawProject) {
             $basecamps = [];
-            // fixme: fetch in loop
-            $project = $this->database->findByCostlockerId($rawProject['id']);
-            if ($project) {
+            $basecampProject = $mappedProjects[$rawProject['id']] ?? null;
+            if ($basecampProject instanceof BasecampProject) {
                 $basecamps[] = [
-                    'id' => $project->id,
-                    'settings' => $project->settings,
+                    'id' => $basecampProject->id,
+                    'settings' => $basecampProject->settings,
                     'account' => [
-                        'id' => $project->basecampUser->id,
-                        'basecampId' => $project->basecampUser->basecampAccount->id,
-                        'name' => $project->basecampUser->basecampAccount->name,
-                        'product' => $project->basecampUser->basecampAccount->product,
-                        'href' => $project->basecampUser->basecampAccount->urlApi,
-                        'identity' => $project->basecampUser->data,
+                        'id' => $basecampProject->basecampUser->id,
+                        'basecampId' => $basecampProject->basecampUser->basecampAccount->id,
+                        'name' => $basecampProject->basecampUser->basecampAccount->name,
+                        'product' => $basecampProject->basecampUser->basecampAccount->product,
+                        'href' => $basecampProject->basecampUser->basecampAccount->urlApi,
+                        'identity' => $basecampProject->basecampUser->data,
                     ],
-                    'url' => $this->basecamps->buildBasecampLink($project),
+                    'url' => $this->basecamps->buildBasecampLink($basecampProject),
                 ];
             }
             $projects[] = [
