@@ -24,6 +24,11 @@ class Synchronizer
         return $this->database->findProject($costlockerId);
     }
 
+    public function findBasecampProjectByCostlockerId($costlockerId)
+    {
+        return $this->database->findBasecampProject($costlockerId);
+    }
+
     public function findProjectByBasecampId($basecampId)
     {
         return $this->database->findBasecampProjectById($basecampId);

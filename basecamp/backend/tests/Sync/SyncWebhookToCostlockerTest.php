@@ -3,86 +3,109 @@
 namespace Costlocker\Integrations\Sync;
 
 use Mockery as m;
-use Costlocker\Integrations\Database\CompaniesRepository;
-use Costlocker\Integrations\Events\EventsLogger;
+use GuzzleHttp\Psr7\Response;
 use Costlocker\Integrations\Entities\Event;
 
 class SyncWebhookToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
 {
-    const BASECAMP_ID = 123456;
-
-    private $eventsLogger;
-    private $isBasecampProjectMappped = true;
-    private $isBasecampSynchronizationAllowed = true;
-
     public function setUp()
     {
         parent::setUp();
-        $this->eventsLogger = m::mock(EventsLogger::class);
-    }
-    
-    protected function createSynchronizer(Synchronizer $s)
-    {
-        $companiesRepository = m::mock(CompaniesRepository::class);
-        return new SyncWebhookToBasecamp($companiesRepository, $s, $this->eventsLogger);
+        $this->request = [
+            'costlockerProject' => 1,
+        ];
     }
 
-    public function testPushBasecampWebhookToQueue()
+    protected function createSynchronizer(Synchronizer $s)
     {
-        $this->givenBasecampWebhook('todo_created.json');
-        $this->eventsLogger->shouldReceive('__invoke')
-            ->once()
-            ->with(
-                Event::WEBHOOK_BASECAMP,
-                [
-                    'basecamp' => [
-                        'event' => 'todo_created',
-                        'project' => self::BASECAMP_ID,
+        return new SyncProjectToCostlocker($s);
+    }
+
+    public function testPushChangesToCostlockerButNoChangeInBasecamp()
+    {
+        $basecampId = 'irrelevant id';
+        $this->whenProjectIsMapped(
+            $basecampId,
+            [
+                1 => [
+                    'id' => $basecampId,
+                    'tasks' => [],
+                    'persons' => [],
+                ]
+            ],
+            [
+                'areTasksEnabled' => true,
+                'isDeletingTasksEnabled' => true,
+                'isCreatingActivitiesEnabled' => true,
+                'isDeletingActivitiesEnabled' => true,
+            ]
+        );
+        $this->whenProjectExistsInBasecamp();
+        $this->shouldNotCreatePeopleOrTodosInBasecamp();
+        $this->basecamp->shouldReceive('canBeSynchronizedFromBasecamp')->andReturn(true);
+        $this->basecamp->shouldReceive('getTodolists')->once()->andReturn([
+            $basecampId => (object) [
+                'name' => 'existing todolist',
+                'todoitems' => [
+                    'todo created in costlocker (task)' => (object) [
+                        'content' => 'basecamp todo',
+                        'assignee' => [
+                            'email' => 'john@example.com',
+                            'first_name' => 'John',
+                            'last_name' => 'Doe',
+                        ],
                     ],
                 ],
-                m::type(\Costlocker\Integrations\Entities\BasecampProject::class)
+            ],
+        ]);
+        $this->costlocker->shouldReceive('__invoke')
+            ->with('/projects', m::on(function ($data) {
+                assertThat($data['items'], is(arrayWithSize(1)));
+                return true;
+            }))
+            ->andReturn(
+                new Response(200, [], json_encode([
+                    'data' => [
+                        [
+                            'items' => [
+                                [
+                                    'action' => 'upsert',
+                                    'item' => [
+                                        'type' => 'task',
+                                        'activity_id' => 1,
+                                        'person_id' => 1,
+                                        'task_id' => 123,
+                                    ],
+                                ],
+                            ],  
+                        ],
+                    ],
+                ]))
             );
-        $this->processWebhook();
+        $this->synchronize(Event::RESULT_SUCCESS);
+        $this->assertMappingIs(
+            [
+                'id' => $basecampId,
+                'account' => null,
+                'activities' => [
+                    1 => [
+                        'id' => $basecampId,
+                        'tasks' => [
+                            123 => [
+                                'id' => 'todo created in costlocker (task)',
+                                'person_id' => 1,
+                                'name' => 'basecamp todo',
+                            ],
+                        ],
+                        'persons' => [],
+                    ],
+                ],
+            ]
+        );
     }
 
     public function testIgnoreUnknownBasecampProject()
     {
-        $this->givenBasecampWebhook('todo_created.json');
-        $this->isBasecampProjectMappped = false;
-        $this->processWebhook('Unmapped or disabled');
-    }
-
-    public function testIgnoreProjectWithDisabledSync()
-    {
-        $this->givenBasecampWebhook('todo_created.json');
-        $this->isBasecampSynchronizationAllowed = false;
-        $this->processWebhook('Unmapped or disabled');
-    }
-
-    public function testIgnoreUnrelatedBasecampWebhooks()
-    {
-        $this->givenBasecampWebhook('message_created.json');
-        $this->eventsLogger->shouldReceive('__invoke')->never();
-        $this->processWebhook('Not allowed');
-    }
-
-    protected function processWebhook($expectedResult = null)
-    {
-        if ($this->isBasecampProjectMappped) {
-            $this->whenProjectIsMapped(
-                self::BASECAMP_ID,
-                [],
-                ['areTasksEnabled' => $this->isBasecampSynchronizationAllowed]
-            );
-        }
-        $this->synchronize($expectedResult);
-    }
-
-    private function givenBasecampWebhook($file)
-    {
-        parent::givenWebhook(
-            "basecamp/{$file}",
-            ['user-agent'  => ['Basecamp3 Webhook']]
-        );
+        $this->synchronize(null);
     }
 }

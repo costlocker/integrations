@@ -23,6 +23,10 @@ class EventsToJson
                     Event::MANUAL_SYNC | Event::RESULT_NOCHANGE => 'No change after user request sync',
                     Event::MANUAL_SYNC | Event::RESULT_PARTIAL_SUCCESS => 'partial sync after user request',
                     Event::WEBHOOK_BASECAMP => 'Basecamp webhook',
+                    Event::WEBHOOK_BASECAMP | Event::RESULT_SUCCESS => 'Successful sync after basecamp webhooks',
+                    Event::WEBHOOK_BASECAMP | Event::RESULT_FAILURE => 'Failed sync after basecamp webhooks',
+                    Event::WEBHOOK_BASECAMP | Event::RESULT_NOCHANGE => 'No change after basecamp webhooks',
+                    Event::WEBHOOK_BASECAMP | Event::RESULT_PARTIAL_SUCCESS => 'partial sync after basecamp webhooks',
                     // disconnect should be successful 99%, so using results is not necessary
                     Event::DISCONNECT_BASECAMP => 'Disconnect basecamp account',
                     Event::DISCONNECT_PROJECT => 'Disconnect project',
