@@ -9,7 +9,7 @@ use Costlocker\Integrations\Basecamp\Api\BasecampApi;
 use Costlocker\Integrations\Entities\BasecampAccount;
 use Costlocker\Integrations\Entities\BasecampProject;
 
-class BasecampFactory
+class BasecampAdapter
 {
     private $user;
 
@@ -18,7 +18,7 @@ class BasecampFactory
         $this->user = $u;
     }
 
-    public function __invoke($basecampUserId): BasecampApi
+    public function buildClient($basecampUserId): BasecampApi
     {
         $account = $this->user->getBasecampAccount($basecampUserId);
 
@@ -37,7 +37,7 @@ class BasecampFactory
         return $this->fakeApi($account)->canBeSynchronizedFromBasecamp();
     }
 
-    public function buildProjectUrl(BasecampProject $p)
+    public function buildBasecampLink(BasecampProject $p)
     {
         $account = $p->basecampUser->basecampAccount;
         return $this->fakeApi($account)->buildProjectUrl(

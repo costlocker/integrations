@@ -3,20 +3,19 @@
 namespace Costlocker\Integrations\Costlocker;
 
 use Costlocker\Integrations\CostlockerClient;
-use Costlocker\Integrations\Basecamp\BasecampFactory;
-use Costlocker\Integrations\Entities\BasecampProject;
+use Costlocker\Integrations\Basecamp\BasecampAdapter;
 use Costlocker\Integrations\Sync\SyncDatabase;
 
 class GetProjects
 {
     private $client;
-    private $basecampFactory;
+    private $basecamps;
     private $database;
 
-    public function __construct(CostlockerClient $c, BasecampFactory $b, SyncDatabase $db)
+    public function __construct(CostlockerClient $c, BasecampAdapter $b, SyncDatabase $db)
     {
         $this->client = $c;
-        $this->basecampFactory = $b;
+        $this->basecamps = $b;
         $this->database = $db;
     }
 
@@ -40,7 +39,7 @@ class GetProjects
                         'href' => $project->basecampUser->basecampAccount->urlApi,
                         'identity' => $project->basecampUser->data,
                     ],
-                    'url' => $this->basecampFactory->buildProjectUrl($project),
+                    'url' => $this->basecamps->buildBasecampLink($project),
                 ];
             }
             $projects[] = [

@@ -8,12 +8,12 @@ use Costlocker\Integrations\Entities\BasecampUser;
 
 class GetProjects
 {
-    private $basecampFactory;
+    private $basecamps;
     private $getUser;
 
-    public function __construct(BasecampFactory $b, GetUser $u)
+    public function __construct(BasecampAdapter $b, GetUser $u)
     {
-        $this->basecampFactory = $b;
+        $this->basecamps = $b;
         $this->getUser = $u;
     }
 
@@ -22,10 +22,10 @@ class GetProjects
         $costlockerUser = $this->getUser->getCostlockerUser();
         $account = $costlockerUser->getUser($r->query->get('account'));
         if ($account instanceof BasecampUser) {
-            $basecamp = $this->basecampFactory->__invoke($account->id);
+            $client = $this->basecamps->buildClient($account->id);
             return [
-                'projects' => $basecamp->getProjects(),
-                'companies' => $basecamp->getCompanies(),
+                'projects' => $client->getProjects(),
+                'companies' => $client->getCompanies(),
             ];
         } else {
             return [];

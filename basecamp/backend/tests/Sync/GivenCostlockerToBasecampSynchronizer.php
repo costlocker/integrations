@@ -5,7 +5,7 @@ namespace Costlocker\Integrations\Sync;
 use Mockery as m;
 use GuzzleHttp\Psr7\Response;
 use Costlocker\Integrations\CostlockerClient;
-use Costlocker\Integrations\Basecamp\BasecampFactory;
+use Costlocker\Integrations\Basecamp\BasecampAdapter;
 use Costlocker\Integrations\Basecamp\Api\BasecampApi;
 use Costlocker\Integrations\Entities\Event;
 use Costlocker\Integrations\Auth\GetUser;
@@ -179,11 +179,10 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
         $user = m::mock(GetUser::class);
         $user->shouldReceive('overrideCostlockerUser');
 
-        $basecampFactory = m::mock(BasecampFactory::class);
-        $basecampFactory->shouldReceive('__invoke')->andReturn($this->basecamp);
-        $basecampFactory->shouldReceive('getAccount')->andReturn([]);
+        $basecamps = m::mock(BasecampAdapter::class);
+        $basecamps->shouldReceive('buildClient')->andReturn($this->basecamp);
 
-        $synchronizer = new Synchronizer($this->costlocker, $user, $basecampFactory, $this->database, $this->eventsLogger, '');
+        $synchronizer = new Synchronizer($this->costlocker, $user, $basecamps, $this->database, $this->eventsLogger, '');
         $uc = $this->createSynchronizer($synchronizer);
         $results = $uc($this->request);
         if (is_string($expectedStatus)) {

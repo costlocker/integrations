@@ -2,7 +2,7 @@
 
 namespace Costlocker\Integrations\Sync;
 
-use Costlocker\Integrations\Basecamp\BasecampFactory;
+use Costlocker\Integrations\Basecamp\BasecampAdapter;
 use Costlocker\Integrations\Basecamp\Api\BasecampException;
 use Costlocker\Integrations\Entities\BasecampProject;
 use Costlocker\Integrations\Events\EventsLogger;
@@ -18,7 +18,7 @@ class SynchronizedBasecamp
     private $bcProject;
     private $todolists;
 
-    public function __construct(BasecampFactory $b, EventsLogger $l, $webhookUrl)
+    public function __construct(BasecampAdapter $b, EventsLogger $l, $webhookUrl)
     {
         $this->factory = $b;
         $this->logger = $l;
@@ -27,7 +27,7 @@ class SynchronizedBasecamp
 
     public function init($basecampAccount)
     {
-        $this->client = $this->factory->__invoke($basecampAccount);
+        $this->client = $this->factory->buildClient($basecampAccount);
         $this->bcProject = null;
         $this->todolists = null;
     }

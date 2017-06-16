@@ -3,7 +3,7 @@
 namespace Costlocker\Integrations\Sync;
 
 use Costlocker\Integrations\CostlockerClient;
-use Costlocker\Integrations\Basecamp\BasecampFactory;
+use Costlocker\Integrations\Basecamp\BasecampAdapter;
 use Costlocker\Integrations\Auth\GetUser;
 use Costlocker\Integrations\Events\EventsLogger;
 
@@ -13,7 +13,7 @@ class Synchronizer
     private $basecamp;
     private $database;
 
-    public function __construct(CostlockerClient $c, GetUser $u, BasecampFactory $b, SyncDatabase $db, EventsLogger $l, $webhookUrl)
+    public function __construct(CostlockerClient $c, GetUser $u, BasecampAdapter $b, SyncDatabase $db, EventsLogger $l, $webhookUrl)
     {
         $this->costlocker = new SynchronizedCostlocker($c, $u, $l, $webhookUrl);
         $this->basecamp = new SynchronizedBasecamp($b, $l, $webhookUrl);

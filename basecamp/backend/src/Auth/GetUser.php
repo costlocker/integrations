@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Costlocker\Integrations\Entities\CostlockerUser;
 use Costlocker\Integrations\Entities\BasecampUser;
 use Costlocker\Integrations\Entities\BasecampAccount;
-use Costlocker\Integrations\Basecamp\BasecampFactory;
+use Costlocker\Integrations\Basecamp\BasecampAdapter;
 
 class GetUser
 {
@@ -90,12 +90,12 @@ DQL;
         ];
         $entities = $this->entityManager->createQuery($dql)->execute($params);
 
-        $basecampFactory = new BasecampFactory($this);
+        $basecamps = new BasecampAdapter($this);
         $basecampUsers = array_reduce(
             array_map(
-                function (CostlockerUser $u) use ($loggedUser, $basecampFactory) {
+                function (CostlockerUser $u) use ($loggedUser, $basecamps) {
                     return array_map(
-                        function (BasecampUser $b) use ($u, $loggedUser, $basecampFactory) {
+                        function (BasecampUser $b) use ($u, $loggedUser, $basecamps) {
                             return [
                                 'isMyAccount' => $u->id == $loggedUser->id,
                                 'person' => $u->data['person'],
@@ -106,7 +106,7 @@ DQL;
                                     'urlApp' => $b->basecampAccount->urlApp,
                                     'identity' => $b->data,
                                     'canBeSynchronizedFromBasecamp' =>
-                                        $basecampFactory->canBeSynchronizedFromBasecamp($b->basecampAccount)
+                                        $basecamps->canBeSynchronizedFromBasecamp($b->basecampAccount)
                                 ],
                             ];
                         },

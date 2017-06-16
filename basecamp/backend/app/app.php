@@ -58,7 +58,7 @@ $app['client.costlocker'] = function ($app) {
 };
 
 $app['client.basecamp'] = function ($app) {
-    return new \Costlocker\Integrations\Basecamp\BasecampFactory($app['client.user']);
+    return new \Costlocker\Integrations\Basecamp\BasecampAdapter($app['client.user']);
 };
 
 $app['oauth.basecamp'] = function () {
