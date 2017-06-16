@@ -52,12 +52,12 @@ class ProjectsDatabase implements SyncDatabase
 
     public function findBasecampProject($costlockerProjectId)
     {
-        return $this->findProjectEntity('cl_project_id', $costlockerProjectId);
+        return $this->findProjectEntity('costlockerProject', $costlockerProjectId);
     }
 
     public function findBasecampProjectById($basecampProjectId)
     {
-        return $this->findProjectEntity('bc_project_id', $basecampProjectId);
+        return $this->findProjectEntity('basecampProject', $basecampProjectId);
     }
 
     private function findProjectEntity($column, $projectId)

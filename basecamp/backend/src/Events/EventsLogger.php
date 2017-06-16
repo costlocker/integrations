@@ -5,6 +5,7 @@ namespace Costlocker\Integrations\Events;
 use Doctrine\ORM\EntityManagerInterface;
 use Costlocker\Integrations\Auth\GetUser;
 use Costlocker\Integrations\Entities\Event;
+use Costlocker\Integrations\Entities\BasecampProject;
 
 class EventsLogger
 {
@@ -17,12 +18,13 @@ class EventsLogger
         $this->getUser = $u;
     }
 
-    public function __invoke($eventType, array $data)
+    public function __invoke($eventType, array $data, BasecampProject $p = null)
     {
         $event = new Event();
         $event->event = $eventType;
         $event->data = $data;
         $event->costlockerUser = $this->getUser->getCostlockerUser(false);
+        $event->basecampProject = $p;
 
         $this->entityManager->persist($event);
         $this->entityManager->flush();

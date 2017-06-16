@@ -49,8 +49,12 @@ class ProcessSyncRequest
             $strategy = $this->getSynchronizer($requestEvent->data['type']);
             if ($strategy) {
                 $results = $strategy($requestEvent->data['request'], $requestEvent->costlockerUser);
-                foreach ($results as $result) {
-                    $events[] = $this->buildProjectEvent($event, $result);
+                if (is_array($results)) {
+                    foreach ($results as $result) {
+                        $events[] = $this->buildProjectEvent($event, $result);
+                    }
+                } elseif (is_string($results)) {
+                    $requestEvent->markStatus(Event::RESULT_FAILURE, ['error' => $results]);
                 }
             }
         } catch (\Exception $e) {
@@ -88,7 +92,7 @@ class ProcessSyncRequest
             return new \Costlocker\Integrations\Sync\SyncWebhookToBasecamp(
                 $this->app['database.companies'],
                 $synchronizer,
-                $app['events.logger']
+                $this->app['events.logger']
             );
         }
     }

@@ -39,7 +39,8 @@ class SyncWebhookToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
                         'event' => 'todo_created',
                         'project' => self::BASECAMP_ID,
                     ],
-                ]
+                ],
+                m::type(\Costlocker\Integrations\Entities\BasecampProject::class)
             );
         $this->processWebhook();
     }
@@ -48,24 +49,24 @@ class SyncWebhookToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
     {
         $this->givenBasecampWebhook('todo_created.json');
         $this->isBasecampProjectMappped = false;
-        $this->processWebhook();
+        $this->processWebhook('Unmapped or disabled');
     }
 
     public function testIgnoreProjectWithDisabledSync()
     {
         $this->givenBasecampWebhook('todo_created.json');
         $this->isBasecampSynchronizationAllowed = false;
-        $this->processWebhook();
+        $this->processWebhook('Unmapped or disabled');
     }
 
     public function testIgnoreUnrelatedBasecampWebhooks()
     {
         $this->givenBasecampWebhook('message_created.json');
         $this->eventsLogger->shouldReceive('__invoke')->never();
-        $this->processWebhook();
+        $this->processWebhook('Not allowed');
     }
 
-    protected function processWebhook()
+    protected function processWebhook($expectedResult = null)
     {
         if ($this->isBasecampProjectMappped) {
             $this->whenProjectIsMapped(
@@ -74,7 +75,7 @@ class SyncWebhookToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
                 ['areTasksEnabled' => $this->isBasecampSynchronizationAllowed]
             );
         }
-        $this->synchronize(null);
+        $this->synchronize($expectedResult);
     }
 
     private function givenBasecampWebhook($file)

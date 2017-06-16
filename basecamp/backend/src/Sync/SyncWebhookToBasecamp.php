@@ -23,8 +23,7 @@ class SyncWebhookToBasecamp
     public function __invoke(array $webhook)
     {
         if ($this->isBasecampWebhook($webhook['headers'])) {
-            $this->processBasecampWebhook($webhook['body']);
-            return [];
+            return $this->processBasecampWebhook($webhook['body']);
         }
 
         $requests = $this->processCostlockerWebhook($webhook['body']);
@@ -54,15 +53,15 @@ class SyncWebhookToBasecamp
         ];
 
         if (!in_array($webhook['event'] ?? '', $allowedWebhooks)) {
-            return;
+            return "Not allowed basecamp event";
         }
 
         $project = $this->synchronizer->findProjectByBasecampId($webhook['project']);
         if (!$project || $project->isBasecampSynchronizationDisabled()) {
-            return;
+            return "Unmapped or disabled basecamp synchronization";
         }
 
-        $this->eventsLogger->__invoke(Event::WEBHOOK_BASECAMP, ['basecamp' => $webhook]);
+        $this->eventsLogger->__invoke(Event::WEBHOOK_BASECAMP, ['basecamp' => $webhook], $project);
     }
 
     private function processCostlockerWebhook(array $json)

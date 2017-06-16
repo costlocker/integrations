@@ -22,6 +22,7 @@ class EventsToJson
                     Event::MANUAL_SYNC | Event::RESULT_FAILURE => 'Failed sync after user request',
                     Event::MANUAL_SYNC | Event::RESULT_NOCHANGE => 'No change after user request sync',
                     Event::MANUAL_SYNC | Event::RESULT_PARTIAL_SUCCESS => 'partial sync after user request',
+                    Event::WEBHOOK_BASECAMP => 'Basecamp webhook',
                     // disconnect should be successful 99%, so using results is not necessary
                     Event::DISCONNECT_BASECAMP => 'Disconnect basecamp account',
                     Event::DISCONNECT_PROJECT => 'Disconnect project',
@@ -35,6 +36,8 @@ class EventsToJson
                     $description .= " {$e->data['basecamp']}";
                 } elseif ($e->event == Event::DISCONNECT_PROJECT) {
                     $description .= " #{$e->data['project']}";
+                } elseif ($e->event == Event::WEBHOOK_BASECAMP) {
+                    $description .= " '{$e->data['basecamp']['event']}' in project #{$e->data['basecamp']['project']}";
                 } elseif ($e->basecampProject) {
                     $description .= " #{$e->basecampProject->costlockerProject->id}";
                 }
