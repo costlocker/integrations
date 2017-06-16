@@ -5,7 +5,7 @@ namespace Costlocker\Integrations\Sync;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Costlocker\Integrations\Entities\CostlockerUser;
 
-class SyncProjectToBasecamp
+class ProcessManualRequest
 {
     private $synchronizer;
 

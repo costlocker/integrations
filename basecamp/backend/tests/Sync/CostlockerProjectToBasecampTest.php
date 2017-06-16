@@ -5,7 +5,7 @@ namespace Costlocker\Integrations\Sync;
 use Costlocker\Integrations\Basecamp\Api\BasecampAccessException;
 use Costlocker\Integrations\Entities\Event;
 
-class SyncProjectToBasecampTest extends GivenCostlockerToBasecampSynchronizer
+class CostlockerProjectToBasecampTest extends GivenSynchronizer
 {
     protected $eventType = Event::MANUAL_SYNC;
 

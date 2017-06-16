@@ -11,7 +11,7 @@ use Costlocker\Integrations\Entities\Event;
 use Costlocker\Integrations\Auth\GetUser;
 use Costlocker\Integrations\Events\EventsLogger;
 
-abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_TestCase
+abstract class GivenSynchronizer extends \PHPUnit_Framework_TestCase
 {
     protected $costlocker;
     protected $basecamp;

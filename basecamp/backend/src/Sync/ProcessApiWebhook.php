@@ -6,7 +6,7 @@ use Costlocker\Integrations\Entities\CostlockerCompany;
 use Costlocker\Integrations\Events\EventsLogger;
 use Costlocker\Integrations\Entities\Event;
 
-class SyncWebhookToBasecamp
+class ProcessApiWebhook
 {
     private $database;
     private $synchronizer;
@@ -23,14 +23,9 @@ class SyncWebhookToBasecamp
     {
         if ($this->isBasecampWebhook($webhook['headers'])) {
             return $this->processBasecampWebhook($webhook['body']);
+        } else {
+            return $this->processCostlockerWebhooks($webhook['body']);
         }
-
-        $requests = $this->processCostlockerWebhook($webhook['body']);
-        $results = [];
-        foreach ($requests as list($r, $config)) {
-            $results[] = $this->synchronizer->__invoke($r, $config);
-        }
-        return $results;
     }
 
     private function isBasecampWebhook(array $headers)
@@ -66,6 +61,16 @@ class SyncWebhookToBasecamp
             ],
             $project
         );
+    }
+
+    private function processCostlockerWebhooks(array $json)
+    {
+        $requests = $this->processCostlockerWebhook($json);
+        $results = [];
+        foreach ($requests as list($r, $config)) {
+            $results[] = $this->synchronizer->__invoke($r, $config);
+        }
+        return $results;
     }
 
     private function processCostlockerWebhook(array $json)

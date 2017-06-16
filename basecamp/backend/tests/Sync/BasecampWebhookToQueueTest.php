@@ -5,7 +5,7 @@ namespace Costlocker\Integrations\Sync;
 use Mockery as m;
 use Costlocker\Integrations\Entities\Event;
 
-class ProcessBasecampWebhookTest extends GivenCostlockerToBasecampSynchronizer
+class BasecampWebhookToQueueTest extends GivenSynchronizer
 {
     protected $eventType = Event::WEBHOOK_SYNC;
     const BASECAMP_ID = 123456;

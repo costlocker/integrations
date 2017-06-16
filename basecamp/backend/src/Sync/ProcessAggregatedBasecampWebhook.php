@@ -2,7 +2,7 @@
 
 namespace Costlocker\Integrations\Sync;
 
-class SyncProjectToCostlocker
+class ProcessAggregatedBasecampWebhook
 {
     private $database;
     private $synchronizer;

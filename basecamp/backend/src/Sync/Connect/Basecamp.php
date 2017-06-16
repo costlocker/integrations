@@ -1,14 +1,15 @@
 <?php
 
-namespace Costlocker\Integrations\Sync;
+namespace Costlocker\Integrations\Sync\Connect;
 
 use Costlocker\Integrations\Basecamp\BasecampAdapter;
 use Costlocker\Integrations\Basecamp\Api\BasecampException;
 use Costlocker\Integrations\Entities\BasecampProject;
 use Costlocker\Integrations\Events\EventsLogger;
 use Costlocker\Integrations\Entities\Event;
+use Costlocker\Integrations\Sync\SyncChangelog;
 
-class SynchronizedBasecamp
+class Basecamp
 {
     private $factory;
     private $client;

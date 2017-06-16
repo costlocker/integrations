@@ -6,7 +6,7 @@ use Mockery as m;
 use Costlocker\Integrations\Entities\Event;
 use GuzzleHttp\Psr7\Response;
 
-class SyncProjectToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
+class BasecampProjectToCostlockerTest extends GivenSynchronizer
 {
     protected $eventType = Event::MANUAL_SYNC;
 

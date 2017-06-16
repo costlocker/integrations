@@ -4,7 +4,7 @@ namespace Costlocker\Integrations\Sync\Queue;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Costlocker\Integrations\Entities\Event;
-use Costlocker\Integrations\Sync\SyncResult;
+use Costlocker\Integrations\Sync\SyncResponse;
 use Costlocker\Integrations\Events\EventsRepository;
 use Costlocker\Integrations\Sync\ProcessEvent;
 use Psr\Log\LoggerInterface;
@@ -71,7 +71,7 @@ class ProcessSyncRequest
         return count($events);
     }
 
-    private function buildProjectEvent(Event $event, SyncResult $result)
+    private function buildProjectEvent(Event $event, SyncResponse $result)
     {
         $projectEvent = clone $event;
         $projectEvent->basecampProject = $result->mappedProject;

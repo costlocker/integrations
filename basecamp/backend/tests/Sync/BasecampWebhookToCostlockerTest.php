@@ -6,7 +6,7 @@ use Mockery as m;
 use GuzzleHttp\Psr7\Response;
 use Costlocker\Integrations\Entities\Event;
 
-class SyncWebhookToCostlockerTest extends GivenCostlockerToBasecampSynchronizer
+class BasecampWebhookToCostlockerTest extends GivenSynchronizer
 {
     protected $eventType = Event::WEBHOOK_BASECAMP;
 

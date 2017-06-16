@@ -1,14 +1,15 @@
 <?php
 
-namespace Costlocker\Integrations\Sync;
+namespace Costlocker\Integrations\Sync\Connect;
 
 use Costlocker\Integrations\CostlockerClient;
 use Costlocker\Integrations\Auth\GetUser;
 use Costlocker\Integrations\Entities\Event;
 use Costlocker\Integrations\Events\EventsLogger;
 use Costlocker\Integrations\Entities\BasecampProject;
+use Costlocker\Integrations\Sync\SyncProjectRequest;
 
-class SynchronizedCostlocker
+class Costlocker
 {
     private $client;
     private $getUser;

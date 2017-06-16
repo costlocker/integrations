@@ -7,7 +7,7 @@ use GuzzleHttp\Psr7\Response;
 use Costlocker\Integrations\Entities\Event;
 use Costlocker\Integrations\Entities\CostlockerCompany;
 
-class SyncWebhookToBasecampTest extends GivenCostlockerToBasecampSynchronizer
+class CostlockerWebhookToBasecampTest extends GivenSynchronizer
 {
     protected $eventType = Event::WEBHOOK_SYNC;
 

@@ -4,7 +4,7 @@ namespace Costlocker\Integrations\Sync;
 
 use Costlocker\Integrations\Entities\Event;
 
-class SyncResult
+class SyncResponse
 {
     /** @var SyncProjectRequest */
     public $projectRequest;

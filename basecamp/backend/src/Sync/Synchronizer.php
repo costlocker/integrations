@@ -2,10 +2,8 @@
 
 namespace Costlocker\Integrations\Sync;
 
-use Costlocker\Integrations\CostlockerClient;
-use Costlocker\Integrations\Basecamp\BasecampAdapter;
-use Costlocker\Integrations\Auth\GetUser;
-use Costlocker\Integrations\Events\EventsLogger;
+use Costlocker\Integrations\Sync\Connect\Costlocker;
+use Costlocker\Integrations\Sync\Connect\Basecamp;
 
 class Synchronizer
 {
@@ -13,10 +11,10 @@ class Synchronizer
     private $basecamp;
     private $database;
 
-    public function __construct(CostlockerClient $c, GetUser $u, BasecampAdapter $b, SyncDatabase $db, EventsLogger $l, $webhookUrl)
+    public function __construct(Costlocker $c, Basecamp $b, SyncDatabase $db)
     {
-        $this->costlocker = new SynchronizedCostlocker($c, $u, $l, $webhookUrl);
-        $this->basecamp = new SynchronizedBasecamp($b, $l, $webhookUrl);
+        $this->costlocker = $c;
+        $this->basecamp = $b;
         $this->database = $db;
     }
 
@@ -25,7 +23,7 @@ class Synchronizer
         $this->basecamp->init($config->account);
         $this->costlocker->init($r);
 
-        $result = new SyncResult($r, $config);
+        $result = new SyncResponse($r, $config);
         $isNotMapped = $this->upsertProject($r, $config);
 
         if ($isNotMapped) {
@@ -384,7 +382,7 @@ class Synchronizer
         }
     }
 
-    private function saveProject(SyncResult $result)
+    private function saveProject(SyncResponse $result)
     {
         $result->mappedProject = $this->database->upsertProject(
             $result->costlockerChangelog->projectId,

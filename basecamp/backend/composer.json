@@ -10,7 +10,7 @@
             "tests/GivenApi.php",
             "tests/Basecamp/ApiCall.php",
             "tests/Basecamp/GivenBasecampConnect.php",
-            "tests/Sync/GivenCostlockerToBasecampSynchronizer.php",
+            "tests/Sync/GivenSynchronizer.php",
             "tests/Sync/InMemoryDatabase.php",
             "vendor/hamcrest/hamcrest-php/hamcrest/Hamcrest.php"
         ]
