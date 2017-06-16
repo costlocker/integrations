@@ -18,6 +18,7 @@ class ProcessSyncRequestsCommand extends Command
     private $output;
     private $isVerboseMode;
     private $isInfiniteLoop = true;
+    private $loop = 0;
 
     public function __construct(ProcessSyncRequests $p, AggregateBasecampWebhooks $w, LoggerInterface $l)
     {
@@ -56,6 +57,7 @@ class ProcessSyncRequestsCommand extends Command
                 $this->aggregateBasecampWebhooks($basecampDelay);
             } catch (\Exception $e) {
                 $this->writeln([
+                    "<comment>Loop</comment>: {$this->loop}",
                     "<error>{$e->getMessage()}</error>",
                     get_class($e),
                 ]);
@@ -63,6 +65,7 @@ class ProcessSyncRequestsCommand extends Command
                 $this->logger->critical($e);
             }
             usleep($delayInMicros);
+            $this->loop++;
         } while ($this->isInfiniteLoop);
     }
 
@@ -78,6 +81,10 @@ class ProcessSyncRequestsCommand extends Command
 
     private function aggregateBasecampWebhooks($delay)
     {
+        if ($this->loop % 4 != 0) {
+            $this->writeln("Skip basecamp webhooks", false);
+            return;
+        }
         $events = $this->agreggateWebhooks->__invoke($delay);
         if ($events) {
             $this->writeln([
