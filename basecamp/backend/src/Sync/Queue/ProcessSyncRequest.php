@@ -46,7 +46,7 @@ class ProcessSyncRequest
         $events = [];
 
         try {
-            $strategy = $this->getSynchronizer($requestEvent->data['type']);
+            $strategy = $this->getSynchronizer($requestEvent->data['type'], $requestEvent->data['request']['webhookUrl']);
             if ($strategy) {
                 $results = $strategy($requestEvent->data['request'], $requestEvent->costlockerUser);
                 if (is_array($results)) {
@@ -77,13 +77,15 @@ class ProcessSyncRequest
         return count($events);
     }
 
-    private function getSynchronizer($eventType)
+    private function getSynchronizer($eventType, $webhookUrl)
     {
         $synchronizer = new \Costlocker\Integrations\Sync\Synchronizer(
             $this->app['client.costlocker'],
             $this->app['client.user'],
             $this->app['client.basecamp'],
-            $this->app['database']
+            $this->app['database'],
+            $this->app['events.logger'],
+            $webhookUrl
         );
 
         if ($eventType == Event::MANUAL_SYNC) {

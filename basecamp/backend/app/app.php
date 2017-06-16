@@ -167,7 +167,7 @@ $app
     ->before($checkAuthorization('costlocker'));
 
 $app
-    ->post('/settings', function (Request $r) use ($app, $getWebhookUrl) {
+    ->post('/settings', function (Request $r) use ($app) {
         $uc = new \Costlocker\Integrations\Database\UpdateSettings($app['orm.em'], $app['client.user']);
         $uc($r->request->all());
         return new JsonResponse();
@@ -210,14 +210,21 @@ $pushEvent = function ($event, array $data) use ($app) {
 };
     
 $app
-    ->post('/basecamp', function (Request $r) use ($pushEvent) {
-        return $pushEvent(\Costlocker\Integrations\Entities\Event::MANUAL_SYNC, $r->request->all());
+    ->post('/basecamp', function (Request $r) use ($pushEvent, $getWebhookUrl) {
+        return $pushEvent(
+            \Costlocker\Integrations\Entities\Event::MANUAL_SYNC,
+            ['webhookUrl' => $getWebhookUrl($r)] + $r->request->all()
+        );
     })
     ->before($checkAuthorization('basecamp'));
 
 $app
-    ->post('/webhooks/handler', function (Request $r) use ($pushEvent) {
-        $data = ['body' => json_decode($r->getContent(), true), 'headers' => $r->headers->all()];
+    ->post('/webhooks/handler', function (Request $r) use ($pushEvent, $getWebhookUrl) {
+        $data = [
+            'webhookUrl' => $getWebhookUrl($r),
+            'body' => json_decode($r->getContent(), true),
+            'headers' => $r->headers->all()
+        ];
         return $pushEvent(\Costlocker\Integrations\Entities\Event::WEBHOOK_SYNC, $data);
     });
 

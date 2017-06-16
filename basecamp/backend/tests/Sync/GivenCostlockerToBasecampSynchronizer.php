@@ -9,12 +9,14 @@ use Costlocker\Integrations\Basecamp\BasecampFactory;
 use Costlocker\Integrations\Basecamp\Api\BasecampApi;
 use Costlocker\Integrations\Entities\Event;
 use Costlocker\Integrations\Auth\GetUser;
+use Costlocker\Integrations\Events\EventsLogger;
 
 abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_TestCase
 {
     protected $costlocker;
     protected $basecamp;
     protected $database;
+    protected $eventsLogger;
 
     protected $request;
 
@@ -23,6 +25,7 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
         $this->costlocker = m::mock(CostlockerClient::class);
         $this->basecamp = m::mock(BasecampApi::class);
         $this->database = new InMemoryDatabase();
+        $this->eventsLogger = m::mock(EventsLogger::class);
     }
 
     protected function givenCostlockerProject($file)
@@ -180,7 +183,7 @@ abstract class GivenCostlockerToBasecampSynchronizer extends \PHPUnit_Framework_
         $basecampFactory->shouldReceive('__invoke')->andReturn($this->basecamp);
         $basecampFactory->shouldReceive('getAccount')->andReturn([]);
 
-        $synchronizer = new Synchronizer($this->costlocker, $user, $basecampFactory, $this->database);
+        $synchronizer = new Synchronizer($this->costlocker, $user, $basecampFactory, $this->database, $this->eventsLogger, '');
         $uc = $this->createSynchronizer($synchronizer);
         $results = $uc($this->request);
         if (is_string($expectedStatus)) {

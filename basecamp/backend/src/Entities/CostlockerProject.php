@@ -18,6 +18,7 @@ class CostlockerProject
     public $id;
 
     /**
+     * @var CostlockerCompany
      * @ORM\ManyToOne(targetEntity="CostlockerCompany")
      * @ORM\JoinColumn(name="cl_company_id", nullable=false, onDelete="CASCADE")
      */

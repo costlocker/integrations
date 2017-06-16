@@ -4,22 +4,14 @@ namespace Costlocker\Integrations\Sync;
 
 use Mockery as m;
 use Costlocker\Integrations\Database\CompaniesRepository;
-use Costlocker\Integrations\Events\EventsLogger;
 use Costlocker\Integrations\Entities\Event;
 
 class ProcessBasecampWebhookTest extends GivenCostlockerToBasecampSynchronizer
 {
     const BASECAMP_ID = 123456;
 
-    private $eventsLogger;
     private $isBasecampProjectMappped = true;
     private $isBasecampSynchronizationAllowed = true;
-
-    public function setUp()
-    {
-        parent::setUp();
-        $this->eventsLogger = m::mock(EventsLogger::class);
-    }
     
     protected function createSynchronizer(Synchronizer $s)
     {

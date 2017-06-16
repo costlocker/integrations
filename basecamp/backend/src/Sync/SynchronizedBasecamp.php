@@ -3,20 +3,26 @@
 namespace Costlocker\Integrations\Sync;
 
 use Costlocker\Integrations\Basecamp\BasecampFactory;
-use Costlocker\Integrations\Basecamp\Api\BasecampApi;
 use Costlocker\Integrations\Basecamp\Api\BasecampException;
+use Costlocker\Integrations\Entities\BasecampProject;
+use Costlocker\Integrations\Events\EventsLogger;
+use Costlocker\Integrations\Entities\Event;
 
 class SynchronizedBasecamp
 {
     private $factory;
     private $client;
+    private $logger;
+    private $webhookUrl;
 
     private $bcProject;
     private $todolists;
 
-    public function __construct(BasecampFactory $b)
+    public function __construct(BasecampFactory $b, EventsLogger $l, $webhookUrl)
     {
         $this->factory = $b;
+        $this->logger = $l;
+        $this->webhookUrl = $webhookUrl;
     }
 
     public function init($basecampAccount)
@@ -237,6 +243,25 @@ class SynchronizedBasecamp
                     unset($this->bcProject['activities'][$activityId][$type][$taskId]);
                 }
             }
+        }
+    }
+
+    public function registerWebhook(BasecampProject $project)
+    {
+        try {
+            $project->basecampWebhook = $this->client->registerWebhook(
+                $project->basecampProject,
+                $this->webhookUrl,
+                $project->settings['isBasecampWebhookEnabled'],
+                $project->basecampWebhook
+            );
+
+            $this->logger->__invoke(
+                Event::REGISTER_BASECAMP_WEBHOOK,
+                ['webhook' => $project->basecampWebhook],
+                $project
+            );
+        } catch (\Exception $ex) {
         }
     }
 }
