@@ -225,8 +225,10 @@ class BasecampClient
                 $errorDetails = '';
                 if (is_numeric(strpos($result->info['content_type'], 'application/json'))) {
                     $moreInfo = Json::decode($result->body);
-                    if (!(is_null($moreInfo))) {
+                    if (isset($moreInfo->error)) {
                         $errorDetails = ' - ' . $moreInfo->error;
+                    } elseif ($moreInfo) {
+                        $errorDetails = ' - ' . json_encode($moreInfo);
                     }
                 }
 
