@@ -248,6 +248,10 @@ class SynchronizedBasecamp
 
     public function registerWebhook(BasecampProject $project)
     {
+        if ($project->isNotChangedSetting('isBasecampWebhookEnabled')) {
+            return;
+        }
+
         try {
             $project->basecampWebhook = $this->client->registerWebhook(
                 $project->basecampProject,

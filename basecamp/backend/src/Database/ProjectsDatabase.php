@@ -38,7 +38,7 @@ class ProjectsDatabase implements SyncDatabase
         
         $basecampProject = $costlockerProject->upsertProject($mapping['id']);
         $basecampProject->mapping = $mapping['activities'];
-        $basecampProject->settings = $settings;
+        $basecampProject->updateSettings($settings);
         $basecampProject->basecampUser = $this->entityManager
             ->getRepository(BasecampUser::class)
             ->find($mapping['account']);

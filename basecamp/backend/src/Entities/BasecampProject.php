@@ -60,9 +60,24 @@ class BasecampProject
      */
     public $deletedAt;
 
+    private $previousSettings;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
+    }
+
+    public function updateSettings(array $settings)
+    {
+        $this->previousSettings = $this->settings ?: [];
+        $this->settings = $settings;
+    }
+
+    public function isNotChangedSetting($setting)
+    {
+        $old = $this->previousSettings[$setting] ?? null;
+        $new = $this->settings[$setting] ?? null;
+        return $old === $new;
     }
 
     public function isBasecampSynchronizationDisabled()

@@ -45,7 +45,7 @@ class InMemoryDatabase implements SyncDatabase
     {
         $p = new BasecampProject();
         $p->mapping = $mapping;
-        $p->settings = $this->lastSettings;
+        $p->updateSettings($this->lastSettings);
         $p->basecampUser = new \Costlocker\Integrations\Entities\BasecampUser();
         $p->costlockerProject = new \Costlocker\Integrations\Entities\CostlockerProject();
         $p->costlockerProject->id = $costlockerId;
