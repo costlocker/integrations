@@ -4,7 +4,6 @@ namespace Costlocker\Integrations\Database;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Costlocker\Integrations\Auth\GetUser;
-use Costlocker\Integrations\Costlocker\RegisterWebhook;
 use Costlocker\Integrations\Entities\CostlockerUser;
 use Costlocker\Integrations\Entities\CostlockerCompany;
 
@@ -12,13 +11,11 @@ class UpdateSettings
 {
     private $entityManager;
     private $getUser;
-    private $registerWebhook;
 
-    public function __construct(EntityManagerInterface $em, GetUser $u, RegisterWebhook $r)
+    public function __construct(EntityManagerInterface $em, GetUser $u)
     {
         $this->entityManager = $em;
         $this->getUser = $u;
-        $this->registerWebhook = $r;
     }
 
     public function __invoke(array $settings)
@@ -28,7 +25,6 @@ class UpdateSettings
         $company->defaultBasecampUser = $this->findBasecampUser($company, $settings['account']);
         $company->defaultCostlockerUser = $this->findCostlockerUser($company, $settings['costlockerUser']);
 
-        $this->registerWebhook->__invoke($company);
         $this->entityManager->persist($company);
         $this->entityManager->flush();
     }

@@ -168,15 +168,7 @@ $app
 
 $app
     ->post('/settings', function (Request $r) use ($app, $getWebhookUrl) {
-        $uc = new \Costlocker\Integrations\Database\UpdateSettings(
-            $app['orm.em'],
-            $app['client.user'],
-            new \Costlocker\Integrations\Costlocker\RegisterWebhook(
-                $app['client.costlocker'],
-                $app['events.logger'],
-                $getWebhookUrl($r)
-            )
-        );
+        $uc = new \Costlocker\Integrations\Database\UpdateSettings($app['orm.em'], $app['client.user']);
         $uc($r->request->all());
         return new JsonResponse();
     })

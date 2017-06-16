@@ -47,7 +47,7 @@ export default function Settings({ form, accounts }) {
                     /> Costlocker webhook
                 </label>
                 <p className="help-block">
-                  Webhook is automatically registered and validated after you save settings.
+                  Webhook is automatically registered and validated during project synchronization.
                 </p>
               </div>
             </div>
