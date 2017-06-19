@@ -3,6 +3,7 @@
 namespace Costlocker\Integrations\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity
@@ -40,9 +41,19 @@ class BasecampUser
     public $basecampAccount;
 
     /**
+     * @ORM\OneToMany(targetEntity="BasecampProject", mappedBy="basecampUser")
+     */
+    public $projects;
+
+    /**
      * @ORM\Column(type="datetime", nullable=true)
      */
     public $deletedAt;
+
+    public function __construct()
+    {
+        $this->projects = new ArrayCollection();
+    }
 
     public function isActive()
     {

@@ -42,6 +42,7 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, loginEr
                 <th>Person</th>
                 <th>Basecamp</th>
                 <th>Version</th>
+                <th title="Number of synchronized projects">Projects</th>
                 <th></th>
               </tr>
             </thead>
@@ -67,7 +68,11 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, loginEr
                 </td>
                 <td>{account.name} <ExternalLink url={account.urlApp} /></td>
                 <td>{account.product}</td>
-                <td>{personAccount.isMyAccount ? <Button action={() => disconnect(account.id)} title='Disconnect' className="btn btn-sm btn-danger" /> : ''}</td>
+                <td>{personAccount.connectedProjectsCount}</td>
+                <td>{personAccount.isMyAccount && !personAccount.connectedProjectsCount
+                  ? <Button action={() => disconnect(account.id)} title='Disconnect' className="btn btn-sm btn-danger" />
+                  : <button className="btn btn-default btn-sm" disabled="disabled" title='You can disconnect only your accounts that are not used in any project'>Disconnect</button>
+                }</td>
               </tr>;
             })}
             </tbody>

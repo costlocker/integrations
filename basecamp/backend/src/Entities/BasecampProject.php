@@ -31,7 +31,7 @@ class BasecampProject
 
     /**
      * @var BasecampUser
-     * @ORM\ManyToOne(targetEntity="BasecampUser")
+     * @ORM\ManyToOne(targetEntity="BasecampUser", inversedBy="projects")
      * @ORM\JoinColumn(name="bc_user_id", nullable=true, onDelete="RESTRICT")
      */
     public $basecampUser;

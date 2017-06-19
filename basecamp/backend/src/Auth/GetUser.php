@@ -79,11 +79,14 @@ class GetUser
             return [];
         }
         $dql =<<<DQL
-            SELECT cu, bu, ba
+            SELECT cu, bu, ba, partial bp.{id}
             FROM Costlocker\Integrations\Entities\CostlockerUser cu
             JOIN cu.basecampUsers bu
             JOIN bu.basecampAccount ba
-            WHERE cu.costlockerCompany = :company AND bu.deletedAt IS NULL
+            LEFT JOIN bu.projects bp
+            WHERE cu.costlockerCompany = :company
+              AND bu.deletedAt IS NULL
+              AND bp.deletedAt IS NULL
 DQL;
         $params = [
             'company' => $costlockerUser->costlockerCompany->id,
@@ -108,6 +111,7 @@ DQL;
                                     'canBeSynchronizedFromBasecamp' =>
                                         $basecamps->canBeSynchronizedFromBasecamp($b->basecampAccount)
                                 ],
+                                'connectedProjectsCount' => count($b->projects),
                             ];
                         },
                         $u->basecampUsers->toArray()
