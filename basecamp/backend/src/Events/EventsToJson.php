@@ -67,6 +67,9 @@ class EventsToJson
                         SyncChangelog::arrayToStats('basecamp', $e->data['result']['basecamp'] ?? []),
                         SyncChangelog::arrayToStats('costlocker', $e->data['result']['costlocker'] ?? []),
                     ])),
+                    'project' => [
+                        'costlocker' => $e->basecampProject ? $e->basecampProject->costlockerProject->id : null,
+                    ],
                 ];
             },
             $events

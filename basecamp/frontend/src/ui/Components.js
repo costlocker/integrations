@@ -26,8 +26,8 @@ const Button = ({ title, route, params, action, className }) => {
   return <button onClick={onClick} className={className}>{title}</button>;
 };
 
-const Link = ({ title, route }) => (
-  <a href="" onClick={(e) => redirectToRoute(route, undefined, e)}>{title}</a>
+const Link = ({ title, route, params }) => (
+  <a href="" onClick={(e) => redirectToRoute(route, params, e)}>{title}</a>
 );
 
 export { Errors, ExternalLink, Button, Link };

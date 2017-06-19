@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button } from '../ui/Components';
+import { Button, Link } from '../ui/Components';
 
 export default function Projects({ events, refresh }) {
   if (!events) {
@@ -37,7 +37,9 @@ export default function Projects({ events, refresh }) {
               return <tr key={event.id} className={statusToCssClass[event.status]}>
                 <td className="text-center">{event.date}</td>
                 <td>
-                  {event.description}<br />
+                  {event.description}
+                  {event.project.costlocker ? <span> - <Link title='go to project' route='sync' params={{clProject: event.project.costlocker}} /></span> : ''}
+                  <br />
                   {event.changelogs.length ? (
                   <table className="table table-condensed table-inline">
                     <thead>

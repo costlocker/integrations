@@ -109,7 +109,7 @@ export const states = [
   },
   {
     name: 'sync',
-    url: '/sync?account&clProject&bcProject',
+    url: '/sync?account&clProject',
     component: (props) => <Sync
       costlockerProjects={appState.cursor(['costlocker', 'projects']).deref()}
       basecampProjects={appState.cursor(['basecamp', 'projects']).deref()}
