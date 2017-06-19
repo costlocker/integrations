@@ -50,8 +50,17 @@ class GetProjects
                 'basecamps' => $basecamps,
             ];
         }
+        return $this->sortProjects($projects);
+    }
+
+    private function sortProjects(array $projects)
+    {
         usort($projects, function (array $a, array $b) {
-            return count($b['basecamps']) - count($a['basecamps']);
+            $basecampsDiff = count($b['basecamps']) - count($a['basecamps']);
+            if ($basecampsDiff) {
+                return $basecampsDiff;
+            }
+            return strcasecmp($a['name'], $b['name']);
         });
         return $projects;
     }
