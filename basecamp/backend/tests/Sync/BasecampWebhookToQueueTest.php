@@ -24,6 +24,7 @@ class BasecampWebhookToQueueTest extends GivenSynchronizer
                     'costlockerProject' => 1,
                     'basecampProject' => self::BASECAMP_ID,
                     'basecampEvent' => 'todo_created',
+                    'webhookUrl' => self::WEBHOOK_URL,
                 ],
                 m::type(\Costlocker\Integrations\Entities\BasecampProject::class)
             );

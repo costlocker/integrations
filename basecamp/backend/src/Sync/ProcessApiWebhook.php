@@ -3,6 +3,7 @@
 namespace Costlocker\Integrations\Sync;
 
 use Costlocker\Integrations\Entities\CostlockerCompany;
+use Costlocker\Integrations\Entities\CostlockerUser;
 use Costlocker\Integrations\Events\EventsLogger;
 use Costlocker\Integrations\Entities\Event;
 
@@ -19,10 +20,10 @@ class ProcessApiWebhook
         $this->eventsLogger = $e;
     }
 
-    public function __invoke(array $webhook)
+    public function __invoke(array $webhook, CostlockerUser $user = null, $webhookUrl = '')
     {
         if ($this->isBasecampWebhook($webhook['headers'])) {
-            return $this->processBasecampWebhook($webhook['body']);
+            return $this->processBasecampWebhook($webhook['body'], $webhookUrl);
         } else {
             return $this->processCostlockerWebhooks($webhook['body']);
         }
@@ -33,7 +34,7 @@ class ProcessApiWebhook
         return in_array('Basecamp3 Webhook', (array) ($headers['user-agent'] ?? []));
     }
 
-    private function processBasecampWebhook(array $json)
+    private function processBasecampWebhook(array $json, $webhookUrl)
     {
         $allowedWebhooks = [
             'todo_archived', 'todo_assignment_changed', 'todo_content_changed', 'todo_created',
@@ -58,6 +59,7 @@ class ProcessApiWebhook
                 'costlockerProject' => $project->costlockerProject->id,
                 'basecampProject' => $basecampId,
                 'basecampEvent' => $json['kind'],
+                'webhookUrl' => $webhookUrl,
             ],
             $project
         );

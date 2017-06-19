@@ -17,8 +17,9 @@ class ProcessEvent
 
     public function __invoke(Event $e)
     {
-        $strategy = $this->getSynchronizer($e->data['type'], $e->data['request']['webhookUrl']);
-        return $strategy($e->data['request'], $e->costlockerUser);
+        $webhookUrl = $e->data['webhookUrl'];
+        $strategy = $this->getSynchronizer($e->data['type'], $webhookUrl);
+        return $strategy($e->data['request'], $e->costlockerUser, $webhookUrl);
     }
 
     private function getSynchronizer($eventType, $webhookUrl)

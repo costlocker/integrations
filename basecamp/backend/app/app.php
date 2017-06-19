@@ -200,28 +200,25 @@ $app
     })
     ->before($checkAuthorization('basecamp'));
 
-$pushEvent = function ($event, array $data) use ($app) {
-    $app['events.pushSyncRequest']($event, $data);
+$pushEvent = function ($event, array $data, Request $r) use ($app, $getWebhookUrl) {
+    $app['events.pushSyncRequest']($event, $data, $getWebhookUrl($r));
     return new JsonResponse([], 200);
 };
     
 $app
-    ->post('/basecamp', function (Request $r) use ($pushEvent, $getWebhookUrl) {
-        return $pushEvent(
-            \Costlocker\Integrations\Entities\Event::MANUAL_SYNC,
-            ['webhookUrl' => $getWebhookUrl($r)] + $r->request->all()
-        );
+    ->post('/basecamp', function (Request $r) use ($pushEvent) {
+        $data = $r->request->all();
+        return $pushEvent(\Costlocker\Integrations\Entities\Event::MANUAL_SYNC, $data, $r);
     })
     ->before($checkAuthorization('basecamp'));
 
 $app
-    ->post('/webhooks/handler', function (Request $r) use ($pushEvent, $getWebhookUrl) {
+    ->post('/webhooks/handler', function (Request $r) use ($pushEvent) {
         $data = [
-            'webhookUrl' => $getWebhookUrl($r),
             'body' => json_decode($r->getContent(), true),
             'headers' => $r->headers->all()
         ];
-        return $pushEvent(\Costlocker\Integrations\Entities\Event::WEBHOOK_SYNC, $data);
+        return $pushEvent(\Costlocker\Integrations\Entities\Event::WEBHOOK_SYNC, $data, $r);
     });
 
 return $app;

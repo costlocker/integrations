@@ -36,6 +36,7 @@ SQL;
         $sql =<<<SQL
             SELECT p.cl_project_id as id,
                    array_to_json(array_agg(e.id)) as events,
+                   array_to_json(array_agg(e.data)) as data,
                    min(e.created_at) as min_event_date,
                    max(e.created_at) as max_event_date
             FROM events e

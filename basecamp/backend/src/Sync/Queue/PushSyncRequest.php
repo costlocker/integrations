@@ -14,12 +14,13 @@ class PushSyncRequest
         $this->logger = $l;
     }
 
-    public function __invoke($eventType, array $request)
+    public function __invoke($eventType, array $request, $webhookUrl)
     {
         $this->logger->__invoke(
             Event::SYNC_REQUEST,
             [
                 'type' => $eventType,
+                'webhookUrl' => $webhookUrl,
                 'request' => $request,
             ]
         );

@@ -22,7 +22,12 @@ class AggregateBasecampWebhooks
         $events = $this->repository->findBasecampWebhooks($secondsDelay);
         foreach ($events as $project) {
             $eventIds = json_decode($project['events']);
-            $this->pushEvent->__invoke(Event::WEBHOOK_BASECAMP, ['costlockerProject' => $project['id']]);
+            $webhookUrl = json_decode($project['data'], true)[0]['webhookUrl'];
+            $this->pushEvent->__invoke(
+                Event::WEBHOOK_BASECAMP,
+                ['costlockerProject' => $project['id']],
+                $webhookUrl
+            );
             $this->repository->markEventsAsProcessed($eventIds);
         }
         return $events;

@@ -13,6 +13,8 @@ use Costlocker\Integrations\Events\EventsLogger;
 
 abstract class GivenSynchronizer extends \PHPUnit_Framework_TestCase
 {
+    const WEBHOOK_URL = '';
+
     protected $costlocker;
     protected $basecamp;
     protected $database;
@@ -181,7 +183,8 @@ abstract class GivenSynchronizer extends \PHPUnit_Framework_TestCase
         $event = new Event();
         $event->data = [
             'type' => $this->eventType,
-            'request' => ['webhookUrl' => ''] + $this->request,
+            'webhookUrl' => '',
+            'request' => $this->request,
         ];
 
         $uc = new ProcessEvent([
@@ -191,7 +194,7 @@ abstract class GivenSynchronizer extends \PHPUnit_Framework_TestCase
             'database' => $this->database,
             'events.logger' => $this->eventsLogger,
         ]);
-        $results = $uc($event);
+        $results = $uc($event, null, self::WEBHOOK_URL);
         if (is_string($expectedStatus)) {
             assertThat($results, containsString($expectedStatus));
         } elseif ($results) {
