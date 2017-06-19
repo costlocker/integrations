@@ -177,9 +177,9 @@ export const states = [
   {
     name: 'events',
     url: '/events?clProject',
-    component: () => <Events
+    component: (props) => <Events
       events={appState.cursor(['events']).deref()}
-      refresh={() => loadEvents().then(fetchProjects())} // hotfix for reloading projects list
+      refresh={() => loadEvents(props.transition.params().clProject).then(fetchProjects())} // hotfix for reloading projects list
     />,
     resolve: loadCostlockerProjects().concat([
       {
