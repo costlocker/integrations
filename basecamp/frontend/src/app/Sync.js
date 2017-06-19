@@ -204,38 +204,44 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampCom
                   onChange={optionalSetIfAvailable('areTasksEnabled')} checked={syncForm.get('areTasksEnabled')}
                   /> Todo items are transformed to tasks under activity.
               </label><br />
+              {syncForm.get('areTasksEnabled') &&
               <label className="checkbox-inline">
                 <input type="checkbox" name="isCreatingActivitiesEnabled"
                   onChange={optionalSetIfAvailable('isCreatingActivitiesEnabled')} checked={syncForm.get('isCreatingActivitiesEnabled')}
                   /> New todolists are transformed to an activity (if the activity already exists in Costlocker, no new activity is created).
               </label>
+              }
             </div>
           </div>
-          <div className="form-group">
-            <label>What should happen when something is deleted in the Basecamp?</label>
-            <div>
-              <label className="checkbox-inline">
-                <input type="checkbox" name="isDeletingTasksEnabled"
-                  onChange={optionalSetIfAvailable('isDeletingTasksEnabled')} checked={syncForm.get('isDeletingTasksEnabled')}
-                  /> Delete tasks in Costlocker
-              </label>
-              <label className="checkbox-inline">
-                <input type="checkbox" name="isDeletingActivitiesEnabled"
-                  onChange={syncForm.set('isDeletingActivitiesEnabled')} checked={syncForm.get('isDeletingActivitiesEnabled')}
-                  /> Delete activities in Costlocker
-              </label>
+          {syncForm.get('areTasksEnabled') &&
+          <div>
+            <div className="form-group">
+              <label>What should happen when something is deleted in the Basecamp?</label>
+              <div>
+                <label className="checkbox-inline">
+                  <input type="checkbox" name="isDeletingTasksEnabled"
+                    onChange={optionalSetIfAvailable('isDeletingTasksEnabled')} checked={syncForm.get('isDeletingTasksEnabled')}
+                    /> Delete tasks in Costlocker
+                </label>
+                <label className="checkbox-inline">
+                  <input type="checkbox" name="isDeletingActivitiesEnabled"
+                    onChange={syncForm.set('isDeletingActivitiesEnabled')} checked={syncForm.get('isDeletingActivitiesEnabled')}
+                    /> Delete activities in Costlocker
+                </label>
+              </div>
+            </div>
+            <div className="form-group">
+              <label>Webhooks</label>
+              <div>
+                <label className="checkbox-inline">
+                  <input type="checkbox" name="isBasecampWebhookEnabled"
+                    onChange={optionalSetIfAvailable('isBasecampWebhookEnabled')} checked={syncForm.get('isBasecampWebhookEnabled')}
+                    /> Allow real-time webhook synchronization
+                </label>
+              </div>
             </div>
           </div>
-          <div className="form-group">
-            <label>Webhooks</label>
-            <div>
-              <label className="checkbox-inline">
-                <input type="checkbox" name="isBasecampWebhookEnabled"
-                  onChange={optionalSetIfAvailable('isBasecampWebhookEnabled')} checked={syncForm.get('isBasecampWebhookEnabled')}
-                  /> Allow real-time webhook synchronization
-              </label>
-            </div>
-          </div>
+          }
         </div>
       </div>
       <button type="submit" className="btn btn-primary btn-block">Synchronize</button>
