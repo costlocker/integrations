@@ -68,6 +68,12 @@ class BasecampProject
         $this->createdAt = new \DateTime();
     }
 
+    public function getSettings()
+    {
+        $request = new SyncSettings($this->settings);
+        return $request->toArray();
+    }
+
     public function updateSettings(array $settings)
     {
         if (!$this->syncSettings) {

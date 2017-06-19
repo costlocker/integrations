@@ -31,7 +31,7 @@ class GetProjects
             if ($basecampProject instanceof BasecampProject) {
                 $basecamps[] = [
                     'id' => $basecampProject->id,
-                    'settings' => $basecampProject->settings,
+                    'settings' => $basecampProject->getSettings(),
                     'account' => [
                         'id' => $basecampProject->basecampUser->id,
                         'basecampId' => $basecampProject->basecampUser->basecampAccount->id,
