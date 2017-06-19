@@ -35,7 +35,7 @@ export default function Projects({ allProjects, disconnect }) {
                 <td>
                   {project.basecamps.map(basecamp => (
                     <div key={basecamp.id}>
-                      <em>{basecamp.account.name} {basecamp.account.product}</em>
+                      <em>{basecamp.account.name} <span className="label label-default">{basecamp.account.product}</span></em>
                       &nbsp;&nbsp; <ExternalLink url={basecamp.url} />
                       <br />{basecamp.account.identity.email_address}
                     </div>
@@ -71,7 +71,7 @@ export default function Projects({ allProjects, disconnect }) {
     {notConnectedProjectsCount &&
     <div className="row">
       <div className="col-sm-12">
-        <Button route='sync' title={<span>Connect new project ({notConnectedProjectsCount})</span>} className="btn btn-success" />
+        <Button route='sync' title={<span>Connect new project ({notConnectedProjectsCount})</span>} className="btn btn-success btn-block" />
       </div>
     </div>
     }

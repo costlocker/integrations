@@ -8,6 +8,7 @@ import { appState } from './state';
 import { states, config, isRouteActive } from './Router';
 import App from './ui/App';
 import Loading from './ui/Loading';
+import './ui/index.css'
 
 export const plugins = isDevelopmentMode ? [pushStateLocationPlugin, Visualizer] : [pushStateLocationPlugin];
 

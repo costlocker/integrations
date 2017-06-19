@@ -27,6 +27,8 @@ bin/console mig:exec 20170606100151  --down
 cd frontend
 yarn install
 cp .env.example .env
+yarn watch-css
+yarn start
 ```
 
 ### Apache VirtualHost example

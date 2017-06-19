@@ -35,7 +35,7 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, loginEr
             <thead>
               <tr>
                 <th>Costlocker</th>
-                <th colSpan="4" className="active text-center">Basecamp</th>
+                <th colSpan="5" className="active">Basecamp</th>
               </tr>
               <tr>
                 <th>Person</th>

@@ -87,10 +87,10 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampCom
         <ul>
           <li>
             Costlocker project:
-            <strong>{editedProject.name}</strong> <span className="label label-default">{editedProject.client.name}</span></li>
+            &nbsp;<strong>{editedProject.name}</strong> <span className="label label-default">{editedProject.client.name}</span></li>
           <li>
             Basecamp account:
-            <strong>{connectedBasecamp.account.name}</strong> <span className="label label-default">{connectedBasecamp.account.product}</span>
+            &nbsp;<strong>{connectedBasecamp.account.name}</strong> <span className="label label-default">{connectedBasecamp.account.product}</span>
           </li>
           <li>
             Basecamp person:

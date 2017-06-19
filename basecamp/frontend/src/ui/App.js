@@ -27,11 +27,11 @@ const User = ({ auth }) => {
     return null;
   }
   return <div>
-    <span className="text-primary" title="Costlocker user">
+    <span title="Costlocker user">
       <CostlockerUser user={auth.get('costlocker')} />
     </span>
-    &nbsp;/&nbsp;
-    <span className="text-success" title="Basecamp user">
+    <span className="text-muted">&nbsp;/&nbsp;</span>
+    <span title="Basecamp user">
       <BasecampUser user={auth.get('basecamp')} />
     </span>
   </div>;
