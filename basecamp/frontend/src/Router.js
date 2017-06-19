@@ -186,7 +186,8 @@ export const states = [
         deps: ['$transition$'],
         resolveFn: ($transition$) => {
           const params = $transition$.params();
-          return loadEvents(params.clProject);
+          loadEvents(params.clProject);
+          return true;
         },
       }
     ]),

@@ -1,10 +1,11 @@
 import React from 'react';
 
 import { ExternalLink, Button } from '../ui/Components';
+import Loading from '../ui/Loading';
 
 export default function Projects({ allProjects, disconnect }) {
   if (!allProjects) {
-    return <span>Loading....</span>;
+    return <Loading title="Loading projects" />;
   }
   const projects = allProjects.filter(p => p.basecamps.length);
   const notConnectedProjectsCount = allProjects.length - projects.length;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Loading() {
+export default function Loading({ title }) {
   return (
     <div className="container-fluid cover">
       <div className="row">
@@ -14,7 +14,7 @@ export default function Loading() {
       </div>
       <div className="row">
         <div className="col-sm-12 text-center">
-          <h1 className="text-muted">Loading Costlocker & Basecamp integration&hellip;</h1>
+          <h1 className="text-muted">{title}&hellip;</h1>
         </div>
       </div>
     </div>

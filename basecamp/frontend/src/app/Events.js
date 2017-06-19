@@ -1,10 +1,11 @@
 import React from 'react';
 
 import { Button, Link } from '../ui/Components';
+import Loading from '../ui/Loading';
 
-export default function Projects({ events, refresh }) {
+export default function Events({ events, refresh }) {
   if (!events) {
-    return <span>Loading....</span>;
+    return <Loading title="Loading events" />;
   }
 
   return <div>

@@ -14,7 +14,7 @@ export const plugins = isDevelopmentMode ? [pushStateLocationPlugin, Visualizer]
 const render = () => {
   let content = null;
   if (appState.cursor(['auth', 'isLoading']).deref()) {
-    content = <Loading />
+    content = <Loading title='Loading Costlocker & Basecamp integration' />
   } else {
     content =
       <UIRouter states={states} config={config} plugins={plugins}>

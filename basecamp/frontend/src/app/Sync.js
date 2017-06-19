@@ -1,4 +1,5 @@
 import React from 'react';
+import Loading from '../ui/Loading';
 
 const BasecampAccountSelect = ({ title, accounts, syncForm }) => (
   <div className="form-group">
@@ -40,7 +41,7 @@ const BasecampCompaniesSelect = ({ basecampCompanies, isBasecampProjectCreated, 
 
 export default function Sync({ costlockerProjects, basecampProjects, basecampCompanies, basecampAccounts, syncForm }) {
   if (!costlockerProjects) {
-    return <span>Loading...</span>;
+    return <Loading title="Loading projects" />;
   } else if (!costlockerProjects.length) {
     return <span>No projects available</span>;
   }
