@@ -37,13 +37,7 @@ const User = ({ auth }) => {
   </div>;
 }
 
-const Navigation = ({ isRouteActive }) => {
-  const routes = [
-    { route: 'projects', title: 'Projects' },
-    { route: 'sync', title: 'Add project', params: { clProject: null } },
-    { route: 'events', title: 'Events', params: { clProject: null } },
-    { route: 'settings', title: 'Settings' },
-  ];
+const Navigation = ({ isRouteActive, routes }) => {
   return (
     <ul className="nav navbar-nav">
       {routes.map(({ route, params, title }) => (
@@ -68,14 +62,18 @@ export default function Layout({ auth, isRouteActive }) {
             </div>
           </div>
           <div>
-            {auth.get('costlocker') ? <Navigation isRouteActive={isRouteActive} /> : ''}
+            {auth.get('costlocker') ? <Navigation isRouteActive={isRouteActive} routes={[
+              { route: 'projects', title: 'Projects' },
+              { route: 'sync', title: 'Add project', params: { clProject: null } },
+              { route: 'events', title: 'Events', params: { clProject: null } },
+              { route: 'settings', title: 'Settings' },
+            ]} /> : ''}
           </div>
           <div className="navbar-right text-right">
-            <ul className="nav navbar-nav">
-              <li className={isRouteActive('accounts') ? 'active' : null}>
-                <Link route='accounts' title={<User auth={auth} />} />
-              </li>
-            </ul>
+            <Navigation isRouteActive={isRouteActive} routes={[
+              { route: 'accounts', title: <User auth={auth} /> },
+              { route: 'help', title: <span className="fa fa-question-circle"></span> },
+            ]} />
           </div>
         </div>
       </nav>

@@ -9,6 +9,7 @@ import Sync from './app/Sync';
 import Accounts from './app/Accounts';
 import Settings from './app/Settings';
 import Events from './app/Events';
+import Help from './app/Help';
 import { SyncSettings } from './app/SyncSettings';
 
 export let redirectToRoute = (route) => console.log('app is not ready', route);
@@ -72,6 +73,11 @@ export const states = [
     name: 'homepage',
     url: '/?loginError',
     redirectTo: 'projects',
+  },
+  {
+    name: 'help',
+    url: '/help',
+    component: () => <Help />,
   },
   {
     name: 'projects',
@@ -199,7 +205,7 @@ const hooks = [
     event: 'onBefore',
     criteria: {
       to: state => {
-        const publicStates = ['login'];
+        const publicStates = ['login', 'help'];
         const isPrivateState = publicStates.indexOf(state.name) === -1;
         return isPrivateState && isNotLoggedInCostlocker();
       }
