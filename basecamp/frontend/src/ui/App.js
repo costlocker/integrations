@@ -40,14 +40,14 @@ const User = ({ auth }) => {
 const Navigation = ({ isRouteActive }) => {
   const routes = [
     { route: 'projects', title: 'Projects' },
-    { route: 'sync', title: 'Add project' },
+    { route: 'sync', title: 'Add project', params: { clProject: null } },
     { route: 'events', title: 'Events' },
     { route: 'settings', title: 'Settings' },
   ];
   return (
     <ul className="nav navbar-nav">
-      {routes.map(({ route, title }) => (
-      <li key={route} className={isRouteActive(route) ? 'active' : null}><Link route={route} title={title} /></li>
+      {routes.map(({ route, params, title }) => (
+      <li key={route} className={isRouteActive(route) ? 'active' : null}><Link route={route} params={params} title={title} /></li>
       ))}
     </ul>
   );

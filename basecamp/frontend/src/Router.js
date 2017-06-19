@@ -125,7 +125,7 @@ export const states = [
         updateCostlockerProjects: (updater) => appState.cursor(['sync', 'costlockerProject']).update(updater),
         submit: (e) => {
           e.preventDefault();
-          pushToApi(`/basecamp`, appState.cursor(['sync']).deref())
+          pushToApi(`/sync`, appState.cursor(['sync']).deref())
             .then((r) => redirectToRoute('events'))
             .catch((e) => alert('Synchronization has failed'));
         }

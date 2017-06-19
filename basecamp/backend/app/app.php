@@ -206,7 +206,7 @@ $pushEvent = function ($event, array $data, Request $r) use ($app, $getWebhookUr
 };
     
 $app
-    ->post('/basecamp', function (Request $r) use ($pushEvent) {
+    ->post('/sync', function (Request $r) use ($pushEvent) {
         $data = $r->request->all();
         return $pushEvent(\Costlocker\Integrations\Entities\Event::MANUAL_SYNC, $data, $r);
     })
