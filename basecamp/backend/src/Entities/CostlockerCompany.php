@@ -64,7 +64,6 @@ class CostlockerCompany
             'isCreatingBasecampProjectEnabled' => $this->isCreatingBasecampProjectEnabled(),
             'account' => $this->defaultBasecampUser ? $this->defaultBasecampUser->id : null,
             'costlockerUser' => $this->defaultCostlockerUser ? $this->defaultCostlockerUser->email : null,
-            'isCostlockerWebhookEnabled' => $this->urlWebhook ? true : false,
         ] + $request->toArray();
     }
 

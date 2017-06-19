@@ -19,7 +19,6 @@ const appState = immstruct({
   currentState: '', // helper for active menu items
   events: null,
   companySettings: {
-    isCostlockerWebhookEnabled: false,
     isCreatingBasecampProjectEnabled: false,
     account: null,
     costlockerUser: null,

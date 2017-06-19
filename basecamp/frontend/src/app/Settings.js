@@ -42,9 +42,7 @@ export default function Settings({ form, accounts }) {
               <label>Webhooks</label>
               <div>
                 <label className="checkbox-inline">
-                  <input type="checkbox" disabled
-                    onChange={form.set('isCostlockerWebhookEnabled')} checked={form.get('isCostlockerWebhookEnabled')}
-                    /> Costlocker webhook
+                  <input type="checkbox" disabled defaultChecked /> Allow real-time synchronization from Costlocker
                 </label>
                 <p className="help-block">
                   Webhook is automatically registered and validated during project synchronization.
@@ -134,7 +132,7 @@ export default function Settings({ form, accounts }) {
                 <label className="checkbox-inline">
                   <input type="checkbox" name="isBasecampWebhookEnabled"
                     onChange={form.set('isBasecampWebhookEnabled')} checked={form.get('isBasecampWebhookEnabled')}
-                    /> Allow real-time webhook synchronization
+                    /> Allow real-time synchronization from Basecamp
                 </label>
                 <p className="help-block">
                   Webhook is automatically registered and validated during project synchronization.
