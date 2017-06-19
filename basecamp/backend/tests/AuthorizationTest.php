@@ -19,7 +19,7 @@ class AuthorizationTest extends GivenApi
         return [
             ['GET', '/costlocker'],
             ['GET', '/basecamp?account=123'],
-            ['POST', '/basecamp'],
+            ['POST', '/sync'],
         ];
     }
 }
