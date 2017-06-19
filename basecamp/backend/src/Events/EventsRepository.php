@@ -90,8 +90,11 @@ DQL;
         $filter = '';
         $filterParams = [];
         if ($costlockerProjectId) {
-            $filter = ' AND pc.id = :id';
+            $filter = 'pc.id = :id';
             $filterParams = ['id' => $costlockerProjectId];
+        } else {
+            $filter = 'e.event <> :ignoredEvent';
+            $filterParams = ['ignoredEvent' => Event::WEBHOOK_BASECAMP];
         }
         $dql =<<<DQL
             SELECT e, u, p
@@ -99,7 +102,8 @@ DQL;
             LEFT JOIN e.costlockerUser u
             LEFT JOIN e.basecampProject p
             LEFT JOIN p.costlockerProject pc
-            WHERE (u.costlockerCompany = :company OR pc.costlockerCompany = :company) {$filter}
+            WHERE (u.costlockerCompany = :company OR pc.costlockerCompany = :company)
+              AND {$filter}
             ORDER BY e.id DESC
 DQL;
         $params = [
