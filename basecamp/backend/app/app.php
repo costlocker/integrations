@@ -157,8 +157,9 @@ $app
     ->before($checkAuthorization('costlocker'));
 
 $app
-    ->get('/events', function () use ($app) {
-        return new JsonResponse($app['database.events']->findLatestEvents());
+    ->get('/events', function (Request $r) use ($app) {
+        $project = $r->query->get('project');
+        return new JsonResponse($app['database.events']->findLatestEvents($project));
     })
     ->before($checkAuthorization('costlocker'));
 

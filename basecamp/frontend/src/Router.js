@@ -52,7 +52,9 @@ const loadCostlockerProjects = (callback) => [
   }
 ];
 
-const loadEvents = () => fetchFromApi('/events').then(events => appState.cursor().set('events', events));
+const loadEvents = (clProject) =>
+  fetchFromApi(clProject ? `/events?project=${clProject}` : '/events')
+  .then(events => appState.cursor().set('events', events));
 
 appState.on('next-animation-frame', function (newStructure, oldStructure, keyPath) {
   const oldId = oldStructure.getIn(['sync', 'account']);
@@ -174,17 +176,21 @@ export const states = [
   },
   {
     name: 'events',
-    url: '/events',
+    url: '/events?clProject',
     component: () => <Events
       events={appState.cursor(['events']).deref()}
       refresh={() => loadEvents().then(fetchProjects())} // hotfix for reloading projects list
     />,
-    resolve: [
+    resolve: loadCostlockerProjects().concat([
       {
         token: 'loadEvents',
-        resolveFn: loadEvents
+        deps: ['$transition$'],
+        resolveFn: ($transition$) => {
+          const params = $transition$.params();
+          return loadEvents(params.clProject);
+        },
       }
-    ],
+    ]),
   },
 ];
 

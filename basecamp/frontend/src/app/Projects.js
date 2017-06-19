@@ -24,7 +24,7 @@ export default function Projects({ allProjects, disconnect }) {
               <th>Costlocker</th>
               <th>Basecamp account</th>
               <th>Synchronization</th>
-              <th width='200' className="text-center">Actions</th>
+              <th width='300' className="text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -34,15 +34,15 @@ export default function Projects({ allProjects, disconnect }) {
                 <td>
                   {project.basecamps.map(basecamp => (
                     <div key={basecamp.id}>
-                      <em>{basecamp.account.name}</em>&nbsp;&nbsp; <ExternalLink url={basecamp.url} />
-                      <br />
-                      {basecamp.account.product}, {basecamp.account.identity.email_address}
+                      <em>{basecamp.account.name} {basecamp.account.product}</em>
+                      &nbsp;&nbsp; <ExternalLink url={basecamp.url} />
+                      <br />{basecamp.account.identity.email_address}
                     </div>
                   ))}
                 </td>
                 <td>
                   {project.basecamps.map(basecamp => (
-                    <div>
+                    <div key={basecamp.id}>
                       {basecamp.settings.areTodosEnabled ? <span className="text-primary">Costlocker &rarr; Basecamp</span> : ''}<br />
                       {basecamp.settings.areTasksEnabled ? <span className="text-success">Basecamp &rarr; Costlocker</span> : ''}
                     </div>
@@ -51,6 +51,9 @@ export default function Projects({ allProjects, disconnect }) {
                 <td className="text-right">
                   <Button route='sync' params={{ clProject: project.id }}
                     title={<span><i className="fa fa-refresh"></i> Refresh</span>} className="btn btn-sm btn-primary" />
+                  &nbsp;&nbsp;
+                  <Button route='events' params={{ clProject: project.id }}
+                    title={<span><i className="fa fa-th-list"></i> Events</span>} className="btn btn-sm btn-info" />
                   &nbsp;&nbsp;
                   <Button action={() => disconnect(project.id)}
                     title={<span><i className="fa fa-trash"></i> Disconnect</span>} className="btn btn-sm btn-danger" />

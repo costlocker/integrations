@@ -41,7 +41,7 @@ const Navigation = ({ isRouteActive }) => {
   const routes = [
     { route: 'projects', title: 'Projects' },
     { route: 'sync', title: 'Add project', params: { clProject: null } },
-    { route: 'events', title: 'Events' },
+    { route: 'events', title: 'Events', params: { clProject: null } },
     { route: 'settings', title: 'Settings' },
   ];
   return (

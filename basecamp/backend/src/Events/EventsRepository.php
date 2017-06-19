@@ -85,20 +85,26 @@ DQL;
         return array_shift($entities);
     }
 
-    public function findLatestEvents()
+    public function findLatestEvents($costlockerProjectId)
     {
+        $filter = '';
+        $filterParams = [];
+        if ($costlockerProjectId) {
+            $filter = ' AND pc.id = :id';
+            $filterParams = ['id' => $costlockerProjectId];
+        }
         $dql =<<<DQL
             SELECT e, u, p
             FROM Costlocker\Integrations\Entities\Event e
             LEFT JOIN e.costlockerUser u
             LEFT JOIN e.basecampProject p
             LEFT JOIN p.costlockerProject pc
-            WHERE (u.costlockerCompany = :company OR pc.costlockerCompany = :company)
+            WHERE (u.costlockerCompany = :company OR pc.costlockerCompany = :company) {$filter}
             ORDER BY e.id DESC
 DQL;
         $params = [
             'company' => $this->getUser->getCostlockerUser()->costlockerCompany->id,
-        ];
+        ] + $filterParams;
         $entities = $this->entityManager
             ->createQuery($dql)
             ->setMaxResults(50)
