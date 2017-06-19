@@ -1,5 +1,5 @@
 import React from 'react';
-import { Map, Set } from 'immutable';
+import { Map } from 'immutable';
 
 import { appState, isNotLoggedInCostlocker, isNotLoggedInBasecamp } from './state';
 import { fetchFromApi, pushToApi, loginUrls } from './api';
@@ -9,9 +9,11 @@ import Sync from './app/Sync';
 import Accounts from './app/Accounts';
 import Settings from './app/Settings';
 import Events from './app/Events';
+import { SyncSettings } from './app/SyncSettings';
 
 export let redirectToRoute = (route) => console.log('app is not ready', route);
 export let isRouteActive = () => false;
+const syncSettings = new SyncSettings(appState);
 
 const fetchUser = () =>
   fetchFromApi('/user')
@@ -34,14 +36,17 @@ if (isNotLoggedInCostlocker()) {
 
 const fetchProjects = () =>
    fetchFromApi('/costlocker')
-    .then(projects => appState.cursor(['costlocker']).set('projects', projects));
+    .then(projects => {
+      appState.cursor(['costlocker']).set('projects', projects);
+      return projects;
+    });
 
-const loadCostlockerProjects = [
+const loadCostlockerProjects = (callback) => [
   {
     token: 'loadCostlockerProjects',
     resolveFn: () => {
       if (!appState.cursor(['costlocker', 'projects']).deref()) {
-        fetchProjects();
+        fetchProjects().then(callback ? callback : (r => r));
       }
     }
   }
@@ -77,7 +82,7 @@ export const states = [
           .catch((e) => alert('Disconnect has failed'))
       }
     />,
-    resolve: loadCostlockerProjects,
+    resolve: loadCostlockerProjects(),
   },
   {
     name: 'login',
@@ -126,52 +131,23 @@ export const states = [
         }
       }}
     />,
-    resolve: loadCostlockerProjects.concat([
+    resolve:
+      loadCostlockerProjects(
+        projects => syncSettings.loadProjectSettings(projects)
+      ).concat([
       {
         token: 'loadUrlParms',
         deps: ['$transition$'],
         resolveFn: ($transition$) => {
           const params = $transition$.params();
           if (params.clProject) {
-            const allProjects = appState.cursor(['costlocker', 'projects']).deref();
-            const projects = allProjects ? allProjects.filter(p => p.id == params.clProject) : [];
-            if (projects.length) {
-              const editedProject = projects[0];
-              const basecampProject = editedProject.basecamps[0];
-              appState.cursor(['sync']).update(sync => sync
-                .set('mode', 'edit')
-                .set('costlockerProject', Set([editedProject.id]))
-                .set('basecampProject', basecampProject.id)
-                .set('account', basecampProject.account.id)
-                .set('areTodosEnabled', basecampProject.settings.areTodosEnabled)
-                .set('isDeletingTodosEnabled', basecampProject.settings.isDeletingTodosEnabled)
-                .set('isRevokeAccessEnabled', basecampProject.settings.isRevokeAccessEnabled)
-                .set('areTasksEnabled', basecampProject.settings.areTasksEnabled)
-                .set('isDeletingTasksEnabled', basecampProject.settings.isDeletingTasksEnabled)
-                .set('isCreatingActivitiesEnabled', basecampProject.settings.isCreatingActivitiesEnabled)
-                .set('isDeletingActivitiesEnabled', basecampProject.settings.isDeletingActivitiesEnabled)
-                .set('isBasecampWebhookEnabled', basecampProject.settings.isBasecampWebhookEnabled)
-              )
-              return;
-            }
+            syncSettings.setProjectId(params.clProject);
+            syncSettings.loadProjectSettings(
+              appState.cursor(['costlocker', 'projects']).deref()
+            );
+            return;
           }
-
-          const companySettings = appState.cursor(['companySettings']).deref();
-          const myAccount = appState.cursor(['auth', 'settings']).myAccount;
-          appState.cursor(['sync']).update(sync => sync
-            .set('mode', 'create')
-            .set('costlockerProject', Set())
-            .set('basecampProject', '')
-            .set('account', myAccount ? myAccount : sync.get('account'))
-            .set('areTodosEnabled', companySettings.get('areTodosEnabled'))
-            .set('isDeletingTodosEnabled', companySettings.get('isDeletingTodosEnabled'))
-            .set('isRevokeAccessEnabled', companySettings.get('isRevokeAccessEnabled'))
-            .set('areTasksEnabled', companySettings.get('areTasksEnabled'))
-            .set('isDeletingTasksEnabled', companySettings.get('isDeletingTasksEnabled'))
-            .set('isCreatingActivitiesEnabled', companySettings.get('isCreatingActivitiesEnabled'))
-            .set('isDeletingActivitiesEnabled', companySettings.get('isDeletingActivitiesEnabled'))
-            .set('isBasecampWebhookEnabled', companySettings.get('isBasecampWebhookEnabled'))
-          );
+          syncSettings.loadCompanySettings();
         }
       }
     ]),

@@ -1,5 +1,6 @@
 import immstruct from 'immstruct';
 import { Set } from 'immutable';
+import { defaultSyncSettings } from './app/SyncSettings';
 
 const appState = immstruct({
   auth: {
@@ -18,35 +19,19 @@ const appState = immstruct({
   currentState: '', // helper for active menu items
   events: null,
   companySettings: {
-    areTodosEnabled: true,
-    isDeletingTodosEnabled: false,
-    isRevokeAccessEnabled: false,
     isCostlockerWebhookEnabled: false,
     isCreatingBasecampProjectEnabled: false,
     account: null,
     costlockerUser: null,
-    // basecamp -> costlocker
-    areTasksEnabled: false,
-    isDeletingTasksEnabled: false,
-    isCreatingActivitiesEnabled: false,
-    isDeletingActivitiesEnabled: false,
-    isBasecampWebhookEnabled: false,
+    ...defaultSyncSettings,
   },
   sync: {
     account: null,
     costlockerProject: Set(),
     basecampProject: '',
     basecampClassicCompanyId: '',
-    areTodosEnabled: true,
-    isDeletingTodosEnabled: false,
-    isRevokeAccessEnabled: false,
     mode: 'create',
-    // basecamp -> costlocker
-    areTasksEnabled: false,
-    isDeletingTasksEnabled: false,
-    isCreatingActivitiesEnabled: false,
-    isDeletingActivitiesEnabled: false,
-    isBasecampWebhookEnabled: false,
+    ...defaultSyncSettings,
   }
 });
 
