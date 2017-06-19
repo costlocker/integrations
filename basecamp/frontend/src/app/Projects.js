@@ -22,8 +22,9 @@ export default function Projects({ allProjects, disconnect }) {
           <thead>
             <tr>
               <th>Costlocker</th>
-              <th>Basecamp</th>
-              <th className="text-right">Actions</th>
+              <th>Basecamp account</th>
+              <th>Synchronization</th>
+              <th width='200' className="text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -33,11 +34,17 @@ export default function Projects({ allProjects, disconnect }) {
                 <td>
                   {project.basecamps.map(basecamp => (
                     <div key={basecamp.id}>
-                      <em>
-                        {basecamp.account.name} ({basecamp.account.product}, {basecamp.account.identity.email_address})
-                      </em>
-                      &nbsp;&nbsp;
-                      <ExternalLink url={basecamp.url} />
+                      <em>{basecamp.account.name}</em>&nbsp;&nbsp; <ExternalLink url={basecamp.url} />
+                      <br />
+                      {basecamp.account.product}, {basecamp.account.identity.email_address}
+                    </div>
+                  ))}
+                </td>
+                <td>
+                  {project.basecamps.map(basecamp => (
+                    <div>
+                      {basecamp.settings.areTodosEnabled ? <span className="text-primary">Costlocker &rarr; Basecamp</span> : ''}<br />
+                      {basecamp.settings.areTasksEnabled ? <span className="text-success">Basecamp &rarr; Costlocker</span> : ''}
                     </div>
                   ))}
                 </td>
