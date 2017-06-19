@@ -52,14 +52,12 @@ abstract class GivenSynchronizer extends \PHPUnit_Framework_TestCase
 
     protected function whenProjectIsMapped($basecampId, array $activities = [], array $settings = [])
     {
-        $this->database->upsertProject(
-            1,
-            [
-                'id' => $basecampId,
-                'activities' => $activities,
-                'settings' => (new SyncSettings($settings + ['isDeletingTodosEnabled' => true]))->toArray(),
-            ]
-        );
+        $result = new SyncResponse(new SyncRequest());
+        $result->costlockerChangelog->projectId = 1;
+        $result->basecampChangelog->projectId = $basecampId;
+        $result->request->settings = new SyncSettings($settings + ['isDeletingTodosEnabled' => true]);
+        $result->newMapping = $activities;
+        $this->database->upsertProject($result);
     }
 
     protected function givenBasecampPeople(array $emails)

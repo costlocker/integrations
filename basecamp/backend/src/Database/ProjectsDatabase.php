@@ -8,6 +8,7 @@ use Costlocker\Integrations\Entities\CostlockerCompany;
 use Costlocker\Integrations\Entities\CostlockerProject;
 use Costlocker\Integrations\Entities\BasecampUser;
 use Costlocker\Integrations\Sync\SyncDatabase;
+use Costlocker\Integrations\Sync\SyncResponse;
 
 class ProjectsDatabase implements SyncDatabase
 {
@@ -20,22 +21,24 @@ class ProjectsDatabase implements SyncDatabase
         $this->getUser = $u;
     }
 
-    public function upsertProject($costockerProjectId, array $update)
+    public function upsertProject(SyncResponse $result)
     {
         $costlockerProject = $this->entityManager->getRepository(CostlockerProject::class)
-            ->find($costockerProjectId) ?: new CostlockerProject();
-        $costlockerProject->id = $costockerProjectId;
+            ->find($result->costlockerChangelog->projectId) ?: new CostlockerProject();
+        $costlockerProject->id = $result->costlockerChangelog->projectId;
 
         if ($this->getUser->getCostlockerUser(false)) {
             $costlockerProject->costlockerCompany = $this->getUser->getCostlockerUser()->costlockerCompany;
         }
         
-        $basecampProject = $costlockerProject->upsertProject($update['id']);
-        $basecampProject->mapping = $update['activities'];
-        $basecampProject->updateSettings($update['settings']);
+        $basecampProject = $costlockerProject->upsertProject($result->basecampChangelog->projectId);
+        $basecampProject->mapping = $result->newMapping;
+        if ($result->request->isCompleteProjectSynchronized) {
+            $basecampProject->updateSettings($result->getSettings());
+        }
         $basecampProject->basecampUser = $this->entityManager
             ->getRepository(BasecampUser::class)
-            ->find($update['account']);
+            ->find($result->request->account);
 
         $this->entityManager->persist($costlockerProject);
         $this->entityManager->persist($basecampProject);

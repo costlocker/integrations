@@ -14,5 +14,5 @@ interface SyncDatabase
     public function findByBasecampId($id);
 
     /** @return \Costlocker\Integrations\Entities\BasecampProject */
-    public function upsertProject($costockerProjectId, array $update);
+    public function upsertProject(SyncResponse $result);
 }

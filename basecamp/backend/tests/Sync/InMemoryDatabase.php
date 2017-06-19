@@ -21,12 +21,17 @@ class InMemoryDatabase implements SyncDatabase
         $this->company->defaultCostlockerUser = new CostlockerUser();
     }
 
-    public function upsertProject($costockerProjectId, array $update)
+    public function upsertProject(SyncResponse $result)
     {
-        $this->mapping[$costockerProjectId] = $update;
-        $this->lastSettings = $update['settings'];
+        $update = [
+            'id' => $result->basecampChangelog->projectId,
+            'account' => $result->request->account,
+            'activities' => $result->newMapping,
+        ];
+        $this->mapping[$result->costlockerChangelog->projectId] = $update;
+        $this->lastSettings = $result->getSettings();
         if ($this->shouldRegisterWebhooks) {
-            return $this->stubBasecampProject($costockerProjectId, $update);
+            return $this->stubBasecampProject($result->costlockerChangelog->projectId, $update);
         }
     }
 

@@ -10,6 +10,9 @@ class SyncResponse
     public $request;
     /** @var \Costlocker\Integrations\Entities\BasecampProject */
     public $mappedProject;
+    /** @var array */
+    public $newMapping;
+
     /** @var SyncChangelog */
     public $costlockerChangelog;
     /** @var SyncChangelog */

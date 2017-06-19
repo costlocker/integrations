@@ -380,15 +380,8 @@ class Synchronizer
 
     private function saveProject(SyncResponse $result)
     {
-        $result->mappedProject = $this->database->upsertProject(
-            $result->costlockerChangelog->projectId,
-            [
-                'id' => $result->basecampChangelog->projectId,
-                'account' => $result->request->account,
-                'activities' => $this->basecamp->getMappedActivities(),
-                'settings' => $result->getSettings(),
-            ]
-        );
+        $result->newMapping = $this->basecamp->getMappedActivities();
+        $result->mappedProject = $this->database->upsertProject($result);
 
         if ($result->request->isCompleteProjectSynchronized && $result->mappedProject) {
             try {
