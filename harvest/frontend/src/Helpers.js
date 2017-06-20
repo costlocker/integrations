@@ -26,8 +26,8 @@ const Errors = ({ title, error }) => {
   );
 };
 
-const ExternalLink = ({ url }) => (
-  <a href={url} target="_blank"><i className="fa fa-external-link"></i></a>
+const ExternalLink = ({ url, className }) => (
+  <a href={url} target="_blank" className={className}><i className="fa fa-external-link"></i></a>
 );
 
 export { FullButton, Errors, ExternalLink };

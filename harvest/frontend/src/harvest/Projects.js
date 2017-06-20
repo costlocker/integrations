@@ -1,4 +1,5 @@
 import React from 'react';
+import { ExternalLink } from '../Helpers';
 
 const isFixedProject = project =>
   project.finance.billable &&
@@ -26,6 +27,7 @@ const ProjectsList = ({ projects, goTo }) => {
               Budgeted by
             </a>
           </th>
+          <th className="text-center" width='120'>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -43,9 +45,7 @@ const ProjectsList = ({ projects, goTo }) => {
         };
 
         const cells = [
-          <td key='project' className='text-left'><a href="" onClick={goToProject}>
-            {project.name}
-          </a></td>,
+          <th key='project' className='text-left'>{project.name}</th>,
           <td key='status'><span className={`label label-${labelClass}`}>{status}</span></td>,
           <td key='billable'>{project.finance.billable
             ? <span className="fa fa-check text-success"></span>
@@ -57,6 +57,12 @@ const ProjectsList = ({ projects, goTo }) => {
           cells.push(<td key='bill_by'>{project.finance.bill_by}</td>);
           cells.push(<td key='budget_by'>{project.finance.budget_by}</td>);
         }
+        cells.push(
+          <td key='actions' className="btn-toolbar">
+            <a href="" onClick={goToProject} className={`btn btn-${labelClass} btn-sm`}>Import</a>
+            <ExternalLink url={project.links.harvest} className="btn btn-default btn-sm" />
+          </td>
+        );
         return <tr key={project.id}>{cells}</tr>
       })}
       </tbody>

@@ -108,7 +108,10 @@ $app
 
 $app
     ->get('/harvest', function (Request $r) use ($app) {
-        $strategy = new Costlocker\Integrations\Harvest\GetDataFromHarvest($app['import.database']);
+        $strategy = new Costlocker\Integrations\Harvest\GetDataFromHarvest(
+            $app['import.database'],
+            $app['client.user']
+        );
         $data = $strategy($r, $app['client.harvest']);
         return new JsonResponse($data);
     })

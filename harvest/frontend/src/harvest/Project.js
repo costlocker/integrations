@@ -26,6 +26,7 @@ export default function Project({ project, data, detailComponent, steps }) {
         {project.name}
         <span className="label label-primary" title="Client">{project.client.name}</span>
         <span className="label label-warning" title="Dates">{project.dates.date_start} - {project.dates.date_end}</span>
+        <a href={project.links.harvest} target="_blank" className="btn btn-link btn-sm">Go to harvest</a>
       </h1>
       {detail}
       {navigation}
