@@ -54,14 +54,20 @@ $border-radius-small: 0;
     border-radius: 0;
 }
 
-.navbar-brand {
-    padding: 5px;
-    a {
-        text-decoration: none;
-        color: $text-muted;
-    }
-    img {
-        height: 100%;
+.navbar {
+    border-top: 0;
+    border-right: 0;
+    border-left: 0;
+
+    .navbar-brand {
+        padding: 5px;
+        a {
+            text-decoration: none;
+            color: $text-muted;
+        }
+        img {
+            height: 100%;
+        }
     }
 }
 
