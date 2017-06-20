@@ -2,6 +2,7 @@
 
 namespace Costlocker\Integrations\Basecamp\Api;
 
+/** @SuppressWarnings(PHPMD.TooManyPublicMethods) */
 class Connect implements BasecampApi
 {
     const BASECAMP_BCX_TYPE = 'bcx';
@@ -92,7 +93,7 @@ class Connect implements BasecampApi
         return $this->currentApi->completeTodo($bcProjectId, $bcTodoitemId);
     }
 
-    public function createProject($name, $bcCompanyId = NULL, $description = NULL)
+    public function createProject($name, $bcCompanyId = null, $description = null)
     {
         return $this->currentApi->createProject($name, $bcCompanyId, $description);
     }
@@ -117,7 +118,7 @@ class Connect implements BasecampApi
         return $this->currentApi->createTodolist($bcProjectId, $name);
     }
 
-    public function createTodo($bcProjectId, $bcTodolistId, $content, $assignee = NULL)
+    public function createTodo($bcProjectId, $bcTodolistId, $content, $assignee = null)
     {
         return $this->currentApi->createTodo($bcProjectId, $bcTodolistId, $content, $assignee);
     }

@@ -2,6 +2,10 @@
 
 namespace Costlocker\Integrations\Basecamp\Api;
 
+/**
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+ */
 class BasecampClient
 {
     /** HTTP 1.1 response codes */
@@ -30,8 +34,8 @@ class BasecampClient
         S503_SERVICE_UNAVAILABLE = 503,
         S504_GATEWAY_TIMEOUT = 504;
 
-    /** @var FALSE|cURL handle */
-    private $curlSession = FALSE;
+    /** @var false|cURL handle */
+    private $curlSession = false;
 
     /**
      * Default cURL options
@@ -44,24 +48,26 @@ class BasecampClient
      */
     private $curlOptions = array(
         CURLOPT_TIMEOUT => 30,
-        CURLOPT_RETURNTRANSFER => TRUE,
-        //CURLOPT_FOLLOWLOCATION => TRUE,
+        CURLOPT_RETURNTRANSFER => true,
+        //CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_USERAGENT => 'Costlocker (http://integrations.costlocker.com)',
-        CURLOPT_SSL_VERIFYPEER => FALSE,
-        CURLOPT_SSL_VERIFYHOST => FALSE,
-        CURLOPT_HEADER => TRUE,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
+        CURLOPT_HEADER => true,
     );
 
     public function __construct()
     {
         if (!in_array('curl', get_loaded_extensions())) {
-            throw new BasecampClientException('PHP cURL extension not present, rebuild PHP with --with-curl to use cURL.');
+            throw new BasecampClientException(
+                'PHP cURL extension not present, rebuild PHP with --with-curl to use cURL.'
+            );
         }
     }
 
     public function __destruct()
     {
-        if ($this->curlSession !== FALSE) {
+        if ($this->curlSession !== false) {
             curl_close($this->curlSession);
         }
     }
@@ -76,8 +82,8 @@ class BasecampClient
         return $this->initialize($url)
                 ->addHeaders($headers)
                 ->setOption(CURLOPT_CUSTOMREQUEST, 'GET')
-                ->setOption(CURLOPT_POST, FALSE)
-                ->setOption(CURLOPT_POSTFIELDS, NULL)
+                ->setOption(CURLOPT_POST, false)
+                ->setOption(CURLOPT_POSTFIELDS, null)
                 ->execute();
     }
 
@@ -96,7 +102,7 @@ class BasecampClient
         return $this->initialize($url)
                 ->addHeaders($headers)
                 ->setOption(CURLOPT_CUSTOMREQUEST, 'POST')
-                ->setOption(CURLOPT_POST, TRUE)
+                ->setOption(CURLOPT_POST, true)
                 ->setOption(CURLOPT_POSTFIELDS, $params)
                 ->execute();
     }
@@ -116,7 +122,7 @@ class BasecampClient
         return $this->initialize($url)
                 ->addHeaders($headers)
                 ->setOption(CURLOPT_CUSTOMREQUEST, 'PUT')
-                ->setOption(CURLOPT_POST, TRUE)
+                ->setOption(CURLOPT_POST, true)
                 ->setOption(CURLOPT_POSTFIELDS, $params)
                 ->execute();
     }
@@ -131,8 +137,8 @@ class BasecampClient
         return $this->initialize($url)
                 ->addHeaders($headers)
                 ->setOption(CURLOPT_CUSTOMREQUEST, 'DELETE')
-                ->setOption(CURLOPT_POST, FALSE)
-                ->setOption(CURLOPT_POSTFIELDS, NULL)
+                ->setOption(CURLOPT_POST, false)
+                ->setOption(CURLOPT_POSTFIELDS, null)
                 ->execute();
     }
 
@@ -164,7 +170,7 @@ class BasecampClient
      */
     private function initialize($url)
     {
-        if ($this->curlSession === FALSE) {
+        if ($this->curlSession === false) {
             $this->curlSession = curl_init();
         }
 
@@ -192,14 +198,12 @@ class BasecampClient
 
         // Request failed
 
-        if ($response === FALSE) {
-
+        if ($response === false) {
             $curlError = curl_error($this->curlSession) . '(' . curl_errno($this->curlSession) . ')';
             throw new BasecampClientException($curlError);
 
             // Request successful
         } else {
-
             // Split the returned data into header and body
 
             list($result->header, $result->body) = explode("\r\n\r\n", $response, 2);
@@ -215,13 +219,11 @@ class BasecampClient
 
             if ($result->info['http_code'] == self::S200_OK ||
                 $result->info['http_code'] == self::S201_CREATED ||
-                $result->info['http_code'] == self::S204_NO_CONTENT) {
-
+                $result->info['http_code'] == self::S204_NO_CONTENT
+            ) {
                 return $result;
             } else {
-
                 // Error handling
-
                 $errorDetails = '';
                 if (is_numeric(strpos($result->info['content_type'], 'application/json'))) {
                     $moreInfo = Json::decode($result->body);
@@ -233,45 +235,51 @@ class BasecampClient
                 }
 
                 switch ($result->info['http_code']) {
-
-                    case self::S400_BAD_REQUEST :
+                    case self::S400_BAD_REQUEST:
                         // Tato vyjimka muze nastat pokud chybi hlavicka dotazu
                         throw new BasecampGeneralException(sprintf('Bad request or missing headers' . $errorDetails));
                         break;
-                    case self::S401_UNAUTHORIZED :
+                    case self::S401_UNAUTHORIZED:
                         throw new BasecampAuthorizationException('Not authorized' . $errorDetails);
                         break;
-                    case self::S403_FORBIDDEN :
+                    case self::S403_FORBIDDEN:
                         throw new BasecampAccessException('Action not permitted' . $errorDetails);
                         break;
-                    case self::S404_NOT_FOUND :
+                    case self::S404_NOT_FOUND:
                         throw new BasecampAccessException('Resource not available' . $errorDetails);
                         break;
-                    case self::S415_UNSUPPORTED_MEDIA_TYPE :
+                    case self::S415_UNSUPPORTED_MEDIA_TYPE:
                         // Tato vyjimka muze nastat pokud dotaz neobsahuje hlavicku Content-type
-                        throw new BasecampGeneralException('Wrong URL or missing Content-type in headers' . $errorDetails);
+                        throw new BasecampGeneralException(
+                            'Wrong URL or missing Content-type in headers' . $errorDetails
+                        );
                         break;
-                    case self::S422_UNPROCESSABLE_ENTITY :
-                        throw new BasecampAccessException('Request was well-formed but was unable to be followed due to semantic errors' . $errorDetails);
+                    case self::S422_UNPROCESSABLE_ENTITY:
+                        throw new BasecampAccessException(
+                            'Request was well-formed but was unable ' .
+                            'to be followed due to semantic errors' . $errorDetails
+                        );
                         break;
-                    case self::S429_TOO_MANY_REQUESTS :
+                    case self::S429_TOO_MANY_REQUESTS:
                         // Parse response headers for Retry-After value
                         $headers = explode("\n", $result->header);
                         foreach ($headers as $header) {
-                            if (stripos($header, 'Retry-After:') !== FALSE) {
+                            if (stripos($header, 'Retry-After:') !== false) {
                                 $retryAfter = $header;
                             }
                         }
                         throw new BasecampRateLimitException('Too many requests. ' . $retryAfter);
                         break;
-                    case self::S500_INTERNAL_SERVER_ERROR :
-                    case self::S501_NOT_IMPLEMENTED :
-                    case self::S502_BAD_GATEWAY :
-                    case self::S503_SERVICE_UNAVAILABLE :
-                    case self::S504_GATEWAY_TIMEOUT :
-                        throw new BasecampUnavailableException('Basecamp not available. HTTP code: ' . $result->info['http_code']);
+                    case self::S500_INTERNAL_SERVER_ERROR:
+                    case self::S501_NOT_IMPLEMENTED:
+                    case self::S502_BAD_GATEWAY:
+                    case self::S503_SERVICE_UNAVAILABLE:
+                    case self::S504_GATEWAY_TIMEOUT:
+                        throw new BasecampUnavailableException(
+                            'Basecamp not available. HTTP code: ' . $result->info['http_code']
+                        );
                         break;
-                    default :
+                    default:
                         throw new BasecampGeneralException('HTTP code: ' . $result->info['http_code']);
                 }
             }

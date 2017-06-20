@@ -74,7 +74,7 @@ class BasecampWebhookToCostlockerTest extends GivenSynchronizer
                                         'task_id' => 123,
                                     ],
                                 ],
-                            ],  
+                            ],
                         ],
                     ],
                 ]))

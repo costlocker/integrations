@@ -42,7 +42,7 @@ class BcxApi extends ExternalApi
     {
         $this->call('get', "/projects/{$bcProjectId}.json");
 
-        return TRUE;
+        return true;
     }
 
     public function getTodolists($bcProjectId)
@@ -60,8 +60,8 @@ class BcxApi extends ExternalApi
                     'content' => strval($todoitem->content),
                     'creator_id' => intval($todoitem->creator->id),
                     'creator_name' => strval($todoitem->creator->name),
-                    'assignee_id' => (isset($todoitem->assignee->id) ? intval($todoitem->assignee->id) : NULL),
-                    'assignee_name' => (isset($todoitem->assignee->name) ? strval($todoitem->assignee->name) : NULL),
+                    'assignee_id' => (isset($todoitem->assignee->id) ? intval($todoitem->assignee->id) : null),
+                    'assignee_name' => (isset($todoitem->assignee->name) ? strval($todoitem->assignee->name) : null),
                 );
             }
 
@@ -78,21 +78,21 @@ class BcxApi extends ExternalApi
     {
         $this->call('put', "/projects/{$bcProjectId}.json", array('archived' => true));
 
-        return TRUE;
+        return true;
     }
 
     public function completeTodo($bcProjectId, $bcTodoitemId)
     {
         $this->call('put', "/projects/{$bcProjectId}/todos/{$bcTodoitemId}.json", array('completed' => true));
 
-        return TRUE;
+        return true;
     }
 
-    public function createProject($name, $bcCompanyId = NULL, $description = NULL)
+    public function createProject($name, $bcCompanyId = null, $description = null)
     {
         $payloadData = array('name' => strval($name));
 
-        if ($description !== NULL) {
+        if ($description !== null) {
             $payloadData['description'] = strval($description);
         }
 
@@ -125,14 +125,14 @@ class BcxApi extends ExternalApi
         if (!(empty($emails))) {
             $this->call('post', "/projects/{$bcProjectId}/accesses.json", array('email_addresses' => $emails));
         }
-        return TRUE;
+        return true;
     }
 
     public function revokeAccess($bcProjectId, $bcPersonId)
     {
         $this->call('delete', "/projects/{$bcProjectId}/accesses/{$bcPersonId}.json");
 
-        return TRUE;
+        return true;
     }
 
     public function createTodolist($bcProjectId, $name)
@@ -142,7 +142,7 @@ class BcxApi extends ExternalApi
         return $this->getId($response);
     }
 
-    public function createTodo($bcProjectId, $bcTodolistId, $content, $assignee = NULL)
+    public function createTodo($bcProjectId, $bcTodolistId, $content, $assignee = null)
     {
         $payload = array('content' => strval($content));
         if (!is_null($assignee)) {
@@ -161,14 +161,14 @@ class BcxApi extends ExternalApi
     {
         $this->call('delete', "/projects/{$bcProjectId}/todolists/{$bcTodolistId}.json");
 
-        return TRUE;
+        return true;
     }
 
     public function deleteTodo($bcProjectId, $bcTodoitemId)
     {
         $this->call('delete', "/projects/{$bcProjectId}/todos/{$bcTodoitemId}.json");
 
-        return TRUE;
+        return true;
     }
 
     protected function parseIdFromResponse($response)

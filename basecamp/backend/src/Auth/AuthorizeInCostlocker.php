@@ -16,9 +16,15 @@ class AuthorizeInCostlocker
     private $provider;
     private $persistUser;
     private $logger;
+    private $appUrl;
 
-    public function __construct(SessionInterface $s, GenericProvider $p, PersistCostlockerUser $db, LoggerInterface $l, $appUrl)
-    {
+    public function __construct(
+        SessionInterface $s,
+        GenericProvider $p,
+        PersistCostlockerUser $db,
+        LoggerInterface $l,
+        $appUrl
+    ) {
         $this->session = $s;
         $this->provider = $p;
         $this->persistUser = $db;

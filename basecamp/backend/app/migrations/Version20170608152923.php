@@ -5,8 +5,10 @@ namespace Costlocker\Integrations\Database\Migrations;
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 
+/** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
 class Version20170608152923 extends AbstractMigration
 {
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public function up(Schema $schema)
     {
         $this->addSql('CREATE SEQUENCE oauth2_tokens_id_seq INCREMENT BY 1 MINVALUE 1 START 1');

@@ -51,7 +51,7 @@ class ClassicApi extends ExternalApi
     {
         $this->call('get', "/projects/{$bcProjectId}.xml");
 
-        return TRUE;
+        return true;
     }
 
     public function getTodolists($bcProjectId)
@@ -71,8 +71,8 @@ class ClassicApi extends ExternalApi
                         'content' => strval($todoitem['content']),
                         'creator_id' => intval($todoitem['creator-id']),
                         'creator_name' => strval($todoitem['creator-name']),
-                        'assignee_id' => NULL,
-                        'assignee_name' => NULL,
+                        'assignee_id' => null,
+                        'assignee_name' => null,
                 );
             }
 
@@ -92,17 +92,17 @@ class ClassicApi extends ExternalApi
 
         $this->call('put', "/projects/{$bcProjectId}.xml", $archiveProjectXML);
 
-        return TRUE;
+        return true;
     }
 
     public function completeTodo($bcProjectId, $bcTodoitemId)
     {
         $this->call('put', "/todo_items/{$bcTodoitemId}/complete.xml");
 
-        return TRUE;
+        return true;
     }
 
-    public function createProject($name, $bcCompanyId = NULL, $description = NULL)
+    public function createProject($name, $bcCompanyId = null, $description = null)
     {
         $createProjectXML = new \SimpleXMLElement("<request></request>");
         $project = $createProjectXML->addChild('project');
@@ -154,7 +154,7 @@ class ClassicApi extends ExternalApi
         return $this->getId($response);
     }
 
-    public function createTodo($bcProjectId, $bcTodolistId, $content, $assignee = NULL)
+    public function createTodo($bcProjectId, $bcTodolistId, $content, $assignee = null)
     {
         $createTodoXML = new \SimpleXMLElement("<todo-item></todo-item>");
         $createTodoXML->addChild('content', strval($content));
@@ -171,14 +171,14 @@ class ClassicApi extends ExternalApi
     {
         $this->call('delete', "/todo_lists/{$bcTodolistId}.xml");
 
-        return TRUE;
+        return true;
     }
 
     public function deleteTodo($bcProjectId, $bcTodoitemId)
     {
         $this->call('delete', "/todo_items/{$bcTodoitemId}.xml");
 
-        return TRUE;
+        return true;
     }
 
     /**
@@ -187,7 +187,7 @@ class ClassicApi extends ExternalApi
      */
     protected function encodeRequest($request)
     {
-        return $request ? $request->asXML() : NULL;
+        return $request ? $request->asXML() : null;
     }
 
     /**
@@ -197,22 +197,22 @@ class ClassicApi extends ExternalApi
      * @param  string $root Return tree starting at this element
      * @return array        Array of elements
      */
-    protected function decodeResponse($response, $root = NULL)
+    protected function decodeResponse($response, $root = null)
     {
         $xml = $response->body;
         $processedArray = array();
 
         // Parse XML
         // Disable libxml error handling
-        libxml_use_internal_errors(TRUE);
+        libxml_use_internal_errors(true);
         $xmlObject = simplexml_load_string($xml);
-        if ($xmlObject === FALSE) {
+        if ($xmlObject === false) {
             throw new BasecampInvalidXmlException($xml);
         }
 
         // Convert to array
         // Dirty way to quickly convert SimpleXmlObject to an array
-        $xmlArray = json_decode(json_encode($xmlObject), TRUE);
+        $xmlArray = json_decode(json_encode($xmlObject), true);
         unset($xmlArray['@attributes']);
 
         // Pokud XML obsahuje pouze jeden element, obsahuje simpleXMLobject pouze element.

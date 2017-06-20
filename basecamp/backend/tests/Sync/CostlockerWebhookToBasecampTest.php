@@ -157,7 +157,7 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
             [
                 'John Doe (john@example.com)' => 'john@example.com',
             ]
-             // no grantAccess, becasue grantAccess is executed only for item=person
+            // no grantAccess, becasue grantAccess is executed only for item=person
         );
         $this->givenBasecampTodolists([$basecampId => []]);
         $this->shouldNotCreatePeopleOrTodosInBasecamp();

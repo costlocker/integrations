@@ -59,21 +59,21 @@ class Basecamp3Api extends ExternalApi
     {
         $this->call('get', "/projects/{$bcProjectId}.json");
 
-        return TRUE;
+        return true;
     }
 
     public function archiveProject($bcProjectId)
     {
         $this->call('delete', "/projects/{$bcProjectId}.json");
 
-        return TRUE;
+        return true;
     }
 
-    public function createProject($name, $bcCompanyId = NULL, $description = NULL)
+    public function createProject($name, $bcCompanyId = null, $description = null)
     {
         $payloadData = array('name' => strval($name));
 
-        if ($description !== NULL) {
+        if ($description !== null) {
             $payloadData['description'] = strval($description);
         }
 
@@ -119,26 +119,34 @@ class Basecamp3Api extends ExternalApi
             $response = $this->call('put', "/projects/{$bcProjectId}/people/users.json", $accesses);
             return $this->decodeResponse($response);
         }
-        return TRUE;
+        return true;
     }
 
     public function revokeAccess($bcProjectId, $bcPersonId)
     {
         $this->call('put', "/projects/{$bcProjectId}/people/users.json", array('revoke' => array($bcPersonId)));
 
-        return TRUE;
+        return true;
     }
 
     public function getTodolists($bcProjectId)
     {
         $todoset = $this->findTodosetId($bcProjectId);
-        $response = $this->call('get', "/buckets/{$bcProjectId}/todosets/{$todoset}/todolists.json", self::DECODE_RESPONSE);
+        $response = $this->call(
+            'get',
+            "/buckets/{$bcProjectId}/todosets/{$todoset}/todolists.json",
+            self::DECODE_RESPONSE
+        );
         $todolists = array();
 
         foreach ($response as $todolist) {
             $todoitems = array();
             $listId = $todolist->id;
-            $todos = $this->call('get', "/buckets/{$bcProjectId}/todolists/{$listId}/todos.json", self::DECODE_RESPONSE);
+            $todos = $this->call(
+                'get',
+                "/buckets/{$bcProjectId}/todolists/{$listId}/todos.json",
+                self::DECODE_RESPONSE
+            );
 
             foreach ($todos as $todoitem) {
                 $assignee = array_shift($todoitem->assignees);
@@ -146,8 +154,8 @@ class Basecamp3Api extends ExternalApi
                     'content' => strval($todoitem->content),
                     'creator_id' => intval($todoitem->creator->id),
                     'creator_name' => strval($todoitem->creator->name),
-                    'assignee_id' => $assignee ? intval($assignee->id) : NULL,
-                    'assignee_name' => $assignee ? strval($assignee->name) : NULL,
+                    'assignee_id' => $assignee ? intval($assignee->id) : null,
+                    'assignee_name' => $assignee ? strval($assignee->name) : null,
                     'assignee' => $assignee ? $this->assigneeToPerson($assignee) : null,
                 );
             }
@@ -174,7 +182,11 @@ class Basecamp3Api extends ExternalApi
     public function createTodolist($bcProjectId, $name)
     {
         $todoset = $this->findTodosetId($bcProjectId);
-        $response = $this->call('post', "/buckets/{$bcProjectId}/todosets/{$todoset}/todolists.json", array('name' => strval($name)));
+        $response = $this->call(
+            'post',
+            "/buckets/{$bcProjectId}/todosets/{$todoset}/todolists.json",
+            array('name' => strval($name))
+        );
 
         return $this->getId($response);
     }
@@ -199,10 +211,10 @@ class Basecamp3Api extends ExternalApi
     {
         $this->call('delete', "/buckets/{$bcProjectId}/todolists/{$bcTodolistId}.json");
 
-        return TRUE;
+        return true;
     }
 
-    public function createTodo($bcProjectId, $bcTodolistId, $content, $assignee = NULL)
+    public function createTodo($bcProjectId, $bcTodolistId, $content, $assignee = null)
     {
         $payload = array('content' => strval($content));
         if (!is_null($assignee)) {
@@ -220,14 +232,14 @@ class Basecamp3Api extends ExternalApi
     {
         $this->call('post', "/buckets/{$bcProjectId}/todos/{$bcTodoitemId}/completion.json");
 
-        return TRUE;
+        return true;
     }
 
     public function deleteTodo($bcProjectId, $bcTodoitemId)
     {
         $this->call('delete', "/buckets/{$bcProjectId}/todos/{$bcTodoitemId}.json");
 
-        return TRUE;
+        return true;
     }
 
     protected function parseIdFromResponse($response)

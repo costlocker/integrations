@@ -39,7 +39,7 @@ class ProcessApiWebhook
         $allowedWebhooks = [
             'todo_archived', 'todo_assignment_changed', 'todo_content_changed', 'todo_created',
             'todo_trashed', 'todo_unarchived', 'todo_untrashed',
-            'todolist_archived', 'todolist_created', 'todolist_name_changed', 
+            'todolist_archived', 'todolist_created', 'todolist_name_changed',
             'todolist_trashed', 'todolist_unarchived', 'todolist_untrashed',
         ];
 

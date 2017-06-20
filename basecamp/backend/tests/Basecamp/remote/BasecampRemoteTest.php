@@ -25,10 +25,11 @@ class BasecampRemoteTest extends \PHPUnit_Framework_TestCase
 
         if (!$accessToken || !$accountUrl || !$basecampVersion) {
             $this->writelnOnlyOnce(
-                'Missing authorization (env variables in phpunit.xml)', [
-                'accessToken' => $accessToken,
-                'accountUrl' => $accountUrl,
-                'accountVersion' => $basecampVersion,
+                'Missing authorization (env variables in phpunit.xml)',
+                [
+                    'accessToken' => $accessToken,
+                    'accountUrl' => $accountUrl,
+                    'accountVersion' => $basecampVersion,
                 ]
             );
             $this->markTestSkipped();
@@ -70,7 +71,8 @@ class BasecampRemoteTest extends \PHPUnit_Framework_TestCase
         $this->writeln('Created todolist', $bcTodolistId);
 
         $bcPersonId = getenv('existingPersonInBasecamp');
-        $grantedPeople = $this->connect->grantAccess($bcProjectId, ['John Doe' => getenv('newPersonEmail'), $bcPersonId]);
+        $grantedPeople =
+            $this->connect->grantAccess($bcProjectId, ['John Doe' => getenv('newPersonEmail'), $bcPersonId]);
         $this->writeln('Granted people', $grantedPeople);
 
         $bcTodoitemId = $this->connect->createTodo($bcProjectId, $bcTodolistId, "{$testName} (complete)", $bcPersonId);
@@ -106,5 +108,4 @@ class BasecampRemoteTest extends \PHPUnit_Framework_TestCase
             json_encode($data, JSON_PRETTY_PRINT)
         ]);
     }
-
 }

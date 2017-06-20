@@ -125,7 +125,7 @@ class Basecamp
 
     public function isTodoMapped($activityId, $bcTodoId)
     {
-        return 
+        return
             $this->findByBasecampId($this->getMappedTasks($activityId, 'tasks'), $bcTodoId) ||
             $this->findByBasecampId($this->getMappedTasks($activityId, 'persons'), $bcTodoId);
     }
@@ -197,8 +197,7 @@ class Basecamp
         $bcTodoId = $this->bcProject['activities'][$activityId][$type][$personOrTaskId]['id'];
 
         $this->getTodolists();
-        if (
-            isset($this->todolists[$bcTodolistId]) &&
+        if (isset($this->todolists[$bcTodolistId]) &&
             array_key_exists($bcTodoId, $this->todolists[$bcTodolistId]->todoitems)
         ) {
             $this->client->deleteTodo($this->bcProject['id'], $bcTodoId);
@@ -208,7 +207,7 @@ class Basecamp
 
     public function grantAccess($peopleEmails)
     {
-        $this->client->grantAccess($this->bcProject['id'], $peopleEmails);;
+        $this->client->grantAccess($this->bcProject['id'], $peopleEmails);
     }
 
     public function revokeAccessToPerson(\stdClass $bcPerson)

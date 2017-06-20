@@ -9,7 +9,7 @@ abstract class ExternalApi implements BasecampApi
     public function __construct(BasecampClient $client, $baseUrl, $accessToken)
     {
         $headers = $this->getHeaders($accessToken);
-        $this->callApi = function ($method, $path, $params = NULL) use ($client, $baseUrl, $headers) {
+        $this->callApi = function ($method, $path, $params = null) use ($client, $baseUrl, $headers) {
             $url = $baseUrl . $path;
             if (in_array($method, ['get', 'delete'])) {
                 $response = $client->{$method}($url, $headers);
@@ -23,7 +23,7 @@ abstract class ExternalApi implements BasecampApi
     /**
      * @return \stdClass
      */
-    protected function call($method, $endpoint, $params = NULL)
+    protected function call($method, $endpoint, $params = null)
     {
         return $this->callApi->__invoke($method, $endpoint, $params);
     }

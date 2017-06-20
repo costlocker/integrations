@@ -194,7 +194,7 @@ class BasecampProjectToCostlockerTest extends GivenSynchronizer
                                         'task_id' => 456,
                                     ],
                                 ],
-                            ],  
+                            ],
                         ],
                     ],
                 ]))
@@ -348,7 +348,7 @@ class BasecampProjectToCostlockerTest extends GivenSynchronizer
                                         'task_id' => 456,
                                     ],
                                 ],
-                            ],  
+                            ],
                         ],
                     ],
                 ]))
@@ -462,7 +462,7 @@ class BasecampProjectToCostlockerTest extends GivenSynchronizer
                                         'person_id' => 885,
                                     ],
                                 ],
-                            ],  
+                            ],
                         ],
                     ],
                 ]))
@@ -533,7 +533,7 @@ class BasecampProjectToCostlockerTest extends GivenSynchronizer
                                         'activity_id' => 1,
                                     ],
                                 ],
-                            ],  
+                            ],
                         ],
                     ],
                 ]))

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+phpqa=`which phpqa`
+if [ "$phpqa" = "" ]
+then
+    echo "phpqa must be installed globally"
+    echo "> https://github.com/EdgedesignCZ/phpqa#without-composer"
+    exit 1
+fi
+
+phpqa --report --tools phpcs:0,phpmd:16,phpcpd:5,phpmetrics,phploc,pdepend \
+    --buildDir var/QA \
+    --analyzedDirs ./ \
+    --ignoredDirs var,vendor \
+    --ignoredFiles src/Basecamp/Api/Exceptions.php
+

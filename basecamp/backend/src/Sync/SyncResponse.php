@@ -29,7 +29,10 @@ class SyncResponse
     public function getResultStatus()
     {
         $hasError = $this->costlockerChangelog->error || $this->basecampChangelog->error;
-        $hasSucceed = $this->costlockerChangelog->wasSomethingChanged() || $this->basecampChangelog->wasSomethingChanged();
+        $hasSucceed =
+            $this->costlockerChangelog->wasSomethingChanged() ||
+            $this->basecampChangelog->wasSomethingChanged();
+
         if ($hasSucceed && $hasError) {
             return Event::RESULT_PARTIAL_SUCCESS;
         } elseif ($hasError) {

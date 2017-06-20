@@ -94,8 +94,7 @@ class Synchronizer
         $activities = [];
         foreach ($request->projectItems as $item) {
             $action = $item['action'] ?? 'upsert';
-            if (
-                ($item['item']['type'] == 'activity' || isset($item['activity']['name'])) &&
+            if (($item['item']['type'] == 'activity' || isset($item['activity']['name'])) &&
                 !array_key_exists($item['item']['activity_id'], $activities)
             ) {
                 $activities[$item['item']['activity_id']] = [
@@ -204,7 +203,10 @@ class Synchronizer
     }
 
     private function deleteLegacyEntitiesInBasecamp(
-        array $peopleFromCostlocker, array $activities, SyncRequest $request, SyncChangelog $changelog
+        array $peopleFromCostlocker,
+        array $activities,
+        SyncRequest $request,
+        SyncChangelog $changelog
     ) {
         if ($this->basecamp->isCreated() || $request->settings->isDeleteDisabledInCostlocker()) {
             return;
@@ -213,7 +215,7 @@ class Synchronizer
         if ($request->settings->isDeletingTodosEnabled) {
             foreach ($activities as $activityId => $activity) {
                 foreach (['tasks', 'persons'] as $type) {
-                    foreach ($activity['delete'][$type] as $id => $task) {
+                    foreach (array_keys($activity['delete'][$type]) as $id) {
                         $this->basecamp->deleteTodo($activityId, $type, $id);
                         $changelog->deleteTask($activityId, $type, $id);
                     }

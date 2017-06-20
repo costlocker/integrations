@@ -151,7 +151,11 @@ $app
         $strategy = new Costlocker\Integrations\Auth\AuthorizeInBasecamp(
             $app['session'],
             $app['oauth.basecamp'],
-            new Costlocker\Integrations\Database\PersistBasecampUser($app['orm.em'], $app['client.user'], $allowedProducts),
+            new Costlocker\Integrations\Database\PersistBasecampUser(
+                $app['orm.em'],
+                $app['client.user'],
+                $allowedProducts
+            ),
             $app['logger'],
             getenv('APP_FRONTED_URL')
         );

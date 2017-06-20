@@ -3,13 +3,6 @@
 namespace Costlocker\Integrations\Basecamp\Api;
 
 /**
- * Json Exception
- */
-class JsonException extends \Exception
-{
-}
-
-/**
  * Json encode / decode wrapper
  * Based on Nette and http://phpfashion.com/how-to-encode-and-decode-json-in-php
  */
@@ -23,6 +16,7 @@ class Json
         JSON_ERROR_SYNTAX => 'Syntax error, malformed JSON',
     );
 
+    /** @SuppressWarnings(PHPMD.UnusedLocalVariable) */
     public static function encode($value)
     {
         // needed to receive 'Invalid UTF-8 sequence' error; PHP bugs #52397, #54109, #63004
@@ -31,7 +25,7 @@ class Json
         }
 
         // needed to receive 'recursion detected' error
-        set_error_handler(function($severity, $message) {
+        set_error_handler(function ($severity, $message) {
             restore_error_handler();
             throw new JsonException($message);
         });
@@ -50,15 +44,18 @@ class Json
         return $json;
     }
 
-    public static function decode($json, $assoc = FALSE)
+    public static function decode($json, $assoc = false)
     {
         $json = (string) $json;
 
         $value = json_decode($json, $assoc);
 
-        if ($value === NULL && $json !== '' && strcasecmp($json, 'null')) { // '' do not clean json_last_error
+        if ($value === null && $json !== '' && strcasecmp($json, 'null')) { // '' do not clean json_last_error
             $error = PHP_VERSION_ID >= 50300 ? json_last_error() : 0;
-            throw new JsonException(isset(static::$messages[$error]) ? static::$messages[$error] : 'Unknown error', $error);
+            throw new JsonException(
+                isset(static::$messages[$error]) ? static::$messages[$error] : 'Unknown error',
+                $error
+            );
         }
 
         return $value;

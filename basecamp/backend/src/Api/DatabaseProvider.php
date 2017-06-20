@@ -14,6 +14,7 @@ use Doctrine\DBAL\Migrations\Tools\Console\Helper\ConfigurationHelper;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use Dflydev\Provider\DoctrineOrm\DoctrineOrmServiceProvider;
 
+/** @SuppressWarnings(PHPMD.CouplingBetweenObjects) */
 class DatabaseProvider implements ServiceProviderInterface
 {
     private $projectDir;

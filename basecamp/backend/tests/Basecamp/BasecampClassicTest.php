@@ -2,6 +2,7 @@
 
 namespace Costlocker\Integrations\Basecamp\Api;
 
+/** @SuppressWarnings(PHPMD.TooManyPublicMethods) */
 class BasecampClassicTest extends \Tests\Basecamp\GivenBasecampConnect
 {
     protected function getApiType()

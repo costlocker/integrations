@@ -69,11 +69,11 @@ interface BasecampApi
      * Creates new project and returns its ID
      *
      * @param  string       $name        Name for the project
-     * @param  NULL|integer $bcCompanyId Company (client) ID
+     * @param  null|integer $bcCompanyId Company (client) ID
      * @param  string $description       New Basecamp only
      * @return integer                   Project ID
      */
-    public function createProject($name, $bcCompanyId = NULL, $description = NULL);
+    public function createProject($name, $bcCompanyId = null, $description = null);
 
     /**
      *
@@ -134,8 +134,8 @@ interface BasecampApi
      *             [content] => <todoitem_content>
      *             [creator_id] => <creator_id>
      *             [creator_name] => <creator_name>
-     *             [assignee_id] => <assignee_id> | NULL
-     *             [assignee_name] => <assignee_name> | NULL
+     *             [assignee_id] => <assignee_id> | null
+     *             [assignee_name] => <assignee_name> | null
      *           )
      *         ...
      *       )
@@ -175,10 +175,10 @@ interface BasecampApi
      * @param  integer      $bcProjectId  Project ID
      * @param  integer      $bcTodolistId ID of parent Basecamp todo list
      * @param  string       $content      Content of the todo item
-     * @param  NULL|integer $assignee     ID of a person assigned
+     * @param  null|integer $assignee     ID of a person assigned
      * @return integer                    Todo item ID
      */
-    public function createTodo($bcProjectId, $bcTodolistId, $content, $assignee = NULL);
+    public function createTodo($bcProjectId, $bcTodolistId, $content, $assignee = null);
 
     /**
      *

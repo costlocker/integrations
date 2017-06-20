@@ -2,6 +2,7 @@
 
 namespace Costlocker\Integrations\Basecamp\Api;
 
+/** @SuppressWarnings(PHPMD.TooManyPublicMethods) */
 class Basecamp3Test extends \Tests\Basecamp\GivenBasecampConnect
 {
     private $todoset;
@@ -209,7 +210,9 @@ class Basecamp3Test extends \Tests\Basecamp\GivenBasecampConnect
         $this->whenEntityIsUpdated('grant');
         $this->api->grantAccess($this->project, ['name' => 'mail', $personId]);
         $this->assertCalledUrl("/projects/{$this->project}/people/users.json");
-        $this->assertRequestContains('{"grant":[' . $personId . '],"revoke":[],"create":[{"name":"name","email_address":"mail"}]}');
+        $this->assertRequestContains(
+            '{"grant":[' . $personId . '],"revoke":[],"create":[{"name":"name","email_address":"mail"}]}'
+        );
     }
 
     public function testRevokeAccess()
