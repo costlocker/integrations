@@ -44,7 +44,7 @@ const CostlockerCosts = ({ peopleCosts }) => {
   )
 };
 
-const PeopleCosts = ({ peopleCosts, project }) => {
+const PeopleCosts = ({ peopleCosts, project, fixedBudget }) => {
   return (
     <div>
       <h2>Harvest Project</h2>
@@ -58,6 +58,12 @@ const PeopleCosts = ({ peopleCosts, project }) => {
             <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods/#setting-up-a-budget" target="_blank">Budget by</a>
             <em> (estimated hours)</em>: <strong>{project.finance.budget_by}</strong>
           </li>
+          {fixedBudget &&
+          <li>
+            <a href="https://www.getharvest.com/blog/2017/05/introducing-fixed-fee-projects/" target="_blank">Fixed fee</a>
+            : <strong>{fixedBudget}</strong>
+          </li>
+          }
         </ul>
       </div>
       <h2>Tasks, Team &rarr; Activities, People</h2>
