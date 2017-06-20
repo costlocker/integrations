@@ -76,12 +76,6 @@ class GetProjects
                             'from' => $formatDate($project['project']['hint_earliest_record_at']),
                             'to' => $formatDate($latestRecordPlusOneMonth),
                         ]),
-                        'billing' => "/harvest?" . http_build_query([
-                            'billing' => $project['project']['id'],
-                            'client' => $project['project']['client_id'],
-                            'from' => $formatDate($project['project']['hint_earliest_record_at']),
-                            'to' => $formatDate($latestRecordPlusOneMonth),
-                        ]),
                         'harvest' => "{$this->getUser->getHarvestUrl()}/projects/{$project['project']['id']}",
                     ],
                 ];

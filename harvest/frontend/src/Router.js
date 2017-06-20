@@ -5,7 +5,6 @@ import Projects from './harvest/Projects';
 import Project from './harvest/Project';
 import { PeopleCosts } from './harvest/PeopleCosts';
 import Expenses from './harvest/Expenses';
-import { Billing } from './harvest/Billing';
 import Summary from './harvest/Summary';
 import Results from './harvest/Results';
 import WizardLayout from './wizard/WizardLayout';
@@ -18,7 +17,6 @@ const steps = new Steps([
   'Projects',
   'People costs',
   'Expenses',
-  'Billing',
   'Summary',
   'Results',
 ]);
@@ -104,7 +102,7 @@ export const states = [
               .set('fixedBudget', fixedBudget)
               .set('peoplecosts', null)
               .set('expenses', null)
-              .set('billing', null)));
+        ))
         steps.goToNextStep();
       };
       return <Projects projects={appState.cursor(['harvest', 'projects']).deref()} goToProject={goTo} />;
@@ -125,11 +123,10 @@ export const states = [
     fixedBudget={appState.cursor(['harvest', 'fixedBudget']).deref()}
   />),
   buildHarvestProjectStep(4, 'expenses', data => <Expenses expenses={data} />),
-  buildHarvestProjectStep(5, 'billing', data => <Billing billing={data} />),
-  buildHarvestProjectStep(6, null, data => <Summary project={data} goToNextStep={steps.goToNextStep} />),
+  buildHarvestProjectStep(5, null, data => <Summary project={data} goToNextStep={steps.goToNextStep} />),
   {
-    name: 'wizard.7',
-    url: '/7',
+    name: 'wizard.6',
+    url: '/6',
     component: () => {
       return <Results importResult={appState.cursor(['importResult']).deref()} />;
     },

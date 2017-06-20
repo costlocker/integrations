@@ -60,7 +60,7 @@ class HarvestToCostlocker
             'items' => array_merge(
                 $this->transformPeopleCosts($harvestId, $harvestProject['peoplecosts']['tasks']),
                 $this->transformExpenses($harvestId, $harvestProject['expenses']),
-                $this->transformBilling($harvestId, $harvestProject['billing']['stats'])
+                $this->transformBilling($harvestId, ['draft' => 0, 'sent' => 0])
             ),
             'harvest' => $harvestId,
         ];

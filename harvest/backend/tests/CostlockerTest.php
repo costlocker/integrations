@@ -115,6 +115,7 @@ class CostlockerTest extends GivenApi
         $this->app['session']->set('harvest', [
             'account' => [
                 'company_subdomain' => 'database',
+                'company_url' => 'irrelevant url',
             ],
         ]);
         $this->app['session']->set('costlocker', [

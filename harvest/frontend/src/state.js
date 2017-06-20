@@ -11,7 +11,6 @@ const appState = immstruct({
     fixedBudget: null,
     peoplecosts: null,
     expenses: null,
-    billing: null,
   },
   importResult: null,
 });
