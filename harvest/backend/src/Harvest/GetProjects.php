@@ -56,6 +56,7 @@ class GetProjects
                         'date_end' => current(array_filter($dateEnd)),
                     ],
                     'finance' => [
+                        'billable' => $project['project']['billable'],
                         'bill_by' => $project['project']['bill_by'],
                         'budget' => $project['project']['budget'],
                         'budget_by' => $project['project']['budget_by'],

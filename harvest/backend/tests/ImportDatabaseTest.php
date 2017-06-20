@@ -18,8 +18,7 @@ class ImportDatabaseTest extends \PHPUnit_Framework_TestCase
         );
         $projects = [['id' => 123]];
         assertThat($database->separateProjectsByStatus($projects), is([
-            'new' => $projects,
-            'imported' => [],
+            ['id' => 123, 'status' => 'new'],
         ]));
         assertThat($database->getProjectId(123), is(emptyArray()));
         assertThat($database->getBilling(123, 'sent'), is(emptyArray()));

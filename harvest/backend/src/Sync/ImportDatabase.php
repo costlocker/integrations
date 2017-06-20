@@ -112,10 +112,12 @@ class ImportDatabase
     {
         $this->loadDatabase();
         $mappedProjects = array_keys($this->getCurrentProjects());
-        $result = ['new' => [], 'imported' => []];
+        $result = [];
         foreach ($projects as $project) {
             $status = in_array($project['id'], $mappedProjects) ? 'imported' : 'new';
-            $result[$status][] = $project;
+            $result[] = $project + [
+                'status' => $status
+            ];
         }
         return $result;
     }

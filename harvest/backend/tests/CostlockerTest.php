@@ -56,8 +56,8 @@ class CostlockerTest extends GivenApi
         $this->importProject();
         $projects = [['id' => $this->costlockerId], ['id' => $this->harvestId]];
         assertThat($this->database->separateProjectsByStatus($projects), is([
-            'new' => [reset($projects)],
-            'imported' => [end($projects)],
+            reset($projects) + ['status' => 'new'],
+            end($projects) + ['status' => 'imported'],
         ]));
     }
 
