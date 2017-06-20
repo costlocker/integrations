@@ -55,6 +55,7 @@ class AuthorizeInCostlocker
                 list($costlockerId, $basecampId) = $this->persistUser->__invoke($costlockerUser, $accessToken);
                 $this->session->set('costlocker', ['userId' => $costlockerId]);
                 $this->session->set('basecamp', ['userId' => $basecampId]);
+                $this->session->set('csrfToken', sha1($r->query->get('state')));
                 return new RedirectResponse($this->appUrl);
             } catch (IdentityProviderException $e) {
                 return $this->sendError($e->getMessage());
@@ -69,6 +70,7 @@ class AuthorizeInCostlocker
     {
         $this->session->remove('costlocker');
         $this->session->remove('costlockerLogin');
+        $this->session->remove('csrfToken');
         return new RedirectResponse("{$this->appUrl}?loginError={$errorMessage}");
     }
 }

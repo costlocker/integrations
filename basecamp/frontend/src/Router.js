@@ -26,6 +26,7 @@ const fetchUser = () =>
           .setIn(['auth', 'costlocker'], user.costlocker)
           .setIn(['auth', 'basecamp'], user.basecamp)
           .setIn(['auth', 'settings'], user.settings)
+          .setIn(['csrfToken'], user.csrfToken)
           .setIn(['sync', 'account'], user.settings.myAccount)
           .setIn(['companySettings'], Map(user.settings.sync))
       );

@@ -24,6 +24,14 @@ class CheckAuthorization
         }
     }
 
+    public function checkCsrfToken($csrfToken)
+    {
+        $sessionToken = $this->session->get('csrfToken');
+        if (!$sessionToken || $csrfToken != $sessionToken) {
+            return ResponseHelper::error("Invalid CSRF token", 403);
+        }
+    }
+
     public function verifyTokens()
     {
         $this->verifyToken('costlocker', $this->costlockerClient, '__invoke', '/me');

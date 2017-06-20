@@ -30,6 +30,7 @@ class GetUser
         return new JsonResponse([
             'costlocker' => $clUser->data,
             'basecamp' => $bcUser->data,
+            'csrfToken' => $this->session->get('csrfToken'),
             'settings' => [
                 'sync' => $clUser->costlockerCompany ? $clUser->costlockerCompany->getSettings() : null,
                 'myAccount' => $bcUser->id,

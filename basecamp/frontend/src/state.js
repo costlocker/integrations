@@ -18,6 +18,7 @@ const appState = immstruct({
   },
   currentState: '', // helper for active menu items
   error: null,
+  csrfToken: null,
   events: null,
   companySettings: {
     isCreatingBasecampProjectEnabled: false,
@@ -41,4 +42,6 @@ const isNotLoggedInCostlocker = () =>
 const isNotLoggedInBasecamp = () =>
   appState.cursor(['auth', 'basecamp']).deref() === null;
 
-export { appState, isNotLoggedInCostlocker, isNotLoggedInBasecamp };
+const getCsrfToken = () => appState.cursor(['csrfToken']).deref();
+
+export { appState, isNotLoggedInCostlocker, isNotLoggedInBasecamp, getCsrfToken };

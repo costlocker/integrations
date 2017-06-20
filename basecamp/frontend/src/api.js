@@ -1,5 +1,6 @@
 
 import { apiUrl } from './config';
+import { getCsrfToken } from './state';
 
 const loginUrls = {
   costlocker: `${apiUrl}/oauth/costlocker`,
@@ -28,6 +29,7 @@ const pushToApi = (path: string, data: Object) =>
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': getCsrfToken(),
       },
       credentials: 'include',
       body: JSON.stringify(data),

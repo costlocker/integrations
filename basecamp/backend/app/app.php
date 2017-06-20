@@ -95,6 +95,12 @@ $checkAuthorization = function ($service) use ($app) {
     };
 };
 
+$checkCsrf = function () {
+    return function (Request $r, $app) {
+        return $app['client.check']->checkCsrfToken($r->headers->get('X-CSRF-TOKEN'));
+    };
+};
+
 $getWebhookUrl = function (Request $r) {
     return getenv('BASECAMP_WEBHOOK_URL') ?: $r->getUriForPath('/webhooks/handler');
 };
@@ -178,7 +184,8 @@ $app
         $uc($r->request->all());
         return new JsonResponse();
     })
-    ->before($checkAuthorization('costlocker'));
+    ->before($checkAuthorization('costlocker'))
+    ->before($checkCsrf());
 
 $app
     ->post('/disconnect', function (Request $r) use ($app) {
@@ -200,7 +207,8 @@ $app
         }
         return new JsonResponse([], $wasDisconnected ? 200 : 400);
     })
-    ->before($checkAuthorization('basecamp'));
+    ->before($checkAuthorization('basecamp'))
+    ->before($checkCsrf());
 
 $app
     ->get('/basecamp', function (Request $r) use ($app) {
@@ -220,7 +228,8 @@ $app
         $data = $r->request->all();
         return $pushEvent(\Costlocker\Integrations\Entities\Event::MANUAL_SYNC, $data, $r);
     })
-    ->before($checkAuthorization('basecamp'));
+    ->before($checkAuthorization('basecamp'))
+    ->before($checkCsrf());
 
 $app
     ->post('/webhooks/handler', function (Request $r) use ($pushEvent) {
