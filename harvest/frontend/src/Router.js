@@ -29,7 +29,8 @@ const loadHarvestData = (type) => ([
     resolveFn: () => {
       if (!appState.cursor(['harvest', type]).deref()) {
         const url = appState.cursor(['harvest', 'selectedProject']).deref().links[type];
-        fetchFromApi(url).then(data => appState.cursor(['harvest']).set(type, data));
+        const params = `fixedBudget=${appState.cursor(['harvest', 'fixedBudget']).deref()}`;
+        fetchFromApi(`${url}&${params}`).then(data => appState.cursor(['harvest']).set(type, data));
       }
     }
   }
@@ -94,12 +95,13 @@ export const states = [
     name: 'wizard.2',
     url: '/2',
     component: () => {
-      const goTo = (project) => {
+      const goTo = (project, fixedBudget) => {
         appState.cursor().update(
           state => state
             .setIn(['importResult'], null)
             .updateIn(['harvest'], harvest => harvest
               .set('selectedProject', project)
+              .set('fixedBudget', fixedBudget)
               .set('peoplecosts', null)
               .set('expenses', null)
               .set('billing', null)));

@@ -30,23 +30,32 @@ const ProjectsList = ({ projects, goTo }) => {
       </thead>
       <tbody>
       {projects.map(project => {
-        const isNewProject = project.status == 'new';
+        const isNewProject = project.status === 'new';
         const status = isNewProject ? 'new' : 'imported';
         const labelClass = isNewProject ? 'primary' : 'success';
+        const isFixed = isFixedProject(project);
+        const goToProject = (e) => {
+          let fixedBudget = null;
+          if (isFixed) {
+            fixedBudget = parseInt(prompt("Please insert fixed fee"), 0);
+          }
+          return goTo(e, project, fixedBudget);
+        };
+
         const cells = [
-          <td className='text-left'><a href="" onClick={(e) => goTo(e, project)}>
+          <td key='project' className='text-left'><a href="" onClick={goToProject}>
             {project.name}
           </a></td>,
-          <td><span className={`label label-${labelClass}`}>{status}</span></td>,
-          <td>{project.finance.billable
+          <td key='status'><span className={`label label-${labelClass}`}>{status}</span></td>,
+          <td key='billable'>{project.finance.billable
             ? <span className="fa fa-check text-success"></span>
             : <span className="fa fa-close text-danger"></span>}</td>,
         ];
-        if (isFixedProject(project)) {
-          cells.push(<td colSpan='2'>Fixed fee project</td>);
+        if (isFixed) {
+          cells.push(<td key='fixed' colSpan='2'>Fixed fee project</td>);
         } else {
-          cells.push(<td>{project.finance.bill_by}</td>);
-          cells.push(<td>{project.finance.budget_by}</td>);
+          cells.push(<td key='bill_by'>{project.finance.bill_by}</td>);
+          cells.push(<td key='budget_by'>{project.finance.budget_by}</td>);
         }
         return <tr key={project.id}>{cells}</tr>
       })}
@@ -56,9 +65,9 @@ const ProjectsList = ({ projects, goTo }) => {
 };
 
 export default function Projects({ projects, goToProject }) {
-  const goTo = (e, project) => {
+  const goTo = (e, project, fixedBudget) => {
     e.preventDefault();
-    goToProject(project);
+    goToProject(project, fixedBudget);
   };
 
   if (!projects) {
