@@ -39,6 +39,7 @@ $border-radius-small: 0;
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/labels";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/badges";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/alerts";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/panels";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/progress-bars";
 
 // Utility classes
@@ -83,5 +84,15 @@ $border-radius-small: 0;
     thead {
         opacity: 0.5;
         font-size: 0.8em;
+    }
+}
+
+.error-page {
+    margin: 2em 0;
+    pre {
+        display: block;
+        font-family: monospace;
+        white-space: pre-wrap;
+        word-wrap: break-word;
     }
 }

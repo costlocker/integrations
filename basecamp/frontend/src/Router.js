@@ -15,6 +15,7 @@ import { SyncSettings } from './app/SyncSettings';
 export let redirectToRoute = (route) => console.log('app is not ready', route);
 export let isRouteActive = () => false;
 const syncSettings = new SyncSettings(appState);
+const setError = e => appState.cursor().set('error', e);
 
 const fetchUser = () =>
   fetchFromApi('/user')
@@ -37,6 +38,7 @@ if (isNotLoggedInCostlocker()) {
 
 const fetchProjects = () =>
    fetchFromApi('/costlocker')
+    .catch(setError)
     .then(projects => {
       appState.cursor(['costlocker']).set('projects', projects);
       return projects;
@@ -55,13 +57,15 @@ const loadCostlockerProjects = (callback) => [
 
 const loadEvents = (clProject) =>
   fetchFromApi(clProject ? `/events?project=${clProject}` : '/events')
-  .then(events => appState.cursor().set('events', events));
+    .catch(setError)
+    .then(events => appState.cursor().set('events', events));
 
 appState.on('next-animation-frame', function (newStructure, oldStructure, keyPath) {
   const oldId = oldStructure.getIn(['sync', 'account']);
   const accountId = newStructure.getIn(['sync', 'account']);
   if (oldId !== accountId && accountId) {
     fetchFromApi(`/basecamp?account=${accountId}`)
+      .catch(setError)
       .then(data => appState.cursor(['basecamp']).update(
         bc => bc.set('projects', data.projects).set('companies', data.companies)
       ));
@@ -233,6 +237,7 @@ const hooks = [
 
 export const config = (router) => {
   router.urlRouter.otherwise(() => '/');
+  router.stateService.defaultErrorHandler(setError);
   redirectToRoute = (route, params, e) => {
     if (e) {
       e.preventDefault();

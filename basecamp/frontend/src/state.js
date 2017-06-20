@@ -17,6 +17,7 @@ const appState = immstruct({
     companies: [],
   },
   currentState: '', // helper for active menu items
+  error: null,
   events: null,
   companySettings: {
     isCreatingBasecampProjectEnabled: false,
