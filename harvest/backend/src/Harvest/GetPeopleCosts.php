@@ -9,11 +9,17 @@ class GetPeopleCosts
 {
     private $project;
     private $analysis;
+    private $activeTasks;
 
     public function __invoke(Request $r, HarvestClient $apiClient)
     {
         $this->project = $apiClient("/projects/{$r->query->get('peoplecosts')}")['project'];
         $this->analysis = $apiClient("/projects/{$r->query->get('peoplecosts')}/analysis?period=lifespan");
+        $this->activeTasks = [
+            'total' => 0,
+            'people' => [],
+            'tasks' => [],
+        ];
 
         $taskPersons = [];
         foreach ($this->analysis['tasks'] as $i => $task) {
@@ -21,6 +27,14 @@ class GetPeopleCosts
                 "/projects/{$r->query->get('peoplecosts')}/team_analysis?task_id={$task['task_id']}&period=lifespan"
             );
             $taskPersons[$task['task_id']] = $this->removePeopleWithNoTrackedTime($allPeople);
+            $this->activeTasks['total'] += count($taskPersons[$task['task_id']]);
+            $this->activeTasks['tasks'][$task['task_id']] = count($taskPersons[$task['task_id']]);
+            foreach ($taskPersons[$task['task_id']] as $person) {
+                if (!isset($this->activeTasks['people'][$person['user_id']])) {
+                    $this->activeTasks['people'][$person['user_id']] = 0;
+                }
+                $this->activeTasks['people'][$person['user_id']]++;
+            }
             if (!$taskPersons[$task['task_id']]) {
                 unset($this->analysis['tasks'][$i]);
             }
@@ -63,14 +77,14 @@ class GetPeopleCosts
                             'tracked' => $task['total_hours'],
                         ],
                         'people' => array_map(
-                            function (array $person) use ($task, $users) {
+                            function (array $person) use ($users, $task) {
                                 return [
                                     'id' => $person['user_id'],
                                     'finance' => [
                                         'billed_rate' => $person['billed_rate'],
                                     ],
                                     'hours' => [
-                                        'budget' => $person['total_hours'],
+                                        'budget' => $this->calculatePersonEstimate($person, $task),
                                         'tracked' => $person['total_hours'],
                                     ],
                                     'person' => $users[$person['user_id']],
@@ -123,6 +137,9 @@ class GetPeopleCosts
 
     private function calculateActivityRate($budget, array $task, array $persons)
     {
+        if (!$this->project['billable']) {
+            return 0;
+        }
         $personHours = array_sum(array_map(
             function (array $person) {
                 return $person['total_hours'];
@@ -130,5 +147,23 @@ class GetPeopleCosts
             $persons
         ));
         return $budget / $personHours;
+    }
+
+    private function calculatePersonEstimate(array $person, array $task)
+    {
+        if (!$this->project['billable']) {
+            switch ($this->project['budget_by']) {
+                case 'project':
+                    $itemsCount = count($this->analysis['tasks']) * $this->activeTasks['total'];
+                    return $this->project['budget'] / $itemsCount;
+                case 'person':
+                    $itemsCount = $this->activeTasks['people'][$person['user_id']];
+                    return $person['budget'] / $itemsCount;
+                case 'task':
+                    $itemsCount = $this->activeTasks['tasks'][$task['task_id']];
+                    return $task['budget'] / $itemsCount;
+            }
+        }
+        return $person['total_hours'];
     }
 }

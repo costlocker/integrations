@@ -37,6 +37,31 @@ class HarvestTest extends \Costlocker\Integrations\GivenApi
                 ],
                 200000,
             ],
+            // NON-BILLABLE PROJECTS - no client rate, revenue
+            'non-billable project + no budget' => [
+                'non-billable-no-budget.json',
+                [
+                    'Project Management' => ['rate' => 0, 'hours' => 5.83, 'revenue' => 0],
+                ],
+            ],
+            'non-billable project + total project hours' => [
+                'non-billable-total-project-hours.json',
+                [
+                    'Project Management' => ['rate' => 0, 'hours' => 5, 'revenue' => 0],
+                ],
+            ],
+            'non-billable project + hours per person' => [
+                'non-billable-person-hours.json',
+                [
+                    'Project Management' => ['rate' => 0, 'hours' => 10 / 1, 'revenue' => 0],
+                ],
+            ],
+            'non-billable project + hours per task' => [
+                'non-billable-task-hours.json',
+                [
+                    'Project Management' => ['rate' => 0, 'hours' => 8 / 1, 'revenue' => 0],
+                ],
+            ],
         ];
     }
 
