@@ -61,7 +61,7 @@ class GetPeopleCosts
                                         'billed_rate' => $person['billed_rate'],
                                     ],
                                     'hours' => [
-                                        'budget' => $this->calculatePersonEstimate($person, $task),
+                                        'budget' => $person['total_hours'],
                                         'tracked' => $person['total_hours'],
                                     ],
                                     'person' => $users[$person['user_id']],
@@ -69,6 +69,9 @@ class GetPeopleCosts
                             },
                             $taskPersons[$task['task_id']]
                         ),
+                        'finance' => [
+                            'revenue' => $task['money_budget'] ?: 0,
+                        ],
                     ];
                 },
                 $this->analysis['tasks']
@@ -103,39 +106,12 @@ class GetPeopleCosts
 
     private function calculateActivityRate(array $task, array $persons)
     {
-        switch ($this->project['bill_by']) {
-            case 'People':
-                $personRates = array_map(
-                    function (array $person) {
-                        return $person['billed_rate'];
-                    },
-                    $persons
-                );
-                return array_sum($personRates) / count($personRates);
-            case 'Project':
-            case 'Tasks':
-                return $task['billed_rate'];
-        }
-        return 0;
-    }
-
-    private function calculatePersonEstimate(array $person, array $task)
-    {
-        switch ($this->project['budget_by']) {
-            case 'project':
-                $itemsCount = count($this->analysis['tasks']) * count($this->analysis['team_members']);
-                return $this->project['budget'] / $itemsCount;
-            case 'person':
-                return $person['budget'] / count($this->analysis['tasks']);
-            case 'task':
-                return $task['budget'] / count($this->analysis['team_members']);
-            case 'task_fees':
-                if (!$task['billed_rate']) {
-                    return 0;
-                }
-                $hoursBudget = $task['money_budget'] / $task['billed_rate'];
-                return $hoursBudget / count($this->analysis['team_members']);
-        }
-        return 0;
+        $personHours = array_sum(array_map(
+            function (array $person) {
+                return $person['total_hours'];
+            },
+            $persons
+        ));
+        return $task['money_budget'] / $personHours;
     }
 }

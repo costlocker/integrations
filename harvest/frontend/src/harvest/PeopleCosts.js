@@ -10,6 +10,7 @@ const CostlockerCosts = ({ peopleCosts }) => {
           <td></td>
           <td>{task.hours.tracked}</td>
           <td>{task.activity.hourly_rate}</td>
+          <td>{task.finance.revenue}</td>
         </tr>
       );
       task.people.forEach(person => {
@@ -19,7 +20,8 @@ const CostlockerCosts = ({ peopleCosts }) => {
             <td>- <em>{person.person.full_name}</em></td>
             <td>{person.hours.budget}</td>
             <td>{person.hours.tracked}</td>
-            <td>-</td>
+            <td></td>
+            <td></td>
           </tr>
         );
       })
@@ -35,6 +37,7 @@ const CostlockerCosts = ({ peopleCosts }) => {
           <th>Estimated hours</th>
           <th>Tracked hours</th>
           <th>Client rate</th>
+          <th>Revenue</th>
         </tr>
       </thead>
       <tbody>
@@ -52,11 +55,11 @@ const PeopleCosts = ({ peopleCosts, project, fixedBudget }) => {
         <ul>
           <li>
             <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods/#setting-up-an-invoice-method" target="_blank">Invoiced by</a>
-            <em> (client rates)</em>: <strong>{project.finance.bill_by}</strong>
+            : <strong>{project.finance.bill_by}</strong>
           </li>
           <li>
             <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods/#setting-up-a-budget" target="_blank">Budget by</a>
-            <em> (estimated hours)</em>: <strong>{project.finance.budget_by}</strong>
+            : <strong>{project.finance.budget_by}</strong>
           </li>
           {fixedBudget &&
           <li>

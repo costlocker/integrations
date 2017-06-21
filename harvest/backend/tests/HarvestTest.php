@@ -23,10 +23,10 @@ class HarvestTest extends \Costlocker\Integrations\GivenApi
             'Person hourly rate + task fees' => [
                 'person-hourly-rate-task-fees.json',
                 [
-                    'Graphic Design' => ['rate' => 300, 'hours' => 34.16389559513506],
-                    'Marketing' => ['rate' => 185, 'hours' => 18.018018018018019],
-                    'Project Management' => ['rate' => 350, 'hours' => 0],
-                    'Business Development' => ['rate' => 280, 'hours' => 0],
+                    'Graphic Design' => ['rate' => 45000 / 77.13, 'hours' => 77.13, 'revenue' => 45000],
+                    'Marketing' => ['rate' => 20000 / 27.5, 'hours' => 27.5, 'revenue' => 20000],
+                    'Project Management' => ['rate' => 0, 'hours' => 13.17, 'revenue' => 0],
+                    'Business Development' => ['rate' => 0, 'hours' => 2.1, 'revenue' => 0],
                 ],
             ],
         ];
@@ -51,8 +51,12 @@ class HarvestTest extends \Costlocker\Integrations\GivenApi
         foreach ($peopleCosts['tasks'] as $activity) {
             $activityName = $activity['activity']['name'];
             $activities[$activityName]['rate'] = $activity['activity']['hourly_rate'];
+            $activities[$activityName]['revenue'] = $activity['finance']['revenue'];
             foreach ($activity['people'] as $person) {
-                $activities[$activityName]['hours'] = $person['hours']['budget'];
+                if (!isset($activities[$activityName]['hours'])) {
+                    $activities[$activityName]['hours'] = 0;
+                }
+                $activities[$activityName]['hours'] += $person['hours']['budget'];
             }
         }
         return $activities;
