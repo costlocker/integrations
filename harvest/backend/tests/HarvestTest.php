@@ -20,64 +20,13 @@ class HarvestTest extends \Costlocker\Integrations\GivenApi
     public function provideProjects()
     {
         return [
-            'Task hourly rate + no budget' => [
-                'task+no-budget.json',
+            'Person hourly rate + task fees' => [
+                'person-hourly-rate-task-fees.json',
                 [
-                    'Business Development' => ['rate' => 0, 'hours' => 0],
-                    'Programming' => ['rate' => 100, 'hours' => 0],
-                    'Project Management' => ['rate' => 200, 'hours' => 0],
-                ],
-            ],
-            'Task hourly rate + total hours' => [
-                'task+total-hours.json',
-                [
-                    'Business Development' => ['rate' => 0, 'hours' => 360 / 3],
-                    'Programming' => ['rate' => 100, 'hours' => 360 / 3],
-                    'Project Management' => ['rate' => 200, 'hours' => 360 / 3],
-                ],
-            ],
-            'Task hourly rate + hours per task' => [
-                'task+task-hours.json',
-                [
-                    'Business Development' => ['rate' => 0, 'hours' => 100 / 1],
-                    'Project Management' => ['rate' => 100, 'hours' => 200 / 1],
-                ],
-            ],
-            'Task hourly rate + hours per person' => [
-                'task+person-hours.json',
-                [
-                    'Business Development' => ['rate' => 0, 'hours' => 50 / 3],
-                    'Graphic Design' => ['rate' => 100, 'hours' => 50 / 3],
-                    'Project Management' => ['rate' => 200, 'hours' => 50 / 3],
-                ],
-            ],
-            'Task hourly rate + fees per task' => [
-                'task+fees.json',
-                [
-                    'Business Development' => ['rate' => 0, 'hours' => 0],
-                    'Programming' => ['rate' => 100, 'hours' => (20000 / 100)],
-                    'Project Management' => ['rate' => 200, 'hours' => (30000 / 200)],
-                ],
-            ],
-            'No hourly rate + some budget (e.g. task)' => [
-                'no-hourly-rate.json',
-                [
-                    'Programming' => ['rate' => 0, 'hours' => 200 / 1],
-                    'Project Management' => ['rate' => 0, 'hours' => 10 / 1],
-                ],
-            ],
-            'Project hourly rate + some budget (e.g. task)' => [
-                'project-hourly-rate.json',
-                [
-                    'Programming' => ['rate' => 200, 'hours' => 100 / 1],
-                    'Project Management' => ['rate' => 200, 'hours' => 200 / 1],
-                ],
-            ],
-            'Person hourly rate + some budget (e.g. task)' => [
-                'person-hourly-rate.json',
-                [
-                    'Programming' => ['rate' => 400, 'hours' => 20 / 1],
-                    'Project Management' => ['rate' => 400, 'hours' => 100 / 1],
+                    'Graphic Design' => ['rate' => 300, 'hours' => 34.16389559513506],
+                    'Marketing' => ['rate' => 185, 'hours' => 18.018018018018019],
+                    'Project Management' => ['rate' => 350, 'hours' => 0],
+                    'Business Development' => ['rate' => 280, 'hours' => 0],
                 ],
             ],
         ];

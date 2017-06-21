@@ -16,10 +16,14 @@ class GetPeopleCosts
         $this->analysis = $apiClient("/projects/{$r->query->get('peoplecosts')}/analysis?period=lifespan");
 
         $taskPersons = [];
-        foreach ($this->analysis['tasks'] as $task) {
-            $taskPersons[$task['task_id']] = $apiClient(
+        foreach ($this->analysis['tasks'] as $i => $task) {
+            $allPeople = $apiClient(
                 "/projects/{$r->query->get('peoplecosts')}/team_analysis?task_id={$task['task_id']}&period=lifespan"
             );
+            $taskPersons[$task['task_id']] = $this->removePeopleWithNoTrackedTime($allPeople);
+            if (!$taskPersons[$task['task_id']]) {
+                unset($this->analysis['tasks'][$i]);
+            }
         }
 
         $users = [];
@@ -85,6 +89,16 @@ class GetPeopleCosts
                 $this->analysis['team_members']
             ),
         ];
+    }
+
+    private function removePeopleWithNoTrackedTime(array $persons)
+    {
+        return array_filter(
+            $persons,
+            function (array $person) {
+                return $person['total_hours'];
+            }
+        );
     }
 
     private function calculateActivityRate(array $task, array $persons)
