@@ -9,11 +9,11 @@ use Symfony\Component\HttpFoundation\Request;
 class HarvestTest extends \Costlocker\Integrations\GivenApi
 {
     /** @dataProvider provideProjects */
-    public function testBuildPeopleCostsFromTasksAndPeople($file, array $expectedActivities)
+    public function testBuildPeopleCostsFromTasksAndPeople($file, array $expectedActivities, $fixedBudget = 0)
     {
         $apiClient = $this->givenApiResponses($file);
         $costs = new GetPeopleCosts();
-        $peopleCosts = $costs(new Request(), $apiClient);
+        $peopleCosts = $costs(new Request(['fixedBudget' => $fixedBudget]), $apiClient);
         $this->assertEquals($expectedActivities, $this->normalizePeopleCosts($peopleCosts));
     }
 
@@ -28,6 +28,14 @@ class HarvestTest extends \Costlocker\Integrations\GivenApi
                     'Project Management' => ['rate' => 0, 'hours' => 13.17, 'revenue' => 0],
                     'Business Development' => ['rate' => 0, 'hours' => 2.1, 'revenue' => 0],
                 ],
+            ],
+            'fixed fee' => [
+                'fixed-fee.json',
+                [
+                    'Programming' => ['rate' => 100000 / 62.20, 'hours' => 62.20, 'revenue' => 100000],
+                    'Marketing' => ['rate' => 100000 / 17.98, 'hours' => 17.98, 'revenue' => 100000],
+                ],
+                200000,
             ],
         ];
     }

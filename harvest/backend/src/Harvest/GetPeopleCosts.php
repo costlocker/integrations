@@ -41,14 +41,23 @@ class GetPeopleCosts
             ];
         }
 
+        $fixedBudget = $this->isFixedBudget($this->project) && $this->analysis['tasks']
+            ? ($r->query->get('fixedBudget', 0) / count($this->analysis['tasks']))
+            : 0;
+
         return [
             'tasks' => array_map(
-                function (array $task) use ($taskPersons, $users) {
+                function (array $task) use ($taskPersons, $users, $fixedBudget) {
+                    $budget = $fixedBudget ? $fixedBudget : ($task['money_budget'] ?? 0);
                     return [
                         'id' => $task['task_id'],
                         'activity' => [
                             'name' => $task['name'],
-                            'hourly_rate' => $this->calculateActivityRate($task, $taskPersons[$task['task_id']]),
+                            'hourly_rate' => $this->calculateActivityRate(
+                                $budget,
+                                $task,
+                                $taskPersons[$task['task_id']]
+                            ),
                         ],
                         'hours' => [
                             'tracked' => $task['total_hours'],
@@ -70,7 +79,7 @@ class GetPeopleCosts
                             $taskPersons[$task['task_id']]
                         ),
                         'finance' => [
-                            'revenue' => $task['money_budget'] ?: 0,
+                            'revenue' => $budget,
                         ],
                     ];
                 },
@@ -104,7 +113,15 @@ class GetPeopleCosts
         );
     }
 
-    private function calculateActivityRate(array $task, array $persons)
+    private function isFixedBudget($project)
+    {
+        return 
+            $project['billable'] &&
+            $project['bill_by'] == 'none' &&
+            $project['budget_by'] == 'none';
+    }
+
+    private function calculateActivityRate($budget, array $task, array $persons)
     {
         $personHours = array_sum(array_map(
             function (array $person) {
@@ -112,6 +129,6 @@ class GetPeopleCosts
             },
             $persons
         ));
-        return $task['money_budget'] / $personHours;
+        return $budget / $personHours;
     }
 }
