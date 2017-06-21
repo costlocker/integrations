@@ -19,24 +19,7 @@ class HarvestTest extends \Costlocker\Integrations\GivenApi
 
     public function provideProjects()
     {
-        return [
-            'Person hourly rate + task fees' => [
-                'person-hourly-rate-task-fees.json',
-                [
-                    'Graphic Design' => ['rate' => 45000 / 77.13, 'hours' => 77.13, 'revenue' => 45000],
-                    'Marketing' => ['rate' => 20000 / 27.5, 'hours' => 27.5, 'revenue' => 20000],
-                    'Project Management' => ['rate' => 0, 'hours' => 13.17, 'revenue' => 0],
-                    'Business Development' => ['rate' => 0, 'hours' => 2.1, 'revenue' => 0],
-                ],
-            ],
-            'fixed fee' => [
-                'fixed-fee.json',
-                [
-                    'Programming' => ['rate' => 100000 / 62.20, 'hours' => 62.20, 'revenue' => 100000],
-                    'Marketing' => ['rate' => 100000 / 17.98, 'hours' => 17.98, 'revenue' => 100000],
-                ],
-                200000,
-            ],
+        return $this->provideTaskFeesBudget() + [
             // BILLABLE WITHOUT BUDGET
             'no-budget + hours per person' => [
                 'no-budget-person-hours.json',
@@ -74,6 +57,15 @@ class HarvestTest extends \Costlocker\Integrations\GivenApi
                     'Business Development' => ['rate' => 0, 'hours' => 2.1, 'revenue' => 0],
                 ],
             ],
+            // FIXED FEE
+            'fixed fee' => [
+                'fixed-fee.json',
+                [
+                    'Programming' => ['rate' => 100000 / 62.20, 'hours' => 62.20, 'revenue' => 100000],
+                    'Marketing' => ['rate' => 100000 / 17.98, 'hours' => 17.98, 'revenue' => 100000],
+                ],
+                200000,
+            ],
             // NON-BILLABLE PROJECTS - no client rate, revenue
             'non-billable project + no budget' => [
                 'non-billable-no-budget.json',
@@ -100,6 +92,25 @@ class HarvestTest extends \Costlocker\Integrations\GivenApi
                 ],
             ],
         ];
+    }
+
+    // task_fees is used as budget (for calculating client rates), bill_by is ignored
+    private function provideTaskFeesBudget()
+    {
+        $projects = [];
+        $billingTypes = ['person-rate', 'task-rate', 'project-rate', 'no-rate'];
+        foreach ($billingTypes as $billingType) {
+            $projects["task_fees + {$billingType}.json"] = [
+                "task-fees-{$billingType}.json",
+                [
+                    'Graphic Design' => ['rate' => 45000 / 77.13, 'hours' => 77.13, 'revenue' => 45000],
+                    'Marketing' => ['rate' => 20000 / 27.5, 'hours' => 27.5, 'revenue' => 20000],
+                    'Project Management' => ['rate' => 0, 'hours' => 13.17, 'revenue' => 0],
+                    'Business Development' => ['rate' => 0, 'hours' => 2.1, 'revenue' => 0],
+                ],
+            ];
+        }
+        return $projects;
     }
 
     private function givenApiResponses($file)
