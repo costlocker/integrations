@@ -29,7 +29,9 @@ class GetPeopleCosts
             );
             $taskPersons[$task['task_id']] = $this->removePeopleWithNoTrackedTime($allPeople);
             $this->activeTasks['total'] += count($taskPersons[$task['task_id']]);
-            $this->activeTasks['billable'] += (int) $task['billable'];
+            if ($taskPersons[$task['task_id']]) {
+                $this->activeTasks['billable'] += (int) $task['billable'];
+            }
             $this->activeTasks['tasks'][$task['task_id']] = count($taskPersons[$task['task_id']]);
             foreach ($taskPersons[$task['task_id']] as $person) {
                 if (!isset($this->activeTasks['people'][$person['user_id']])) {
@@ -57,8 +59,8 @@ class GetPeopleCosts
             ];
         }
 
-        $fixedBudget = $this->isFixedBudget($this->project) && $this->analysis['tasks']
-            ? ($r->query->get('fixedBudget', 0) / count($this->analysis['tasks']))
+        $fixedBudget = $this->isFixedBudget($this->project) && $this->activeTasks['billable']
+            ? ($r->query->get('fixedBudget', 0) / $this->activeTasks['billable'])
             : 0;
 
         return [
@@ -140,7 +142,7 @@ class GetPeopleCosts
     private function calculateTaskBudget($fixedBudget, array $task, array $persons)
     {
         if ($fixedBudget) {
-            return $fixedBudget;
+            return $task['billable'] ? $fixedBudget : 0;
         } elseif (isset($task['money_budget'])) {
             return $task['money_budget'];
         } elseif ($this->project['budget_by'] == 'project_cost') {
