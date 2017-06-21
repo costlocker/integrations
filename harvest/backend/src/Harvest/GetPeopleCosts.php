@@ -62,7 +62,7 @@ class GetPeopleCosts
         return [
             'tasks' => array_map(
                 function (array $task) use ($taskPersons, $users, $fixedBudget) {
-                    $budget = $fixedBudget ? $fixedBudget : ($task['money_budget'] ?? 0);
+                    $budget = $this->calculateTaskBudget($fixedBudget, $task, $taskPersons[$task['task_id']]);
                     return [
                         'id' => $task['task_id'],
                         'activity' => [
@@ -133,6 +133,24 @@ class GetPeopleCosts
             $project['billable'] &&
             $project['bill_by'] == 'none' &&
             $project['budget_by'] == 'none';
+    }
+
+    private function calculateTaskBudget($fixedBudget, array $task, array $persons)
+    {
+        if ($fixedBudget) {
+            return $fixedBudget;
+        } elseif (isset($task['money_budget'])) {
+            return $task['money_budget'];
+        } else {
+            return array_sum(
+                array_map(
+                    function (array $person) {
+                        return $person['billable_amount'];
+                    },
+                    $persons
+                )
+            );
+        }
     }
 
     private function calculateActivityRate($budget, array $task, array $persons)
