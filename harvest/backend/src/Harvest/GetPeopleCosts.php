@@ -17,6 +17,7 @@ class GetPeopleCosts
         $this->analysis = $apiClient("/projects/{$r->query->get('peoplecosts')}/analysis?period=lifespan");
         $this->activeTasks = [
             'total' => 0,
+            'billable' => 0,
             'people' => [],
             'tasks' => [],
         ];
@@ -28,6 +29,7 @@ class GetPeopleCosts
             );
             $taskPersons[$task['task_id']] = $this->removePeopleWithNoTrackedTime($allPeople);
             $this->activeTasks['total'] += count($taskPersons[$task['task_id']]);
+            $this->activeTasks['billable'] += (int) $task['billable'];
             $this->activeTasks['tasks'][$task['task_id']] = count($taskPersons[$task['task_id']]);
             foreach ($taskPersons[$task['task_id']] as $person) {
                 if (!isset($this->activeTasks['people'][$person['user_id']])) {
@@ -141,6 +143,8 @@ class GetPeopleCosts
             return $fixedBudget;
         } elseif (isset($task['money_budget'])) {
             return $task['money_budget'];
+        } elseif ($this->project['budget_by'] == 'project_cost') {
+            return $task['billable'] ? ($this->project['cost_budget'] / $this->activeTasks['billable']) : 0;
         } else {
             return array_sum(
                 array_map(

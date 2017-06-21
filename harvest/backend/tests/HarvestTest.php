@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class HarvestTest extends \Costlocker\Integrations\GivenApi
 {
+    private $billingTypes = ['person-rate', 'task-rate', 'project-rate', 'no-rate'];
+
     /** @dataProvider provideProjects */
     public function testBuildPeopleCostsFromTasksAndPeople($file, array $expectedActivities, $fixedBudget = 0)
     {
@@ -19,7 +21,7 @@ class HarvestTest extends \Costlocker\Integrations\GivenApi
 
     public function provideProjects()
     {
-        return $this->provideTaskFeesBudget() + [
+        return $this->provideTaskFeesBudget() + $this->provideProjectCostBudget() + [
             // BILLABLE WITHOUT BUDGET
             'no-budget + hours per person' => [
                 'no-budget-person-hours.json',
@@ -98,13 +100,30 @@ class HarvestTest extends \Costlocker\Integrations\GivenApi
     private function provideTaskFeesBudget()
     {
         $projects = [];
-        $billingTypes = ['person-rate', 'task-rate', 'project-rate', 'no-rate'];
-        foreach ($billingTypes as $billingType) {
+        foreach ($this->billingTypes as $billingType) {
             $projects["task_fees + {$billingType}.json"] = [
                 "task-fees-{$billingType}.json",
                 [
                     'Graphic Design' => ['rate' => 45000 / 77.13, 'hours' => 77.13, 'revenue' => 45000],
                     'Marketing' => ['rate' => 20000 / 27.5, 'hours' => 27.5, 'revenue' => 20000],
+                    'Project Management' => ['rate' => 0, 'hours' => 13.17, 'revenue' => 0],
+                    'Business Development' => ['rate' => 0, 'hours' => 2.1, 'revenue' => 0],
+                ],
+            ];
+        }
+        return $projects;
+    }
+
+    // project cost is used as budget (for calculating client rates), bill_by is ignored
+    private function provideProjectCostBudget()
+    {
+        $projects = [];
+        foreach ($this->billingTypes as $billingType) {
+            $projects["project cost + {$billingType}.json"] = [
+                "project-cost-{$billingType}.json",
+                [
+                    'Graphic Design' => ['rate' => 100000 / 77.13, 'hours' => 77.13, 'revenue' => 100000],
+                    'Marketing' => ['rate' => 100000 / 27.5, 'hours' => 27.5, 'revenue' => 100000],
                     'Project Management' => ['rate' => 0, 'hours' => 13.17, 'revenue' => 0],
                     'Business Development' => ['rate' => 0, 'hours' => 2.1, 'revenue' => 0],
                 ],
