@@ -35,11 +35,11 @@ yarn start
 
 ```bash
 # /etc/hosts
-127.0.0.1 basecamp-costlocker.dev
+127.0.0.1 basecamp.integrations-costlocker.dev
 
 # /etc/apache2/extra/httpd-vhosts.conf
 <VirtualHost *:80>
-  ServerName harvest-costlocker.dev
+  ServerName basecamp.integrations-costlocker.dev
   DocumentRoot "/path-to/basecamp/web"
   RewriteEngine On
 </VirtualHost>
@@ -65,4 +65,25 @@ docker exec -it basecamp-costlocker /app/backend/bin/console migrations:migrate
 # run daemons
 docker exec -it basecamp-costlocker /app/backend/bin/console queue:daemon
 docker exec -it basecamp-costlocker /app/backend/bin/console refreshTokens --expiration "1 day" --execute
+```
+
+### Nginx
+
+```
+server {  
+  listen 8080;
+  server_name basecamp.integrations-costlocker.dev;
+
+  location / {
+    proxy_pass http://127.0.0.1:19997/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Host $host:$server_port;
+    proxy_set_header X-Forwarded-Server $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_cache_bypass $http_upgrade;
+  }
+}
 ```

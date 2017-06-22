@@ -8,7 +8,7 @@ services:
             dockerfile: ./.docker/Dockerfile
         # env variables aren't accessible in APACHE/nginx, use backend/.env for cofiguration
         ports:
-            - "19991:80"
+            - "19998:80"
         volumes:
             - "./backend/var/sessions:/app/backend/var/sessions"
             - "./backend/var/database:/app/backend/var/database"
