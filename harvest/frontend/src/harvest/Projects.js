@@ -19,12 +19,12 @@ const ProjectsList = ({ projects, goTo }) => {
           <th className="text-center">Is billable?</th>
           <th className="text-center">
             <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods" target="_blank">
-              Invoiced by
+              Budgeted by
             </a>
           </th>
           <th className="text-center">
             <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods" target="_blank">
-              Budgeted by
+              Invoiced by
             </a>
           </th>
           <th className="text-center" width='120'>Actions</th>
@@ -58,8 +58,8 @@ const ProjectsList = ({ projects, goTo }) => {
         if (isFixed) {
           cells.push(<td key='fixed' colSpan='2'>Fixed fee project</td>);
         } else {
-          cells.push(<td key='bill_by'>{project.finance.bill_by}</td>);
           cells.push(<td key='budget_by'>{project.finance.budget_by}</td>);
+          cells.push(<td key='bill_by'>{project.finance.bill_by}</td>);
         }
         cells.push(
           <td key='actions' className="btn-toolbar">

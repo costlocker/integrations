@@ -1,4 +1,5 @@
 import React from 'react';
+import { Number } from '../Helpers';
 
 const CostlockerCosts = ({ peopleCosts }) => {
   const taskToPeopleCosts = () => {
@@ -8,9 +9,9 @@ const CostlockerCosts = ({ peopleCosts }) => {
         <tr key={task.id}>
           <th>{task.activity.name}</th>
           <td></td>
-          <td>{task.hours.tracked}</td>
-          <td>{task.activity.hourly_rate}</td>
-          <td>{task.finance.revenue}</td>
+          <td><Number value={task.hours.tracked} /></td>
+          <td><Number value={task.activity.hourly_rate} /></td>
+          <td><Number value={task.finance.revenue} /></td>
         </tr>
       );
       task.people.forEach(person => {
@@ -18,8 +19,8 @@ const CostlockerCosts = ({ peopleCosts }) => {
         rows.push(
           <tr key={key}>
             <td>- <em>{person.person.full_name}</em></td>
-            <td>{person.hours.budget}</td>
-            <td>{person.hours.tracked}</td>
+            <td><Number value={person.hours.budget} /></td>
+            <td><Number value={person.hours.tracked} /></td>
             <td></td>
             <td></td>
           </tr>
@@ -54,12 +55,12 @@ const PeopleCosts = ({ peopleCosts, project, fixedBudget }) => {
       <div className="row">
         <ul>
           <li>
-            <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods/#setting-up-an-invoice-method" target="_blank">Invoiced by</a>
-            : <strong>{project.finance.bill_by}</strong>
-          </li>
-          <li>
             <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods/#setting-up-a-budget" target="_blank">Budget by</a>
             : <strong>{project.finance.budget_by}</strong>
+          </li>
+          <li>
+            <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods/#setting-up-an-invoice-method" target="_blank">Invoiced by</a>
+            : <strong>{project.finance.bill_by}</strong>
           </li>
           {fixedBudget &&
           <li>
@@ -71,22 +72,20 @@ const PeopleCosts = ({ peopleCosts, project, fixedBudget }) => {
       </div>
       <h2>Tasks, Team &rarr; Activities, People</h2>
       <div className="row">
-        <div className="col-sm-6">
+        <div className="col-sm-5">
           <h3>Harvest tasks</h3>
           <table className="table table-striped table-hover table-condensed">
             <thead>
               <tr>
                 <th>Task</th>
                 <th>Total hours</th>
-                <th>Billed rate</th>
               </tr>
             </thead>
             <tbody>
               {peopleCosts.tasks.map(task => (
                 <tr key={task.id}>
                   <th>{task.activity.name}</th>
-                  <td>{task.hours.tracked}</td>
-                  <td>{task.activity.hourly_rate}</td>
+                  <td><Number value={task.hours.tracked} /></td>
                 </tr>
               ))}
             </tbody>
@@ -97,7 +96,6 @@ const PeopleCosts = ({ peopleCosts, project, fixedBudget }) => {
               <tr>
                 <th>Task</th>
                 <th>Total hours</th>
-                <th>Billed rate</th>
                 <th>Cost rate</th>
               </tr>
             </thead>
@@ -105,15 +103,14 @@ const PeopleCosts = ({ peopleCosts, project, fixedBudget }) => {
               {peopleCosts.people.map(person => (
                 <tr key={person.id}>
                   <th title={person.person.email}>{person.person.full_name}</th>
-                  <td>{person.hours.tracked}</td>
-                  <td>{person.finance.billed_rate}</td>
-                  <td>{person.person.salary.hourly_rate}</td>
+                  <td><Number value={person.hours.tracked} /></td>
+                  <td><Number value={person.person.salary.hourly_rate} /></td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <div className="col-sm-6">
+        <div className="col-sm-7">
           <h3>People costs in Costlocker</h3>
           <CostlockerCosts peopleCosts={peopleCosts} />
         </div>

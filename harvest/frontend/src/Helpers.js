@@ -26,8 +26,10 @@ const Errors = ({ title, error }) => {
   );
 };
 
+const Number = ({ value }) => <span title={value}>{Math.round(value * 100) / 100}</span>;
+
 const ExternalLink = ({ url, className }) => (
   <a href={url} target="_blank" className={className}><i className="fa fa-external-link"></i></a>
 );
 
-export { FullButton, Errors, ExternalLink };
+export { FullButton, Errors, Number, ExternalLink };
