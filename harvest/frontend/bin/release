@@ -11,7 +11,7 @@ build_frontend() {
 
 commit_changes() {
     git add --all build
-    git commit -m "Rebuild files $(date +"%Y-%m-%d %H:%M:%S")"
+    git commit -m "Harvest - rebuild files $(date +"%Y-%m-%d %H:%M:%S")"
 }
 
 release
