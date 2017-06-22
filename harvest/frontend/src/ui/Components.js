@@ -15,13 +15,9 @@ const Errors = ({ title, error }) => {
     return null;
   }
   return (
-    <div className="panel panel-danger">
-      <div className="panel-heading">
-        {title}
-      </div>
-      <div className="panel-body">
-        {decodeURIComponent(error)}
-      </div>
+    <div className="alert alert-danger">
+      <strong>{title}</strong><br />
+      {decodeURIComponent(error)}
     </div>
   );
 };

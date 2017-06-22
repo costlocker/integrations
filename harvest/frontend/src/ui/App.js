@@ -1,7 +1,46 @@
 import React from 'react';
 import { UIView } from 'ui-router-react';
+import { ExternalLink } from '../ui/Components';
 
-import { User } from '../app/User';
+const AnonymousUser = () => <em>Not logged in</em>;
+
+const HarvestUser = ({ user }) => {
+  if (!user) {
+    return <AnonymousUser />
+  }
+  return (
+    <span>
+      <strong>
+        {user.user_name}
+      </strong> ({user.company_name} <ExternalLink url={user.company_url} />)
+    </span>
+  );
+};
+
+const CostlockerUser = ({ user }) => {
+  if (!user) {
+    return <AnonymousUser />
+  }
+  return (
+    <span>
+      <strong>
+        {user.person.first_name} {user.person.last_name}
+      </strong> ({user.company.name})
+    </span>
+  );
+};
+
+const User = ({ auth }) => {
+  return <div>
+    <span title="Costlocker user">
+      <CostlockerUser user={auth.costlocker} />
+    </span>
+    <span className="text-muted">&nbsp;/&nbsp;</span>
+    <span title="Basecamp user">
+      <HarvestUser user={auth.harvest} />
+    </span>
+  </div>;
+};
 
 export default function App({ auth, steps }) {
   const stepsItems = [];
@@ -22,12 +61,10 @@ export default function App({ auth, steps }) {
           <div className="navbar-header">
             <div className="navbar-brand">
               <a href="/">
-                <img alt="" src="https://cdn-images-1.medium.com/max/1200/1*BLdn5GGWwijxJkcr0I0rgg.png" width="40px" />
+                <img title="Costlocker" alt="Costlocker" src="https://cdn-images-1.medium.com/max/1200/1*BLdn5GGWwijxJkcr0I0rgg.png" />
+                &nbsp;+&nbsp;
+                <img title="Harvest" alt="Harvest" src="https://www.getharvest.com/assets/press/harvest-logo-icon-77a6f855102e2f85a7fbe070575f293346a643c371a49ceff341d2814e270468.png" />
               </a>
-            </div>
-            <div className="navbar-brand">
-              <span className="text-warning">Harvest</span><br />
-              <span className="text-primary">Costlocker</span>
             </div>
           </div>
           <div className="navbar-text navbar-right text-right">
@@ -35,12 +72,16 @@ export default function App({ auth, steps }) {
           </div>
         </div>
       </nav>
-      <div className="container">
-        <div className="row">
-          <div className="col-sm-12">
-            <ol className="breadcrumb">{stepsItems}</ol>
+      <nav className="nav-breadcrumbs">
+        <div className="container">
+          <div className="row">
+            <div className="col-sm-12">
+              <ol className="breadcrumb">{stepsItems}</ol>
+            </div>
           </div>
         </div>
+      </nav>
+      <div className="container">
         <div className="row">
           <div className="col-sm-12">
             <UIView />
