@@ -6,6 +6,7 @@ import { Visualizer } from 'ui-router-visualizer';
 import { isDevelopmentMode } from './config';
 import { appState } from './state';
 import { states, config } from './Router';
+import './ui/index.css'
 
 export const plugins = isDevelopmentMode ? [pushStateLocationPlugin, Visualizer] : [pushStateLocationPlugin];
 
