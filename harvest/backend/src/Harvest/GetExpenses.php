@@ -26,7 +26,7 @@ class GetExpenses
                         'date' => $expense['expense']['spent_at'],
                     ],
                     'billed' => [
-                        'total_amount' => $expense['expense']['total_cost'],
+                        'total_amount' => $expense['expense']['billable'] ? $expense['expense']['total_cost'] : 0,
                     ],
                 ];
             },
