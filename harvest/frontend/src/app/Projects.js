@@ -39,7 +39,7 @@ const ProjectsList = ({ projects, goTo }) => {
         const goToProject = (e) => {
           let fixedBudget = null;
           if (isFixed) {
-            fixedBudget = 200000;
+            fixedBudget = parseInt(prompt("Please insert fixed fee"), 0);
             if (isNaN(fixedBudget)) {
               e.preventDefault();
               return;
