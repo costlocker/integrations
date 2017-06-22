@@ -230,7 +230,7 @@ const hooks = [
     },
     callback: (transition: any) => {
       alert('Login in Basecamp before starting synchronization');
-      return transition.router.stateService.target('projects', undefined, { location: true });
+      return transition.router.stateService.target('accounts', undefined, { location: true });
     },
     priority: 10,
   },
