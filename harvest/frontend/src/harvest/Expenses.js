@@ -4,6 +4,7 @@ export default function Expenses({ expenses, currencySymbol }) {
   return (
     <div>
       <h2>Project expenses</h2>
+      {expenses.length ? (
       <table className="table table-striped table-hover table-condensed">
         <thead>
           <tr>
@@ -28,6 +29,9 @@ export default function Expenses({ expenses, currencySymbol }) {
           ))}
         </tbody>
       </table>
+      ) : (
+        <p className="text-muted">No project expenses</p>
+      )}
     </div>
   );
 }

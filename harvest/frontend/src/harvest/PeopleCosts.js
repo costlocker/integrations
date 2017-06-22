@@ -6,7 +6,7 @@ const CostlockerCosts = ({ peopleCosts }) => {
     const rows = [];
     peopleCosts.tasks.forEach(task => {
       rows.push(
-        <tr key={task.id}>
+        <tr key={task.id} className="active">
           <th>{task.activity.name}</th>
           <td></td>
           <td><Number value={task.hours.tracked} /></td>
@@ -31,7 +31,7 @@ const CostlockerCosts = ({ peopleCosts }) => {
   }
 
   return (
-    <table className="table table-striped table-hover table-condensed">
+    <table className="table table-hover table-condensed">
       <thead>
         <tr>
           <th>Activity / Person</th>
