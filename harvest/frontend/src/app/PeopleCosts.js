@@ -1,5 +1,5 @@
 import React from 'react';
-import { Number } from '../Helpers';
+import { Number } from '../ui/Components';
 
 const CostlockerCosts = ({ peopleCosts }) => {
   const taskToPeopleCosts = () => {

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ExternalLink } from '../Helpers';
+import { ExternalLink } from '../ui/Components';
 
 const AnonymousUser = () => <em>Not logged in</em>;
 

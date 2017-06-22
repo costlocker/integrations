@@ -1,7 +1,7 @@
 import React from 'react';
 
 import OAuthLogin from './OAuthLogin';
-import { FullButton, ExternalLink } from '../Helpers';
+import { FullButton, ExternalLink } from '../ui/Components';
 
 export default function Login({ isLoggedIn, auth, goToNextStep, loginUrls, clLoginError, harvestLoginError }) {
   let navigation = null;

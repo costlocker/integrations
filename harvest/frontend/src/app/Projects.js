@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExternalLink } from '../Helpers';
+import { ExternalLink } from '../ui/Components';
 
 const isFixedProject = project =>
   project.finance.billable &&
@@ -39,7 +39,7 @@ const ProjectsList = ({ projects, goTo }) => {
         const goToProject = (e) => {
           let fixedBudget = null;
           if (isFixed) {
-            fixedBudget = parseInt(prompt("Please insert fixed fee"), 0);
+            fixedBudget = 200000;
             if (isNaN(fixedBudget)) {
               e.preventDefault();
               return;

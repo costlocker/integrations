@@ -1,14 +1,14 @@
 import React from 'react';
 
-import Login from './auth/Login';
-import Projects from './harvest/Projects';
-import Project from './harvest/Project';
-import { PeopleCosts } from './harvest/PeopleCosts';
-import Expenses from './harvest/Expenses';
-import Summary from './harvest/Summary';
-import Results from './harvest/Results';
-import WizardLayout from './wizard/WizardLayout';
-import Steps from './wizard/Steps';
+import Login from './app/Login';
+import Projects from './app/Projects';
+import Project from './app/Project';
+import { PeopleCosts } from './app/PeopleCosts';
+import Expenses from './app/Expenses';
+import Summary from './app/Summary';
+import Results from './app/Results';
+import App from './ui/App';
+import Steps from './app/Steps';
 import { appState, isNotLoggedIn } from './state';
 import { pushToApi, fetchFromApi, loginUrls } from './api';
 
@@ -60,7 +60,7 @@ export const states = [
     name: 'wizard',
     url: '/step',
     redirectTo: 'wizard.1',
-    component: () => <WizardLayout
+    component: () => <App
       auth={appState.cursor(['auth']).deref().toJS()}
       steps={steps} />,
   },

@@ -2,7 +2,7 @@ import React from 'react';
 
 import Expenses from './Expenses';
 import { CostlockerCosts } from './PeopleCosts';
-import { FullButton } from '../Helpers';
+import { FullButton } from '../ui/Components';
 
 const calculateRevenue = (project) => {
   let revenue = 0;

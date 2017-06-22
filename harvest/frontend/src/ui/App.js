@@ -1,9 +1,9 @@
 import React from 'react';
 import { UIView } from 'ui-router-react';
 
-import { User } from '../auth/User';
+import { User } from '../app/User';
 
-export default function WizardLayout({ auth, steps }) {
+export default function App({ auth, steps }) {
   const stepsItems = [];
   steps.titles.forEach((title, index) => {
     const i = index + 1;
