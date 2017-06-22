@@ -23,7 +23,11 @@ class GetProjects
     {
         $clients = [];
         foreach ($apiClient("/clients") as $client) {
-            $clients[$client['client']['id']] = $client['client']['name'];
+            $clients[$client['client']['id']] = [
+                'id' => $client['client']['id'],
+                'name' => $client['client']['name'],
+                'currency' => $client['client']['currency_symbol'],
+            ];
         }
 
         $formatDate = function ($date) {
@@ -50,10 +54,7 @@ class GetProjects
                 return [
                     'id' => $project['project']['id'],
                     'name' => $project['project']['name'],
-                    'client' => [
-                        'id' => $project['project']['client_id'],
-                        'name' => $clients[$project['project']['client_id']],
-                    ],
+                    'client' => $clients[$project['project']['client_id']],
                     'dates' => [
                         'date_start' => current(array_filter($dateStart)),
                         'date_end' => current(array_filter($dateEnd)),

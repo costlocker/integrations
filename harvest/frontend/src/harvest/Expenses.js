@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Expenses({ expenses }) {
+export default function Expenses({ expenses, currencySymbol }) {
   return (
     <div>
       <h2>Project expenses</h2>
@@ -12,9 +12,9 @@ export default function Expenses({ expenses }) {
             <th className="bg-info">Billed</th>
           </tr>
           <tr>
-            <th className="bg-warning">Amount [$]</th>
+            <th className="bg-warning">Amount [{currencySymbol}]</th>
             <th className="bg-warning">Date</th>
-            <th className="bg-info">Amount [$]</th>
+            <th className="bg-info">Amount [{currencySymbol}]</th>
           </tr>
         </thead>
         <tbody>

@@ -122,7 +122,10 @@ export const states = [
     project={appState.cursor(['harvest', 'selectedProject']).deref()}
     fixedBudget={appState.cursor(['harvest', 'fixedBudget']).deref()}
   />),
-  buildHarvestProjectStep(4, 'expenses', data => <Expenses expenses={data} />),
+  buildHarvestProjectStep(4, 'expenses', data => <Expenses
+    expenses={data}
+    currencySymbol={appState.cursor(['harvest', 'selectedProject']).deref().client.currency}
+  />),
   buildHarvestProjectStep(5, null, data => <Summary project={data} goToNextStep={steps.goToNextStep} />),
   {
     name: 'wizard.6',
