@@ -34,7 +34,7 @@ const ProjectsList = ({ projects, goTo }) => {
       {projects.map(project => {
         const isNewProject = project.status === 'new';
         const status = isNewProject ? 'new' : 'imported';
-        const labelClass = isNewProject ? 'primary' : 'success';
+        const labelClass = isNewProject ? 'warning' : 'primary';
         const isFixed = isFixedProject(project);
         const goToProject = (e) => {
           let fixedBudget = null;

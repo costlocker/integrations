@@ -119,7 +119,18 @@ class ImportDatabase
                 'status' => $status
             ];
         }
-        return $result;
+        return $this->sortProjects($result);
+    }
+
+    private function sortProjects(array $projects)
+    {
+        usort($projects, function (array $a, array $b) {
+            if ($b['status'] != $a['status']) {
+                return $b['status'] == 'new';
+            }
+            return strcasecmp($a['name'], $b['name']);
+        });
+        return $projects;
     }
 
     private function getCurrentProjects()
