@@ -32,7 +32,10 @@ class HarvestTest extends \Costlocker\Integrations\GivenApi
             $this->provideNonBillableBudget('project-hours', 5 / 1) +
             $this->provideNonBillableBudget('person-hours', 10 / 1) +
             $this->provideNonBillableBudget('task-hours', 8 / 1) +
-            $this->provideNonBillableBudget('no-budget', 5.83);
+            $this->provideNonBillableBudget('no-budget', 5.83) + 
+            $this->provideHoursBudget('project') +
+            $this->provideHoursBudget('task') +
+            $this->provideHoursBudget('person');
     }
 
     // task_fees is used as budget (for calculating client rates), bill_by is ignored
@@ -116,6 +119,50 @@ class HarvestTest extends \Costlocker\Integrations\GivenApi
             ],
         ];
     }
+
+    // rate + tracked time is used (time budget are ignored, we want ot have same billable amount)
+    private function provideHoursBudget($type)
+    {
+        return [
+            "{$type} hours + project rate" => [
+                "{$type}-hours-project-rate.json",
+                [
+                    'Graphic Design' => ['rate' => 300, 'hours' => 77.13, 'revenue' => 300 * 77.13],
+                    'Marketing' => ['rate' => 300, 'hours' => 27.5, 'revenue' => 300 * 27.5],
+                    'Project Management' => ['rate' => 0, 'hours' => 13.17, 'revenue' => 0],
+                    'Business Development' => ['rate' => 0, 'hours' => 2.1, 'revenue' => 0],
+                ],
+            ],
+            "{$type} hours + task rate" => [
+                "{$type}-hours-task-rate.json",
+                [
+                    'Graphic Design' => ['rate' => 400.0, 'hours' => 77.13, 'revenue' => 400 * 77.13],
+                    'Marketing' => ['rate' => 300.0, 'hours' => 27.5, 'revenue' => 300 * 27.5],
+                    'Project Management' => ['rate' => 0, 'hours' => 13.17, 'revenue' => 0],
+                    'Business Development' => ['rate' => 0, 'hours' => 2.1, 'revenue' => 0],
+                ],
+            ],
+            "{$type} hours + person rate" => [
+                "{$type}-hours-person-rate.json",
+                [
+                    'Graphic Design' => ['rate' => 16932 / 77.13, 'hours' => 77.13, 'revenue' => 16932],
+                    'Marketing' => ['rate' => 5087.5 / 27.5, 'hours' => 27.5, 'revenue' => 5087.5],
+                    'Project Management' => ['rate' => 0, 'hours' => 13.17, 'revenue' => 0],
+                    'Business Development' => ['rate' => 0, 'hours' => 2.1, 'revenue' => 0],
+                ],
+            ],
+            "{$type} hours + no rate" => [
+                "{$type}-hours-no-rate.json",
+                [
+                    'Graphic Design' => ['rate' => 0, 'hours' => 77.13, 'revenue' => 0],
+                    'Marketing' => ['rate' => 0, 'hours' => 27.5, 'revenue' => 0],
+                    'Project Management' => ['rate' => 0, 'hours' => 13.17, 'revenue' => 0],
+                    'Business Development' => ['rate' => 0, 'hours' => 2.1, 'revenue' => 0],
+                ],
+            ],
+        ];
+    }
+    
 
     private function givenApiResponses($file)
     {

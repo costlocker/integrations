@@ -71,11 +71,7 @@ class GetPeopleCosts
                         'id' => $task['task_id'],
                         'activity' => [
                             'name' => $task['name'],
-                            'hourly_rate' => $this->calculateActivityRate(
-                                $budget,
-                                $task,
-                                $taskPersons[$task['task_id']]
-                            ),
+                            'hourly_rate' => $this->calculateActivityRate($budget, $taskPersons[$task['task_id']]),
                         ],
                         'hours' => [
                             'tracked' => $task['total_hours'],
@@ -141,12 +137,14 @@ class GetPeopleCosts
 
     private function calculateTaskBudget($fixedBudget, array $task, array $persons)
     {
-        if ($fixedBudget) {
-            return $task['billable'] ? $fixedBudget : 0;
+        if (!$task['billable']) {
+            return 0;
+        } elseif ($fixedBudget) {
+            return $fixedBudget;
         } elseif (isset($task['money_budget'])) {
             return $task['money_budget'];
         } elseif ($this->project['budget_by'] == 'project_cost') {
-            return $task['billable'] ? ($this->project['cost_budget'] / $this->activeTasks['billable']) : 0;
+            return $this->project['cost_budget'] / $this->activeTasks['billable'];
         } else {
             return array_sum(
                 array_map(
@@ -159,7 +157,7 @@ class GetPeopleCosts
         }
     }
 
-    private function calculateActivityRate($budget, array $task, array $persons)
+    private function calculateActivityRate($budget, array $persons)
     {
         if (!$this->project['billable']) {
             return 0;
@@ -178,7 +176,7 @@ class GetPeopleCosts
         if (!$this->project['billable']) {
             switch ($this->project['budget_by']) {
                 case 'project':
-                    $itemsCount = count($this->analysis['tasks']) * $this->activeTasks['total'];
+                    $itemsCount = $this->activeTasks['total'];
                     return $this->project['budget'] / $itemsCount;
                 case 'person':
                     $itemsCount = $this->activeTasks['people'][$person['user_id']];
