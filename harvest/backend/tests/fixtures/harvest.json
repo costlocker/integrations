@@ -4,13 +4,15 @@
         "name": "Trello",
         "client": {
             "id": 5554369,
-            "name": "2f"
+            "name": "2f",
+            "currency": "$"
         },
         "dates": {
             "date_start": "2017-03-01",
             "date_end": "2017-04-01"
         },
         "finance": {
+            "billable": true,
             "bill_by": "Tasks",
             "budget": 360,
             "budget_by": "project",
@@ -59,7 +61,10 @@
                             }
                         }
                     }
-                ]
+                ],
+                "finance": {
+                    "revenue": 12000
+                }
             },
             {
                 "id": 7783432,
@@ -92,7 +97,10 @@
                             }
                         }
                     }
-                ]
+                ],
+                "finance": {
+                    "revenue": 2600
+                }
             }
         ],
         "people": [
@@ -142,29 +150,5 @@
                 "total_amount": 11000
             }
         }
-    ],
-    "billing": {
-        "stats": {
-            "draft": 800,
-            "sent": 12300
-        },
-        "invoices": [
-            {
-                "id": 12685377,
-                "description": "#2",
-                "total_amount": 800,
-                "date": "2017-05-03",
-                "is_sent": false,
-                "state": "draft"
-            },
-            {
-                "id": 12613594,
-                "description": "#1 Hello world",
-                "total_amount": 12300,
-                "date": "2017-04-29",
-                "is_sent": true,
-                "state": "paid"
-            }
-        ]
-    }
+    ]
 }

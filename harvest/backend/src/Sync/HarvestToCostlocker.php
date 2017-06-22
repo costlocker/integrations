@@ -50,6 +50,7 @@ class HarvestToCostlocker
     private function transformProject(array $harvestProject)
     {
         $harvestId = $harvestProject['selectedProject']['id'];
+        $revenue = $this->calculateRevenue($harvestProject);
         return $this->database->getProjectId($harvestId) + [
             'name' => $harvestProject['selectedProject']['name'],
             'client' => $harvestProject['selectedProject']['client']['name'],
@@ -60,10 +61,22 @@ class HarvestToCostlocker
             'items' => array_merge(
                 $this->transformPeopleCosts($harvestId, $harvestProject['peoplecosts']['tasks']),
                 $this->transformExpenses($harvestId, $harvestProject['expenses']),
-                $this->transformBilling($harvestId, ['draft' => 0, 'sent' => 0])
+                $this->transformBilling($harvestId, ['draft' => 0, 'sent' => $revenue])
             ),
             'harvest' => $harvestId,
         ];
+    }
+
+    private function calculateRevenue(array $harvestProject)
+    {
+        $revenue = 0;
+        foreach ($harvestProject['peoplecosts']['tasks'] as $task) {
+            $revenue += $task['finance']['revenue'];
+        }
+        foreach ($harvestProject['expenses'] as $expense) {
+            $revenue += $expense['billed']['total_amount'];
+        }
+        return $revenue;
     }
 
     private function transformPeopleCosts($projectId, array $tasks)
