@@ -60,35 +60,35 @@ export default function Settings({ form, accounts }) {
               </div>
             </div>
             {form.get('isCreatingBasecampProjectEnabled') ? (
-            <div>
-              <div className="form-group">
-                <label htmlFor="account">Choose a Basecamp used for creating a new project</label>
-                <select
-                  className="form-control" name="account" id="account"
-                  value={form.get('account') ? form.get('account') : ''} onChange={form.set('account')}
-                >
-                  <option></option>
-                  {accounts.basecamp.map(personAccount => {
-                    return <option key={personAccount.account.id} value={personAccount.account.id}>
-                      {personAccount.account.name} ({personAccount.account.identity.email_address})
-                    </option>;
-                  })}
-                </select>
-              </div>
-              <div className="form-group">
-                <label htmlFor="account">Choose a Costlocker user used for accessing Costlocker</label>
-                <select
-                  className="form-control" name="costlockerUser" id="costlockerUser"
-                  value={form.get('costlockerUser') ? form.get('costlockerUser') : ''} onChange={form.set('costlockerUser')}
-                >
-                  <option></option>
-                  {accounts.costlocker.map(person => {
-                    return <option key={person.email} value={person.email}>
-                      {person.first_name} {person.last_name} ({person.email})
-                    </option>;
-                  })}
-                </select>
-              </div>
+            <div className="form-group">
+              <label htmlFor="account">Choose a Basecamp used for creating a new project</label>
+              <select
+                className="form-control" name="account" id="account"
+                value={form.get('account') ? form.get('account') : ''} onChange={form.set('account')}
+              >
+                <option></option>
+                {accounts.basecamp.map(personAccount => {
+                  return <option key={personAccount.account.id} value={personAccount.account.id}>
+                    {personAccount.account.name} ({personAccount.account.identity.email_address})
+                  </option>;
+                })}
+              </select>
+            </div>
+            ) : null}
+            {form.get('isCreatingBasecampProjectEnabled') || form.get('areTasksEnabled') ? (
+            <div className="form-group">
+              <label htmlFor="account">Choose a Costlocker user used for accessing Costlocker</label>
+              <select
+                className="form-control" name="costlockerUser" id="costlockerUser"
+                value={form.get('costlockerUser') ? form.get('costlockerUser') : ''} onChange={form.set('costlockerUser')}
+              >
+                <option></option>
+                {accounts.costlocker.map(person => {
+                  return <option key={person.email} value={person.email}>
+                    {person.first_name} {person.last_name} ({person.email})
+                  </option>;
+                })}
+              </select>
             </div>
             ) : null}
           </div>
