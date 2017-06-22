@@ -15,7 +15,7 @@ import { pushToApi, fetchFromApi, loginUrls } from './api';
 const steps = new Steps([
   'Login',
   'Projects',
-  'People costs',
+  'Personnel costs',
   'Expenses',
   'Summary',
   'Results',

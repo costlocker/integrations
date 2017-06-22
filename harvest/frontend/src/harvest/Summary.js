@@ -8,7 +8,7 @@ export default function Summary({ project, goToNextStep }) {
   return (
     <div>
       <FullButton text="Import project to Costlocker" onClick={goToNextStep} />
-      <h2>People Costs</h2>
+      <h2>Personnel Costs</h2>
       <CostlockerCosts peopleCosts={project.peoplecosts} />
       <Expenses expenses={project.expenses} />
     </div>

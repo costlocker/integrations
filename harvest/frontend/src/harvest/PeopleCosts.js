@@ -111,7 +111,7 @@ const PeopleCosts = ({ peopleCosts, project, fixedBudget }) => {
           </table>
         </div>
         <div className="col-sm-7">
-          <h3>People costs in Costlocker</h3>
+          <h3>Personnel costs in Costlocker</h3>
           <CostlockerCosts peopleCosts={peopleCosts} />
         </div>
       </div>
