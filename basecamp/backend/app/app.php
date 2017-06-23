@@ -84,7 +84,8 @@ $app['client.user'] = function ($app) {
 $app['client.check'] = function ($app) {
     return new Costlocker\Integrations\Auth\CheckAuthorization(
         $app['session'],
-        $app['client.costlocker']
+        $app['client.costlocker'],
+        $app['client.basecamp']
     );
 };
 

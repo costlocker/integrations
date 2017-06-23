@@ -1,7 +1,7 @@
 import React from 'react';
 import { pushToApi } from '../api';
 
-const buildError = ({ jsError, currentUser }) => ({
+const buildError = (jsError, currentUser) => ({
   error: jsError.toString(),
   stack: jsError.stack,
   user: {
