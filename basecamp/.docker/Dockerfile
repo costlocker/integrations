@@ -9,7 +9,7 @@ RUN php -r "readfile('https://getcomposer.org/installer');" > composer-setup.php
     php composer-setup.php && \
     php -r "unlink('composer-setup.php');" && \
     mv composer.phar /usr/local/bin/composer && \
-    (cd /app/backend && composer install --no-dev) && \
+    (cd /app/backend && bin/init prod) && \
     chown www-data.www-data -R /app 
 
 EXPOSE 80

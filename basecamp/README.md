@@ -8,8 +8,8 @@
 ```
 cd backend
 createdb costlocker_basecamp -e -E utf8
-composer install
 cp .env.example .env
+bin/init
 bin/console migrations:migrate
 ```
 
