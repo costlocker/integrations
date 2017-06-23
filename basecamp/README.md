@@ -62,8 +62,13 @@ docker exec -it basecamp_postgres_1 createdb costlocker_basecamp -e -E utf8 --ow
 # run migrations
 docker exec -it basecamp-costlocker /app/backend/bin/console migrations:migrate
 
-# run daemons
+# run daemon
+## you can setup daemon in your host supervisor, upstart, ...
+## or you can use docker service, take a look at 'queue_daemon' in docker-compose.yml.example
+## for experiments and development we recommend to run daemon interactively in your terminal
 docker exec -it basecamp-costlocker /app/backend/bin/console queue:daemon
+
+# refresh tokens in cron
 docker exec -it basecamp-costlocker /app/backend/bin/console refreshTokens --expiration "1 day" --execute
 ```
 

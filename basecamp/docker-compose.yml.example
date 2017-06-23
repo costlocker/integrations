@@ -18,10 +18,18 @@ services:
         links:
             - postgres:db.local
 
+    queue_daemon:
+        container_name: basecamp-costlocker-queue
+        restart: always
+        build:
+            context: .
+            dockerfile: ./.docker/Dockerfile.queue
+        links:
+            - postgres:db.local
+
     postgres:
         image: postgres:9.6.3
-        ports:
-            - "5433:5432"
+        restart: always
         volumes:
             - postgres-data:/var/lib/postgresql/data
         environment:
