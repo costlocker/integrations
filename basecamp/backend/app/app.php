@@ -103,7 +103,7 @@ $checkCsrf = function () {
 };
 
 $getWebhookUrl = function (Request $r) {
-    return getenv('BASECAMP_WEBHOOK_URL') ?: $r->getUriForPath('/webhooks/handler');
+    return getenv('APP_WEBHOOK_DEV_URL') ?: $r->getUriForPath('/webhooks/handler');
 };
 
 $app
