@@ -11,12 +11,14 @@ class ProcessApiWebhook
 {
     private $database;
     private $synchronizer;
+    private $webhookVerifier;
     private $eventsLogger;
 
-    public function __construct(SyncDatabase $db, Synchronizer $s, EventsLogger $e)
+    public function __construct(SyncDatabase $db, Synchronizer $s, CostlockerWebhookVerifier $v, EventsLogger $e)
     {
         $this->database = $db;
         $this->synchronizer = $s;
+        $this->webhookVerifier = $v;
         $this->eventsLogger = $e;
     }
 
@@ -25,7 +27,7 @@ class ProcessApiWebhook
         if ($this->isBasecampWebhook($webhook['headers'])) {
             return $this->processBasecampWebhook($webhook['body'], $webhookUrl);
         } else {
-            return $this->processCostlockerWebhooks($webhook['body']);
+            return $this->processCostlockerWebhooks($webhook);
         }
     }
 
@@ -65,9 +67,14 @@ class ProcessApiWebhook
         );
     }
 
-    private function processCostlockerWebhooks(array $json)
+    private function processCostlockerWebhooks(array $webhook)
     {
-        $requests = $this->processCostlockerWebhook($json);
+        if (!$this->webhookVerifier->__invoke($webhook['body'], $webhook['headers'])) {
+            $this->eventsLogger->__invoke(Event::INVALID_COSTLOCKER_WEBHOOK, $webhook);
+            return [];
+        }
+
+        $requests = $this->processCostlockerWebhook($webhook['body']);
         $results = [];
         foreach ($requests as $r) {
             $results[] = $this->synchronizer->__invoke($r);

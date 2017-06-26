@@ -19,6 +19,7 @@ abstract class GivenSynchronizer extends \PHPUnit_Framework_TestCase
     protected $basecamp;
     protected $database;
     protected $eventsLogger;
+    protected $hasWebhookValidSignature = true;
 
     protected $eventType;
     protected $request;
@@ -178,6 +179,9 @@ abstract class GivenSynchronizer extends \PHPUnit_Framework_TestCase
         $basecamps = m::mock(BasecampAdapter::class);
         $basecamps->shouldReceive('buildClient')->andReturn($this->basecamp);
 
+        $verifier = m::mock(CostlockerWebhookVerifier::class);
+        $verifier->shouldReceive('__invoke')->andReturn($this->hasWebhookValidSignature);
+
         $event = new Event();
         $event->data = [
             'type' => $this->eventType,
@@ -189,6 +193,7 @@ abstract class GivenSynchronizer extends \PHPUnit_Framework_TestCase
             'client.costlocker' => $this->costlocker,
             'client.user' => $user,
             'client.basecamp' => $basecamps,
+            'signature.costlocker' => $verifier,
             'database' => $this->database,
             'events.logger' => $this->eventsLogger,
         ]);

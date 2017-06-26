@@ -47,6 +47,7 @@ class ProcessEvent
             return new ProcessApiWebhook(
                 $this->services['database'],
                 $synchronizer,
+                $this->services['signature.costlocker'],
                 $this->services['events.logger']
             );
         } else {

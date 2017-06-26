@@ -57,6 +57,10 @@ $app['client.basecamp'] = function ($app) {
     return new \Costlocker\Integrations\Basecamp\BasecampAdapter($app['client.user']);
 };
 
+$app['signature.costlocker'] = function () {
+    return new \Costlocker\Integrations\Sync\CostlockerWebhookVerifier(getenv('CL_CLIENT_SECRET'));
+};
+
 $app['oauth.basecamp'] = function () {
     return new Costlocker\Integrations\Auth\Provider\BasecampOAuthProvider([
         'clientId' => getenv('BASECAMP_CLIENT_ID'),

@@ -346,6 +346,15 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
         ];
     }
 
+    public function testIgnoreWehbhookWithInvalidSignature()
+    {
+        $this->hasWebhookValidSignature = false;
+        $this->givenCostlockerWebhook('update-person-and-tasks.json');
+        $this->shouldNotCreatePeopleOrTodosInBasecamp();
+        $this->eventsLogger->shouldReceive('__invoke')->once()->with(Event::INVALID_COSTLOCKER_WEBHOOK, m::any());
+        $this->synchronize(null);
+    }
+
     protected function givenCostlockerWebhook($file)
     {
         parent::givenWebhook($file, []);
