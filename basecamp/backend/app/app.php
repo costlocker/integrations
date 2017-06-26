@@ -243,7 +243,7 @@ $app
 $app
     ->post('/webhooks/handler', function (Request $r) use ($pushEvent) {
         $data = [
-            'body' => json_decode($r->getContent(), true),
+            'rawBody' => $r->getContent(),
             'headers' => $r->headers->all()
         ];
         return $pushEvent(\Costlocker\Integrations\Entities\Event::WEBHOOK_SYNC, $data, $r);

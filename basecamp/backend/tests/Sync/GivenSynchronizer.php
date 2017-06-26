@@ -46,8 +46,8 @@ abstract class GivenSynchronizer extends \PHPUnit_Framework_TestCase
     {
         $json = file_get_contents(__DIR__ . "/fixtures/webhooks/{$file}");
         $this->request = [
-            'headers' => $headers, // should verify that webhook is from costlocker
-            'body' => json_decode($json, true)
+            'headers' => $headers,
+            'rawBody' => $json,
         ];
     }
 

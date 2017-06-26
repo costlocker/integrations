@@ -38,11 +38,11 @@ class CostlockerWebhookVerifierTest extends \PHPUnit_Framework_TestCase
     private function signatureShouldBe($expectedResult)
     {
         $request = [
-            'body' => $this->body,
+            'rawBody' => json_encode($this->body),
             'headers' => $this->headers,
         ];
         $verifier = new CostlockerWebhookVerifier($this->secret);
-        assertThat($verifier($request['body'], $request['headers']), identicalTo($expectedResult));
+        assertThat($verifier($request['rawBody'], $request['headers']), identicalTo($expectedResult));
     }
 
     private function givenSignatureHeaders($secret, $algorithm = 'sha256')
