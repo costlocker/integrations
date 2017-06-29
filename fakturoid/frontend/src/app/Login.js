@@ -3,6 +3,9 @@ import React from 'react';
 import { Errors, ExternalLink } from '../ui/Components';
 
 export default function Login({ costlockerAuth, fakturoidAuth, loginUrls, loginError }) {
+  const fakturoidUrl = fakturoidAuth
+    ? `https://app.fakturoid.cz/${fakturoidAuth.account.slug}`
+    : 'https://app.fakturoid.cz';
   return (
     <div>
       <div className="row text-center">
@@ -20,13 +23,13 @@ export default function Login({ costlockerAuth, fakturoidAuth, loginUrls, loginE
           </a>
         </div>
         <div className="col-sm-6">
-          <h2>Fakturoid <ExternalLink url="https://fakturoid.cz" /></h2>
+          <h2>Fakturoid <ExternalLink url={fakturoidUrl} /></h2>
           {costlockerAuth ? (
           <form action={loginUrls.fakturoid} method="POST">
             <div className="form-group">
               <label htmlFor="email">Email address</label>
               <input type="email" className="form-control" id="email" name="email" placeholder="Email"
-                defaultValue={fakturoidAuth ? fakturoidAuth.email : null} />
+                defaultValue={fakturoidAuth ? fakturoidAuth.person.email : null} />
             </div>
             <div className="form-group">
               <label htmlFor="token">API token</label>
@@ -35,7 +38,7 @@ export default function Login({ costlockerAuth, fakturoidAuth, loginUrls, loginE
             <div className="form-group">
               <label htmlFor="token">Fakturoid slug (subdomain)</label>
               <input type="text" className="form-control" id="slug" name="slug"
-                defaultValue={fakturoidAuth ? fakturoidAuth.accounts[0].slug : null} />
+                defaultValue={fakturoidAuth ? fakturoidAuth.account.slug : null} />
             </div>
             <button type="submit" className="btn btn-primary btn-block">{fakturoidAuth ? 'Switch account' : 'Login'}</button>
           </form>

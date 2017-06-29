@@ -23,6 +23,11 @@ class FakturoidAccount
     public $slug;
 
     /**
+     * @ORM\Column(type="string")
+     */
+    public $name;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     public $createdAt;

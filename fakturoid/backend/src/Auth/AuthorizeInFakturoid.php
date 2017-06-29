@@ -45,29 +45,28 @@ class AuthorizeInFakturoid
             return $this->sendError('Invalid fakturoid credentials');
         }
 
-        $rawUser = json_decode($response->getBody(), true);
-        $user = $this->removeOtherAccounts($rawUser, $slug);
-        if (!$user['accounts']) {
+        $user = json_decode($response->getBody(), true);
+        $account = $this->getSelectedAccount($user, $slug);
+        if (!$account) {
             return $this->sendError("You don't have access to '{$slug}' account");
         }
 
-        $fakturoidId = $this->persistUser->__invoke($user, $slug);
+        $fakturoidId = $this->persistUser->__invoke($user, $account);
         $this->session->set('fakturoid', [
             'userId' => $fakturoidId,
-            'account' => $user,
             'accessToken' => $authorization,
         ]);
         return new RedirectResponse($this->appUrl);
     }
 
-    private function removeOtherAccounts(array $user, $slug)
+    private function getSelectedAccount(array $user, $slug)
     {
-        foreach ($user['accounts'] as $id => $account) {
-            if ($account['slug'] != $slug) {
-                unset($user['accounts'][$id]);
+        foreach ($user['accounts'] as $account) {
+            if ($account['slug'] == $slug) {
+                return $account;
             }
         }
-        return $user;
+        return null;
     }
 
     private function sendError($errorMessage)

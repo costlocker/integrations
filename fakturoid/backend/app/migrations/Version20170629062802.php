@@ -30,6 +30,7 @@ class Version20170629062802 extends AbstractMigration
             CREATE TABLE fa_accounts (
                 id INT NOT NULL,
                 slug VARCHAR(255) NOT NULL,
+                name VARCHAR(255) NOT NULL,
                 created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
                 PRIMARY KEY(id)
             )
@@ -39,6 +40,7 @@ class Version20170629062802 extends AbstractMigration
                 id INT NOT NULL,
                 email VARCHAR(255) NOT NULL,
                 data JSON NOT NULL,
+                fa_user_id INT NOT NULL,
                 fa_company_id INT NOT NULL,
                 created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
                 updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL,

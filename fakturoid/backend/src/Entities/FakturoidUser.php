@@ -28,6 +28,11 @@ class FakturoidUser
     public $data;
 
     /**
+     * @ORM\Column(type="integer", name="fa_user_id")
+     */
+    public $fakturoidId;
+
+    /**
      * @ORM\ManyToOne(targetEntity="FakturoidAccount")
      * @ORM\JoinColumn(name="fa_company_id", nullable=false, onDelete="CASCADE")
      */

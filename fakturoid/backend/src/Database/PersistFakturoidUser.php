@@ -18,15 +18,17 @@ class PersistFakturoidUser
         $this->getUser = $u;
     }
 
-    public function __invoke(array $apiUser, $slug)
+    public function __invoke(array $apiUser, array $apiAccount)
     {
-        $account = $this->findAccountInDb($slug) ?: new FakturoidAccount();
-        $account->slug = $slug;
+        $account = $this->findAccountInDb($apiAccount['slug']) ?: new FakturoidAccount();
+        $account->slug = $apiAccount['slug'];
+        $account->name = $apiAccount['name'];
 
-        $user = $this->findUserInDb($apiUser['email'], $slug) ?: new FakturoidUser();
+        $user = $this->findUserInDb($apiUser['email'], $apiAccount['slug']) ?: new FakturoidUser();
         $user->email = $apiUser['email'];
         $user->data = $apiUser;
         $user->fakturoidAccount = $account;
+        $user->fakturoidId = $apiUser['id'];
         $user->updatedAt = new \DateTime();
 
         $clUser = $this->getUser->getCostlockerUser();

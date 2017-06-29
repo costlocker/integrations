@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Costlocker\Integrations\Entities\CostlockerUser;
+use Costlocker\Integrations\Entities\FakturoidUser;
 
 class GetUser
 {
@@ -22,9 +23,10 @@ class GetUser
 
     public function __invoke()
     {
+        $clUser = $this->getCostlockerUser();
         return new JsonResponse([
-            'fakturoid' => $this->session->get('fakturoid')['account'] ?? null,
-            'costlocker' => $this->session->get('costlocker')['account'] ?? null,
+            'costlocker' => $clUser->data,
+            'fakturoid' => $clUser->fakturoidUser ? $this->transformFakturoidUser($clUser->fakturoidUser): null,
             'csrfToken' => $this->session->get('csrfToken'),
         ]);
     }
@@ -37,11 +39,33 @@ class GetUser
     public function getCostlockerUser()
     {
         if (!$this->costlockerUser) {
-            $userId = $this->session->get('costlocker')['userId'] ?? 0;
-            $user = $this->entityManager->getRepository(CostlockerUser::class)
-                ->find($userId);
-            $this->costlockerUser = $user;
+            $dql =<<<DQL
+                SELECT cu, fu, fa
+                FROM Costlocker\Integrations\Entities\CostlockerUser cu
+                LEFT JOIN cu.fakturoidUser fu
+                LEFT JOIN fu.fakturoidAccount fa
+                WHERE cu.id = :id
+DQL;
+            $params = [
+                'id' => $this->session->get('costlocker')['userId'] ?? 0
+            ];
+            $entities = $this->entityManager->createQuery($dql)->execute($params);
+            $this->costlockerUser = array_shift($entities);
         }
         return $this->costlockerUser ?: new CostlockerUser();
+    }
+
+    private function transformFakturoidUser(FakturoidUser $u)
+    {
+        return [
+            'person' => [
+                'email' => $u->email,
+                'full_name' => $u->data['full_name'],  
+            ],
+            'account' => [
+                'slug' => $u->fakturoidAccount->slug,
+                'name' => $u->fakturoidAccount->name,
+            ],
+        ];
     }
 }
