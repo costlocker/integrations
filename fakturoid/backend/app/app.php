@@ -138,8 +138,7 @@ $app
             $app['client.user'],
             $app['orm.em']
         );
-        $data = $strategy($r);
-        return new JsonResponse($data);
+        return $strategy($r);
     })
     ->before($checkAuthorization('fakturoid'));
 

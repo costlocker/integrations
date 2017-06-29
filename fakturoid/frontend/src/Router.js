@@ -53,9 +53,10 @@ export const states = [
           ),
           submit: (e) => {
             e.preventDefault();
-            const request = appState.cursor(['invoice']).deref().toJS();
-            request.costlocker = appState.cursor(['costlocker', 'invoice']).deref();
-            console.log(JSON.stringify(request, null, 2));
+            const request = {
+              fakturoid: appState.cursor(['invoice']).deref().toJS(),
+              costlocker: appState.cursor(['costlocker', 'invoice']).deref(),
+            };
             pushToApi('/fakturoid', request)
               .catch(setError)
               .then(response => console.log(response));
