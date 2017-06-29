@@ -20,6 +20,7 @@ const appState = immstruct({
   },
   invoice: {
     subject: '',
+    lines: []
   },
 });
 

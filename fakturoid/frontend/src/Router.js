@@ -44,6 +44,7 @@ export const states = [
       return <Invoice
         costlockerInvoice={appState.cursor(['costlocker', 'invoice']).deref()}
         fakturoidSubjects={appState.cursor(['fakturoid', 'subjects']).deref()}
+        invoiceCursor={appState.cursor(['invoice'])}
         form={{
           get: (type) => appState.cursor(['invoice', type]).deref(),
           set: (type) => (e) => appState.cursor(['invoice']).set(
