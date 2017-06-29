@@ -23,12 +23,12 @@ class FakturoidClient
         return $this->authorization;
     }
 
-    public function __invoke($path)
+    public function __invoke($path, array $json = null)
     {
         $authorization = $this->authorization ?: $this->getUser->getFakturoidAuthorization();
 
         return $this->client->request(
-            'get',
+            is_array($json) ? 'post' : 'get',
             "https://app.fakturoid.cz/api/v2{$path}",
             [
                 'http_errors' => false,
@@ -37,6 +37,7 @@ class FakturoidClient
                     'User-Agent' => 'CostlockerIntegration (development@costlocker.com)',
                     'Authorization' => "Basic {$authorization}"
                 ],
+                'json' => $json,
             ]
         );
     }

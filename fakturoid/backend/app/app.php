@@ -131,4 +131,16 @@ $app
     })
     ->before($checkAuthorization('fakturoid'));
 
+$app
+    ->post('/fakturoid', function (Request $r) use ($app) {
+        $strategy = new Costlocker\Integrations\Fakturoid\CreateInvoice(
+            $app['client.fakturoid'],
+            $app['client.user'],
+            $app['orm.em']
+        );
+        $data = $strategy($r);
+        return new JsonResponse($data);
+    })
+    ->before($checkAuthorization('fakturoid'));
+
 return $app;

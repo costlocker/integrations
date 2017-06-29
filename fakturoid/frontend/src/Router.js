@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { appState, isNotLoggedInCostlocker, isNotLoggedInFakturoid } from './state';
-import { fetchFromApi, loginUrls } from './api';
+import { fetchFromApi, pushToApi, loginUrls } from './api';
 import Login from './app/Login';
 import Invoice from './app/Invoice';
 import InvoiceTutorial from './app/InvoiceTutorial';
@@ -53,7 +53,12 @@ export const states = [
           ),
           submit: (e) => {
             e.preventDefault();
-            console.log(appState.cursor(['invoice']).deref().toJS());
+            const request = appState.cursor(['invoice']).deref().toJS();
+            request.costlocker = appState.cursor(['costlocker', 'invoice']).deref();
+            console.log(JSON.stringify(request, null, 2));
+            pushToApi('/fakturoid', request)
+              .catch(setError)
+              .then(response => console.log(response));
           }
         }}
       />
