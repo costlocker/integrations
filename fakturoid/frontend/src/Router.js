@@ -59,7 +59,7 @@ export const states = [
             };
             pushToApi('/fakturoid', request)
               .catch(setError)
-              .then(response => console.log(response));
+              .then(response => alert('Invoice was created in Fakturoid, updated in Costlocker'));
           }
         }}
       />

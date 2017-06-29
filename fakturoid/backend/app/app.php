@@ -136,6 +136,7 @@ $app
         $strategy = new Costlocker\Integrations\Fakturoid\CreateInvoice(
             $app['client.fakturoid'],
             $app['client.user'],
+            new \Costlocker\Integrations\Costlocker\MarkSentInvoice($app['client.costlocker']),
             $app['orm.em']
         );
         return $strategy($r);

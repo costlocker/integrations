@@ -73,4 +73,9 @@ class Invoice
         $this->costlockerUser = $u;
         $this->fakturoidUser = $u->fakturoidUser; 
     }
+
+    public function getCurrentCostlockerDescription()
+    {
+        return $this->data['request']['costlocker']['invoice']['billing']['description'] ?? '';
+    }
 }
