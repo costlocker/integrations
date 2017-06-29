@@ -41,6 +41,7 @@ export const states = [
     url: '/login?loginError',
     component: (props) => <Login
       costlockerAuth={appState.cursor(['auth', 'costlocker']).deref()}
+      fakturoidAuth={appState.cursor(['auth', 'fakturoid']).deref()}
       loginUrls={loginUrls}
       loginError={props.transition.params().loginError} />,
   },

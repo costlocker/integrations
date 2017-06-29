@@ -6,14 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(
- *  name="cl_users",
- *  uniqueConstraints={
- *    @ORM\UniqueConstraint(name="cl_unique_user", columns={"email", "cl_company_id"})
- *  }
- * )
+ * @ORM\Table(name="fa_users")
  */
-class CostlockerUser
+class FakturoidUser
 {
     /**
      * @ORM\Id
@@ -28,20 +23,15 @@ class CostlockerUser
     public $email;
 
     /**
-     * @ORM\Column(type="integer", name="cl_company_id")
-     */
-    public $costlockerCompany;
-
-    /**
      * @ORM\Column(type="json_array")
      */
     public $data;
 
     /**
-     * @ORM\ManyToOne(targetEntity="FakturoidUser")
-     * @ORM\JoinColumn(name="fa_user_id", nullable=true, referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\ManyToOne(targetEntity="FakturoidAccount")
+     * @ORM\JoinColumn(name="fa_company_id", nullable=false, onDelete="CASCADE")
      */
-    public $fakturoidUser;
+    public $fakturoidAccount;
 
     /**
      * @ORM\Column(type="datetime")

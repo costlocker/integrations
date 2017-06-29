@@ -4,6 +4,7 @@ import { getCsrfToken } from './state';
 
 const loginUrls = {
   costlocker: `${apiUrl}/oauth/costlocker`,
+  fakturoid: `${apiUrl}/oauth/fakturoid`,
 };
 
 const handleErrors = (response) => {

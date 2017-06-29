@@ -41,7 +41,7 @@ $app['oauth.costlocker'] = function () {
 };
 
 $app['client.user'] = function ($app) {
-    return new Costlocker\Integrations\Auth\GetUser($app['session']);
+    return new Costlocker\Integrations\Auth\GetUser($app['session'], $app['orm.em']);
 };
 
 $app['client.check'] = function ($app) {
@@ -49,6 +49,13 @@ $app['client.check'] = function ($app) {
         $app['session'],
         $app['client.costlocker']
     );
+};
+
+$checkAuthorization = function ($service) use ($app) {
+    // prevents 'Cannot override frozen service "guzzle"'
+    return function () use ($service, $app) {
+        return $app['client.check']->checkAccount($service);
+    };
 };
 
 $app
@@ -73,5 +80,17 @@ $app
         );
         return $strategy($r);
     });
+
+$app
+    ->post('/oauth/fakturoid', function (Request $r) use ($app) {
+        $strategy = new Costlocker\Integrations\Auth\AuthorizeInFakturoid(
+            $app['guzzle'],
+            $app['session'],
+            new Costlocker\Integrations\Database\PersistFakturoidUser($app['orm.em'], $app['client.user']),
+            getenv('APP_FRONTED_URL')
+        );
+        return $strategy($r);
+    })
+    ->before($checkAuthorization('costlocker'));
 
 return $app;

@@ -1,19 +1,47 @@
 import React from 'react';
 
-import OAuthLogin from './OAuthLogin';
-import { ExternalLink } from '../ui/Components';
+import { Errors, ExternalLink } from '../ui/Components';
 
-export default function Login({ costlockerAuth, loginUrls, loginError }) {
+export default function Login({ costlockerAuth, fakturoidAuth, loginUrls, loginError }) {
   return (
     <div>
       <div className="row text-center">
         <div className="col-sm-12">
+          <Errors title="Login error" error={loginError} />
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-sm-6 text-center">
           <h2>Costlocker <ExternalLink url="https://new.costlocker.com" /></h2>
-          <OAuthLogin
-            title={costlockerAuth
+          <a href={loginUrls.costlocker} className="btn btn-primary">
+            {costlockerAuth
               ? <span>Switch account <strong>{costlockerAuth.person.first_name} {costlockerAuth.person.last_name}</strong></span>
               : 'Login to Costlocker'}
-            loginError={loginError} loginUrl={loginUrls.costlocker} />
+          </a>
+        </div>
+        <div className="col-sm-6">
+          <h2>Fakturoid <ExternalLink url="https://fakturoid.cz" /></h2>
+          {costlockerAuth ? (
+          <form action={loginUrls.fakturoid} method="POST">
+            <div className="form-group">
+              <label htmlFor="email">Email address</label>
+              <input type="email" className="form-control" id="email" name="email" placeholder="Email"
+                defaultValue={fakturoidAuth ? fakturoidAuth.email : null} />
+            </div>
+            <div className="form-group">
+              <label htmlFor="token">API token</label>
+              <input type="text" className="form-control" id="token" name="token" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="token">Fakturoid slug (subdomain)</label>
+              <input type="text" className="form-control" id="slug" name="slug"
+                defaultValue={fakturoidAuth ? fakturoidAuth.accounts[0].slug : null} />
+            </div>
+            <button type="submit" className="btn btn-primary btn-block">{fakturoidAuth ? 'Switch account' : 'Login'}</button>
+          </form>
+          ) : (
+            <p className="text-muted">At first you have to login to Costlocker</p>
+          )}
         </div>
       </div>
     </div>

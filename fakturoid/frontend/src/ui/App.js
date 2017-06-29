@@ -15,7 +15,7 @@ const CostlockerUser = ({ user }) => {
 const FakturoidUser = ({ user }) => {
   if (user) {
     return <span>
-      {user.first_name} {user.last_name} ({user.email_address})
+      {user.full_name} ({user.accounts[0].name})
     </span>;
   } else {
     return <em>Not logged in Fakturoid</em>;
