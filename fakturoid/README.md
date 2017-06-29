@@ -1,5 +1,5 @@
 
-# Harvest integration
+# Fakturoid integration
 
 ## Installation
 
