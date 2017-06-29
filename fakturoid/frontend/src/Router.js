@@ -4,6 +4,7 @@ import { appState, isNotLoggedInCostlocker, isNotLoggedInFakturoid } from './sta
 import { fetchFromApi, loginUrls } from './api';
 import Login from './app/Login';
 import Invoice from './app/Invoice';
+import InvoiceTutorial from './app/InvoiceTutorial';
 
 export let redirectToRoute = (route) => console.log('app is not ready', route);
 export let isRouteActive = () => false;
@@ -35,21 +36,27 @@ export const states = [
   },
   {
     name: 'invoice',
-    url: '/invoice',
-    component: () => <Invoice
-      fakturoidSubjects={appState.cursor(['fakturoid', 'subjects']).deref()}
-      form={{
-        get: (type) => appState.cursor(['invoice', type]).deref(),
-        set: (type) => (e) => appState.cursor(['invoice']).set(
-          type,
-          e.target.type === 'checkbox' ? e.target.checked : e.target.value
-        ),
-        submit: (e) => {
-          e.preventDefault();
-          console.log(appState.cursor(['invoice']).deref().toJS());
-        }
-      }}
-    />,
+    url: '/invoice?id',
+    component: (props) => {
+      const id = props.transition.params().id;
+      if (!id) {
+        return <InvoiceTutorial />;
+      }
+      return <Invoice
+        fakturoidSubjects={appState.cursor(['fakturoid', 'subjects']).deref()}
+        form={{
+          get: (type) => appState.cursor(['invoice', type]).deref(),
+          set: (type) => (e) => appState.cursor(['invoice']).set(
+            type,
+            e.target.type === 'checkbox' ? e.target.checked : e.target.value
+          ),
+          submit: (e) => {
+            e.preventDefault();
+            console.log(appState.cursor(['invoice']).deref().toJS());
+          }
+        }}
+      />
+    },
     resolve: [
       {
         token: 'loadFakturoidClients',
@@ -85,8 +92,9 @@ const hooks = [
         return isPrivateState && isNotLoggedInCostlocker();
       }
     },
-    callback: (transition: any) =>
-      transition.router.stateService.target('login', transition.params(), { location: true }),
+    callback: (transition: any) => {
+      transition.router.stateService.target('login', transition.params(), { location: true })
+    },
     priority: 10,
   },
   {
