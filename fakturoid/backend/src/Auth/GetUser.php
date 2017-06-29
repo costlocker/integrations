@@ -27,8 +27,14 @@ class GetUser
         return new JsonResponse([
             'costlocker' => $clUser->data,
             'fakturoid' => $clUser->fakturoidUser ? $this->transformFakturoidUser($clUser->fakturoidUser): null,
+            'isLoggedInFakturoid' => $this->session->get('fakturoid') && $clUser->fakturoidUser ? true : false,
             'csrfToken' => $this->session->get('csrfToken'),
         ]);
+    }
+
+    public function getFakturoidAuthorization()
+    {
+        return $this->session->get('fakturoid')['accessToken'];
     }
 
     public function getCostlockerAccessToken()

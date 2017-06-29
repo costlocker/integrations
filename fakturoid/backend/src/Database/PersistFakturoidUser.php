@@ -38,8 +38,6 @@ class PersistFakturoidUser
         $this->entityManager->persist($user);
         $this->entityManager->persist($clUser);
         $this->entityManager->flush();
-
-        return $user->id;
     }
 
     private function findAccountInDb($slug)

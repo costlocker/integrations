@@ -5,6 +5,7 @@ const appState = immstruct({
     isLoading: true,
     costlocker: null,
     fakturoid: null,
+    isLoggedInFakturoid: false,
   },
   app: {
     csrfToken: null,
@@ -17,7 +18,7 @@ const isNotLoggedInCostlocker = () =>
   appState.cursor(['auth', 'costlocker']).deref() === null;
 
 const isNotLoggedInFakturoid = () =>
-  appState.cursor(['auth', 'fakturoid']).deref() === null;
+  appState.cursor(['auth', 'isLoggedInFakturoid']).deref() === false;
 
 const getCsrfToken = () => appState.cursor(['app', 'csrfToken']).deref();
 

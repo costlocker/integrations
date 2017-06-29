@@ -16,6 +16,7 @@ const fetchUser = () =>
           .setIn(['auth', 'isLoading'], false)
           .setIn(['auth', 'costlocker'], user.costlocker)
           .setIn(['auth', 'fakturoid'], user.fakturoid)
+          .setIn(['auth', 'isLoggedInFakturoid'], user.isLoggedInFakturoid)
           .setIn(['app', 'csrfToken'], user.csrfToken)
       );
     })
@@ -29,7 +30,7 @@ export const states = [
   {
     name: 'homepage',
     url: '/?loginError',
-    redirectTo: 'invoice',
+    redirectTo: 'login',
   },
   {
     name: 'invoice',
@@ -42,6 +43,7 @@ export const states = [
     component: (props) => <Login
       costlockerAuth={appState.cursor(['auth', 'costlocker']).deref()}
       fakturoidAuth={appState.cursor(['auth', 'fakturoid']).deref()}
+      isLoggedInFakturoid={appState.cursor(['auth', 'isLoggedInFakturoid']).deref()}
       loginUrls={loginUrls}
       loginError={props.transition.params().loginError} />,
   },

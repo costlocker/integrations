@@ -28,6 +28,10 @@ $app['client.costlocker'] = function ($app) {
     return new \Costlocker\Integrations\CostlockerClient($app['guzzle'], $app['client.user'], getenv('CL_HOST'));
 };
 
+$app['client.fakturoid'] = function ($app) {
+    return new Costlocker\Integrations\FakturoidClient($app['guzzle'], $app['client.user']);
+};
+
 $app['oauth.costlocker'] = function () {
     $costlockerHost = getenv('CL_HOST');
     return new \League\OAuth2\Client\Provider\GenericProvider([
@@ -47,7 +51,8 @@ $app['client.user'] = function ($app) {
 $app['client.check'] = function ($app) {
     return new Costlocker\Integrations\Auth\CheckAuthorization(
         $app['session'],
-        $app['client.costlocker']
+        $app['client.costlocker'],
+        $app['client.fakturoid']
     );
 };
 
@@ -84,7 +89,7 @@ $app
 $app
     ->post('/oauth/fakturoid', function (Request $r) use ($app) {
         $strategy = new Costlocker\Integrations\Auth\AuthorizeInFakturoid(
-            $app['guzzle'],
+            $app['client.fakturoid'],
             $app['session'],
             new Costlocker\Integrations\Database\PersistFakturoidUser($app['orm.em'], $app['client.user']),
             getenv('APP_FRONTED_URL')

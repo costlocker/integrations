@@ -12,8 +12,8 @@ const CostlockerUser = ({ user }) => {
   );
 };
 
-const FakturoidUser = ({ user }) => {
-  if (user) {
+const FakturoidUser = ({ user, isLoggedIn }) => {
+  if (isLoggedIn) {
     return <span>
       {user.person.full_name} ({user.account.name})
     </span>;
@@ -32,7 +32,7 @@ const User = ({ auth }) => {
     </span>
     <span className="text-muted">&nbsp;/&nbsp;</span>
     <span title="Fakturoid user">
-      <FakturoidUser user={auth.get('fakturoid')} />
+      <FakturoidUser user={auth.get('fakturoid')} isLoggedIn={auth.get('isLoggedInFakturoid')} />
     </span>
   </div>;
 }

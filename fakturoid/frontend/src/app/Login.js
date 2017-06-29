@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Errors, ExternalLink } from '../ui/Components';
 
-export default function Login({ costlockerAuth, fakturoidAuth, loginUrls, loginError }) {
+export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturoid, loginUrls, loginError }) {
   const fakturoidUrl = fakturoidAuth
     ? `https://app.fakturoid.cz/${fakturoidAuth.account.slug}`
     : 'https://app.fakturoid.cz';
@@ -40,7 +40,7 @@ export default function Login({ costlockerAuth, fakturoidAuth, loginUrls, loginE
               <input type="text" className="form-control" id="slug" name="slug"
                 defaultValue={fakturoidAuth ? fakturoidAuth.account.slug : null} />
             </div>
-            <button type="submit" className="btn btn-primary btn-block">{fakturoidAuth ? 'Switch account' : 'Login'}</button>
+            <button type="submit" className="btn btn-primary btn-block">{isLoggedInFakturoid ? 'Switch account' : 'Login'}</button>
           </form>
           ) : (
             <p className="text-muted">At first you have to login to Costlocker</p>
