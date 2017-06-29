@@ -42,6 +42,11 @@ class GetUser
         return $this->session->get('costlocker')['accessToken']['access_token'];
     }
 
+    public function getFakturoidAccount()
+    {
+        return $this->getCostlockerUser()->fakturoidUser->fakturoidAccount;
+    }
+
     public function getCostlockerUser()
     {
         if (!$this->costlockerUser) {

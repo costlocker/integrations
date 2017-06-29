@@ -98,4 +98,18 @@ $app
     })
     ->before($checkAuthorization('costlocker'));
 
+$app
+    ->get('/fakturoid', function () use ($app) {
+        $strategy = new Costlocker\Integrations\Fakturoid\GetSubjects(
+            $app['client.user'],
+            new Costlocker\Integrations\Fakturoid\DownloadSubjects(
+                $app['client.fakturoid'],
+                $app['orm.em']
+            )
+        );
+        $data = $strategy();
+        return new JsonResponse($data);
+    })
+    ->before($checkAuthorization('fakturoid'));
+
 return $app;

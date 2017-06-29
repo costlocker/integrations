@@ -3,6 +3,7 @@ import React from 'react';
 import { appState, isNotLoggedInCostlocker, isNotLoggedInFakturoid } from './state';
 import { fetchFromApi, loginUrls } from './api';
 import Login from './app/Login';
+import Invoice from './app/Invoice';
 
 export let redirectToRoute = (route) => console.log('app is not ready', route);
 export let isRouteActive = () => false;
@@ -35,7 +36,32 @@ export const states = [
   {
     name: 'invoice',
     url: '/invoice',
-    component: () => <div>Import invoice</div>,
+    component: () => <Invoice
+      fakturoidSubjects={appState.cursor(['fakturoid', 'subjects']).deref()}
+      form={{
+        get: (type) => appState.cursor(['invoice', type]).deref(),
+        set: (type) => (e) => appState.cursor(['invoice']).set(
+          type,
+          e.target.type === 'checkbox' ? e.target.checked : e.target.value
+        ),
+        submit: (e) => {
+          e.preventDefault();
+          console.log(appState.cursor(['invoice']).deref().toJS());
+        }
+      }}
+    />,
+    resolve: [
+      {
+        token: 'loadFakturoidClients',
+        resolveFn: () => {
+          if (!appState.cursor(['fakturoid', 'subjects']).deref()) {
+            fetchFromApi('/fakturoid')
+              .catch(setError)
+              .then(projects => appState.cursor(['fakturoid']).set('subjects', projects));
+          }
+        }
+      }
+    ],
   },
   {
     name: 'login',

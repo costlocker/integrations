@@ -31,6 +31,8 @@ class Version20170629062802 extends AbstractMigration
                 id INT NOT NULL,
                 slug VARCHAR(255) NOT NULL,
                 name VARCHAR(255) NOT NULL,
+                subjects JSON NOT NULL,
+                subjects_downloaded_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL,
                 created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
                 PRIMARY KEY(id)
             )

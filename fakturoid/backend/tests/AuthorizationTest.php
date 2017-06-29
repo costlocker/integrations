@@ -17,7 +17,8 @@ class AuthorizationTest extends GivenApi
     public function provideSecureUrl()
     {
         return [
-            ['GET', '/oauth/fakturoid'],
+            ['GET', '/fakturoid'],
+            ['POST', '/oauth/fakturoid'],
         ];
     }
 }

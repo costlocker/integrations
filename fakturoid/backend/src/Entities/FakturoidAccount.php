@@ -28,6 +28,16 @@ class FakturoidAccount
     public $name;
 
     /**
+     * @ORM\Column(type="json_array")
+     */
+    public $subjects = [];
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    public $subjectsDownloadedAt;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     public $createdAt;
@@ -35,5 +45,12 @@ class FakturoidAccount
     public function __construct()
     {
         $this->createdAt = new \DateTime();
+    }
+
+    public function addSubjects(array $subjects)
+    {
+        foreach ($subjects as $subject) {
+            $this->subjects[$subject['id']] = $subject;
+        }
     }
 }
