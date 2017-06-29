@@ -36,13 +36,13 @@ export const states = [
   },
   {
     name: 'invoice',
-    url: '/invoice?id',
+    url: '/invoice?project&invoice',
     component: (props) => {
-      const id = props.transition.params().id;
-      if (!id) {
+      if (!props.transition.params().invoice || !props.transition.params().project) {
         return <InvoiceTutorial />;
       }
       return <Invoice
+        costlockerInvoice={appState.cursor(['costlocker', 'invoice']).deref()}
         fakturoidSubjects={appState.cursor(['fakturoid', 'subjects']).deref()}
         form={{
           get: (type) => appState.cursor(['invoice', type]).deref(),
@@ -65,6 +65,18 @@ export const states = [
             fetchFromApi('/fakturoid')
               .catch(setError)
               .then(projects => appState.cursor(['fakturoid']).set('subjects', projects));
+          }
+        }
+      },
+      {
+        token: 'loadCostlockerInvoice',
+        deps: ['$transition$'],
+        resolveFn: ($transition$) => {
+          const params = $transition$.params();
+          if (params.invoice && params.project) {
+            fetchFromApi(`/costlocker?project=${params.project}&invoice=${params.invoice}`)
+              .catch(setError)
+              .then(invoice => appState.cursor(['costlocker']).set('invoice', invoice));
           }
         }
       }

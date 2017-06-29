@@ -15,6 +15,9 @@ const appState = immstruct({
   fakturoid: {
     subjects: null,
   },
+  costlocker: {
+    invoice: null,
+  },
   invoice: {
     subject: '',
   },

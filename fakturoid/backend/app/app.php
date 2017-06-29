@@ -108,6 +108,16 @@ $app
     ->before($checkAuthorization('costlocker'));
 
 $app
+    ->get('/costlocker', function (Request $r) use ($app) {
+        $strategy = new \Costlocker\Integrations\Costlocker\GetInvoice(
+            $app['client.costlocker']
+        );
+        $data = $strategy($r);
+        return new JsonResponse($data);
+    })
+    ->before($checkAuthorization('costlocker'));
+
+$app
     ->get('/fakturoid', function () use ($app) {
         $strategy = new Costlocker\Integrations\Fakturoid\GetSubjects(
             $app['client.user'],
