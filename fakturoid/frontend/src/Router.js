@@ -36,6 +36,16 @@ const fetchInvoice = ({ project, invoice }) =>
     .catch(setError)
     .then(invoice => appState.cursor(['costlocker']).set('invoice', invoice));
 
+const fetchLatestInvoices = () =>
+  fetchFromApi(`/costlocker`)
+    .catch(setError)
+    .then(invoices => appState.cursor(['costlocker']).set('latestInvoices', invoices));
+
+const fetchProjectInvoices = (project) =>
+  fetchFromApi(`/costlocker?project=${project}`)
+    .catch(setError)
+    .then(invoices => appState.cursor(['costlocker']).set('projectInvoices', invoices));
+
 const fetchSubjects = () =>
   fetchFromApi('/fakturoid')
     .catch(setError)
@@ -52,10 +62,13 @@ export const states = [
     url: '/invoice?project&invoice',
     component: (props) => {
       const params = props.transition.params();
-      if (!params.invoice || !params.project) {
-        return <InvoiceTutorial />;
-      }
       const subjects = appState.cursor(['fakturoid', 'subjects']).deref();
+      if (!params.invoice || !params.project) {
+        return <InvoiceTutorial
+          latestInvoices={appState.cursor(['costlocker', 'latestInvoices']).deref()}
+          subjects={subjects}
+        />;
+      }
       const invoice = appState.cursor(['costlocker', 'invoice']).deref();
       if (!subjects || !invoice) {
         return <Loading title="Loading fakturoid clients, Costlocker invoice" />;
@@ -66,6 +79,7 @@ export const states = [
       return <Invoice
         costlockerInvoice={invoice}
         fakturoidSubjects={subjects}
+        projectInvoices={appState.cursor(['costlocker', 'projectInvoices']).deref()}
         lines={new InvoiceLines(appState.cursor(['invoice', 'lines']))}
         forceUpdate={() => appState.cursor(['invoice']).set('isForced', true)}
         form={{
@@ -121,6 +135,9 @@ export const states = [
           const params = $transition$.params();
           if (params.invoice && params.project) {
             fetchInvoice(params);
+            fetchProjectInvoices(params.project);
+          } else {
+            fetchLatestInvoices();
           }
         }
       }

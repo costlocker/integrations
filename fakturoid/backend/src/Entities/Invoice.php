@@ -68,6 +68,11 @@ class Invoice
      */
     public $data;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    public $createdAt;
+
     public function __construct(CostlockerUser $u = null)
     {
         if ($u) {

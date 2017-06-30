@@ -28,6 +28,37 @@ class Database
         return array_shift($entities);
     }
 
+    public function findProjectInvoices($costlockerProjectId)
+    {
+        return $this->findInvoices(
+            'i.costlockerProject = :project',
+            ['project' => (int) $costlockerProjectId],
+            100
+        );
+    }
+
+    public function findLatestInvoices(FakturoidAccount $account, $limit)
+    {
+        return $this->findInvoices(
+            'fu.fakturoidAccount = :account',
+            ['account' => $account],
+            $limit
+        );
+    }
+
+    public function findInvoices($condition, $params, $limit)
+    {
+        $dql =<<<DQL
+            SELECT i, cu, fu
+            FROM Costlocker\Integrations\Entities\Invoice i
+            JOIN i.costlockerUser cu
+            JOIN i.fakturoidUser fu
+            WHERE {$condition}
+            ORDER BY i.id DESC
+DQL;
+        return $this->entityManager->createQuery($dql)->setMaxResults($limit)->execute($params);
+    }
+
     public function findCostlockerUserById($id)
     {
         $dql =<<<DQL

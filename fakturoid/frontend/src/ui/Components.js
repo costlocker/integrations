@@ -31,7 +31,10 @@ const Link = ({ title, route, params, action, className }) => {
   return <a href="" onClick={onClick} className={className}>{title}</a>;
 };
 
-const roundNumber = value => Math.round(value * 100) / 100;
+const roundNumber = value => {
+  const rounded = Math.round(value * 100) / 100;
+  return isNaN(rounded) ? null : rounded;
+};
 
 const Number = ({ value }) => <span title={value}>{roundNumber(value)}</span>;
 

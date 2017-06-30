@@ -19,6 +19,8 @@ const appState = immstruct({
   },
   costlocker: {
     invoice: null,
+    latestInvoices: [],
+    projectInvoices: [],
   },
   invoice: {
     isForced: false,

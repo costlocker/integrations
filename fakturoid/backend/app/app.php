@@ -128,10 +128,17 @@ $app
 
 $app
     ->get('/costlocker', function (Request $r) use ($app) {
-        $strategy = new \Costlocker\Integrations\Costlocker\GetInvoice(
-            $app['client.costlocker'],
-            $app['database']
-        );
+        if ($r->query->has('invoice')) {
+            $strategy = new \Costlocker\Integrations\Costlocker\GetInvoice(
+                $app['client.costlocker'],
+                $app['database']
+            );
+        } else {
+            $strategy = new \Costlocker\Integrations\Costlocker\GetCreatedInvoices(
+                $app['database'],
+                $app['client.user']
+            );
+        }
         $data = $strategy($r);
         return new JsonResponse($data);
     })

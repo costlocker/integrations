@@ -1,12 +1,14 @@
 import React from 'react';
 import { Button, Link, Errors, roundNumber, Number } from '../ui/Components';
+import InvoicesList from './InvoicesList';
 
 const InvoiceDetail = ({ costlockerInvoice }) => (
   <table className="table">
     <thead>
       <tr>
         <th style={{ width: '50%' }}>Bill ID / Description</th>
-        <th>Project / Client</th>
+        <th>Client</th>
+        <th>Project</th>
         <th>Billing Date</th>
         <th>Amount</th>
       </tr>
@@ -14,10 +16,9 @@ const InvoiceDetail = ({ costlockerInvoice }) => (
     <tbody>
       <tr>
         <td>{costlockerInvoice.billing.billing.description}</td>
+        <td>{costlockerInvoice.project.client.name}</td>
         <td>
-          {costlockerInvoice.project.name} <span className="badge">{costlockerInvoice.project.client.name}</span>
-          <br />
-          <span className="text-muted">{costlockerInvoice.project.project_id.id}</span>
+          {costlockerInvoice.project.name} <span className="badge">{costlockerInvoice.project.project_id.id}</span>
         </td>
         <td>{costlockerInvoice.billing.billing.date}</td>
         <td>{costlockerInvoice.billing.billing.total_amount}</td>
@@ -75,9 +76,9 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
     <table className="table">
       <thead>
         <tr>
+          <th>Name</th>
           <th width="100">Quantity</th>
           <th width="100">Unit</th>
-          <th>Name</th>
           <th>Unit Amount</th>
           <th>Total Amount</th>
           <th width="10"></th>
@@ -93,6 +94,12 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
           >
             <td>
               <input
+                className="form-control" type="text" required
+                value={line.get('name')} onChange={lines.updateFieldInLine('name', line)}
+              />
+            </td>
+            <td>
+              <input
                 className="form-control" type="number" step="any" required
                 value={line.get('quantity')} onChange={lines.updateFieldInLine('quantity', line)}
               />
@@ -101,12 +108,6 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
               <input
                 className="form-control" type="text"
                 value={line.get('unit')} onChange={lines.updateFieldInLine('unit', line)}
-              />
-            </td>
-            <td>
-              <input
-                className="form-control" type="text" required
-                value={line.get('name')} onChange={lines.updateFieldInLine('name', line)}
               />
             </td>
             <td>
@@ -160,6 +161,9 @@ export default function Invoice(props) {
       <h3>Costlocker billing</h3>
       <InvoiceDetail costlockerInvoice={costlockerInvoice} />
       <InvoiceEditor {...props} />
+      <hr />
+      <h2>Previously imported invoices</h2>
+      <InvoicesList invoices={props.projectInvoices} subjects={props.fakturoidSubjects} />
     </div>;
   } else if (costlockerInvoice.status === 'NOT_DRAFT') {
     return <div>

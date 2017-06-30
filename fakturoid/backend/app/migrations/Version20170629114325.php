@@ -20,8 +20,9 @@ class Version20170629114325 extends AbstractMigration
                 fa_invoice_number VARCHAR(255) NOT NULL, 
                 cl_project_id INT NOT NULL, 
                 cl_client_id INT NOT NULL, 
-                fa_subject_id INT NOT NULL, 
-                data JSON NOT NULL, 
+                fa_subject_id INT NOT NULL,
+                data JSON NOT NULL,
+                created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
                 PRIMARY KEY(id)
             )
         ');
