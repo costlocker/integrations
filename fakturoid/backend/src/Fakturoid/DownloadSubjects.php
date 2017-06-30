@@ -4,17 +4,17 @@ namespace Costlocker\Integrations\Fakturoid;
 
 use Costlocker\Integrations\FakturoidClient;
 use Costlocker\Integrations\Entities\FakturoidAccount;
-use Doctrine\ORM\EntityManagerInterface;
+use Costlocker\Integrations\Database\Database;
 
 class DownloadSubjects
 {
     private $client;
-    private $entityManager;
+    private $database;
 
-    public function __construct(FakturoidClient $c, EntityManagerInterface $em)
+    public function __construct(FakturoidClient $c, Database $db)
     {
         $this->client = $c;
-        $this->entityManager = $em;
+        $this->database = $db;
     }
 
     public function __invoke(FakturoidAccount $account)
@@ -40,13 +40,7 @@ class DownloadSubjects
             $hasNextPage = is_int(strpos($response->getHeaderLine('Link'), "?page={$page}"));
         }
 
-        $this->persistSubjects($account);
-    }
-
-    private function persistSubjects(FakturoidAccount $account)
-    {
         $account->subjectsDownloadedAt = new \DateTime();
-        $this->entityManager->persist($account);
-        $this->entityManager->flush();
+        $this->database->persist($account);
     }
 }

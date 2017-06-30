@@ -6,7 +6,7 @@ use Costlocker\Integrations\FakturoidClient;
 use Costlocker\Integrations\Auth\GetUser;
 use Costlocker\Integrations\Entities\Invoice;
 use Costlocker\Integrations\Costlocker\MarkSentInvoice;
-use Doctrine\ORM\EntityManagerInterface;
+use Costlocker\Integrations\Database\Database;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -15,14 +15,14 @@ class CreateInvoice
     private $client;
     private $getUser;
     private $markSentInvoice;
-    private $entityManager;
+    private $database;
 
-    public function __construct(FakturoidClient $c, GetUser $u, MarkSentInvoice $i, EntityManagerInterface $em)
+    public function __construct(FakturoidClient $c, GetUser $u, MarkSentInvoice $i, Database $dm)
     {
         $this->client = $c;
         $this->getUser = $u;
         $this->markSentInvoice = $i;
-        $this->entityManager = $em;
+        $this->database = $dm;
     }
 
     public function __invoke(Request $r)
@@ -62,8 +62,7 @@ class CreateInvoice
         $invoice->data['response'] = json_decode($response->getBody(), true);
         $invoice->fakturoidInvoiceId = $invoice->data['response']['id'];
         $invoice->fakturoidInvoiceNumber = $invoice->data['response']['number'];
-        $this->entityManager->persist($invoice);
-        $this->entityManager->flush();
+        $this->database->persist($invoice);
 
         $this->markSentInvoice->__invoke($invoice);
 

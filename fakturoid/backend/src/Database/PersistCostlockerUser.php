@@ -3,34 +3,28 @@
 namespace Costlocker\Integrations\Database;
 
 use Costlocker\Integrations\Entities\CostlockerUser;
-use Doctrine\ORM\EntityManagerInterface;
+use Costlocker\Integrations\Database\Database;
 
 class PersistCostlockerUser
 {
-    private $entityManager;
+    private $database;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(Database $db)
     {
-        $this->entityManager = $em;
+        $this->database = $db;
     }
 
     public function __invoke(array $apiUser)
     {
-        $user = $this->findUserInDb($apiUser['person']['email'], $apiUser['company']['id']) ?: new CostlockerUser();
+        $user = $this->database->findCostlockerUser($apiUser['person']['email'], $apiUser['company']['id'])
+            ?: new CostlockerUser();
         $user->email = $apiUser['person']['email'];
         $user->costlockerCompany = $apiUser['company']['id'];
         $user->data = $apiUser;
         $user->updatedAt = new \DateTime();
 
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
+        $this->database->persist($user);
 
         return $user->id;
-    }
-
-    private function findUserInDb($email, $companyId)
-    {
-        return $this->entityManager->getRepository(CostlockerUser::class)
-            ->findOneBy(['email' => $email, 'costlockerCompany' => $companyId]);
     }
 }

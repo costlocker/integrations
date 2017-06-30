@@ -49,7 +49,7 @@ $app['oauth.costlocker'] = function () {
 };
 
 $app['client.user'] = function ($app) {
-    return new Costlocker\Integrations\Auth\GetUser($app['session'], $app['orm.em']);
+    return new Costlocker\Integrations\Auth\GetUser($app['session'], $app['database']);
 };
 
 $app['client.check'] = function ($app) {
@@ -92,7 +92,7 @@ $app
         $strategy = new Costlocker\Integrations\Auth\AuthorizeInCostlocker(
             $app['session'],
             $app['oauth.costlocker'],
-            new Costlocker\Integrations\Database\PersistCostlockerUser($app['orm.em']),
+            new Costlocker\Integrations\Database\PersistCostlockerUser($app['database']),
             $app['logger'],
             getenv('APP_FRONTED_URL')
         );
@@ -104,7 +104,7 @@ $app
         $strategy = new Costlocker\Integrations\Auth\AuthorizeInFakturoid(
             $app['client.fakturoid'],
             $app['session'],
-            new Costlocker\Integrations\Database\PersistFakturoidUser($app['orm.em'], $app['client.user']),
+            new Costlocker\Integrations\Database\PersistFakturoidUser($app['database'], $app['client.user']),
             getenv('APP_FRONTED_URL')
         );
         return $strategy($r);
@@ -128,7 +128,7 @@ $app
             $app['client.user'],
             new Costlocker\Integrations\Fakturoid\DownloadSubjects(
                 $app['client.fakturoid'],
-                $app['orm.em']
+                $app['database']
             )
         );
         $data = $strategy();
@@ -142,7 +142,7 @@ $app
             $app['client.fakturoid'],
             $app['client.user'],
             new \Costlocker\Integrations\Costlocker\MarkSentInvoice($app['client.costlocker']),
-            $app['orm.em']
+            $app['database']
         );
         return $strategy($r);
     })

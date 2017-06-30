@@ -3,22 +3,22 @@
 namespace Costlocker\Integrations\Auth;
 
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Costlocker\Integrations\Entities\CostlockerUser;
 use Costlocker\Integrations\Entities\FakturoidUser;
+use Costlocker\Integrations\Database\Database;
 
 class GetUser
 {
     private $session;
-    private $entityManager;
+    private $database;
 
     private $costlockerUser;
 
-    public function __construct(SessionInterface $s, EntityManagerInterface $em)
+    public function __construct(SessionInterface $s, Database $db)
     {
         $this->session = $s;
-        $this->entityManager = $em;
+        $this->database = $db;
     }
 
     public function __invoke()
@@ -50,18 +50,8 @@ class GetUser
     public function getCostlockerUser()
     {
         if (!$this->costlockerUser) {
-            $dql =<<<DQL
-                SELECT cu, fu, fa
-                FROM Costlocker\Integrations\Entities\CostlockerUser cu
-                LEFT JOIN cu.fakturoidUser fu
-                LEFT JOIN fu.fakturoidAccount fa
-                WHERE cu.id = :id
-DQL;
-            $params = [
-                'id' => $this->session->get('costlocker')['userId'] ?? 0
-            ];
-            $entities = $this->entityManager->createQuery($dql)->execute($params);
-            $this->costlockerUser = array_shift($entities);
+            $id = $this->session->get('costlocker')['userId'] ?? 0;
+            $this->costlockerUser = $this->database->findCostlockerUserById($id);
         }
         return $this->costlockerUser ?: new CostlockerUser();
     }
