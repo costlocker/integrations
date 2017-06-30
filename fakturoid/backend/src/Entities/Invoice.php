@@ -68,14 +68,16 @@ class Invoice
      */
     public $data;
 
-    public function __construct(CostlockerUser $u)
+    public function __construct(CostlockerUser $u = null)
     {
-        $this->costlockerUser = $u;
-        $this->fakturoidUser = $u->fakturoidUser; 
+        if ($u) {
+            $this->costlockerUser = $u;
+            $this->fakturoidUser = $u->fakturoidUser; 
+        }
     }
 
     public function getCurrentCostlockerDescription()
     {
-        return $this->data['request']['costlocker']['invoice']['billing']['description'] ?? '';
+        return $this->data['request']['costlocker']['billing']['billing']['description'] ?? '';
     }
 }

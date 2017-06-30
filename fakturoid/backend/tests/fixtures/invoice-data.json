@@ -1,0 +1,135 @@
+{
+    "request":{
+        "fakturoid":{
+            "isForced":false,
+            "subject":"2910929",
+            "lines":[
+                {
+                    "name":"my description",
+                    "amount":100
+                }
+            ]
+        },
+        "costlocker":{
+            "status":"READY",
+            "project":{
+                "id":"1",
+                "name":"eshop",
+                "client":{
+                    "id":"1",
+                    "name":"kamil"
+                },
+                "project_id":{
+                    "id":"HR001",
+                    "is_generated":false
+                }
+            },
+            "billing":{
+                "item":{
+                    "type":"billing",
+                    "billing_id":"2"
+                },
+                "billing":{
+                    "description":"my description",
+                    "total_amount":100,
+                    "date":"2017-01-06",
+                    "status":"draft"
+                }
+            },
+            "invoice":null
+        }
+    },
+    "response":{
+        "id":4452439,
+        "custom_id":"2",
+        "proforma":false,
+        "partial_proforma":null,
+        "number":"20170009",
+        "variable_symbol":"20170009",
+        "your_name":"ACME",
+        "your_street":"Franti\u0161ka K\u0159\u00ed\u017eka 362\/1",
+        "your_street2":null,
+        "your_city":"Praha",
+        "your_zip":"170 00",
+        "your_country":"CZ",
+        "your_registration_no":"",
+        "your_vat_no":"",
+        "client_name":"Atoto.cz, s.r.o.",
+        "client_street":"Bo\u0159ivojova 878\/35",
+        "client_street2":null,
+        "client_city":"Praha - \u017di\u017ekov",
+        "client_zip":"13000",
+        "client_country":"CZ",
+        "client_registration_no":"04548361",
+        "client_vat_no":"CZ04548361",
+        "subject_id":2910929,
+        "subject_custom_id":null,
+        "generator_id":null,
+        "related_id":null,
+        "correction":false,
+        "correction_id":null,
+        "paypal":false,
+        "gopay":false,
+        "token":"UMRqIeuRix",
+        "status":"open",
+        "order_number":null,
+        "issued_on":"2017-06-30",
+        "taxable_fulfillment_due":"2017-06-30",
+        "due":14,
+        "due_on":"2017-07-14",
+        "sent_at":null,
+        "paid_at":null,
+        "reminder_sent_at":null,
+        "accepted_at":null,
+        "cancelled_at":null,
+        "note":"",
+        "footer_note":"Fyzick\u00e1 osoba zapsan\u00e1 v \u017eivnostensk\u00e9m rejst\u0159\u00edku.",
+        "private_note":null,
+        "tags":[
+
+        ],
+        "bank_account":"630400-2203628910\/5780",
+        "iban":null,
+        "swift_bic":null,
+        "payment_method":"bank",
+        "currency":"CZK",
+        "exchange_rate":"1.0",
+        "language":"cz",
+        "transferred_tax_liability":false,
+        "eu_electronic_service":false,
+        "vat_price_mode":"without_vat",
+        "supply_code":null,
+        "subtotal":"100.0",
+        "total":"100.0",
+        "native_subtotal":"100.0",
+        "native_total":"100.0",
+        "remaining_amount":"100.0",
+        "remaining_native_amount":"100.0",
+        "paid_amount":"0.0",
+        "eet":false,
+        "eet_cash_register":null,
+        "eet_store":null,
+        "eet_records":[
+
+        ],
+        "lines":[
+            {
+                "id":9134817,
+                "name":"m\u016fj popisek",
+                "quantity":"1.0",
+                "unit_name":"",
+                "unit_price":"100.0",
+                "vat_rate":0,
+                "unit_price_without_vat":"100.0",
+                "unit_price_with_vat":"100.0"
+            }
+        ],
+        "html_url":"https:\/\/app.fakturoid.cz\/zdenekdrahos\/invoices\/4452439",
+        "public_html_url":"https:\/\/app.fakturoid.cz\/zdenekdrahos\/p\/UMRqIeuRix\/20170009",
+        "url":"https:\/\/app.fakturoid.cz\/api\/v2\/accounts\/zdenekdrahos\/invoices\/4452439.json",
+        "pdf_url":"https:\/\/app.fakturoid.cz\/api\/v2\/accounts\/zdenekdrahos\/invoices\/4452439\/download.pdf",
+        "subject_url":"https:\/\/app.fakturoid.cz\/api\/v2\/accounts\/zdenekdrahos\/subjects\/2910929.json",
+        "created_at":"2017-06-30T07:13:55.915+02:00",
+        "updated_at":"2017-06-30T07:13:55.940+02:00"
+    }
+}
