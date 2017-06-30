@@ -23,7 +23,11 @@ const Button = ({ title, route, params, action, className }) => {
 };
 
 const Link = ({ title, route, params, action, className }) => {
-  const onClick = action ? action : (e) => redirectToRoute(route, params, e);
+  const onClick = (e) => {
+    e.preventDefault();
+    const handler = action ? action : (e) => redirectToRoute(route, params, e)
+    return handler(e);
+  };
   return <a href="" onClick={onClick} className={className}>{title}</a>;
 };
 

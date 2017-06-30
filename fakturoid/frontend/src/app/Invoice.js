@@ -1,5 +1,4 @@
 import React from 'react';
-import { Map } from 'immutable';
 import { Button, Link, Errors, roundNumber, Number } from '../ui/Components';
 
 const InvoiceDetail = ({ costlockerInvoice }) => (
@@ -27,102 +26,16 @@ const InvoiceDetail = ({ costlockerInvoice }) => (
   </table>
 );
 
-const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, invoiceCursor, reloadSubjects }) => {
-  const lines = invoiceCursor.get('lines').deref();
-  const billedAmount = costlockerInvoice.billing.billing.total_amount;
-  let linesAmount = lines.reduce((sum, item) => item.get('total_amount') + sum, 0);
-
-  if (!lines.size) {
-    invoiceCursor.get('lines').update(list => list.push(Map({
-      name: costlockerInvoice.billing.billing.description
+const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, reloadSubjects }) => {
+  lines.addDefaultIfIsEmpty({
+    name: costlockerInvoice.billing.billing.description
         ? costlockerInvoice.billing.billing.description
         : costlockerInvoice.project.name,
-      quantity: 1,
-      unit: 'ks',
-      unit_amount: costlockerInvoice.billing.billing.total_amount,
-      total_amount: costlockerInvoice.billing.billing.total_amount,
-    })));
-  }
-  const addExpenses = (e) => {
-    e.preventDefault();
-    invoiceCursor.get('lines').update(list => {
-      let updated = list;
-      costlockerInvoice.project.budget.expenses.forEach(expense => {
-        updated = updated.push(Map({
-          name: expense.expense.description,
-          quantity: 1,
-          unit: 'ks',
-          unit_amount: expense.expense.billed.total_amount,
-          total_amount: expense.expense.billed.total_amount,
-        }));
-      });
-      return updated;
-    });
-  };
-  const addActivities = (e) => {
-    e.preventDefault();
-    invoiceCursor.get('lines').update(list => {
-      let updated = list;
-      costlockerInvoice.project.budget.peoplecosts.forEach(activityCost => {
-        updated = updated.push(Map({
-          name: activityCost.activity.name,
-          quantity: activityCost.hours.budget,
-          unit: 'h',
-          unit_amount: activityCost.activity.hourly_rate,
-          total_amount: activityCost.activity.hourly_rate * activityCost.hours.budget,
-        }));
-      });
-      return updated;
-    });
-  };
-  const addPeople = (e) => {
-    e.preventDefault();
-    invoiceCursor.get('lines').update(list => {
-      let updated = list;
-      costlockerInvoice.project.budget.peoplecosts.forEach(activityCost => {
-        activityCost.people.forEach(personCost => {
-          updated = updated.push(Map({
-            name: `${activityCost.activity.name} - ${personCost.person.first_name} ${personCost.person.last_name}`,
-            quantity: personCost.hours.budget,
-            unit: 'h',
-            unit_amount: activityCost.activity.hourly_rate,
-            total_amount: activityCost.activity.hourly_rate * personCost.hours.budget,
-          }));
-        });
-      });
-      return updated;
-    });
-  };
-  const addEmptyLine = (e) => {
-    e.preventDefault();
-    invoiceCursor.get('lines').update(list => list.push(Map({
-      name: '',
-      quantity: 0,
-      unit: 'ks',
-      unit_amount: 0,
-      total_amount: 0,
-    })));
-  };
-  const removeAll = (e) => {
-    e.preventDefault();
-    invoiceCursor.get('lines').update(list => list.clear());
-  };
+    amount: costlockerInvoice.billing.billing.total_amount
+  })
 
-  const changeLine = (field, index, e) => {
-    e.preventDefault();
-    invoiceCursor.get('lines').update(list => list.update(
-      index,
-      value => {
-        let updated = value.set(field, e.target.value);
-        return updated.set('total_amount', updated.get('quantity') * updated.get('unit_amount'))
-      }
-    ));
-  };
-
-  const removeLine = (index, e) => {
-    e.preventDefault();
-    invoiceCursor.get('lines').update(list => list.delete(index));
-  };
+  const linesAmount = lines.calculateTotaAmount();
+  const billedAmount = costlockerInvoice.billing.billing.total_amount;
 
   return <form className="form" onSubmit={form.submit}>
     <div className="form-group">
@@ -150,13 +63,13 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, invoiceCurs
     <h3>Invoice lines</h3>
     <div className="btn-toolbar">
       <div className="btn-group">
-        <Link title="Add expenses" action={addExpenses} className="btn btn-default" />
-        <Link title="Add activities" action={addActivities} className="btn btn-default" />
-        <Link title="Add people" action={addPeople} className="btn btn-default" />
+        <Link title="Add expenses" action={lines.addExpenses(costlockerInvoice.project.budget.expenses)} className="btn btn-default" />
+        <Link title="Add activities" action={lines.addActivities(costlockerInvoice.project.budget.peoplecosts)} className="btn btn-default" />
+        <Link title="Add people" action={lines.addPeople(costlockerInvoice.project.budget.peoplecosts)} className="btn btn-default" />
       </div>
       <div className="btn-group">
-        <Link title="Add empty line" action={addEmptyLine} className="btn btn-default" />
-        <Link title="Reset lines" action={removeAll} className="btn btn-default" />
+        <Link title="Add empty line" action={lines.addEmptyLine()} className="btn btn-default" />
+        <Link title="Reset lines" action={lines.removeAllLines()} className="btn btn-default" />
       </div>
     </div>
     <table className="table">
@@ -181,25 +94,25 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, invoiceCurs
             <td>
               <input
                 className="form-control" type="number" step="any" required
-                value={line.get('quantity')} onChange={e => changeLine('quantity', index, e)}
+                value={line.get('quantity')} onChange={lines.updateFieldInLine('quantity', index)}
               />
             </td>
             <td>
               <input
                 className="form-control" type="text"
-                value={line.get('unit')} onChange={e => changeLine('unit', index, e)}
+                value={line.get('unit')} onChange={lines.updateFieldInLine('unit', index)}
               />
             </td>
             <td>
               <input
                 className="form-control" type="text" required
-                value={line.get('name')} onChange={e => changeLine('name', index, e)}
+                value={line.get('name')} onChange={lines.updateFieldInLine('name', index)}
               />
             </td>
             <td>
               <input
                 className="form-control" type="number" step="any" required size="10"
-                value={roundNumber(line.get('unit_amount'))} onChange={e => changeLine('unit_amount', index, e)}
+                value={roundNumber(line.get('unit_amount'))} onChange={lines.updateFieldInLine('unit_amount', index)}
               />
             </td>
             <td>
@@ -209,10 +122,10 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, invoiceCurs
               />
             </td>
             <td>
-              {lines.size > 1 ? (
+              {lines.hasMultipleLines() ? (
               <Link
                 title={<span className="fa fa-trash"></span>} className="btn btn-link text-danger"
-                action={(e) => removeLine(index, e)}
+                action={lines.removeLine(index)}
               />
               ) : <span className="btn btn-link disabled fa fa-trash"></span>}
             </td>
