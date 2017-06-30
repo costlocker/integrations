@@ -4,17 +4,21 @@ namespace Costlocker\Integrations;
 
 use GuzzleHttp\Client;
 use Costlocker\Integrations\Auth\GetUser;
+use Psr\Log\LoggerInterface;
 
 class FakturoidClient
 {
     private $client;
     private $getUser;
+    private $logger;
+
     private $authorization;
 
-    public function __construct(Client $c, GetUser $u)
+    public function __construct(Client $c, GetUser $u, LoggerInterface $l)
     {
         $this->client = $c;
         $this->getUser = $u;
+        $this->logger = $l;
     }
 
     public function overrideAuthorization($email, $apiToken)
@@ -27,7 +31,7 @@ class FakturoidClient
     {
         $authorization = $this->authorization ?: $this->getUser->getFakturoidAuthorization();
 
-        return $this->client->request(
+        $response = $this->client->request(
             is_array($json) ? 'post' : 'get',
             "https://app.fakturoid.cz/api/v2{$path}",
             [
@@ -40,5 +44,18 @@ class FakturoidClient
                 'json' => $json,
             ]
         );
+
+        if ($response->getStatusCode() >= 400 && !$this->authorization) {
+            $this->logger->error(
+                'Fakturoid API error',
+                [
+                    'url' => $path,
+                    'request' => $json,
+                    'response' => (string) $response->getBody(),
+                ]
+            );
+        }
+
+        return $response;
     }
 }

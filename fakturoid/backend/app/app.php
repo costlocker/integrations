@@ -30,7 +30,7 @@ $app['client.costlocker'] = function ($app) {
 };
 
 $app['client.fakturoid'] = function ($app) {
-    return new Costlocker\Integrations\FakturoidClient($app['guzzle'], $app['client.user']);
+    return new Costlocker\Integrations\FakturoidClient($app['guzzle'], $app['client.user'], $app['logger']);
 };
 
 $app['database'] = function ($app) {
