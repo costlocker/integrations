@@ -65,6 +65,13 @@ $app['client.check'] = function ($app) {
     );
 };
 
+$app['fakturoid.downloadSubjects'] = function ($app) {
+    return new Costlocker\Integrations\Fakturoid\DownloadSubjects(
+        $app['client.fakturoid'],
+        $app['database']
+    );
+};
+
 $checkAuthorization = function ($service) use ($app) {
     // prevents 'Cannot override frozen service "guzzle"'
     return function () use ($service, $app) {
@@ -134,10 +141,7 @@ $app
     ->get('/fakturoid', function () use ($app) {
         $strategy = new Costlocker\Integrations\Fakturoid\GetSubjects(
             $app['client.user'],
-            new Costlocker\Integrations\Fakturoid\DownloadSubjects(
-                $app['client.fakturoid'],
-                $app['database']
-            )
+            $app['fakturoid.downloadSubjects']
         );
         $data = $strategy();
         return new JsonResponse($data);
@@ -160,6 +164,12 @@ $app
                 $app['client.user'],
                 $app['database']
             );
+        } elseif ($action == 'downloadSubjects') {
+            $strategy = function () use ($app) {
+                $account = $app['client.user']->getFakturoidAccount();
+                $app['fakturoid.downloadSubjects']($account);
+                return new JsonResponse();
+            };
         } else {
             $strategy = function () use ($action) {
                 return ResponseHelper::error("Not supported action '{$action}'");

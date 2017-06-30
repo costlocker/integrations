@@ -27,7 +27,7 @@ const InvoiceDetail = ({ costlockerInvoice }) => (
   </table>
 );
 
-const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, invoiceCursor }) => {
+const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, invoiceCursor, reloadSubjects }) => {
   const lines = invoiceCursor.get('lines').deref();
   if (!lines.size) {
     invoiceCursor.get('lines').update(list => list.push(Map({
@@ -64,6 +64,9 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, invoiceCurs
           <Link route='createSubject' title="Create a new subject" className="btn btn-default btn-block" />
         </div>
       </div>
+      <p className="help-block text-right">
+        Are subjects out of date? <Link action={reloadSubjects} title="Download subjects from Fakturoid" className="text-danger" />
+      </p>
     </div>
     <h3>Invoice lines</h3>
     <table className="table">

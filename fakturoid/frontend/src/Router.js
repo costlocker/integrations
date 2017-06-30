@@ -35,6 +35,11 @@ const fetchInvoice = ({ project, invoice }) =>
     .catch(setError)
     .then(invoice => appState.cursor(['costlocker']).set('invoice', invoice));
 
+const fetchSubjects = () =>
+  fetchFromApi('/fakturoid')
+    .catch(setError)
+    .then(projects => appState.cursor(['fakturoid']).set('subjects', projects));
+
 export const states = [
   {
     name: 'homepage',
@@ -91,6 +96,12 @@ export const states = [
               );
           }
         }}
+        reloadSubjects={(e) => {
+          e.preventDefault();
+          pushToApi('/fakturoid?action=downloadSubjects', {})
+            .catch(setError)
+            .then(() => fetchSubjects().then(() => alert('Subjects reloaded')))
+        }}
       />
     },
     resolve: [
@@ -98,9 +109,7 @@ export const states = [
         token: 'loadFakturoidClients',
         resolveFn: () => {
           if (!appState.cursor(['fakturoid', 'subjects']).deref()) {
-            fetchFromApi('/fakturoid')
-              .catch(setError)
-              .then(projects => appState.cursor(['fakturoid']).set('subjects', projects));
+            fetchSubjects();
           }
         }
       },
@@ -138,6 +147,7 @@ export const states = [
             };
           }
           pushToApi('/fakturoid?action=createSubject', request)
+            .catch(setError)
             .then((response) => {
               appState.cursor().update(
                 app => app

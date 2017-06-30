@@ -19,17 +19,12 @@ class DownloadSubjects
 
     public function __invoke(FakturoidAccount $account)
     {
-        $params = $account->subjectsDownloadedAt
-            ? ['updated_since' => $account->subjectsDownloadedAt->format('c')]
-            : [];
+        $account->subjects = [];
 
         $page = 1;
         $hasNextPage = true;
         while ($hasNextPage) {
-            $params['page'] = $page;
-            $response = $this->client->__invoke(
-                "/accounts/{$account->slug}/subjects.json?" . http_build_query($params)
-            );
+            $response = $this->client->__invoke("/accounts/{$account->slug}/subjects.json?page={$page}");
             if ($response->getStatusCode() != 200) {
                 return;
             }
