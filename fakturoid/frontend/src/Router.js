@@ -51,6 +51,7 @@ export const states = [
         costlockerInvoice={invoice}
         fakturoidSubjects={subjects}
         invoiceCursor={appState.cursor(['invoice'])}
+        forceUpdate={() => appState.cursor(['invoice']).set('isForced', true)}
         form={{
           get: (type) => appState.cursor(['invoice', type]).deref(),
           set: (type) => (e) => appState.cursor(['invoice']).set(

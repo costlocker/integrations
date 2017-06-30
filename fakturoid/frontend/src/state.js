@@ -19,6 +19,7 @@ const appState = immstruct({
     invoice: null,
   },
   invoice: {
+    isForced: false,
     subject: '',
     lines: []
   },

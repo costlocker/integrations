@@ -1,6 +1,6 @@
 import React from 'react';
 import { Map } from 'immutable';
-import {  Errors } from '../ui/Components';
+import { Button, Errors } from '../ui/Components';
 
 const InvoiceDetail = ({ costlockerInvoice }) => (
   <table className="table">
@@ -95,7 +95,10 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, invoiceCurs
 
 export default function Invoice(props) {
   const costlockerInvoice = props.costlockerInvoice;
-  if (costlockerInvoice.status === 'READY') {
+  if (
+    costlockerInvoice.status === 'READY' ||
+    (costlockerInvoice.status === 'ALREADY_IMPORTED' && props.form.get('isForced'))
+  ) {
     return <div>
       <h3>Costlocker billing</h3>
       <InvoiceDetail costlockerInvoice={costlockerInvoice} />
@@ -111,9 +114,20 @@ export default function Invoice(props) {
     return <div>
       <h3>Costlocker billing</h3>
       <InvoiceDetail costlockerInvoice={costlockerInvoice} />
-      <a href={costlockerInvoice.invoice.link} target="_blank" className="btn btn-success">
-        {`Open invoice #${costlockerInvoice.invoice.number} in Fakturoid`}
-      </a>
+      <div className="row">
+        <div className="col-sm-6 text-left">
+          <a href={costlockerInvoice.invoice.link} className="btn btn-success" target="_blank" rel="noopener noreferrer">
+            {`Open invoice #${costlockerInvoice.invoice.number} in Fakturoid`}
+          </a>
+        </div>
+        <div className="col-sm-6 text-right">
+          <Button
+            title="Create invoice once again"
+            className="btn btn-warning"
+            action={props.forceUpdate}
+          />
+        </div>
+      </div>
     </div>;
   }
   return <Errors title="Unknown billing" error="Billing not found in Costlocker" />;;
