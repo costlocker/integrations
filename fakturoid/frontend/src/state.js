@@ -11,6 +11,7 @@ const appState = immstruct({
     csrfToken: null,
     currentState: '', // helper for active menu items
     error: null,
+    isSendingForm: false,
   },
   fakturoid: {
     subjects: null,

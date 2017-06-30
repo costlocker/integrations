@@ -29,6 +29,11 @@ if (isNotLoggedInCostlocker()) {
   fetchUser();
 }
 
+const fetchInvoice = ({ project, invoice }) =>
+  fetchFromApi(`/costlocker?project=${project}&invoice=${invoice}`)
+    .catch(setError)
+    .then(invoice => appState.cursor(['costlocker']).set('invoice', invoice));
+
 export const states = [
   {
     name: 'homepage',
@@ -39,13 +44,17 @@ export const states = [
     name: 'invoice',
     url: '/invoice?project&invoice',
     component: (props) => {
-      if (!props.transition.params().invoice || !props.transition.params().project) {
+      const params = props.transition.params();
+      if (!params.invoice || !params.project) {
         return <InvoiceTutorial />;
       }
       const subjects = appState.cursor(['fakturoid', 'subjects']).deref();
       const invoice = appState.cursor(['costlocker', 'invoice']).deref();
       if (!subjects || !invoice) {
         return <Loading title="Loading fakturoid clients, Costlocker invoice" />;
+      }
+      if (appState.cursor(['app', 'isSendingForm']).deref()) {
+        return <Loading title="Creating invoice in Fakturoid" />;
       }
       return <Invoice
         costlockerInvoice={invoice}
@@ -64,9 +73,21 @@ export const states = [
               fakturoid: appState.cursor(['invoice']).deref().toJS(),
               costlocker: appState.cursor(['costlocker', 'invoice']).deref(),
             };
+            appState.cursor(['app']).set('isSendingForm', true);
             pushToApi('/fakturoid', request)
-              .catch(setError)
-              .then(response => alert('Invoice was created in Fakturoid, updated in Costlocker'));
+              .catch(error => {
+                appState.cursor(['app']).set('isSendingForm', false);
+                setError(error);
+              })
+              .then(() =>
+                fetchInvoice(params).then(
+                  appState.cursor().update(
+                    app => app
+                      .setIn(['app', 'isSendingForm'], false)
+                      .setIn(['invoice', 'isForced'], false)
+                  )
+                )
+              );
           }
         }}
       />
@@ -88,9 +109,7 @@ export const states = [
         resolveFn: ($transition$) => {
           const params = $transition$.params();
           if (params.invoice && params.project) {
-            fetchFromApi(`/costlocker?project=${params.project}&invoice=${params.invoice}`)
-              .catch(setError)
-              .then(invoice => appState.cursor(['costlocker']).set('invoice', invoice));
+            fetchInvoice(params);
           }
         }
       }
