@@ -36,8 +36,8 @@ $app['database'] = function ($app) {
     return new \Costlocker\Integrations\Database\Database($app['orm.em']);
 };
 
-$app['redirectUrls'] = function () {
-    return new \Costlocker\Integrations\Auth\RedirectToApp(getenv('APP_FRONTED_URL'));
+$app['redirectUrls'] = function ($app) {
+    return new \Costlocker\Integrations\Auth\RedirectToApp($app['session'], getenv('APP_FRONTED_URL'));
 };
 
 $app['oauth.costlocker'] = function () {
@@ -89,6 +89,9 @@ $app
     ->get('/user', function () use ($app) {
         $app['client.check']->verifyTokens();
         return $app['client.user']();
+    })
+    ->before(function (Request $r, $app) {
+        $app['redirectUrls']->loadInvoiceFromRequest($r);
     });
 
 $app

@@ -45,7 +45,7 @@ class AuthorizeInFakturoid
             'userId' => $user['id'],
             'accessToken' => $authorization,
         ]);
-        return $this->redirectToApp->goToHomepage();
+        return $this->redirectToApp->goToInvoice();
     }
 
     private function getSelectedAccount(array $user, $slug)

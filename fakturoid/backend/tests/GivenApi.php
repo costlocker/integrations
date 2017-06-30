@@ -22,4 +22,12 @@ class GivenApi extends \Silex\WebTestCase
         );
         return $client->getResponse();
     }
+
+    protected function givenUserLoggedInFakturoid()
+    {
+        $this->app['session']->set('fakturoid', [
+            'userId' => 'irrelevant id',
+            'accessToken' => 'irrelevant token',
+        ]);
+    }
 }

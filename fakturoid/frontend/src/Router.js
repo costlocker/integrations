@@ -11,8 +11,8 @@ export let redirectToRoute = (route) => console.log('app is not ready', route);
 export let isRouteActive = () => false;
 const setError = e => appState.cursor(['app']).set('error', e);
 
-const fetchUser = () =>
-  fetchFromApi('/user')
+const fetchUser = (queryString) =>
+  fetchFromApi(`/user${queryString}`)
     .then((user) => {
       appState.cursor().update(
         auth => auth
@@ -26,7 +26,7 @@ const fetchUser = () =>
     .catch(e => console.log('Anonymous user'));
 
 if (isNotLoggedInCostlocker()) {
-  fetchUser();
+  fetchUser(window.location.search);
 }
 
 const fetchInvoice = ({ project, invoice }) =>
@@ -152,7 +152,9 @@ const hooks = [
       }
     },
     callback: (transition: any) => {
-      alert('Login in Fakturoid before creating invoicing');
+      if (!isNotLoggedInCostlocker()) {
+        alert('Login in Fakturoid before creating invoicing');
+      }
       return transition.router.stateService.target('login', undefined, { location: true });
     },
     priority: 10,
