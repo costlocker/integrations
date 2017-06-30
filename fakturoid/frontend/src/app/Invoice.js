@@ -1,6 +1,6 @@
 import React from 'react';
 import { Map } from 'immutable';
-import { Button, Errors } from '../ui/Components';
+import { Button, Link, Errors } from '../ui/Components';
 
 const InvoiceDetail = ({ costlockerInvoice }) => (
   <table className="table">
@@ -48,15 +48,22 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, invoiceCurs
   return <form className="form" onSubmit={form.submit}>
     <div className="form-group">
       <label htmlFor="fakturoidSubject">Fakturoid subject</label>
-      <select required
-        className="form-control" name="fakturoidSubject" id="fakturoidSubject"
-        value={form.get('subject')} onChange={form.set('subject')}
-      >
-        <option></option>
-        {fakturoidSubjects.map(subject => (
-          <option key={subject.id} value={subject.id}>{subject.name}</option>
-        ))}
-      </select>
+      <div className="row">
+        <div className="col-sm-10">
+          <select required
+            className="form-control" name="fakturoidSubject" id="fakturoidSubject"
+            value={form.get('subject')} onChange={form.set('subject')}
+          >
+            <option></option>
+            {fakturoidSubjects.map(subject => (
+              <option key={subject.id} value={subject.id}>{subject.name}</option>
+            ))}
+          </select>
+        </div>
+        <div className="col-sm-2">
+          <Link route='createSubject' title="Create a new subject" className="btn btn-default btn-block" />
+        </div>
+      </div>
     </div>
     <h3>Invoice lines</h3>
     <table className="table">
@@ -130,5 +137,5 @@ export default function Invoice(props) {
       </div>
     </div>;
   }
-  return <Errors title="Unknown billing" error="Billing not found in Costlocker" />;;
+  return <Errors title="Unknown billing" error="Billing not found in Costlocker" />;
 }

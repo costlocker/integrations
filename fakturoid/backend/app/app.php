@@ -4,6 +4,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Costlocker\Integrations\Api\ResponseHelper;
 
 $dotenv = new Dotenv\Dotenv(__DIR__ . '/../');
 $dotenv->load();
@@ -145,12 +146,25 @@ $app
 
 $app
     ->post('/fakturoid', function (Request $r) use ($app) {
-        $strategy = new Costlocker\Integrations\Fakturoid\CreateInvoice(
-            $app['client.fakturoid'],
-            $app['client.user'],
-            new \Costlocker\Integrations\Costlocker\MarkSentInvoice($app['client.costlocker']),
-            $app['database']
-        );
+        $action = $r->query->get('action');
+        if ($action == 'createInvoice') {
+            $strategy = new Costlocker\Integrations\Fakturoid\CreateInvoice(
+                $app['client.fakturoid'],
+                $app['client.user'],
+                new \Costlocker\Integrations\Costlocker\MarkSentInvoice($app['client.costlocker']),
+                $app['database']
+            );
+        } elseif ($action == 'createSubject') {
+            $strategy = new Costlocker\Integrations\Fakturoid\CreateSubject(
+                $app['client.fakturoid'],
+                $app['client.user'],
+                $app['database']
+            );
+        } else {
+            $strategy = function () use ($action) {
+                return ResponseHelper::error("Not supported action '{$action}'");
+            };
+        }
         return $strategy($r);
     })
     ->before($checkAuthorization('fakturoid'));

@@ -24,6 +24,9 @@ const appState = immstruct({
     subject: '',
     lines: []
   },
+  subject: {
+    name: '',
+  },
 });
 
 const isNotLoggedInCostlocker = () =>

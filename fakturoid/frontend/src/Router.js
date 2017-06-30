@@ -5,6 +5,7 @@ import { fetchFromApi, pushToApi, loginUrls } from './api';
 import Login from './app/Login';
 import Invoice from './app/Invoice';
 import InvoiceTutorial from './app/InvoiceTutorial';
+import NewSubject from './app/NewSubject';
 import Loading from './ui/Loading';
 
 export let redirectToRoute = (route) => console.log('app is not ready', route);
@@ -74,7 +75,7 @@ export const states = [
               costlocker: appState.cursor(['costlocker', 'invoice']).deref(),
             };
             appState.cursor(['app']).set('isSendingForm', true);
-            pushToApi('/fakturoid', request)
+            pushToApi('/fakturoid?action=createInvoice', request)
               .catch(error => {
                 appState.cursor(['app']).set('isSendingForm', false);
                 setError(error);
@@ -114,6 +115,40 @@ export const states = [
         }
       }
     ],
+  },
+  {
+    name: 'createSubject',
+    url: '/subject',
+    component: () => <NewSubject
+      form={{
+        get: (type) => appState.cursor(['subject', type]).deref(),
+        set: (type) => (e) => appState.cursor(['subject']).set(
+          type,
+          e.target.type === 'checkbox' ? e.target.checked : e.target.value
+        ),
+        submit: (e) => {
+          e.preventDefault();
+          const request = appState.cursor(['subject']).deref().toJS();
+          const invoice = appState.cursor(['costlocker', 'invoice']).deref();
+          let params = {};
+          if (invoice) {
+            params = {
+              project: invoice.project.id,
+              invoice: invoice.billing.item.billing_id,
+            };
+          }
+          pushToApi('/fakturoid?action=createSubject', request)
+            .then((response) => {
+              appState.cursor().update(
+                app => app
+                  .setIn(['fakturoid', 'subjects'], null)
+                  .setIn(['invoice', 'subject'], response.id)
+              );
+              redirectToRoute('invoice', params);
+            });
+        }
+      }}
+    />,
   },
   {
     name: 'login',
