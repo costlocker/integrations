@@ -94,25 +94,25 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
             <td>
               <input
                 className="form-control" type="number" step="any" required
-                value={line.get('quantity')} onChange={lines.updateFieldInLine('quantity', index)}
+                value={line.get('quantity')} onChange={lines.updateFieldInLine('quantity', line)}
               />
             </td>
             <td>
               <input
                 className="form-control" type="text"
-                value={line.get('unit')} onChange={lines.updateFieldInLine('unit', index)}
+                value={line.get('unit')} onChange={lines.updateFieldInLine('unit', line)}
               />
             </td>
             <td>
               <input
                 className="form-control" type="text" required
-                value={line.get('name')} onChange={lines.updateFieldInLine('name', index)}
+                value={line.get('name')} onChange={lines.updateFieldInLine('name', line)}
               />
             </td>
             <td>
               <input
                 className="form-control" type="number" step="any" required size="10"
-                value={roundNumber(line.get('unit_amount'))} onChange={lines.updateFieldInLine('unit_amount', index)}
+                value={roundNumber(line.get('unit_amount'))} onChange={lines.updateFieldInLine('unit_amount', line)}
               />
             </td>
             <td>
@@ -125,7 +125,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
               {lines.hasMultipleLines() ? (
               <Link
                 title={<span className="fa fa-trash"></span>} className="btn btn-link text-danger"
-                action={lines.removeLine(index)}
+                action={lines.removeLine(line)}
               />
               ) : <span className="btn btn-link disabled fa fa-trash"></span>}
             </td>

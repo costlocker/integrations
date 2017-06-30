@@ -10,9 +10,9 @@ export default class InvoiceLines {
     return this.deref().reduce((sum, item) => item.get('total_amount') + sum, 0);
   }
 
-  addDefaultIfIsEmpty({name, amount }) {
+  addDefaultIfIsEmpty({ name, amount }) {
     if (!this.deref().size) {
-      this.update(list => list.push(Map({
+      this.update(lines => lines.add(Map({
         name: name,
         quantity: 1,
         unit: 'ks',
@@ -23,10 +23,10 @@ export default class InvoiceLines {
   }
 
   addExpenses = (expenses) => () => {
-    this.update(list => {
-      let updated = list;
+    this.update(lines => {
+      let updated = lines;
       expenses.forEach(expense => {
-        updated = updated.push(Map({
+        updated = updated.add(Map({
           name: expense.expense.description,
           quantity: 1,
           unit: 'ks',
@@ -39,10 +39,10 @@ export default class InvoiceLines {
   }
 
   addActivities = (peoplecosts) => () => {
-    this.update(list => {
-      let updated = list;
+    this.update(lines => {
+      let updated = lines;
       peoplecosts.forEach(activityCost => {
-        updated = updated.push(Map({
+        updated = updated.add(Map({
           name: activityCost.activity.name,
           quantity: activityCost.hours.budget,
           unit: 'h',
@@ -55,11 +55,11 @@ export default class InvoiceLines {
   }
 
   addPeople = (peoplecosts) => () => {
-    this.update(list => {
-      let updated = list;
+    this.update(lines => {
+      let updated = lines;
       peoplecosts.forEach(activityCost => {
         activityCost.people.forEach(personCost => {
-          updated = updated.push(Map({
+          updated = updated.add(Map({
             name: `${activityCost.activity.name} - ${personCost.person.first_name} ${personCost.person.last_name}`,
             quantity: personCost.hours.budget,
             unit: 'h',
@@ -73,7 +73,7 @@ export default class InvoiceLines {
   }
 
   addEmptyLine = () => () => {
-    this.update(list => list.push(Map({
+    this.update(lines => lines.add(Map({
       name: '',
       quantity: 0,
       unit: 'ks',
@@ -83,26 +83,22 @@ export default class InvoiceLines {
   }
 
   removeAllLines = () => () => {
-    this.update(list => list.clear());
+    this.update(lines => lines.clear());
   }
 
-  updateFieldInLine = (field, index) => (e) => {
-    this.update(list => list.update(
-      index,
-      value => {
-        let updated = value.set(field, e.target.value);
-        return updated.set('total_amount', updated.get('quantity') * updated.get('unit_amount'))
-      }
-    ));
+  updateFieldInLine = (field, line) => (e) => {
+    let updated = line.set(field, e.target.value);
+    updated = updated.set('total_amount', updated.get('quantity') * updated.get('unit_amount'))
+    this.update(lines => lines.delete(line).add(updated));
   }
 
-  removeLine = (index) => () => this.update(list => list.delete(index))
+  removeLine = (line) => () => this.update(lines => lines.delete(line))
 
   hasMultipleLines = () => this.deref().size > 1
 
   map = (callback) => this.deref().map(callback)
 
-  update = (callback) => this.cursor.update(callback)
+  update = (callback) =>  this.cursor.update(callback)
 
   deref = (callback) => this.cursor.deref()
 }

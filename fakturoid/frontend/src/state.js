@@ -1,4 +1,5 @@
 import immstruct from 'immstruct';
+import { Set } from 'immutable';
 
 const appState = immstruct({
   auth: {
@@ -22,7 +23,7 @@ const appState = immstruct({
   invoice: {
     isForced: false,
     subject: '',
-    lines: []
+    lines: Set(),
   },
   subject: {
     name: '',
