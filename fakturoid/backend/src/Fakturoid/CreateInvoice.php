@@ -30,7 +30,7 @@ class CreateInvoice
         $invoice = new Invoice($this->getUser->getCostlockerUser());
         $invoice->costlockerProject = $r->request->get('costlocker')['project']['id'];
         $invoice->costlockerClient = $r->request->get('costlocker')['project']['client']['id'];
-        $invoice->costlockerInvoiceId = $r->request->get('costlocker')['invoice']['item']['billing_id'];
+        $invoice->costlockerInvoiceId = $r->request->get('costlocker')['billing']['item']['billing_id'];
         $invoice->fakturoidSubject = $r->request->get('fakturoid')['subject'];
         $invoice->data = [
             'request' => $r->request->all(),

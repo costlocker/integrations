@@ -32,6 +32,10 @@ $app['client.fakturoid'] = function ($app) {
     return new Costlocker\Integrations\FakturoidClient($app['guzzle'], $app['client.user']);
 };
 
+$app['database'] = function ($app) {
+    return new \Costlocker\Integrations\Database\Database($app['orm.em']);
+};
+
 $app['oauth.costlocker'] = function () {
     $costlockerHost = getenv('CL_HOST');
     return new \League\OAuth2\Client\Provider\GenericProvider([
@@ -110,7 +114,8 @@ $app
 $app
     ->get('/costlocker', function (Request $r) use ($app) {
         $strategy = new \Costlocker\Integrations\Costlocker\GetInvoice(
-            $app['client.costlocker']
+            $app['client.costlocker'],
+            $app['database']
         );
         $data = $strategy($r);
         return new JsonResponse($data);

@@ -5,6 +5,7 @@ import { fetchFromApi, pushToApi, loginUrls } from './api';
 import Login from './app/Login';
 import Invoice from './app/Invoice';
 import InvoiceTutorial from './app/InvoiceTutorial';
+import Loading from './ui/Loading';
 
 export let redirectToRoute = (route) => console.log('app is not ready', route);
 export let isRouteActive = () => false;
@@ -41,9 +42,14 @@ export const states = [
       if (!props.transition.params().invoice || !props.transition.params().project) {
         return <InvoiceTutorial />;
       }
+      const subjects = appState.cursor(['fakturoid', 'subjects']).deref();
+      const invoice = appState.cursor(['costlocker', 'invoice']).deref();
+      if (!subjects || !invoice) {
+        return <Loading title="Loading fakturoid clients, Costlocker invoice" />;
+      }
       return <Invoice
-        costlockerInvoice={appState.cursor(['costlocker', 'invoice']).deref()}
-        fakturoidSubjects={appState.cursor(['fakturoid', 'subjects']).deref()}
+        costlockerInvoice={invoice}
+        fakturoidSubjects={subjects}
         invoiceCursor={appState.cursor(['invoice'])}
         form={{
           get: (type) => appState.cursor(['invoice', type]).deref(),
