@@ -36,6 +36,10 @@ $app['database'] = function ($app) {
     return new \Costlocker\Integrations\Database\Database($app['orm.em']);
 };
 
+$app['redirectUrls'] = function () {
+    return new \Costlocker\Integrations\Auth\RedirectToApp(getenv('APP_FRONTED_URL'));
+};
+
 $app['oauth.costlocker'] = function () {
     $costlockerHost = getenv('CL_HOST');
     return new \League\OAuth2\Client\Provider\GenericProvider([
@@ -94,7 +98,7 @@ $app
             $app['oauth.costlocker'],
             new Costlocker\Integrations\Database\PersistCostlockerUser($app['database']),
             $app['logger'],
-            getenv('APP_FRONTED_URL')
+            $app['redirectUrls']
         );
         return $strategy($r);
     });
@@ -105,7 +109,7 @@ $app
             $app['client.fakturoid'],
             $app['session'],
             new Costlocker\Integrations\Database\PersistFakturoidUser($app['database'], $app['client.user']),
-            getenv('APP_FRONTED_URL')
+            $app['redirectUrls']
         );
         return $strategy($r);
     })

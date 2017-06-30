@@ -16,20 +16,20 @@ class AuthorizeInCostlocker
     private $provider;
     private $persistUser;
     private $logger;
-    private $appUrl;
+    private $redirectToApp;
 
     public function __construct(
         SessionInterface $s,
         GenericProvider $p,
         PersistCostlockerUser $db,
         LoggerInterface $l,
-        $appUrl
+        RedirectToApp $r
     ) {
         $this->session = $s;
         $this->provider = $p;
         $this->persistUser = $db;
         $this->logger = $l;
-        $this->appUrl = $appUrl;
+        $this->redirectToApp = $r;
     }
 
     public function __invoke(Request $r)
@@ -42,7 +42,6 @@ class AuthorizeInCostlocker
             $url = $this->provider->getAuthorizationUrl();
             $this->session->set('costlockerLogin', [
                 'oauthState' => $this->provider->getState(),
-                'redirectUrl' => $this->appUrl,
             ]);
             return new RedirectResponse($url);
         } elseif ($r->query->get('state') != $this->session->get('costlockerLogin')['oauthState']) {
@@ -68,7 +67,7 @@ class AuthorizeInCostlocker
                     'accessToken' => $accessToken->jsonSerialize(),
                 ]);
                 $this->session->set('csrfToken', sha1($r->query->get('state')));
-                return new RedirectResponse($this->appUrl);
+                return $this->redirectToApp->goToHomepage();
             } catch (IdentityProviderException $e) {
                 return $this->sendError($e->getMessage());
             } catch (\Exception $e) {
@@ -83,6 +82,6 @@ class AuthorizeInCostlocker
         $this->session->remove('costlocker');
         $this->session->remove('costlockerLogin');
         $this->session->remove('csrfToken');
-        return new RedirectResponse("{$this->appUrl}?loginError={$errorMessage}");
+        return $this->redirectToApp->loginError($errorMessage);
     }
 }

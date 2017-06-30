@@ -3,7 +3,6 @@
 namespace Costlocker\Integrations\Auth;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Costlocker\Integrations\FakturoidClient;
 use Costlocker\Integrations\Database\PersistFakturoidUser;
@@ -13,14 +12,14 @@ class AuthorizeInFakturoid
     private $client;
     private $session;
     private $persistUser;
-    private $appUrl;
+    private $redirectToApp;
 
-    public function __construct(FakturoidClient $c, SessionInterface $s, PersistFakturoidUser $db, $appUrl)
+    public function __construct(FakturoidClient $c, SessionInterface $s, PersistFakturoidUser $db, RedirectToApp $r)
     {
         $this->client = $c;
         $this->session = $s;
         $this->persistUser = $db;
-        $this->appUrl = $appUrl;
+        $this->redirectToApp = $r;
     }
 
     public function __invoke(Request $r)
@@ -46,7 +45,7 @@ class AuthorizeInFakturoid
             'userId' => $user['id'],
             'accessToken' => $authorization,
         ]);
-        return new RedirectResponse($this->appUrl);
+        return $this->redirectToApp->goToHomepage();
     }
 
     private function getSelectedAccount(array $user, $slug)
@@ -62,6 +61,6 @@ class AuthorizeInFakturoid
     private function sendError($errorMessage)
     {
         $this->session->remove('fakturoid');
-        return new RedirectResponse("{$this->appUrl}?loginError={$errorMessage}");
+        return $this->redirectToApp->goToHomepage($errorMessage);
     }
 }
