@@ -84,10 +84,10 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
         </tr>
       </thead>
       <tbody>
-        {lines.map((line, index) => {
+        {lines.map((line) => {
           const isLineIgnored = line.get('quantity') <= 0;
           return <tr
-            key={index}
+            key={line.get('id')}
             className={isLineIgnored ? 'bg-danger' : null}
             title={isLineIgnored ? 'Line will be ignored and not imported to Fakturoid' : null}
           >

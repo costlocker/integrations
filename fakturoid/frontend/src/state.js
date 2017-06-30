@@ -1,5 +1,5 @@
 import immstruct from 'immstruct';
-import { Set } from 'immutable';
+import { OrderedMap } from 'immutable';
 
 const appState = immstruct({
   auth: {
@@ -23,7 +23,7 @@ const appState = immstruct({
   invoice: {
     isForced: false,
     subject: '',
-    lines: Set(),
+    lines: OrderedMap(),
   },
   subject: {
     name: '',
