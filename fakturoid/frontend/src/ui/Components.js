@@ -27,4 +27,8 @@ const Link = ({ title, route, params, action, className }) => {
   return <a href="" onClick={onClick} className={className}>{title}</a>;
 };
 
-export { Errors, ExternalLink, Button, Link };
+const roundNumber = value => Math.round(value * 100) / 100;
+
+const Number = ({ value }) => <span title={value}>{roundNumber(value)}</span>;
+
+export { Errors, ExternalLink, Button, Link, roundNumber, Number };

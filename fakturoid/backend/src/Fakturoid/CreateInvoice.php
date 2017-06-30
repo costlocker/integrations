@@ -46,8 +46,9 @@ class CreateInvoice
                     function (array $line) {
                         return [
                             'name' => $line['name'],
-                            'unit_price' => $line['amount'],
-                            'quantity' => 1,
+                            'unit_price' => $line['unit_amount'],
+                            'quantity' => $line['quantity'],
+                            'unit_name' => $line['unit'],
                             'vat_rate' => 0,
                         ];
                     },
