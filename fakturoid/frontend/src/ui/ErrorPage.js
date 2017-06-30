@@ -2,6 +2,7 @@ import React from 'react';
 import { pushToApi } from '../api';
 
 const buildError = (jsError, currentUser) => ({
+  date: (new Date()).toString(),
   error: jsError.toString(),
   stack: jsError.stack,
   user: {
