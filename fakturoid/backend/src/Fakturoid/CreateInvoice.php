@@ -35,6 +35,7 @@ class CreateInvoice
         $invoice->data = [
             'request' => $r->request->all(),
         ];
+        unset($invoice->data['request']['costlocker']['project']['budget']);
 
         $response = $this->client->__invoke(
             "/accounts/{$this->getUser->getFakturoidAccount()->slug}/invoices.json",

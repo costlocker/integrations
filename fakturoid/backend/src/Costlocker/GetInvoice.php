@@ -25,7 +25,10 @@ class GetInvoice
 
     public function __invoke(Request $r)
     {
-        $response = $this->client->__invoke("/projects/{$r->query->get('project')}?types=billing");
+        $response = $this->client->__invoke(
+            "/projects/{$r->query->get('project')}?types=billing,expenses,peoplecosts"
+        );
+
         if ($response->getStatusCode() != 200) {
             return [
                 'status' => self::STATUS_UNKNOWN,
@@ -36,7 +39,8 @@ class GetInvoice
 
         $billingId = $r->query->get('invoice');
         $json = json_decode($response->getBody(), true)['data'];
-        $billing = $this->findDraftBilling($json['items'], $billingId);
+        $items = $this->separateItems($json['items']);
+        $billing = $this->findDraftBilling($items['billing'], $billingId);
         $invoice = $this->database->findInvoice($billingId);
         return [
             'status' => $this->billingToStatus($billing, $invoice),
@@ -45,10 +49,35 @@ class GetInvoice
                 'name' => $json['name'],
                 'client' => $json['client'],
                 'project_id' => $json['project_id'],
+                'budget' => [
+                    'expenses' => $items['expense'],
+                    'peoplecosts' => $items['peoplecosts'],  
+                ],
             ],
             'billing' => $billing,
             'invoice' => $this->invoiceToJson($invoice),
         ];
+    }
+
+    private function separateItems(array $items)
+    {
+        $results = [
+            'peoplecosts' => [],
+            'billing' => [],
+            'expense' => [],
+        ];
+        foreach ($items as $item) {
+            $type = $item['item']['type'];
+            if ($type == 'activity') {
+                $results['peoplecosts'][$item['item']['activity_id']] = $item + ['people' => []];
+            } elseif ($type == 'person') {
+                $results['peoplecosts'][$item['item']['activity_id']]['people'][] = $item;
+            } elseif (in_array($type, ['billing', 'expense'])) {
+                $results[$type][] = $item;
+            }
+        }
+        $results['peoplecosts'] = array_values($results['peoplecosts']);
+        return $results;
     }
 
     private function findDraftBilling(array $items, $invoiceId)
