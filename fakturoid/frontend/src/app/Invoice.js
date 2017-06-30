@@ -93,6 +93,20 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, invoiceCurs
       return updated;
     });
   };
+  const addEmptyLine = (e) => {
+    e.preventDefault();
+    invoiceCursor.get('lines').update(list => list.push(Map({
+      name: '',
+      quantity: 0,
+      unit: 'ks',
+      unit_amount: 0,
+      total_amount: 0,
+    })));
+  };
+  const removeAll = (e) => {
+    e.preventDefault();
+    invoiceCursor.get('lines').update(list => list.clear());
+  };
 
   const changeLine = (field, index, e) => {
     e.preventDefault();
@@ -134,10 +148,16 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, invoiceCurs
       </p>
     </div>
     <h3>Invoice lines</h3>
-    <div className="btn-group">
-      <Link title="Add expenses" action={addExpenses} className="btn btn-default" />
-      <Link title="Add activities" action={addActivities} className="btn btn-default" />
-      <Link title="Add people" action={addPeople} className="btn btn-default" />
+    <div className="btn-toolbar">
+      <div className="btn-group">
+        <Link title="Add expenses" action={addExpenses} className="btn btn-default" />
+        <Link title="Add activities" action={addActivities} className="btn btn-default" />
+        <Link title="Add people" action={addPeople} className="btn btn-default" />
+      </div>
+      <div className="btn-group">
+        <Link title="Add empty line" action={addEmptyLine} className="btn btn-default" />
+        <Link title="Reset lines" action={removeAll} className="btn btn-default" />
+      </div>
     </div>
     <table className="table">
       <thead>
@@ -151,8 +171,13 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, invoiceCurs
         </tr>
       </thead>
       <tbody>
-        {lines.map((line, index) => (
-          <tr key={index}>
+        {lines.map((line, index) => {
+          const isLineIgnored = line.get('quantity') <= 0;
+          return <tr
+            key={index}
+            className={isLineIgnored ? 'bg-danger' : null}
+            title={isLineIgnored ? 'Line will be ignored and not imported to Fakturoid' : null}
+          >
             <td>
               <input
                 className="form-control" type="number" step="any" required
@@ -191,8 +216,8 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, invoiceCurs
               />
               ) : <span className="btn btn-link disabled fa fa-trash"></span>}
             </td>
-          </tr>
-        ))}
+          </tr>;
+        })}
       </tbody>
       <tfoot>
         <tr>

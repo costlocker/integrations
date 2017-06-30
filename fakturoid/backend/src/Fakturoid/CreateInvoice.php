@@ -42,8 +42,11 @@ class CreateInvoice
             [
                 'custom_id' => $invoice->costlockerInvoiceId,
                 'subject_id' => $invoice->fakturoidSubject,
-                'lines' => array_map(
+                'lines' => array_values(array_filter(array_map(
                     function (array $line) {
+                        if ($line['quantity'] <= 0) {
+                            return null;
+                        }
                         return [
                             'name' => $line['name'],
                             'unit_price' => $line['unit_amount'],
@@ -53,7 +56,7 @@ class CreateInvoice
                         ];
                     },
                     $r->request->get('fakturoid')['lines']
-                ),
+                ))),
             ]
         );
 
