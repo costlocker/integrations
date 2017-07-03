@@ -32,6 +32,7 @@ class GetSubjects
                 $subjects[] = [
                     'id' => $subject['id'],
                     'name' => $subject['name'],
+                    'has_vat' => $subject['vat_no'] ? true : false,
                 ];
             }
         }

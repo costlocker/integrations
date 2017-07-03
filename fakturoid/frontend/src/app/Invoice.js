@@ -28,6 +28,16 @@ const InvoiceDetail = ({ costlockerInvoice }) => (
   </table>
 );
 
+const hasSubjectVAT = (subjects, selectedSubject) => {
+  let hasVAT = false;
+  subjects.forEach(s => {
+    if (s.id == selectedSubject) {
+      hasVAT = s.has_vat;
+    }
+  })
+  return hasVAT;
+};
+
 const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, reloadSubjects }) => {
   lines.addDefaultIfIsEmpty({
     name: costlockerInvoice.billing.billing.description
@@ -38,6 +48,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
 
   const linesAmount = lines.calculateTotaAmount();
   const billedAmount = costlockerInvoice.billing.billing.total_amount;
+  const hasVAT = hasSubjectVAT(fakturoidSubjects, form.get('subject'));
 
   return <form className="form" onSubmit={form.submit}>
     <div className="form-group">
@@ -141,8 +152,12 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
       </tbody>
       <tfoot>
         <tr>
-          <th colSpan="4" className="text-right">Total amount</th>
-          <th><Number value={linesAmount} isElement /></th>
+          <th colSpan="4" className="text-right">Total amount (without VAT)</th>
+          <th colSpan="2"><Number value={linesAmount} isElement /></th>
+        </tr>
+        <tr className={hasVAT ? '' : 'hide'}>
+          <th colSpan="4" className="text-right">VAT</th>
+          <th colSpan="2"><Number value={0} isElement />%</th>
         </tr>
       </tfoot>
     </table>
@@ -163,12 +178,23 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
             </label>
           ))}
         </div>
+        <div className="form-group">
+          <label htmlFor="vat">VAT</label><br />
+          {hasVAT ? (
+          <input
+            className="form-control" type="number" id="vat" min="0" max="100" step="1"
+            defaultValue="21"
+          />
+          ) : (
+          <p className="text-muted">Subject doesn't have VAT number</p>
+          )}
+        </div>
       </div>
       <div className="col-sm-8">
         <div className="form-group">
           <label htmlFor="note">Note</label>
           <textarea
-            className="form-control" name="note" id="note"
+            className="form-control" name="note" id="note" rows="4"
             placeholder="Add private note to invoice..."
             value={form.get('note')} onChange={form.set('note')}
           >
