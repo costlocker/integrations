@@ -3,12 +3,12 @@
         "fakturoid":{
             "isForced":false,
             "subject":"2910929",
-            "lines":[
-                {
+            "lines":{
+                "default": {
                     "name":"my description",
                     "amount":100
                 }
-            ]
+            }
         },
         "costlocker":{
             "status":"READY",

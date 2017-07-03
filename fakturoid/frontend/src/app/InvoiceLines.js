@@ -66,7 +66,7 @@ export default class InvoiceLines {
       peoplecosts.forEach(activityCost => {
         activityCost.people.forEach(personCost => {
           updated = this.addLine(updated, {
-            id: `activity-${activityCost.item.activity_id}-${personCost.item.person_id}`,
+            id: `people-${activityCost.item.activity_id}-${personCost.item.person_id}`,
             name: `${activityCost.activity.name} - ${personCost.person.first_name} ${personCost.person.last_name}`,
             quantity: personCost.hours.budget,
             unit: 'h',
