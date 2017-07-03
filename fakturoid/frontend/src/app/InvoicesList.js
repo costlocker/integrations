@@ -86,7 +86,7 @@ export default function InvoicesList({ invoices, subjects }) {
         <tr>
           <th width="150">Date</th>
           <th>User</th>
-          <th>Client</th>
+          <th>Client / Customer</th>
           <th>Project / Invoice</th>
         </tr>
       </thead>

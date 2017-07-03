@@ -57,7 +57,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
 
   return <form className="form" onSubmit={form.submit}>
     <div className="form-group">
-      <label htmlFor="fakturoidSubject">Fakturoid subject</label>
+      <label htmlFor="fakturoidSubject">Fakturoid customer</label>
       <div className="row">
         <div className="col-sm-10">
           <select required
@@ -71,11 +71,11 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           </select>
         </div>
         <div className="col-sm-2">
-          <Link route='createSubject' title="Create a new subject" className="btn btn-default btn-block" />
+          <Link route='createSubject' title="Create a new customer" className="btn btn-default btn-block" />
         </div>
       </div>
       <p className="help-block text-right">
-        Are subjects out of date? <Link action={reloadSubjects} title="Download subjects from Fakturoid" className="text-danger" />
+        Are customers out of date? <Link action={reloadSubjects} title="Download customers from Fakturoid" className="text-danger" />
       </p>
     </div>
     <h3>Invoice lines</h3>
@@ -204,7 +204,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
             value={form.get('vat')} onChange={form.set('vat')} required
           />
           ) : (
-          <p className="text-muted">Subject doesn't have VAT number</p>
+          <p className="text-muted">Customer doesn't have VAT number</p>
           )}
         </div>
       </div>
