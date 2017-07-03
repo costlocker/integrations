@@ -28,6 +28,8 @@ const appState = immstruct({
     subject: '',
     note: '',
     type: 'invoice',
+    hasVat: false,
+    vat: 21,
     lines: OrderedMap(),
   },
   subject: {

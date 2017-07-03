@@ -28,14 +28,19 @@ const InvoiceDetail = ({ costlockerInvoice }) => (
   </table>
 );
 
-const hasSubjectVAT = (subjects, selectedSubject) => {
-  let hasVAT = false;
+const loadVat = (subjects, form) => {
+  let hasVat = false;
   subjects.forEach(s => {
-    if (s.id == selectedSubject) {
-      hasVAT = s.has_vat;
+    if (s.id == form.get('subject')) {
+      hasVat = s.has_vat;
     }
   })
-  return hasVAT;
+  form.set('hasVat')({
+    target: {
+      type: 'checkbox',
+      checked: hasVat,
+    }
+  });
 };
 
 const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, reloadSubjects }) => {
@@ -48,7 +53,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
 
   const linesAmount = lines.calculateTotaAmount();
   const billedAmount = costlockerInvoice.billing.billing.total_amount;
-  const hasVAT = hasSubjectVAT(fakturoidSubjects, form.get('subject'));
+  loadVat(fakturoidSubjects, form);
 
   return <form className="form" onSubmit={form.submit}>
     <div className="form-group">
@@ -150,16 +155,29 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
           </tr>;
         })}
       </tbody>
+      {form.get('hasVat') ? (
       <tfoot>
         <tr>
           <th colSpan="4" className="text-right">Total amount (without VAT)</th>
           <th colSpan="2"><Number value={linesAmount} isElement /></th>
         </tr>
-        <tr className={hasVAT ? '' : 'hide'}>
+        <tr>
           <th colSpan="4" className="text-right">VAT</th>
-          <th colSpan="2"><Number value={0} isElement />%</th>
+          <th colSpan="2"><Number value={form.get('vat')} isElement />%</th>
+        </tr>
+        <tr>
+          <th colSpan="4" className="text-right">Total amount (with VAT)</th>
+          <th colSpan="2"><Number value={linesAmount + linesAmount * (form.get('vat')) / 100} isElement /></th>
         </tr>
       </tfoot>
+      ) : (
+      <tfoot>
+        <tr>
+          <th colSpan="4" className="text-right">Total amount</th>
+          <th colSpan="2"><Number value={linesAmount} isElement /></th>
+        </tr>
+      </tfoot>
+      )}
     </table>
     <div className="row">
       <div className="col-sm-4">
@@ -180,10 +198,10 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
         </div>
         <div className="form-group">
           <label htmlFor="vat">VAT</label><br />
-          {hasVAT ? (
+          {form.get('hasVat') ? (
           <input
             className="form-control" type="number" id="vat" min="0" max="100" step="1"
-            defaultValue="21"
+            value={form.get('vat')} onChange={form.set('vat')} required
           />
           ) : (
           <p className="text-muted">Subject doesn't have VAT number</p>

@@ -5,10 +5,14 @@
             "subject":"2910929",
             "note": "my private note",
             "type": "invoice",
+            "hasVat": false,
+            "vat": 0,
             "lines":{
                 "default": {
                     "name":"my description",
-                    "amount":100
+                    "unit_amount": 100,
+                    "quantity": 1,
+                    "unit": "ks"
                 }
             }
         },

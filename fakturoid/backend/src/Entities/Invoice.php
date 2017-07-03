@@ -82,6 +82,14 @@ class Invoice
         }
     }
 
+    public function addVatToLines()
+    {
+        $vat = $this->data['request']['fakturoid']['hasVat'] ? $this->data['request']['fakturoid']['vat'] : 0;
+        foreach (array_keys($this->data['request']['fakturoid']['lines']) as $id) {
+            $this->data['request']['fakturoid']['lines'][$id]['vat'] = (int) $vat;
+        }
+    }
+
     public function getCurrentCostlockerDescription()
     {
         return $this->data['request']['costlocker']['billing']['billing']['description'] ?? '';

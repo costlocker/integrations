@@ -41,6 +41,7 @@ export default function InvoicesList({ invoices, subjects }) {
           <td width="120">{line.quantity}{line.unit}</td>
           <td width="120">{roundNumber(line.unit_amount)}</td>
           <td width="120">{roundNumber(line.total_amount)}</td>
+          <td width="120">{line.vat ? line.vat : 0}</td>
         </tr>
       );
     })
@@ -48,6 +49,7 @@ export default function InvoicesList({ invoices, subjects }) {
       <tr key={`${invoice.id}-total`}>
         <td colSpan="3"></td>
         <th>{invoice.costlocker.billing.billing.total_amount}</th>
+        <th>{roundNumber(invoice.fakturoid.amount)}</th>
       </tr>
     );
     lines.push(
@@ -69,6 +71,7 @@ export default function InvoicesList({ invoices, subjects }) {
                 <th>Quantity</th>
                 <th>Unit Amount</th>
                 <th>Total Amount</th>
+                <th>VAT</th>
               </tr>
             </thead>
             <tbody>{invoiceLines}</tbody>

@@ -37,12 +37,15 @@ class CreateInvoice
         ];
         unset($invoice->data['request']['costlocker']['project']['budget']);
 
+        $invoice->addVatToLines();
+
         $response = $this->client->__invoke(
             "/accounts/{$this->getUser->getFakturoidAccount()->slug}/invoices.json",
             [
                 'custom_id' => $invoice->costlockerInvoiceId,
                 'subject_id' => $invoice->fakturoidSubject,
                 'private_note' => $r->request->get('fakturoid')['note'],
+                'vat_price_mode' => 'without_vat',
                 'lines' => array_values(array_filter(array_map(
                     function (array $line) {
                         if ($line['quantity'] <= 0) {
@@ -53,10 +56,10 @@ class CreateInvoice
                             'unit_price' => $line['unit_amount'],
                             'quantity' => $line['quantity'],
                             'unit_name' => $line['unit'],
-                            'vat_rate' => 0,
+                            'vat_rate' => $line['vat'],
                         ];
                     },
-                    $r->request->get('fakturoid')['lines']
+                    $invoice->data['request']['fakturoid']['lines']
                 ))),
             ] + $this->convertInvoiceType($r->request->get('fakturoid')['type'])
         );
