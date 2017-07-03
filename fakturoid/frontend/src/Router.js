@@ -237,4 +237,5 @@ export const config = (router) => {
   };
   isRouteActive = router.stateService.is;
   hooks.forEach(hook => router.transitionService[hook.event](hook.criteria, hook.callback, { priority: hook.priority }));
+  appState.cursor(['app']).set('currentState', router.stateService.current.name);
 }

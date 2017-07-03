@@ -73,7 +73,7 @@ export function App({ auth, isRouteActive }) {
           </div>
           <div className="navbar-right text-right">
             <Navigation isRouteActive={isRouteActive} routes={[
-              { route: 'login', title: <User auth={auth} /> },
+              { route: 'login', title: auth.get('costlocker') ? <User auth={auth} /> : 'Login' },
             ]} />
           </div>
         </div>
