@@ -52,7 +52,15 @@ export default function InvoicesList({ invoices, subjects }) {
     );
     lines.push(
       <tr key={`${invoice.id}-lines`}>
-        <td className="text-right"><em>Invoice lines</em></td>
+        <td className="text-right">
+          <em>Invoice lines</em><br />
+          {invoice.fakturoid.guess.actions.map(action => (
+            <span key={action}>
+              <span className="label label-primary">{action}</span>
+              <br />
+            </span>
+          ))}
+        </td>
         <td colSpan="3">
           <table className="table table-striped table-condensed table-bordered">
             <thead>

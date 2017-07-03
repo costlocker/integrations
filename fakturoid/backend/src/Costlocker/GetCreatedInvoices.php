@@ -42,10 +42,34 @@ class GetCreatedInvoices
                         'number' => $i->fakturoidInvoiceNumber,
                         'link' => $i->data['response']['html_url'],
                         'amount' => $i->data['response']['total'],
+                        'guess' => [
+                            'actions' => $this->guessActions(array_keys($i->data['request']['fakturoid']['lines'])),
+                        ],
                     ],
                 ];
             },
             $invoices
         );
+    }
+
+    private function guessActions(array $lineKeys)
+    {
+        $availableActions = [
+            'expense' => 'expenses',
+            'activity' => 'activities',
+            'people' => 'people',
+            'discount' => 'discounts',
+            'default' => 'custom',
+            'empty' => 'custom',
+        ];
+        $actions = [];
+        foreach ($lineKeys as $key) {
+            foreach ($availableActions as $action => $status) {
+                if (is_int(strpos($key, $action))) {
+                    $actions[] = $status;
+                }
+            }
+        }
+        return $actions ? array_values(array_unique($actions)) : ['custom'];
     }
 }
