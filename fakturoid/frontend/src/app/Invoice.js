@@ -146,6 +146,15 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
         </tr>
       </tfoot>
     </table>
+    <div className="form-group">
+      <label htmlFor="note">Note</label>
+      <textarea
+        className="form-control" name="note" id="note"
+        placeholder="Add private note to invoice..."
+        value={form.get('note')} onChange={form.set('note')}
+      >
+      </textarea>
+    </div>
     {Math.abs(billedAmount - linesAmount) <= 0.1 ? (
       <button type="submit" className="btn btn-primary btn-block">Create invoice</button>
     ) : (

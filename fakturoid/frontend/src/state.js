@@ -26,6 +26,7 @@ const appState = immstruct({
   invoice: {
     isForced: false,
     subject: '',
+    note: '',
     lines: OrderedMap(),
   },
   subject: {

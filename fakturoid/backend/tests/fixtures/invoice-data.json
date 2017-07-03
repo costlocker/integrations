@@ -3,6 +3,7 @@
         "fakturoid":{
             "isForced":false,
             "subject":"2910929",
+            "note": "my private note",
             "lines":{
                 "default": {
                     "name":"my description",

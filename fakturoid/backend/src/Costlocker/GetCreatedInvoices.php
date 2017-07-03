@@ -38,6 +38,7 @@ class GetCreatedInvoices
                     'fakturoid' => [
                         'user' => $i->fakturoidUser->data['full_name'],
                         'subject' => $i->data['request']['fakturoid']['subject'],
+                        'note' => $i->data['request']['fakturoid']['note'] ?? '',
                         'lines' => array_values($i->data['request']['fakturoid']['lines']),
                         'number' => $i->fakturoidInvoiceNumber,
                         'link' => $i->data['response']['html_url'],

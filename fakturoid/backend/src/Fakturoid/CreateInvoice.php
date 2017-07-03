@@ -42,6 +42,7 @@ class CreateInvoice
             [
                 'custom_id' => $invoice->costlockerInvoiceId,
                 'subject_id' => $invoice->fakturoidSubject,
+                'private_note' => $r->request->get('fakturoid')['note'],
                 'lines' => array_values(array_filter(array_map(
                     function (array $line) {
                         if ($line['quantity'] <= 0) {

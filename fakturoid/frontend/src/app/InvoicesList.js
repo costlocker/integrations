@@ -73,6 +73,7 @@ export default function InvoicesList({ invoices, subjects }) {
             </thead>
             <tbody>{invoiceLines}</tbody>
           </table>
+          <small className="text-muted">{invoice.fakturoid.note}</small>
         </td>
       </tr>
     );
