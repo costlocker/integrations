@@ -41,4 +41,6 @@ const roundNumber = value => {
 
 const Number = ({ value }) => <span title={value}>{roundNumber(value)}</span>;
 
-export { Errors, ExternalLink, Button, Link, CostlockerLink, roundNumber, Number };
+const Image = ({ src }) => <img src={src} alt="" className="img-responsive img-thumbnail" />
+
+export { Errors, ExternalLink, Button, Link, CostlockerLink, roundNumber, Number, Image };

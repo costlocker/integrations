@@ -68,7 +68,7 @@ export function App({ auth, isRouteActive }) {
           </div>
           <div>
             {auth.get('costlocker') ? <Navigation isRouteActive={isRouteActive} routes={[
-              { route: 'invoice', title: 'Create invoice', params: { id: null } },
+              { route: 'invoice', title: 'Invoices', params: { id: null } },
             ]} /> : ''}
           </div>
           <div className="navbar-right text-right">

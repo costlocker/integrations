@@ -1,5 +1,5 @@
 import React from 'react';
-import { CostlockerLink } from './Components';
+import { CostlockerLink, Image } from './Components';
 
 export default function DisabledAddon() {
   return (
@@ -12,6 +12,8 @@ export default function DisabledAddon() {
             </div>
             <div className="panel-body">
               Ask your owner to <CostlockerLink path="/settings/addons" title="enable the addon in Settings" />.
+              <br /><br />
+              <Image src="https://user-images.githubusercontent.com/7994022/27791571-fd97c17e-5ff5-11e7-9690-05715f1d3742.png" />
             </div>
           </div>
         </div>
