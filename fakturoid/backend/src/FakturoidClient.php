@@ -29,6 +29,9 @@ class FakturoidClient
 
     public function __invoke($path, array $json = null)
     {
+        if ($path != '/user.json') {
+            $path = "/accounts/{$this->getUser->getFakturoidAccount()->slug}{$path}";
+        }
         $authorization = $this->authorization ?: $this->getUser->getFakturoidAuthorization();
 
         $response = $this->client->request(

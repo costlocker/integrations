@@ -25,7 +25,7 @@ class CreateSubject
     {
         $account = $this->getUser->getFakturoidAccount();
         $response = $this->client->__invoke(
-            "/accounts/{$account->slug}/subjects.json",
+            '/subjects.json',
             [
                 'name' => $r->request->get('name'),
             ]

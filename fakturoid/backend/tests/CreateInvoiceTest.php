@@ -5,7 +5,6 @@ namespace Costlocker\Integrations\Fakturoid;
 use Mockery as m;
 use Costlocker\Integrations\FakturoidClient;
 use Costlocker\Integrations\Auth\GetUser;
-use Costlocker\Integrations\Entities\FakturoidAccount;
 use Costlocker\Integrations\Costlocker\MarkSentInvoice;
 use Costlocker\Integrations\Database\Database;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,7 +52,6 @@ class CreateInvoiceTest extends \PHPUnit_Framework_TestCase
         $client->shouldReceive('__invoke')->once()->andReturn(new Response(201));
         $user = m::mock(GetUser::class);
         $user->shouldReceive('getCostlockerUser')->once();
-        $user->shouldReceive('getFakturoidAccount')->once()->andReturn(new FakturoidAccount());
         $markSent = m::mock(MarkSentInvoice::class);
         $markSent->shouldReceive('__invoke')->once();
         $db = m::mock(Database::class);

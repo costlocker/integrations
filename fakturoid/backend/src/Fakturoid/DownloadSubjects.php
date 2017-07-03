@@ -24,7 +24,7 @@ class DownloadSubjects
         $page = 1;
         $hasNextPage = true;
         while ($hasNextPage) {
-            $response = $this->client->__invoke("/accounts/{$account->slug}/subjects.json?page={$page}");
+            $response = $this->client->__invoke("/subjects.json?page={$page}");
             if ($response->getStatusCode() != 200) {
                 return;
             }

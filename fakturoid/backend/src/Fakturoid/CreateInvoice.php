@@ -40,7 +40,7 @@ class CreateInvoice
         $invoice->addVatToLines();
 
         $response = $this->client->__invoke(
-            "/accounts/{$this->getUser->getFakturoidAccount()->slug}/invoices.json",
+            '/invoices.json',
             [
                 'custom_id' => $invoice->costlockerInvoiceId,
                 'subject_id' => $invoice->fakturoidSubject,
