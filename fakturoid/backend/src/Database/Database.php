@@ -59,6 +59,21 @@ DQL;
         return $this->entityManager->createQuery($dql)->setMaxResults($limit)->execute($params);
     }
 
+    public function findLatestSubjectForClient($costlockerClientId)
+    {
+        $sql =<<<SQL
+            SELECT fa_subject_id
+            FROM invoices
+            WHERE cl_client_id = :id
+            ORDER BY id DESC
+            LIMIT 1
+SQL;
+        $params = [
+            'id' => (int) $costlockerClientId,
+        ];
+        return $this->entityManager->getConnection()->executeQuery($sql, $params)->fetchColumn();
+    }
+
     public function findCostlockerUserById($id)
     {
         $dql =<<<DQL

@@ -57,6 +57,7 @@ class GetInvoice
             ],
             'billing' => $billing,
             'invoice' => $this->invoiceToJson($invoice),
+            'guess' => $this->guessInvoiceFields($json),
         ];
     }
 
@@ -113,6 +114,13 @@ class GetInvoice
         return [
             'number' => $i->fakturoidInvoiceNumber,
             'link' => $i->data['response']['html_url'],
+        ];
+    }
+
+    public function guessInvoiceFields(array $project)
+    {
+        return [
+            'subject' => $this->database->findLatestSubjectForClient($project['client']['id']),
         ];
     }
 }

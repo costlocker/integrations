@@ -34,7 +34,10 @@ if (isNotLoggedInCostlocker()) {
 const fetchInvoice = ({ project, invoice }) =>
   fetchFromApi(`/costlocker?project=${project}&invoice=${invoice}`)
     .catch(setError)
-    .then(invoice => appState.cursor(['costlocker']).set('invoice', invoice));
+    .then(invoice => appState.cursor()
+      .setIn(['costlocker', 'invoice'], invoice)
+      .setIn(['invoice', 'subject'], invoice.guess.subject)
+    );
 
 const fetchLatestInvoices = () =>
   fetchFromApi(`/costlocker`)
