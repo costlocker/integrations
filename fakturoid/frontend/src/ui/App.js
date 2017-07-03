@@ -1,6 +1,7 @@
 import React from 'react';
 import { UIView } from 'ui-router-react';
-import { Link } from '../ui/Components';
+import { Link } from './Components';
+import { appState } from '../state';
 
 const CostlockerUser = ({ user }) => {
   return (
@@ -47,7 +48,11 @@ const Navigation = ({ isRouteActive, routes }) => {
   );
 };
 
-export default function Layout({ auth, isRouteActive }) {
+// little hack to avoid wrapping all elements in bootstrap container
+// good enough - it count on that element is not rendererd only once (rerender, when external data are loaded etc.)
+const hasSubnavigation = () => document.getElementsByClassName('nav-breadcrumbs').length > 0;
+
+export function App({ auth, isRouteActive }) {
   return (
     <div>
       <nav className="navbar navbar-default">
@@ -73,13 +78,56 @@ export default function Layout({ auth, isRouteActive }) {
           </div>
         </div>
       </nav>
+      {hasSubnavigation() ? (
+        <UIView />
+      ) : (
+        <div className='container'>
+          <div className="row">
+            <div className="col-sm-12">
+              <UIView />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const PageWithSubnav = ({ tabs }) => {
+  const changeTab = (tab) => () => appState.cursor(['app']).set('activeTab', tab.id);
+  const hasTab = (id) => tabs.filter(tab => tab.id === id).length;
+  const getCss = (id, defaultClass) => {
+    const activeTabInState = appState.cursor(['app', 'activeTab']).deref();
+    const activeTab = activeTabInState && hasTab(activeTabInState) ? activeTabInState : tabs[0].id;
+    return id === activeTab ? `${defaultClass} active` : defaultClass;
+  };
+
+  return <div>
+    <nav className="nav-breadcrumbs">
       <div className="container">
         <div className="row">
           <div className="col-sm-12">
-            <UIView />
+            <ol className="breadcrumb">
+              {tabs.map(tab => (
+                <li key={tab.id} className={getCss(tab.id, null)}>
+                  <Link title={tab.name} action={changeTab(tab)} />
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div className="container">
+      <div className="row">
+        <div className="col-sm-12">
+          <div className="tab-content">
+            {tabs.map(tab => (
+              <div key={tab.id} className={getCss(tab.id, "tab-pane")} id={tab.id}>{tab.content()}</div>
+            ))}
           </div>
         </div>
       </div>
     </div>
-  );
+  </div>;
 };

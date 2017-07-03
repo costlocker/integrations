@@ -6,7 +6,7 @@ import { Visualizer } from 'ui-router-visualizer';
 import { isDevelopmentMode } from './config';
 import { appState } from './state';
 import { states, config, isRouteActive } from './Router';
-import App from './ui/App';
+import { App } from './ui/App';
 import Loading from './ui/Loading';
 import ErrorPage from './ui/ErrorPage';
 import './ui/index.css'

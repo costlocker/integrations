@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Link, Errors, roundNumber, Number } from '../ui/Components';
 import InvoicesList from './InvoicesList';
+import { PageWithSubnav } from '../ui/App';
 
 const InvoiceDetail = ({ costlockerInvoice }) => (
   <table className="table">
@@ -157,14 +158,24 @@ export default function Invoice(props) {
     costlockerInvoice.status === 'READY' ||
     (costlockerInvoice.status === 'ALREADY_IMPORTED' && props.form.get('isForced'))
   ) {
-    return <div>
-      <h3>Costlocker billing</h3>
-      <InvoiceDetail costlockerInvoice={costlockerInvoice} />
-      <InvoiceEditor {...props} />
-      <hr />
-      <h2>Previously imported invoices</h2>
-      <InvoicesList invoices={props.projectInvoices} subjects={props.fakturoidSubjects} />
-    </div>;
+    return <PageWithSubnav
+      tabs={[
+        {
+          id: 'invoice',
+          name: 'New invoice',
+          content: () => <div>
+            <h3>Costlocker billing</h3>
+            <InvoiceDetail costlockerInvoice={costlockerInvoice} />
+            <InvoiceEditor {...props} />
+          </div>,
+        },
+        {
+          id: 'project',
+          name: 'Previously imported project invoices',
+          content: () => <InvoicesList invoices={props.projectInvoices} subjects={props.fakturoidSubjects} />,
+        },
+      ]}
+    />;
   } else if (costlockerInvoice.status === 'NOT_DRAFT') {
     return <div>
       <h3>Costlocker billing</h3>

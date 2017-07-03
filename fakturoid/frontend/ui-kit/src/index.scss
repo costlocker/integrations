@@ -1,13 +1,15 @@
 $blue: #119ee0;
 
-$body-bg: #f2f2f2;
+$body-bg: #fff;
+$breadcrumb-bg: #f2f2f2;
 $navbar-default-bg: #333;
-$navbar-default-link-color: $body-bg;
+$navbar-default-link-color: $breadcrumb-bg;
 $navbar-default-link-hover-color: $blue;
 $navbar-default-link-active-color: $navbar-default-bg;
-$navbar-default-link-active-bg: $body-bg;
+$navbar-default-link-active-bg: $breadcrumb-bg;
 $navbar-default-link-hover-bg: $navbar-default-bg;
-$navbar-default-border: $body-bg;
+$navbar-default-border: $navbar-default-bg;
+$breadcrumb-separator: '';
 $font-size-base: 14px;
 $font-size-h1: floor(($font-size-base * 2.2));
 $font-size-h2: floor(($font-size-base * 1.6));
@@ -36,6 +38,7 @@ $border-radius-small: 0;
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/component-animations";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/navs";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/navbar";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/breadcrumbs";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/labels";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/badges";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/alerts";
@@ -56,10 +59,8 @@ $border-radius-small: 0;
 }
 
 .navbar {
-    border-top: 0;
-    border-right: 0;
-    border-left: 0;
-
+    border: 0;
+    margin-bottom: 0;
     .navbar-brand {
         padding: 5px;
         a {
@@ -68,6 +69,34 @@ $border-radius-small: 0;
         }
         img {
             height: 100%;
+        }
+    }
+    .navbar-text {
+        color: $gray-lighter;
+        a {
+            color: $body-bg;
+        }
+    }
+}
+
+.nav-breadcrumbs {
+    padding: 0;
+    background: $breadcrumb-bg;
+    margin-bottom: 1em;
+    .breadcrumb {
+        margin: 0;
+        padding: 0;
+        li {
+            padding-left: 0.5ex;
+            padding: 1em 1ex;
+            margin: 0 1em 0 0;
+            &.active {
+                font-weight: bold;
+                border-bottom: 3px solid $blue;
+            }
+        }
+        li:before {
+            padding: 0;
         }
     }
 }

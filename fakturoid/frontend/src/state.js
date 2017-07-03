@@ -11,6 +11,7 @@ const appState = immstruct({
   app: {
     csrfToken: null,
     currentState: '', // helper for active menu items
+    activeTab: '',
     error: null,
     isSendingForm: false,
   },
