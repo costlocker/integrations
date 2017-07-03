@@ -171,11 +171,7 @@ export const states = [
           pushToApi('/fakturoid?action=createSubject', request)
             .catch(setError)
             .then((response) => {
-              appState.cursor().update(
-                app => app
-                  .setIn(['fakturoid', 'subjects'], null)
-                  .setIn(['invoice', 'subject'], response.id)
-              );
+              appState.cursor().update(app => app.setIn(['fakturoid', 'subjects'], null));
               redirectToRoute('invoice', params);
             });
         }
