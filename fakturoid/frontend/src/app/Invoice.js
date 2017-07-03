@@ -145,7 +145,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
       <button type="submit" className="btn btn-primary btn-block">Create invoice</button>
     ) : (
       <Errors
-        title={`Billed amount '${billedAmount}' in Costlocker is different than total amount in invoice lines '${linesAmount}'`}
+        title={`Billed amount '${roundNumber(billedAmount)}' in Costlocker is different than total amount in invoice lines '${roundNumber(linesAmount)}'`}
         error="Update quantity or unit amount in lines, so that amount is same"
       />
     )}
@@ -154,10 +154,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
 
 export default function Invoice(props) {
   const costlockerInvoice = props.costlockerInvoice;
-  if (
-    costlockerInvoice.status === 'READY' ||
-    (costlockerInvoice.status === 'ALREADY_IMPORTED' && props.form.get('isForced'))
-  ) {
+  const buildSubnav = (content) => {
     return <PageWithSubnav
       tabs={[
         {
@@ -166,7 +163,7 @@ export default function Invoice(props) {
           content: () => <div>
             <h3>Costlocker billing</h3>
             <InvoiceDetail costlockerInvoice={costlockerInvoice} />
-            <InvoiceEditor {...props} />
+            {content}
           </div>,
         },
         {
@@ -176,31 +173,29 @@ export default function Invoice(props) {
         },
       ]}
     />;
+  }
+  if (
+    costlockerInvoice.status === 'READY' ||
+    (costlockerInvoice.status === 'ALREADY_IMPORTED' && props.form.get('isForced'))
+  ) {
+    return buildSubnav(<InvoiceEditor {...props} />);
   } else if (costlockerInvoice.status === 'NOT_DRAFT') {
-    return <div>
-      <h3>Costlocker billing</h3>
-      <InvoiceDetail costlockerInvoice={costlockerInvoice} />
-      <Errors title="Invalid invoice state" error="Billing is already invoiced in Costlocker" />
-    </div>;
+    return buildSubnav(<Errors title="Invalid invoice state" error="Billing is already invoiced in Costlocker" />);
   } else if (costlockerInvoice.status === 'ALREADY_IMPORTED') {
-    return <div>
-      <h3>Costlocker billing</h3>
-      <InvoiceDetail costlockerInvoice={costlockerInvoice} />
-      <div className="row">
-        <div className="col-sm-6 text-left">
-          <a href={costlockerInvoice.invoice.link} className="btn btn-success" target="_blank" rel="noopener noreferrer">
-            {`Open invoice #${costlockerInvoice.invoice.number} in Fakturoid`}
-          </a>
-        </div>
-        <div className="col-sm-6 text-right">
-          <Button
-            title="Create invoice once again"
-            className="btn btn-warning"
-            action={props.forceUpdate}
-          />
-        </div>
+    return buildSubnav(<div className="row">
+      <div className="col-sm-6 text-left">
+        <a href={costlockerInvoice.invoice.link} className="btn btn-success" target="_blank" rel="noopener noreferrer">
+          {`Open invoice #${costlockerInvoice.invoice.number} in Fakturoid`}
+        </a>
       </div>
-    </div>;
+      <div className="col-sm-6 text-right">
+        <Button
+          title="Create invoice once again"
+          className="btn btn-warning"
+          action={props.forceUpdate}
+        />
+      </div>
+    </div>);
   }
   return <Errors title="Unknown billing" error="Billing not found in Costlocker" />;
 }

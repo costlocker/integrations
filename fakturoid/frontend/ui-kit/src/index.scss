@@ -17,6 +17,7 @@ $font-size-h3: floor(($font-size-base * 1.2));
 $border-radius-base: 0;
 $border-radius-large: 0;
 $border-radius-small: 0;
+$input-bg: #fafafa;
 
 // Core variables and mixins
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/variables";
@@ -54,13 +55,14 @@ $border-radius-small: 0;
     padding-bottom: 2em;
 }
 
-.cover .progress {
-    border-radius: 0;
+.cover {
+    margin-top: 1em;
 }
 
 .navbar {
     border: 0;
     margin-bottom: 0;
+    border-bottom: 3px solid $breadcrumb-bg;
     .navbar-brand {
         padding: 5px;
         a {

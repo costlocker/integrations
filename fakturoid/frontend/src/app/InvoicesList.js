@@ -10,7 +10,7 @@ export default function InvoicesList({ invoices, subjects }) {
     subjects.forEach(s => indexedSubjects[s.id] = s.name);
   }
   const lines = [];
-  invoices.map((invoice) => {
+  invoices.forEach((invoice) => {
     lines.push(
       <tr key={invoice.id}>
         <td>{invoice.date}</td>
@@ -38,9 +38,9 @@ export default function InvoicesList({ invoices, subjects }) {
       invoiceLines.push(
         <tr key={`${invoice.id}-${index}`}>
           <td>{line.name}</td>
-          <td width="100">{line.quantity}{line.unit}</td>
-          <td width="100">{roundNumber(line.unit_amount)}</td>
-          <td width="100">{roundNumber(line.total_amount)}</td>
+          <td width="120">{line.quantity}{line.unit}</td>
+          <td width="120">{roundNumber(line.unit_amount)}</td>
+          <td width="120">{roundNumber(line.total_amount)}</td>
         </tr>
       );
     })
@@ -54,7 +54,7 @@ export default function InvoicesList({ invoices, subjects }) {
       <tr key={`${invoice.id}-lines`}>
         <td className="text-right"><em>Invoice lines</em></td>
         <td colSpan="3">
-          <table className="table table-condensed table-bordered">
+          <table className="table table-striped table-condensed table-bordered">
             <thead>
               <tr>
                 <th>Name</th>
@@ -69,7 +69,7 @@ export default function InvoicesList({ invoices, subjects }) {
       </tr>
     );
   });
-  return <table className="table table-striped table-hover">
+  return <table className="table table-striped">
       <thead>
         <tr>
           <th width="150">Date</th>
