@@ -26,6 +26,7 @@ export default class InvoiceLines {
   addExpenses = (expenses) => () => {
     this.update(lines => {
       let updated = lines;
+      updated = this.removeDefaultIfExists(updated);
       expenses.forEach(expense => {
         updated = this.addLine(updated, {
           id: `expense-${expense.item.expense_id}`,
@@ -43,6 +44,7 @@ export default class InvoiceLines {
   addActivities = (peoplecosts) => () => {
     this.update(lines => {
       let updated = lines;
+      updated = this.removeDefaultIfExists(updated);
       peoplecosts.forEach(activityCost => {
         updated = this.addLine(updated, {
           id: `activity-${activityCost.item.activity_id}`,
@@ -60,6 +62,7 @@ export default class InvoiceLines {
   addPeople = (peoplecosts) => () => {
     this.update(lines => {
       let updated = lines;
+      updated = this.removeDefaultIfExists(updated);
       peoplecosts.forEach(activityCost => {
         activityCost.people.forEach(personCost => {
           updated = this.addLine(updated, {
@@ -103,6 +106,10 @@ export default class InvoiceLines {
 
   removeAllLines = () => () => {
     this.update(lines => lines.clear());
+  }
+
+  removeDefaultIfExists = (lines) => {
+    return lines.delete('default');
   }
 
   updateFieldInLine = (field, line) => (e) => {
