@@ -119,7 +119,7 @@ export const states = [
           e.preventDefault();
           pushToApi('/fakturoid?action=downloadSubjects', {})
             .catch(setError)
-            .then(() => fetchSubjects().then(() =>  alert('Subjects reloaded')))
+            .then(() => fetchSubjects().then(() =>  alert('Customers reloaded')))
         }}
       />
     },
