@@ -75,6 +75,7 @@ class Invoice
 
     public function __construct(CostlockerUser $u = null)
     {
+        $this->createdAt = new \DateTime();
         if ($u) {
             $this->costlockerUser = $u;
             $this->fakturoidUser = $u->fakturoidUser; 
