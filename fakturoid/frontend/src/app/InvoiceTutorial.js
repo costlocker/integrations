@@ -1,17 +1,16 @@
 import React from 'react';
-import { appHost } from '../config';
 import InvoicesList from './InvoicesList';
 import { PageWithSubnav } from '../ui/App';
+import {  CostlockerLink } from '../ui/Components';
 
 export default function InvoiceTutorial({ latestInvoices, subjects, renderContent }) {
-  const billingOutlookUrl = `${appHost}/dashboard/billing-outlook`;
   return <PageWithSubnav
     tabs={[
       {
         id: 'tutorial',
         name: 'Tutorial',
         content: () => <ol>
-          <li>Go to <a href={billingOutlookUrl}>Billing Outlook in Costlocker</a></li>
+          <li>Go to <CostlockerLink path="/dashboard/billing-outlook" title="Billing Outlook in Costlocker" /></li>
           <li>Go to selected project invoice</li>
           <li>Click on <strong>Create invoice</strong></li>
         </ol>,

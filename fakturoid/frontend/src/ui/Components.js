@@ -1,5 +1,6 @@
 import React from 'react';
 import { redirectToRoute } from '../Router';
+import { appHost } from '../config';
 
 const Errors = ({ title, error }) => {
   if (!error) {
@@ -31,6 +32,8 @@ const Link = ({ title, route, params, action, className }) => {
   return <a href="" onClick={onClick} className={className}>{title}</a>;
 };
 
+const CostlockerLink = ({ title, path }) => <a href={`${appHost}${path}`}>{title}</a>
+
 const roundNumber = value => {
   const rounded = Math.round(value * 100) / 100;
   return isNaN(rounded) ? null : rounded;
@@ -38,4 +41,4 @@ const roundNumber = value => {
 
 const Number = ({ value }) => <span title={value}>{roundNumber(value)}</span>;
 
-export { Errors, ExternalLink, Button, Link, roundNumber, Number };
+export { Errors, ExternalLink, Button, Link, CostlockerLink, roundNumber, Number };

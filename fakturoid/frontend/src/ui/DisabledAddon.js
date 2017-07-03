@@ -1,5 +1,5 @@
 import React from 'react';
-import { appHost } from '../config';
+import { CostlockerLink } from './Components';
 
 export default function DisabledAddon() {
   return (
@@ -11,7 +11,7 @@ export default function DisabledAddon() {
               <h1 className="panel-title">Fakturoid integration is disabled</h1>
             </div>
             <div className="panel-body">
-              Ask your owner to <a href={`${appHost}/settings/addons`}>enable the addon in Settings</a>.
+              Ask your owner to <CostlockerLink path="/settings/addons" title="enable the addon in Settings" />.
             </div>
           </div>
         </div>
