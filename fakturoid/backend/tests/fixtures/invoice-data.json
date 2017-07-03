@@ -4,6 +4,7 @@
             "isForced":false,
             "subject":"2910929",
             "note": "my private note",
+            "type": "invoice",
             "lines":{
                 "default": {
                     "name":"my description",

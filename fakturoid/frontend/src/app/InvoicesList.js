@@ -29,7 +29,7 @@ export default function InvoicesList({ invoices, subjects }) {
           &nbsp;<span className="badge">{invoice.costlocker.project.project_id.id}</span>
           &nbsp;<ExternalLink url={invoice.costlocker.link} />
           </span><br />
-          {invoice.fakturoid.number} <ExternalLink url={invoice.fakturoid.link} />
+          {invoice.fakturoid.number} <span className="badge">{invoice.fakturoid.type}</span> <ExternalLink url={invoice.fakturoid.link} />
         </td>
       </tr>
     );

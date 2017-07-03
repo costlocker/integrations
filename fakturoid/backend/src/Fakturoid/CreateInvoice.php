@@ -58,7 +58,7 @@ class CreateInvoice
                     },
                     $r->request->get('fakturoid')['lines']
                 ))),
-            ]
+            ] + $this->convertInvoiceType($r->request->get('fakturoid')['type'])
         );
 
         if ($response->getStatusCode() != 201) {
@@ -73,5 +73,16 @@ class CreateInvoice
         $this->markSentInvoice->__invoke($invoice);
 
         return new JsonResponse();
+    }
+
+    private function convertInvoiceType($type)
+    {
+        if (is_int(strpos($type, 'proforma.'))) {
+            return [
+                'proforma' => true,
+                'partial_proforma' => $type == 'proforma.partial',
+            ];
+        }
+        return [];
     }
 }
