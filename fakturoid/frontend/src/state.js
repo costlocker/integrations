@@ -9,6 +9,7 @@ const appState = immstruct({
     isLoggedInFakturoid: false,
   },
   app: {
+    isDisabled: false,
     csrfToken: null,
     currentState: null, // helper for active menu items
     activeTab: '',

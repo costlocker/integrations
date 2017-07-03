@@ -23,6 +23,7 @@ const fetchUser = (queryString) =>
           .setIn(['auth', 'fakturoid'], user.fakturoid)
           .setIn(['auth', 'isLoggedInFakturoid'], user.isLoggedInFakturoid)
           .setIn(['app', 'csrfToken'], user.csrfToken)
+          .setIn(['app', 'isDisabled'], user.isAddonDisabled)
       );
     })
     .catch(e => console.log('Anonymous user'));

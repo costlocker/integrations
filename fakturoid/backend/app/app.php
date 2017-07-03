@@ -95,8 +95,8 @@ $app
 
 $app
     ->get('/user', function () use ($app) {
-        $app['client.check']->verifyTokens();
-        return $app['client.user']();
+        $isAddonDisabled = $app['client.check']->verifyTokens();
+        return $app['client.user']($isAddonDisabled);
     })
     ->before(function (Request $r, $app) {
         $app['redirectUrls']->loadInvoiceFromRequest($r);

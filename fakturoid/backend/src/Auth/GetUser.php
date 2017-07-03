@@ -21,10 +21,11 @@ class GetUser
         $this->database = $db;
     }
 
-    public function __invoke()
+    public function __invoke($isAddonDisabled)
     {
         $clUser = $this->getCostlockerUser();
         return new JsonResponse([
+            'isAddonDisabled' => $isAddonDisabled,
             'costlocker' => $clUser->data,
             'fakturoid' => $clUser->fakturoidUser ? $this->transformFakturoidUser($clUser->fakturoidUser): null,
             'isLoggedInFakturoid' => $this->session->get('fakturoid') && $clUser->fakturoidUser ? true : false,

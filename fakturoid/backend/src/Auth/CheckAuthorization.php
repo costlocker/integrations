@@ -30,18 +30,25 @@ class CheckAuthorization
 
     public function verifyTokens()
     {
-        $this->verifyToken('costlocker', $this->costlockerClient, '__invoke', '/me');
+        $isAddonDisabled = $this->verifyCostlockerToken();
         $this->verifyFakturoidToken();
+        return $isAddonDisabled;
     }
 
-    private function verifyToken($service, $client, $method, $endpoint)
+    private function verifyCostlockerToken()
     {
-        if (!$this->checkAccount($service)) {
-            $response = $client->{$method}($endpoint);
+        if (!$this->checkAccount('costlocker')) {
+            $response = $this->costlockerClient->__invoke('/me');
             if ($response->getStatusCode() !== 200) {
-                $this->session->remove($service);
+                $this->session->remove('costlocker');
+            } else {
+                return !in_array(
+                    'fakturoid',
+                    json_decode((string) $response->getBody(), true)['data']['company']['addons'] ?? []
+                );
             }
         }
+        return false;
     }
 
     private function verifyFakturoidToken()

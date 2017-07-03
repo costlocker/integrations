@@ -9,6 +9,7 @@ import { states, config, isRouteActive } from './Router';
 import { App } from './ui/App';
 import Loading from './ui/Loading';
 import ErrorPage from './ui/ErrorPage';
+import DisabledAddon from './ui/DisabledAddon';
 import './ui/index.css'
 
 export const plugins = isDevelopmentMode ? [pushStateLocationPlugin, Visualizer] : [pushStateLocationPlugin];
@@ -16,7 +17,9 @@ export const plugins = isDevelopmentMode ? [pushStateLocationPlugin, Visualizer]
 const render = () => {
   let content = null;
   if (appState.cursor(['auth', 'isLoading']).deref()) {
-    content = <Loading title='Loading Costlocker & Fakturoid integration' />
+    content = <Loading title='Loading Costlocker & Fakturoid integration' />;
+  } else if (appState.cursor(['app', 'isDisabled']).deref()) {
+    content = <DisabledAddon />;
   } else if (appState.cursor(['app', 'error']).deref()) {
     content = <ErrorPage appState={appState} isDevelopmentMode={isDevelopmentMode} />
   } else {
