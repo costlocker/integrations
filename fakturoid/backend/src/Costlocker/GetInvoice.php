@@ -26,7 +26,7 @@ class GetInvoice
     public function __invoke(Request $r)
     {
         $response = $this->client->__invoke(
-            "/projects/{$r->query->get('project')}?types=billing,expenses,peoplecosts"
+            "/projects/{$r->query->get('project')}?types=billing,expenses,peoplecosts,discounts"
         );
 
         if ($response->getStatusCode() != 200) {
@@ -51,7 +51,8 @@ class GetInvoice
                 'project_id' => $json['project_id'],
                 'budget' => [
                     'expenses' => $items['expense'],
-                    'peoplecosts' => $items['peoplecosts'],  
+                    'peoplecosts' => $items['peoplecosts'],
+                    'discount' => $items['discount'],
                 ],
             ],
             'billing' => $billing,
@@ -65,6 +66,7 @@ class GetInvoice
             'peoplecosts' => [],
             'billing' => [],
             'expense' => [],
+            'discount' => 0,
         ];
         foreach ($items as $item) {
             $type = $item['item']['type'];
@@ -74,6 +76,8 @@ class GetInvoice
                 $results['peoplecosts'][$item['item']['activity_id']]['people'][] = $item;
             } elseif (in_array($type, ['billing', 'expense'])) {
                 $results[$type][] = $item;
+            } elseif ($type == 'discount') {
+                $results[$type] = $item['discount']['total_amount'];
             }
         }
         $results['peoplecosts'] = array_values($results['peoplecosts']);

@@ -76,6 +76,20 @@ export default class InvoiceLines {
     });
   }
 
+  addDiscount = (discount) => () => {
+    if (discount <= 0) {
+      return;
+    }
+    this.update(lines => this.addLine(lines, {
+      id: `discount`,
+      name: 'Discount',
+      quantity: 1,
+      unit: 'ks',
+      unit_amount: -discount,
+      total_amount: -discount,
+    }));
+  }
+
   addEmptyLine = () => () => {
     this.update(lines => this.addLine(lines, {
       id: `empty-${Math.random().toString(36).substring(7)}`,

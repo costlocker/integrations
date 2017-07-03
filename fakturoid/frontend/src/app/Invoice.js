@@ -65,9 +65,14 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
     <h3>Invoice lines</h3>
     <div className="btn-toolbar">
       <div className="btn-group">
-        <Link title="Add expenses" action={lines.addExpenses(costlockerInvoice.project.budget.expenses)} className="btn btn-default" />
         <Link title="Add activities" action={lines.addActivities(costlockerInvoice.project.budget.peoplecosts)} className="btn btn-default" />
         <Link title="Add people" action={lines.addPeople(costlockerInvoice.project.budget.peoplecosts)} className="btn btn-default" />
+      </div>
+      <div className="btn-group">
+        <Link title="Add expenses" action={lines.addExpenses(costlockerInvoice.project.budget.expenses)} className="btn btn-default" />
+        <Link
+           title="Add discount" action={lines.addDiscount(costlockerInvoice.project.budget.discount)}
+           className={`btn btn-default ${costlockerInvoice.project.budget.discount ? '' : 'disabled'}`} />
       </div>
       <div className="btn-group">
         <Link title="Add empty line" action={lines.addEmptyLine()} className="btn btn-default" />
