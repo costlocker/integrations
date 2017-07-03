@@ -37,7 +37,7 @@ const fetchInvoice = ({ project, billing }) =>
     .catch(setError)
     .then(invoice => appState.cursor()
       .setIn(['costlocker', 'invoice'], invoice)
-      .setIn(['invoice', 'subject'], invoice.guess ? invoice.guess.subject : null)
+      .setIn(['invoice', 'subject'], invoice.fakturoid ? invoice.fakturoid.template.subject : null)
     );
 
 const fetchLatestInvoices = () =>
@@ -81,7 +81,7 @@ export const states = [
         return <Loading title="Creating invoice in Fakturoid" />;
       }
       return <Invoice
-        costlockerInvoice={invoice}
+        invoice={invoice}
         fakturoidSubjects={subjects}
         projectInvoices={appState.cursor(['costlocker', 'projectInvoices']).deref()}
         lines={new InvoiceLines(appState.cursor(['invoice', 'lines']))}
@@ -96,7 +96,7 @@ export const states = [
             e.preventDefault();
             const request = {
               fakturoid: appState.cursor(['invoice']).deref().toJS(),
-              costlocker: appState.cursor(['costlocker', 'invoice']).deref(),
+              costlocker: appState.cursor(['costlocker', 'invoice']).deref().costlocker,
             };
             appState.cursor(['app']).set('isSendingForm', true);
             pushToApi('/fakturoid?action=createInvoice', request)
@@ -133,7 +133,7 @@ export const states = [
         }
       },
       {
-        token: 'loadCostlockerInvoice',
+        token: 'loadInvoice',
         deps: ['$transition$'],
         resolveFn: ($transition$) => {
           const params = $transition$.params();
@@ -160,12 +160,12 @@ export const states = [
         submit: (e) =>  {
           e.preventDefault();
           const request = appState.cursor(['subject']).deref().toJS();
-          const invoice = appState.cursor(['costlocker', 'invoice']).deref();
+          const costlocker = appState.cursor(['costlocker', 'invoice']).deref().costlocker;
           let params = {};
-          if (invoice) {
+          if (costlocker) {
             params = {
-              project: invoice.project.id,
-              invoice: invoice.billing.item.billing_id,
+              project: costlocker.project.id,
+              billing: costlocker.billing.item.billing_id,
             };
           }
           pushToApi('/fakturoid?action=createSubject', request)

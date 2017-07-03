@@ -3,7 +3,7 @@ import { Button, Link, Errors, roundNumber, Number } from '../ui/Components';
 import InvoicesList from './InvoicesList';
 import { PageWithSubnav } from '../ui/App';
 
-const InvoiceDetail = ({ costlockerInvoice }) => (
+const InvoiceDetail = ({ costlocker }) => (
   <table className="table">
     <thead>
       <tr>
@@ -16,13 +16,13 @@ const InvoiceDetail = ({ costlockerInvoice }) => (
     </thead>
     <tbody>
       <tr>
-        <td>{costlockerInvoice.billing.billing.description}</td>
-        <td>{costlockerInvoice.project.client.name}</td>
+        <td>{costlocker.billing.billing.description}</td>
+        <td>{costlocker.project.client.name}</td>
         <td>
-          {costlockerInvoice.project.name} <span className="badge">{costlockerInvoice.project.project_id.id}</span>
+          {costlocker.project.name} <span className="badge">{costlocker.project.project_id.id}</span>
         </td>
-        <td>{costlockerInvoice.billing.billing.date}</td>
-        <td>{costlockerInvoice.billing.billing.total_amount}</td>
+        <td>{costlocker.billing.billing.date}</td>
+        <td>{costlocker.billing.billing.total_amount}</td>
       </tr>
     </tbody>
   </table>
@@ -43,16 +43,16 @@ const loadVat = (subjects, form) => {
   });
 };
 
-const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, reloadSubjects }) => {
+const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubjects }) => {
   lines.addDefaultIfIsEmpty({
-    name: costlockerInvoice.billing.billing.description
-        ? costlockerInvoice.billing.billing.description
-        : costlockerInvoice.project.name,
-    amount: costlockerInvoice.billing.billing.total_amount
+    name: costlocker.billing.billing.description
+        ? costlocker.billing.billing.description
+        : costlocker.project.name,
+    amount: costlocker.billing.billing.total_amount
   })
 
   const linesAmount = lines.calculateTotaAmount();
-  const billedAmount = costlockerInvoice.billing.billing.total_amount;
+  const billedAmount = costlocker.billing.billing.total_amount;
   loadVat(fakturoidSubjects, form);
 
   return <form className="form" onSubmit={form.submit}>
@@ -81,14 +81,14 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
     <h3>Invoice lines</h3>
     <div className="btn-toolbar">
       <div className="btn-group">
-        <Link title="Add activities" action={lines.addActivities(costlockerInvoice.project.budget.peoplecosts)} className="btn btn-default" />
-        <Link title="Add people" action={lines.addPeople(costlockerInvoice.project.budget.peoplecosts)} className="btn btn-default" />
+        <Link title="Add activities" action={lines.addActivities(costlocker.project.budget.peoplecosts)} className="btn btn-default" />
+        <Link title="Add people" action={lines.addPeople(costlocker.project.budget.peoplecosts)} className="btn btn-default" />
       </div>
       <div className="btn-group">
-        <Link title="Add expenses" action={lines.addExpenses(costlockerInvoice.project.budget.expenses)} className="btn btn-default" />
+        <Link title="Add expenses" action={lines.addExpenses(costlocker.project.budget.expenses)} className="btn btn-default" />
         <Link
-           title="Add discount" action={lines.addDiscount(costlockerInvoice.project.budget.discount)}
-           className={`btn btn-default ${costlockerInvoice.project.budget.discount ? '' : 'disabled'}`} />
+           title="Add discount" action={lines.addDiscount(costlocker.project.budget.discount)}
+           className={`btn btn-default ${costlocker.project.budget.discount ? '' : 'disabled'}`} />
       </div>
       <div className="btn-group">
         <Link title="Add empty line" action={lines.addEmptyLine()} className="btn btn-default" />
@@ -232,7 +232,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlockerInvoice, form, lines, relo
 }
 
 export default function Invoice(props) {
-  const costlockerInvoice = props.costlockerInvoice;
+  const invoice = props.invoice;
   const buildSubnav = (content) => {
     return <PageWithSubnav
       tabs={[
@@ -241,7 +241,7 @@ export default function Invoice(props) {
           name: 'New invoice',
           content: () => <div>
             <h3>Costlocker billing</h3>
-            <InvoiceDetail costlockerInvoice={costlockerInvoice} />
+            <InvoiceDetail costlocker={props.invoice.costlocker} />
             {content}
           </div>,
         },
@@ -254,17 +254,17 @@ export default function Invoice(props) {
     />;
   }
   if (
-    costlockerInvoice.status === 'READY' ||
-    (costlockerInvoice.status === 'ALREADY_IMPORTED' && props.form.get('isForced'))
+    invoice.status === 'READY' ||
+    (invoice.status === 'ALREADY_IMPORTED' && props.form.get('isForced'))
   ) {
-    return buildSubnav(<InvoiceEditor {...props} />);
-  } else if (costlockerInvoice.status === 'NOT_DRAFT') {
+    return buildSubnav(<InvoiceEditor {...props} costlocker={props.invoice.costlocker} />);
+  } else if (invoice.status === 'NOT_DRAFT') {
     return buildSubnav(<Errors title="Invalid invoice state" error="Billing is already invoiced in Costlocker" />);
-  } else if (costlockerInvoice.status === 'ALREADY_IMPORTED') {
+  } else if (invoice.status === 'ALREADY_IMPORTED') {
     return buildSubnav(<div className="row">
       <div className="col-sm-6 text-left">
-        <a href={costlockerInvoice.invoice.link} className="btn btn-success" target="_blank" rel="noopener noreferrer">
-          {`Open invoice #${costlockerInvoice.invoice.number} in Fakturoid`}
+        <a href={invoice.fakturoid.link} className="btn btn-success" target="_blank" rel="noopener noreferrer">
+          {`Open invoice #${invoice.fakturoid.number} in Fakturoid`}
         </a>
       </div>
       <div className="col-sm-6 text-right">

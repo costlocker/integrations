@@ -32,8 +32,8 @@ class GetInvoice
         if ($response->getStatusCode() != 200) {
             return [
                 'status' => self::STATUS_UNKNOWN,
-                'project' => null,
-                'invoice' => null,
+                'costlocker' => null,
+                'fakturoid' => null,
             ];
         }
 
@@ -44,20 +44,25 @@ class GetInvoice
         $invoice = $this->database->findInvoice($billingId);
         return [
             'status' => $this->billingToStatus($billing, $invoice),
-            'project' => [
-                'id' => $json['id'],
-                'name' => $json['name'],
-                'client' => $json['client'],
-                'project_id' => $json['project_id'],
-                'budget' => [
-                    'expenses' => $items['expense'],
-                    'peoplecosts' => $items['peoplecosts'],
-                    'discount' => $items['discount'],
+            'costlocker' => [
+                'project' => [
+                    'id' => $json['id'],
+                    'name' => $json['name'],
+                    'client' => $json['client'],
+                    'project_id' => $json['project_id'],
+                    'budget' => [
+                        'expenses' => $items['expense'],
+                        'peoplecosts' => $items['peoplecosts'],
+                        'discount' => $items['discount'],
+                    ],
+                ],
+                'billing' => $billing,
+            ],
+            'fakturoid' => $this->invoiceToJson($invoice) + [
+                'template' => [
+                    'subject' => $this->database->findLatestSubjectForClient($json['client']['id']),
                 ],
             ],
-            'billing' => $billing,
-            'invoice' => $this->invoiceToJson($invoice),
-            'guess' => $this->guessInvoiceFields($json),
         ];
     }
 
@@ -114,13 +119,6 @@ class GetInvoice
         return [
             'number' => $i->fakturoidInvoiceNumber,
             'link' => $i->data['response']['html_url'],
-        ];
-    }
-
-    public function guessInvoiceFields(array $project)
-    {
-        return [
-            'subject' => $this->database->findLatestSubjectForClient($project['client']['id']),
         ];
     }
 }

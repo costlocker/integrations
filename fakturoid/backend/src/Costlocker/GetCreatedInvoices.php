@@ -44,7 +44,7 @@ class GetCreatedInvoices
                         'number' => $i->fakturoidInvoiceNumber,
                         'link' => $i->data['response']['html_url'],
                         'amount' => $i->data['response']['total'],
-                        'guess' => [
+                        'template' => [
                             'actions' => $this->guessActions(array_keys($i->data['request']['fakturoid']['lines'])),
                         ],
                     ],

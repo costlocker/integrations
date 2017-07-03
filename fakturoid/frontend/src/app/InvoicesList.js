@@ -56,7 +56,7 @@ export default function InvoicesList({ invoices, subjects }) {
       <tr key={`${invoice.id}-lines`}>
         <td className="text-right">
           <em>Invoice lines</em><br />
-          {invoice.fakturoid.guess.actions.map(action => (
+          {invoice.fakturoid.template.actions.map(action => (
             <span key={action}>
               <span className="label label-primary">{action}</span>
               <br />
