@@ -32,12 +32,12 @@ if (isNotLoggedInCostlocker()) {
   fetchUser(window.location.search);
 }
 
-const fetchInvoice = ({ project, invoice }) =>
-  fetchFromApi(`/costlocker?project=${project}&invoice=${invoice}`)
+const fetchInvoice = ({ project, billing }) =>
+  fetchFromApi(`/costlocker?project=${project}&billing=${billing}&query=billing`)
     .catch(setError)
     .then(invoice => appState.cursor()
       .setIn(['costlocker', 'invoice'], invoice)
-      .setIn(['invoice', 'subject'], invoice.guess.subject)
+      .setIn(['invoice', 'subject'], invoice.guess ? invoice.guess.subject : null)
     );
 
 const fetchLatestInvoices = () =>
@@ -63,11 +63,11 @@ export const states = [
   },
   {
     name: 'invoice',
-    url: '/invoice?project&invoice',
-    component: (props) => {
+    url: '/invoice?project&billing',
+    component: (props) =>  {
       const params = props.transition.params();
       const subjects = appState.cursor(['fakturoid', 'subjects']).deref();
-      if (!params.invoice || !params.project) {
+      if (!params.billing || !params.project) {
         return <InvoiceTutorial
           latestInvoices={appState.cursor(['costlocker', 'latestInvoices']).deref()}
           subjects={subjects}
@@ -92,7 +92,7 @@ export const states = [
             type,
             e.target.type === 'checkbox' ? e.target.checked : e.target.value
           ),
-          submit: (e) => {
+          submit: (e) =>  {
             e.preventDefault();
             const request = {
               fakturoid: appState.cursor(['invoice']).deref().toJS(),
@@ -119,7 +119,7 @@ export const states = [
           e.preventDefault();
           pushToApi('/fakturoid?action=downloadSubjects', {})
             .catch(setError)
-            .then(() => fetchSubjects().then(() => alert('Subjects reloaded')))
+            .then(() => fetchSubjects().then(() =>  alert('Subjects reloaded')))
         }}
       />
     },
@@ -137,7 +137,7 @@ export const states = [
         deps: ['$transition$'],
         resolveFn: ($transition$) => {
           const params = $transition$.params();
-          if (params.invoice && params.project) {
+          if (params.billing && params.project) {
             fetchInvoice(params);
             fetchProjectInvoices(params.project);
           } else {
@@ -157,7 +157,7 @@ export const states = [
           type,
           e.target.type === 'checkbox' ? e.target.checked : e.target.value
         ),
-        submit: (e) => {
+        submit: (e) =>  {
           e.preventDefault();
           const request = appState.cursor(['subject']).deref().toJS();
           const invoice = appState.cursor(['costlocker', 'invoice']).deref();

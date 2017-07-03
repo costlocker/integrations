@@ -128,7 +128,7 @@ $app
 
 $app
     ->get('/costlocker', function (Request $r) use ($app) {
-        if ($r->query->has('invoice')) {
+        if ($r->query->get('query') == 'billing') {
             $strategy = new \Costlocker\Integrations\Costlocker\GetInvoice(
                 $app['client.costlocker'],
                 $app['database']

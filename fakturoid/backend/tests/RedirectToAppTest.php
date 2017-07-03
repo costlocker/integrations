@@ -4,7 +4,7 @@ namespace Costlocker\Integrations\Auth;
 
 class RedirectToAppTest extends \Costlocker\Integrations\GivenApi
 {
-    private $billingSpecification = '?invoice=1&project=1';
+    private $billingSpecification = '?billing=1&project=1';
 
     public function testRememberCostlockerInvoiceAfterLogin()
     {

@@ -37,7 +37,7 @@ class GetInvoice
             ];
         }
 
-        $billingId = $r->query->get('invoice');
+        $billingId = $r->query->get('billing');
         $json = json_decode($response->getBody(), true)['data'];
         $items = $this->separateItems($json['items']);
         $billing = $this->findDraftBilling($items['billing'], $billingId);

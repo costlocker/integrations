@@ -19,7 +19,7 @@ class RedirectToApp
 
     public function loadInvoiceFromRequest(Request $r)
     {
-        if (!$this->session->get('fakturoid') && $r->query->get('project') && $r->query->get('invoice')) {
+        if (!$this->session->get('fakturoid') && $r->query->get('project') && $r->query->get('billing')) {
             $this->session->set('queryString', $r->getQueryString());
         }
     }
