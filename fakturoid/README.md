@@ -31,19 +31,9 @@ yarn watch-css
 yarn start
 ```
 
-### Apache VirtualHost example
+### Nginx example
 
-```bash
-# /etc/hosts
-127.0.0.1 fakturoid.integrations-costlocker.dev
-
-# /etc/apache2/extra/httpd-vhosts.conf
-<VirtualHost *:80>
-  ServerName fakturoid.integrations-costlocker.dev
-  DocumentRoot "/path-to/fakturoid/web"
-  RewriteEngine On
-</VirtualHost>
-```
+Take a look at [/.docker/nginx.conf](/.docker/nginx.conf).
 
 ### Docker
 
@@ -82,4 +72,25 @@ server {
     proxy_cache_bypass $http_upgrade;
   }
 }
+```
+
+### Apache VirtualHost example
+
+Nginx is recommended. Following configguration does not rewrite html requests,
+Only homepage works, not http://fakturoid.integrations-costlocker.dev/login).
+
+You would have to use extra web directory with symlinks and `.htaccess`.
+Take a look into [history](https://github.com/costlocker/integrations), if you are interested.
+
+```bash
+# /etc/hosts
+127.0.0.1 fakturoid.integrations-costlocker.dev
+
+# /etc/apache2/extra/httpd-vhosts.conf
+<VirtualHost *:80>
+  ServerName fakturoid.integrations-costlocker.dev
+  DocumentRoot "/path-to/fakturoid/frontend/build"
+  RewriteEngine On
+  Alias /api  "/path-to/fakturoid/backend/web"
+</VirtualHost>
 ```
