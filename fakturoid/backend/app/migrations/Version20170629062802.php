@@ -5,6 +5,7 @@ namespace Costlocker\Integrations\Database\Migrations;
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 
+/** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
 class Version20170629062802 extends AbstractMigration
 {
     public function up(Schema $schema)

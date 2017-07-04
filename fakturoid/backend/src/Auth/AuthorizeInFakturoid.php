@@ -25,7 +25,7 @@ class AuthorizeInFakturoid
     public function __invoke(Request $r)
     {
         $slug = $r->request->get('slug');
-        $authorization = 
+        $authorization =
             $this->client->overrideAuthorization($r->request->get('email'), $r->request->get('token'));
 
         $response = $this->client->__invoke('/user.json');

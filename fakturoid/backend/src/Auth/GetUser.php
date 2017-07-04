@@ -62,7 +62,7 @@ class GetUser
         return [
             'person' => [
                 'email' => $u->email,
-                'full_name' => $u->data['full_name'],  
+                'full_name' => $u->data['full_name'],
             ],
             'account' => [
                 'slug' => $u->fakturoidAccount->slug,

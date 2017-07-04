@@ -33,7 +33,9 @@ class GetCreatedInvoices
                             . " {$i->costlockerUser->data['person']['last_name']}",
                         'project' => $i->data['request']['costlocker']['project'],
                         'billing' => $i->data['request']['costlocker']['billing'],
-                        'link' => getenv('CL_HOST') . "/projects/detail/{$i->data['request']['costlocker']['project']['id']}/billing",
+                        'link' =>
+                            getenv('CL_HOST') .
+                            "/projects/detail/{$i->data['request']['costlocker']['project']['id']}/billing",
                     ],
                     'fakturoid' => [
                         'user' => $i->fakturoidUser->data['full_name'],

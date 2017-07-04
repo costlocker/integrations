@@ -78,7 +78,7 @@ class Invoice
         $this->createdAt = new \DateTime();
         if ($u) {
             $this->costlockerUser = $u;
-            $this->fakturoidUser = $u->fakturoidUser; 
+            $this->fakturoidUser = $u->fakturoidUser;
         }
     }
 

@@ -7,6 +7,7 @@ use Costlocker\Integrations\Entities\Invoice;
 use Costlocker\Integrations\Entities\CostlockerUser;
 use Costlocker\Integrations\Entities\FakturoidAccount;
 
+/** @SuppressWarnings(PHPMD.TooManyPublicMethods) */
 class Database
 {
     private $entityManager;
