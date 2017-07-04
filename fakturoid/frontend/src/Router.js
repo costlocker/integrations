@@ -15,6 +15,7 @@ const setError = e => appState.cursor(['app']).set('error', e);
 
 const fetchUser = (queryString) =>
   fetchFromApi(`/user${queryString}`)
+    .catch(setError)
     .then((user) => {
       appState.cursor().update(
         auth => auth
@@ -25,8 +26,7 @@ const fetchUser = (queryString) =>
           .setIn(['app', 'csrfToken'], user.csrfToken)
           .setIn(['app', 'isDisabled'], user.isAddonDisabled)
       );
-    })
-    .catch(e => console.log('Anonymous user'));
+    });
 
 if (isNotLoggedInCostlocker()) {
   fetchUser(window.location.search);
