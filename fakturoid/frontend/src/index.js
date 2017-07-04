@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { UIRouter, pushStateLocationPlugin } from 'ui-router-react';
-import { Visualizer } from 'ui-router-visualizer';
 
 import { isDevelopmentMode } from './config';
 import { appState } from './state';
@@ -12,7 +11,7 @@ import ErrorPage from './ui/ErrorPage';
 import DisabledAddon from './ui/DisabledAddon';
 import './ui/index.css'
 
-export const plugins = isDevelopmentMode ? [pushStateLocationPlugin, Visualizer] : [pushStateLocationPlugin];
+export const plugins = [pushStateLocationPlugin];
 
 const render = () => {
   let content = null;
