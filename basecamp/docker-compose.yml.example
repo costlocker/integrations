@@ -24,8 +24,12 @@ services:
         build:
             context: .
             dockerfile: ./.docker/Dockerfile.queue
+        # if postgres in defined in same docker-compose.yml
         links:
             - postgres:db.local
+        # if postgres is defined in another docker-compose.yml
+        # external_links:
+            # - postgres:db.local
 
     postgres:
         image: postgres:9.6.3
@@ -34,3 +38,8 @@ services:
             - postgres-data:/var/lib/postgresql/data
         environment:
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+networks:
+  default:
+    external:
+      name: costlocker_addons
