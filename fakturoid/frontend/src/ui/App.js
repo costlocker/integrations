@@ -48,9 +48,16 @@ const Navigation = ({ isRouteActive, routes }) => {
   );
 };
 
-// little hack to avoid wrapping all elements in bootstrap container
-// good enough - it count on that element is not rendererd only once (rerender, when external data are loaded etc.)
-const hasSubnavigation = () => document.getElementsByClassName('nav-breadcrumbs').length > 0;
+const hasSubnavigation = (isRouteActive) => isRouteActive('invoice');
+
+export const Page = ({ view }) =>
+  <div className='container'>
+    <div className="row">
+      <div className="col-sm-12">
+        {view}
+      </div>
+    </div>
+  </div>;
 
 export function App({ auth, isRouteActive }) {
   return (
@@ -78,16 +85,10 @@ export function App({ auth, isRouteActive }) {
           </div>
         </div>
       </nav>
-      {hasSubnavigation() ? (
+      {hasSubnavigation(isRouteActive) ? (
         <UIView />
       ) : (
-        <div className='container'>
-          <div className="row">
-            <div className="col-sm-12">
-              <UIView />
-            </div>
-          </div>
-        </div>
+        <Page view={<UIView />} />
       )}
     </div>
   );
@@ -118,16 +119,12 @@ export const PageWithSubnav = ({ tabs }) => {
         </div>
       </div>
     </nav>
-    <div className="container">
-      <div className="row">
-        <div className="col-sm-12">
-          <div className="tab-content">
-            {tabs.map(tab => (
-              <div key={tab.id} className={getCss(tab.id, "tab-pane")} id={tab.id}>{tab.content()}</div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+    <Page
+      view={<div className="tab-content">
+        {tabs.map(tab => (
+          <div key={tab.id} className={getCss(tab.id, "tab-pane")} id={tab.id}>{tab.content()}</div>
+        ))}
+      </div>}
+    />
   </div>;
 };

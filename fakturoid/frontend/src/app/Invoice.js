@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Link, Errors, roundNumber, Number } from '../ui/Components';
 import InvoicesList from './InvoicesList';
-import { PageWithSubnav } from '../ui/App';
+import { PageWithSubnav, Page } from '../ui/App';
 
 const InvoiceDetail = ({ costlocker }) => (
   <table className="table">
@@ -276,5 +276,7 @@ export default function Invoice(props) {
       </div>
     </div>);
   }
-  return <Errors title="Unknown billing" error="Billing not found in Costlocker" />;
+  return <Page
+    view={<Errors title="Unknown billing" error="Billing not found in Costlocker" />}
+  />;
 }

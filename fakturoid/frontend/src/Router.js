@@ -241,9 +241,12 @@ const hooks = [
     criteria: { to: state => state.data && state.data.title },
     callback: (transition) => {
       const params = transition.params();
-      const stateTitle = transition.to().data.title;
+      const state = transition.to();
+      const stateTitle = state.data.title;
       const getTitle = typeof stateTitle === 'function' ? stateTitle : () => stateTitle;
       document.title = `${getTitle(params)} | Costlocker → Fakturoid`;
+      // rerender to change active state in menu - stateService.go reloads only <UIView>
+      appState.cursor(['app']).set('currentState', state.name);
     },
     priority: 10,
   },
@@ -257,10 +260,7 @@ export const config = (router) => {
       e.preventDefault();
     }
     router.stateService.go(route, params, { location: true });
-    // rerender to change active state in menu - stateService.go realoads only <UIView>
-    appState.cursor(['app']).set('currentState', route);
   };
   isRouteActive = router.stateService.is;
   hooks.forEach(hook => router.transitionService[hook.event](hook.criteria, hook.callback, { priority: hook.priority }));
-  appState.cursor(['app']).set('currentState', router.stateService.current.name);
 }
