@@ -114,7 +114,7 @@ class GetInvoice
     private function invoiceToJson(Invoice $i = null)
     {
         if (!$i) {
-            return null;
+            return [];
         }
         return [
             'number' => $i->fakturoidInvoiceNumber,
