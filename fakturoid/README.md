@@ -44,3 +44,42 @@ yarn start
   RewriteEngine On
 </VirtualHost>
 ```
+
+### Docker
+
+```bash
+# create empty directory if you have db dir in subdirectory
+# otherwise: directory "/var/lib/postgresql/data" exists but is not empty
+mkdir backend/var/database
+
+# build
+docker-compose -f docker-compose.yml up --build -d
+
+# create user and DB
+docker exec -it fakturoid_postgres_1 createuser costlocker_fakturoid --pwprompt -U postgres -W
+docker exec -it fakturoid_postgres_1 createdb costlocker_fakturoid -e -E utf8 --owner costlocker_fakturoid -U postgres -W
+
+# run migrations
+docker exec -it fakturoid-costlocker /app/backend/bin/console migrations:migrate
+```
+
+### Nginx
+
+```
+server {  
+  listen 8080;
+  server_name fakturoid.integrations-costlocker.dev;
+
+  location / {
+    proxy_pass http://127.0.0.1:19996/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Host $host:$server_port;
+    proxy_set_header X-Forwarded-Server $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_cache_bypass $http_upgrade;
+  }
+}
+```

@@ -1,0 +1,35 @@
+version: "2"
+
+volumes:
+    postgres-data:
+        driver: local
+
+services:
+    application:
+        container_name: fakturoid-costlocker
+        build:
+            context: .
+            dockerfile: ./.docker/Dockerfile
+        ports:
+            - "19996:80"
+        volumes:
+            - "./backend/var/sessions:/app/backend/var/sessions"
+            - "./backend/var/log:/app/backend/var/log"
+        links:
+            - postgres:db.local
+        # if postgres is defined in another docker-compose.yml
+        # external_links:
+            # - postgres:db.local
+
+    postgres:
+        image: postgres:9.6.3
+        restart: always
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+        environment:
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+networks:
+  default:
+    external:
+      name: costlocker_addons
