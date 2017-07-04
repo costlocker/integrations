@@ -50,7 +50,7 @@ docker exec -it fakturoid_postgres_1 createuser costlocker_fakturoid --pwprompt 
 docker exec -it fakturoid_postgres_1 createdb costlocker_fakturoid -e -E utf8 --owner costlocker_fakturoid -U postgres -W
 
 # run migrations
-docker exec -it fakturoid-costlocker /app/backend/bin/console migrations:migrate
+docker exec -it fakturoid-costlocker-fpm /app/backend/bin/console migrations:migrate
 ```
 
 ### Nginx
