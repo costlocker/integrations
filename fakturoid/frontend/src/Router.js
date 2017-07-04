@@ -72,7 +72,7 @@ export const states = [
         return 'Create invoice';
       },
     },
-    component: (props) =>  {
+    component: (props) => {
       const params = props.transition.params();
       const subjects = appState.cursor(['fakturoid', 'subjects']).deref();
       if (!params.billing || !params.project) {
@@ -100,7 +100,7 @@ export const states = [
             type,
             e.target.type === 'checkbox' ? e.target.checked : e.target.value
           ),
-          submit: (e) =>  {
+          submit: (e) => {
             e.preventDefault();
             const request = {
               fakturoid: appState.cursor(['invoice']).deref().toJS(),
@@ -127,7 +127,7 @@ export const states = [
           e.preventDefault();
           pushToApi('/fakturoid?action=downloadSubjects', {})
             .catch(setError)
-            .then(() => fetchSubjects().then(() =>  alert('Customers reloaded')))
+            .then(() => fetchSubjects().then(() => alert('Customers reloaded')))
         }}
       />
     },
@@ -168,7 +168,7 @@ export const states = [
           type,
           e.target.type === 'checkbox' ? e.target.checked : e.target.value
         ),
-        submit: (e) =>  {
+        submit: (e) => {
           e.preventDefault();
           const request = appState.cursor(['subject']).deref().toJS();
           const costlocker = appState.cursor(['costlocker', 'invoice']).deref().costlocker;

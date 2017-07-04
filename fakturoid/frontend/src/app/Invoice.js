@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Link, Errors, roundNumber, Number } from '../ui/Components';
+import { Button, Link, Errors, roundNumber, Number } from '../ui/Components';
 import InvoicesList from './InvoicesList';
 import { PageWithSubnav, Page } from '../ui/App';
 
@@ -46,8 +46,8 @@ const loadVat = (subjects, form) => {
 const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubjects }) => {
   lines.addDefaultIfIsEmpty({
     name: costlocker.billing.billing.description
-        ? costlocker.billing.billing.description
-        : costlocker.project.name,
+      ? costlocker.billing.billing.description
+      : costlocker.project.name,
     amount: costlocker.billing.billing.total_amount
   })
 
@@ -87,8 +87,8 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
       <div className="btn-group">
         <Link title="Add expenses" action={lines.addExpenses(costlocker.project.budget.expenses)} className="btn btn-default" />
         <Link
-           title="Add discount" action={lines.addDiscount(costlocker.project.budget.discount)}
-           className={`btn btn-default ${costlocker.project.budget.discount ? '' : 'disabled'}`} />
+          title="Add discount" action={lines.addDiscount(costlocker.project.budget.discount)}
+          className={`btn btn-default ${costlocker.project.budget.discount ? '' : 'disabled'}`} />
       </div>
       <div className="btn-group">
         <Link title="Add empty line" action={lines.addEmptyLine()} className="btn btn-default" />
@@ -146,66 +146,66 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
             </td>
             <td>
               {lines.hasMultipleLines() ? (
-              <Link
-                title={<span className="fa fa-trash"></span>} className="btn btn-link text-danger"
-                action={lines.removeLine(line)}
-              />
+                <Link
+                  title={<span className="fa fa-trash"></span>} className="btn btn-link text-danger"
+                  action={lines.removeLine(line)}
+                />
               ) : <span className="btn btn-link disabled fa fa-trash"></span>}
             </td>
           </tr>;
         })}
       </tbody>
       {form.get('hasVat') ? (
-      <tfoot>
-        <tr>
-          <th colSpan="4" className="text-right">Total amount (without VAT)</th>
-          <th colSpan="2"><Number value={linesAmount} isElement /></th>
-        </tr>
-        <tr>
-          <th colSpan="4" className="text-right">VAT</th>
-          <th colSpan="2"><Number value={form.get('vat')} isElement />%</th>
-        </tr>
-        <tr>
-          <th colSpan="4" className="text-right">Total amount (with VAT)</th>
-          <th colSpan="2"><Number value={linesAmount + linesAmount * (form.get('vat')) / 100} isElement /></th>
-        </tr>
-      </tfoot>
+        <tfoot>
+          <tr>
+            <th colSpan="4" className="text-right">Total amount (without VAT)</th>
+            <th colSpan="2"><Number value={linesAmount} isElement /></th>
+          </tr>
+          <tr>
+            <th colSpan="4" className="text-right">VAT</th>
+            <th colSpan="2"><Number value={form.get('vat')} isElement />%</th>
+          </tr>
+          <tr>
+            <th colSpan="4" className="text-right">Total amount (with VAT)</th>
+            <th colSpan="2"><Number value={linesAmount + linesAmount * (form.get('vat')) / 100} isElement /></th>
+          </tr>
+        </tfoot>
       ) : (
-      <tfoot>
-        <tr>
-          <th colSpan="4" className="text-right">Total amount</th>
-          <th colSpan="2"><Number value={linesAmount} isElement /></th>
-        </tr>
-      </tfoot>
-      )}
+          <tfoot>
+            <tr>
+              <th colSpan="4" className="text-right">Total amount</th>
+              <th colSpan="2"><Number value={linesAmount} isElement /></th>
+            </tr>
+          </tfoot>
+        )}
     </table>
     <div className="row">
       <div className="col-sm-4">
         <div className="form-group">
           <label htmlFor="type">Invoice type</label><br />
           {[
-            {id: 'invoice', title: 'Invoice'},
-            {id: 'proforma.full', title: 'Proforma (full)'},
-            {id: 'proforma.partial', title: 'Proforma (partial)'},
+            { id: 'invoice', title: 'Invoice' },
+            { id: 'proforma.full', title: 'Proforma (full)' },
+            { id: 'proforma.partial', title: 'Proforma (partial)' },
           ].map(type => (
             <label className="radio-inline" key={type.id}>
               <input
                 type="radio" name="type" value={type.id}
                 checked={form.get('type') === type.id} onChange={form.set('type')}
-               /> {type.title}
+              /> {type.title}
             </label>
           ))}
         </div>
         <div className="form-group">
           <label htmlFor="vat">VAT</label><br />
           {form.get('hasVat') ? (
-          <input
-            className="form-control" type="number" id="vat" min="0" max="100" step="1"
-            value={form.get('vat')} onChange={form.set('vat')} required
-          />
+            <input
+              className="form-control" type="number" id="vat" min="0" max="100" step="1"
+              value={form.get('vat')} onChange={form.set('vat')} required
+            />
           ) : (
-          <p className="text-muted">Customer doesn't have VAT number</p>
-          )}
+              <p className="text-muted">Customer doesn't have VAT number</p>
+            )}
         </div>
       </div>
       <div className="col-sm-8">
@@ -223,11 +223,11 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     {Math.abs(billedAmount - linesAmount) <= 0.1 ? (
       <button type="submit" className="btn btn-primary btn-block">Create invoice</button>
     ) : (
-      <Errors
-        title={`Billed amount '${roundNumber(billedAmount)}' in Costlocker is different than total amount in invoice lines '${roundNumber(linesAmount)}'`}
-        error="Update quantity or unit amount in lines, so that amount is same"
-      />
-    )}
+        <Errors
+          title={`Billed amount '${roundNumber(billedAmount)}' in Costlocker is different than total amount in invoice lines '${roundNumber(linesAmount)}'`}
+          error="Update quantity or unit amount in lines, so that amount is same"
+        />
+      )}
   </form>;
 }
 

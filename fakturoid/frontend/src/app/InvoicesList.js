@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExternalLink, roundNumber } from '../ui/Components';
+import { ExternalLink, roundNumber } from '../ui/Components';
 
 export default function InvoicesList({ invoices, subjects }) {
   if (!invoices.length) {
@@ -24,10 +24,10 @@ export default function InvoicesList({ invoices, subjects }) {
         </td>
         <td>
           <span className="text-primary">
-          #{invoice.costlocker.billing.item.billing_id}
-          &nbsp;{invoice.costlocker.project.name}
-          &nbsp;<span className="badge">{invoice.costlocker.project.project_id.id}</span>
-          &nbsp;<ExternalLink url={invoice.costlocker.link} />
+            #{invoice.costlocker.billing.item.billing_id}
+            &nbsp;{invoice.costlocker.project.name}
+            &nbsp;<span className="badge">{invoice.costlocker.project.project_id.id}</span>
+            &nbsp;<ExternalLink url={invoice.costlocker.link} />
           </span><br />
           {invoice.fakturoid.number} <span className="badge">{invoice.fakturoid.type}</span> <ExternalLink url={invoice.fakturoid.link} />
         </td>
@@ -82,16 +82,16 @@ export default function InvoicesList({ invoices, subjects }) {
     );
   });
   return <table className="table table-striped">
-      <thead>
-        <tr>
-          <th width="150">Date</th>
-          <th>User</th>
-          <th>Client / Customer</th>
-          <th>Project / Invoice</th>
-        </tr>
-      </thead>
-      <tbody>
-        {lines}
-      </tbody>
-    </table>;
+    <thead>
+      <tr>
+        <th width="150">Date</th>
+        <th>User</th>
+        <th>Client / Customer</th>
+        <th>Project / Invoice</th>
+      </tr>
+    </thead>
+    <tbody>
+      {lines}
+    </tbody>
+  </table>;
 }

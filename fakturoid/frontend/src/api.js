@@ -18,7 +18,8 @@ const handleErrors = (response) => {
   return response;
 };
 
-const fetchFromApi = (path: string) => fetch(`${apiUrl}${path}`, { credentials: 'include' })
+const fetchFromApi = (path: string) =>
+  fetch(`${apiUrl}${path}`, { credentials: 'include' })
     .then(handleErrors)
     .then(response => response.json());
 
@@ -35,7 +36,7 @@ const pushToApi = (path: string, data: Object) =>
       body: JSON.stringify(data),
     }
   )
-  .then(handleErrors)
-  .then(response => response.json());
+    .then(handleErrors)
+    .then(response => response.json());
 
 export { fetchFromApi, pushToApi, loginUrls };

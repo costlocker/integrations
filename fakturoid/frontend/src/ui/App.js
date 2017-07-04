@@ -42,7 +42,7 @@ const Navigation = ({ isRouteActive, routes }) => {
   return (
     <ul className="nav navbar-nav">
       {routes.map(({ route, params, title }) => (
-      <li key={route} className={isRouteActive(route) ? 'active' : null}><Link route={route} params={params} title={title} /></li>
+        <li key={route} className={isRouteActive(route) ? 'active' : null}><Link route={route} params={params} title={title} /></li>
       ))}
     </ul>
   );
@@ -88,8 +88,8 @@ export function App({ auth, isRouteActive }) {
       {hasSubnavigation(isRouteActive) ? (
         <UIView />
       ) : (
-        <Page view={<UIView />} />
-      )}
+          <Page view={<UIView />} />
+        )}
     </div>
   );
 };

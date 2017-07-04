@@ -129,7 +129,7 @@ export default class InvoiceLines {
 
   addLine = (lines, rawData) => lines.set(rawData.id, Map(rawData))
 
-  update = (callback) =>  this.cursor.update(callback)
+  update = (callback) => this.cursor.update(callback)
 
   deref = (callback) => this.cursor.deref()
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import InvoicesList from './InvoicesList';
 import { PageWithSubnav } from '../ui/App';
-import {  CostlockerLink, Image } from '../ui/Components';
+import { CostlockerLink, Image } from '../ui/Components';
 
 export default function InvoiceTutorial({ latestInvoices, subjects, renderContent }) {
   return <PageWithSubnav

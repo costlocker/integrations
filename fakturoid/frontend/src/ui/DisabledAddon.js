@@ -1,5 +1,5 @@
 import React from 'react';
-import { CostlockerLink, Image } from './Components';
+import { CostlockerLink, Image } from './Components';
 
 export default function DisabledAddon() {
   return (
