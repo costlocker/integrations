@@ -64,6 +64,14 @@ export const states = [
   {
     name: 'invoice',
     url: '/invoice?project&billing',
+    data: {
+      title: (params) => {
+        if (!params.billing || !params.project) {
+          return 'Invoices';
+        }
+        return 'Create invoice';
+      },
+    },
     component: (props) =>  {
       const params = props.transition.params();
       const subjects = appState.cursor(['fakturoid', 'subjects']).deref();
@@ -149,7 +157,10 @@ export const states = [
   },
   {
     name: 'createSubject',
-    url: '/subject',
+    url: '/customer',
+    data: {
+      title: 'Create customer'
+    },
     component: () => <NewSubject
       form={{
         get: (type) => appState.cursor(['subject', type]).deref(),
@@ -181,6 +192,9 @@ export const states = [
   {
     name: 'login',
     url: '/login?loginError',
+    data: {
+      title: 'Login'
+    },
     component: (props) => <Login
       costlockerAuth={appState.cursor(['auth', 'costlocker']).deref()}
       fakturoidAuth={appState.cursor(['auth', 'fakturoid']).deref()}
@@ -200,7 +214,7 @@ const hooks = [
         return isPrivateState && isNotLoggedInCostlocker();
       }
     },
-    callback: (transition: any) => {
+    callback: (transition) => {
       transition.router.stateService.target('login', transition.params(), { location: true })
     },
     priority: 10,
@@ -214,11 +228,22 @@ const hooks = [
         return isFakturoidState && isNotLoggedInFakturoid();
       }
     },
-    callback: (transition: any) => {
+    callback: (transition) => {
       if (!isNotLoggedInCostlocker()) {
         alert('Login in Fakturoid before creating invoicing');
       }
       return transition.router.stateService.target('login', undefined, { location: true });
+    },
+    priority: 10,
+  },
+  {
+    event: 'onSuccess',
+    criteria: { to: state => state.data && state.data.title },
+    callback: (transition) => {
+      const params = transition.params();
+      const stateTitle = transition.to().data.title;
+      const getTitle = typeof stateTitle === 'function' ? stateTitle : () => stateTitle;
+      document.title = `${getTitle(params)} | Costlocker → Fakturoid`;
     },
     priority: 10,
   },
