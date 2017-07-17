@@ -12,6 +12,8 @@ const buildError = (jsError, currentUser) => ({
 
 const encodeError = data => btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
 
+const currentUrl = window.location.href;
+
 export default function ErrorPage({ appState, isDevelopmentMode }) {
   const jsError = appState.cursor(['app', 'error']).deref();
   const data = buildError(jsError, appState.cursor(['auth', 'costlocker']).deref());
@@ -30,7 +32,7 @@ export default function ErrorPage({ appState, isDevelopmentMode }) {
               <h1 className="panel-title">Oops, something went wrong</h1>
             </div>
             <div className="panel-body">
-              Try <a href="./">reload the page</a>.
+              Try <a href={currentUrl}>reload the page</a>.
               If the error is happening again, then
               sends us following information as text to <a href="mailto: support@costlocker.com">support@costlocker.com</a>.
             </div>
