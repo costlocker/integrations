@@ -1,7 +1,17 @@
 import React from 'react';
-import { CostlockerLink, Image } from './Components';
+import { CostlockerLink, Image, Link } from './Components';
+import { pushToApi } from '../api';
 
-export default function DisabledAddon() {
+const reloadPage = () => window.location.reload(false);
+
+const logoutUser = () => {
+  pushToApi('/logout', {})
+    .catch(reloadPage)
+    .then(reloadPage)
+};
+
+export default function DisabledAddon({ user }) {
+  const company = user ? `"${user.company.name}"` : '';
   return (
     <div className="container text-center">
       <div className="row">
@@ -14,6 +24,12 @@ export default function DisabledAddon() {
               Ask your owner to <CostlockerLink path="/settings/addons" title="enable the addon in Settings" />.
               <br /><br />
               <Image src="https://user-images.githubusercontent.com/7994022/27791571-fd97c17e-5ff5-11e7-9690-05715f1d3742.png" />
+            </div>
+            <div className="panel-footer">
+              <Link
+                title={`Logout and switch company ${company}`}
+                action={logoutUser}
+                className="btn btn-default" />
             </div>
           </div>
         </div>

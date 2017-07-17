@@ -133,6 +133,12 @@ $app
     ->before($checkAuthorization('costlocker'));
 
 $app
+    ->post('/logout', function () use ($app) {
+        $strategy = new Costlocker\Integrations\Auth\LogoutUser($app['session'], $app['redirectUrls']);
+        return $strategy();
+    });
+
+$app
     ->get('/costlocker', function (Request $r) use ($app) {
         if ($r->query->get('query') == 'billing') {
             $strategy = new \Costlocker\Integrations\Costlocker\GetInvoice(

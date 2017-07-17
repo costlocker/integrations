@@ -18,7 +18,7 @@ const render = () => {
   if (appState.cursor(['auth', 'isLoading']).deref()) {
     content = <Loading title='Loading Costlocker & Fakturoid integration' />;
   } else if (appState.cursor(['app', 'isDisabled']).deref()) {
-    content = <DisabledAddon />;
+    content = <DisabledAddon user={appState.cursor(['auth', 'costlocker']).deref()} />;
   } else if (appState.cursor(['app', 'error']).deref()) {
     content = <ErrorPage appState={appState} isDevelopmentMode={isDevelopmentMode} />
   } else {
