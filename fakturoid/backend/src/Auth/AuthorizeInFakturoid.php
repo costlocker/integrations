@@ -61,6 +61,6 @@ class AuthorizeInFakturoid
     private function sendError($errorMessage)
     {
         $this->session->remove('fakturoid');
-        return $this->redirectToApp->goToHomepage($errorMessage);
+        return $this->redirectToApp->loginError($errorMessage);
     }
 }
