@@ -79,6 +79,12 @@ $checkAuthorization = function ($service) use ($app) {
     };
 };
 
+$checkCsrf = function () {
+    return function (Request $r, $app) {
+        return $app['client.check']->checkCsrfToken($r->headers->get('X-CSRF-TOKEN'));
+    };
+};
+
 $app
     ->get('/', function (Request $r) {
         return new JsonResponse([]);
@@ -184,6 +190,7 @@ $app
         }
         return $strategy($r);
     })
-    ->before($checkAuthorization('fakturoid'));
+    ->before($checkAuthorization('fakturoid'))
+    ->before($checkCsrf());
 
 return $app;
