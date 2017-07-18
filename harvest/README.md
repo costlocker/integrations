@@ -17,6 +17,8 @@ cp .env.example .env
 cd frontend
 yarn install
 cp .env.example .env
+yarn watch-css
+yarn start
 ```
 
 ### Apache VirtualHost example
