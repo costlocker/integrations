@@ -15,7 +15,7 @@ class MarkSentInvoiceTest extends \PHPUnit_Framework_TestCase
     /** @dataProvider provideDescription */
     public function testUpdateDescriptionInCostlocker($description, $expectedDescription)
     {
-        $invoice = $this->givenBillingWithDescription($description);
+        $invoice = $this->givenBilling(['costlockerDescription' => $description]);
         $this->markSentInvoice($invoice);
         assertThat($this->costlockerRequest, containsString($expectedDescription));
     }
@@ -27,12 +27,26 @@ class MarkSentInvoiceTest extends \PHPUnit_Framework_TestCase
             'dont override existing description' => ['my description', 'my description'],
         ];
     }
-    
-    private function givenBillingWithDescription($description)
+
+    public function testOverrideBillingDateByIssuedDate()
     {
+        $invoice = $this->givenBilling(['faktuoroidIssuedDate' => '2017-07-01']);
+        $this->markSentInvoice($invoice);
+        assertThat($this->costlockerRequest, containsString('"date":"2017-07-01"'));
+    }
+
+    private function givenBilling(array $config)
+    {
+        $config += [
+            'costlockerDescription' => '',
+            'faktuoroidIssuedDate' => date('Y-m-d'),
+        ];
         $invoice = new Invoice();
         $invoice->data = json_decode(file_get_contents(__DIR__ . '/fixtures/invoice-data.json'), true);
-        $invoice->data['request']['costlocker']['billing']['billing']['description'] = $description;
+        $invoice->data['request']['costlocker']['billing']['billing']['description']
+            = $config['costlockerDescription'];
+        $invoice->data['response']['issued_on']
+            = $config['faktuoroidIssuedDate'];
         $invoice->fakturoidInvoiceNumber = self::FAKTUROID_NUMBER;
         return $invoice;
     }

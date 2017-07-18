@@ -30,6 +30,7 @@ class MarkSentInvoice
                         'billing' => [
                             'description' => $description,
                             'status' => 'sent',
+                            'date' => $invoice->getIssuedDate(),
                         ],
                     ],
                 ],

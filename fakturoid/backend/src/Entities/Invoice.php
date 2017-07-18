@@ -94,4 +94,9 @@ class Invoice
     {
         return $this->data['request']['costlocker']['billing']['billing']['description'] ?? '';
     }
+
+    public function getIssuedDate()
+    {
+        return $this->data['response']['issued_on'] ?? '';
+    }
 }
