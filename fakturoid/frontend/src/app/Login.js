@@ -17,7 +17,7 @@ export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturo
           <h2>Costlocker <ExternalLink url="https://new.costlocker.com" /></h2>
           <a href={loginUrls.costlocker} className="btn btn-primary">
             {costlockerAuth
-              ? <span>Switch account <strong>{costlockerAuth.person.first_name} {costlockerAuth.person.last_name}</strong></span>
+              ? <span>Switch account <strong>{costlockerAuth.company.name}</strong></span>
               : 'Login to Costlocker'}
           </a>
         </div>
@@ -44,7 +44,9 @@ export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturo
                   <a href={`${fakturoidUrl}/user`} target="_blank" rel="noopener noreferrer">Já &rarr; API klíč</a>
                 </p>
               </div>
-              <button type="submit" className="btn btn-primary btn-block">{isLoggedInFakturoid ? 'Switch account' : 'Login'}</button>
+              <button type="submit" className="btn btn-primary btn-block">
+                {isLoggedInFakturoid ? <span>Switch account <strong>{currentSlug}</strong></span> : 'Login'}
+              </button>
             </form>
           ) : (
               <p className="text-muted">At first you have to login to Costlocker</p>
