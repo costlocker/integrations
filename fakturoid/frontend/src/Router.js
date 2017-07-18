@@ -120,8 +120,18 @@ export const states = [
                   appState.cursor().update(
                     app => app
                       .setIn(['app', 'isSendingForm'], false)
+                      .setIn(['app', 'lastCreatedInvoice'], createdInvoice.id)
                       .setIn(['invoice', 'isForced'], false)
                   );
+                  if (createdInvoice.update.hasFailed) {
+                    appState.cursor().update(app => app.setIn(['app', 'activeTab'], 'invoices'));
+                    redirectToRoute('invoice', {
+                      project: null,
+                      billing: null,
+                      amount: null,
+                    });
+                    return;
+                  }
                   redirectToRoute('invoice', {
                     project: params.project,
                     billing: createdInvoice.billing_id,

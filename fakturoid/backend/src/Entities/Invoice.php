@@ -104,4 +104,12 @@ class Invoice
     {
         return $this->data['response']['issued_on'] ?? '';
     }
+
+    public function getUpdateStatus()
+    {
+        return [
+            'hasFailed' => $this->data['updateCostlocker']['hasFailed'] ?? false,
+            'error' => $this->data['updateCostlocker']['response']['errors'][0]['detail'] ?? '',
+        ];
+    }
 }

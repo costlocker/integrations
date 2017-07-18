@@ -2,6 +2,8 @@ $blue: #119ee0;
 
 $body-bg: #fff;
 $breadcrumb-bg: #f2f2f2;
+$highlight-bg: #f7ecb5;
+$highlight-ligth-bg: #fcf8e3;
 $navbar-default-bg: #333;
 $navbar-default-link-color: $breadcrumb-bg;
 $navbar-default-link-hover-color: $blue;
@@ -107,6 +109,18 @@ $input-bg: #fafafa;
     opacity: 0.6;
     input {
         pointer-events: none;
+    }
+}
+
+.table {
+    .highlight {
+        background: $highlight-bg !important;
+    }
+    .highlight-light {
+        background: $highlight-ligth-bg !important;
+    }
+    .bg-danger {
+        background-color: #f2dede !important;
     }
 }
 

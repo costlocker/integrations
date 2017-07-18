@@ -15,6 +15,7 @@ const appState = immstruct({
     activeTab: '',
     error: null,
     isSendingForm: false,
+    lastCreatedInvoice: null,
   },
   fakturoid: {
     slug: null,

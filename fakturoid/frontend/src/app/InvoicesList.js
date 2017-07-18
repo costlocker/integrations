@@ -1,5 +1,8 @@
 import React from 'react';
 import { ExternalLink, roundNumber } from '../ui/Components';
+import { appState } from '../state';
+
+const isHighlighted = id => id === appState.cursor(['app', 'lastCreatedInvoice']).deref();
 
 export default function InvoicesList({ invoices, subjects }) {
   if (!invoices.length) {
@@ -12,7 +15,7 @@ export default function InvoicesList({ invoices, subjects }) {
   const lines = [];
   invoices.forEach((invoice) => {
     lines.push(
-      <tr key={invoice.id}>
+      <tr key={invoice.id} className={isHighlighted(invoice.id) ? 'highlight' : ''}>
         <td>{invoice.date}</td>
         <td>
           <span className="text-primary">{invoice.costlocker.user}</span><br />
@@ -53,7 +56,7 @@ export default function InvoicesList({ invoices, subjects }) {
       </tr>
     );
     lines.push(
-      <tr key={`${invoice.id}-lines`}>
+      <tr key={`${invoice.id}-lines`} className={isHighlighted(invoice.id) ? 'highlight-light' : ''}>
         <td className="text-right">
           <em>Invoice lines</em><br />
           {invoice.fakturoid.template.actions.map(action => (
@@ -80,6 +83,19 @@ export default function InvoicesList({ invoices, subjects }) {
         </td>
       </tr>
     );
+    if (invoice.costlocker.update.hasFailed) {
+      lines.push(
+        <tr key={`${invoice.id}-error`} className={isHighlighted(invoice.id) ? 'bg-danger' : ''}>
+          <td className="text-right">
+            <em>Costlocker error</em>
+          </td>
+          <td colSpan="3">
+            Costlocker billing wasn't update because:<br />
+            <em className="text-danger">{invoice.costlocker.update.error}</em>
+          </td>
+        </tr>
+      );
+    }
   });
   return <table className="table table-striped">
     <thead>

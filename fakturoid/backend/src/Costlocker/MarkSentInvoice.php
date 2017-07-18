@@ -25,6 +25,7 @@ class MarkSentInvoice
         $response = $this->client->__invoke('/projects', $request);
 
         $invoice->data['updateCostlocker'] = [
+            'hasFailed' => $response ->getStatusCode() != 200,
             'request' => $request,
             'response' => json_decode((string) $response->getBody(), true),
         ];

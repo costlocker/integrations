@@ -36,6 +36,7 @@ class GetCreatedInvoices
                         'link' =>
                             getenv('CL_HOST') .
                             "/projects/detail/{$i->data['request']['costlocker']['project']['id']}/billing",
+                        'update' => $i->getUpdateStatus(),
                     ],
                     'fakturoid' => [
                         'user' => $i->fakturoidUser->data['full_name'],

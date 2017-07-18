@@ -75,7 +75,11 @@ class CreateInvoice
         $this->markSentInvoice->__invoke($invoice);
         $this->database->persist($invoice);
 
-        return new JsonResponse(['billing_id' => $invoice->costlockerInvoiceId]);
+        return new JsonResponse([
+            'id' => $invoice->id,
+            'billing_id' => $invoice->costlockerInvoiceId,
+            'update' => $invoice->getUpdateStatus(),
+        ]);
     }
 
     private function convertInvoiceType($type)
