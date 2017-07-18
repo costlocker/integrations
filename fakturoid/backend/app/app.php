@@ -143,7 +143,8 @@ $app
         if ($r->query->get('query') == 'billing') {
             $strategy = new \Costlocker\Integrations\Costlocker\GetInvoice(
                 $app['client.costlocker'],
-                $app['database']
+                $app['database'],
+                new Costlocker\Integrations\Fakturoid\GuessSubject($app['client.user'])
             );
         } else {
             $strategy = new \Costlocker\Integrations\Costlocker\GetCreatedInvoices(

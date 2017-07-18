@@ -6,6 +6,7 @@ use Costlocker\Integrations\CostlockerClient;
 use Symfony\Component\HttpFoundation\Request;
 use Costlocker\Integrations\Entities\Invoice;
 use Costlocker\Integrations\Database\Database;
+use Costlocker\Integrations\Fakturoid\GuessSubject;
 
 class GetInvoice
 {
@@ -17,11 +18,13 @@ class GetInvoice
 
     private $client;
     private $database;
+    private $guessSubject;
 
-    public function __construct(CostlockerClient $c, Database $db)
+    public function __construct(CostlockerClient $c, Database $db, GuessSubject $s)
     {
         $this->client = $c;
         $this->database = $db;
+        $this->guessSubject = $s;
     }
 
     public function __invoke(Request $r)
@@ -61,7 +64,9 @@ class GetInvoice
             ],
             'fakturoid' => $this->invoiceToJson($invoice) + [
                 'template' => [
-                    'subject' => $this->database->findLatestSubjectForClient($json['client']['id']),
+                    'subject' =>
+                        $this->database->findLatestSubjectForClient($json['client']['id'])
+                        ?: $this->guessSubject->__invoke($json['client']['name']),
                 ],
             ],
         ];
