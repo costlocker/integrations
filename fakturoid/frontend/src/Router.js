@@ -27,6 +27,9 @@ const fetchUser = (queryString) =>
           .setIn(['app', 'csrfToken'], user.csrfToken)
           .setIn(['app', 'isDisabled'], user.isAddonDisabled)
       );
+      if (user.costlocker) {
+        pushToApi('/oauth/refresh').then(r => console.log(r));
+      }
     });
 
 if (isNotLoggedInCostlocker()) {

@@ -133,6 +133,18 @@ $app
     ->before($checkAuthorization('costlocker'));
 
 $app
+    ->post('/oauth/refresh', function () use ($app) {
+        $strategy = new \Costlocker\Integrations\Auth\RefreshCostlockerToken(
+            $app['session'],
+            $app['oauth.costlocker'],
+            24 * 60 * 60 // Refresh token if access token expires in less than 24 hours
+        );
+        return new JsonResponse(['expiration' => $strategy()]);
+    })
+    ->before($checkAuthorization('costlocker'))
+    ->before($checkCsrf());
+
+$app
     ->post('/logout', function () use ($app) {
         $strategy = new Costlocker\Integrations\Auth\LogoutUser($app['session'], $app['redirectUrls']);
         return $strategy();
