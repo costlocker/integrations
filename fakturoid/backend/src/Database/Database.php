@@ -19,6 +19,9 @@ class Database
 
     public function findInvoice($costlockerId)
     {
+        if (!is_numeric($costlockerId)) {
+            return null;
+        }
         $entities = $this->entityManager
             ->getRepository(Invoice::class)
             ->findBy(

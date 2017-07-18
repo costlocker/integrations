@@ -5,6 +5,7 @@ namespace Costlocker\Integrations\Costlocker;
 use Mockery as m;
 use Costlocker\Integrations\CostlockerClient;
 use Costlocker\Integrations\Entities\Invoice;
+use GuzzleHttp\Psr7\Response;
 
 class MarkSentInvoiceTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,13 +36,23 @@ class MarkSentInvoiceTest extends \PHPUnit_Framework_TestCase
         assertThat($this->costlockerRequest, containsString('"date":"2017-07-01"'));
     }
 
+    public function testCreateNewBilling()
+    {
+        $invoice = $this->givenBilling(['costlockerId' => null]);
+        $this->markSentInvoice($invoice);
+        assertThat($this->costlockerRequest, containsString('"total_amount"'));
+        assertThat($this->costlockerRequest, not(containsString('"billing_id"')));
+    }
+
     private function givenBilling(array $config)
     {
         $config += [
+            'costlockerId' => 123,
             'costlockerDescription' => '',
             'faktuoroidIssuedDate' => date('Y-m-d'),
         ];
         $invoice = new Invoice();
+        $invoice->costlockerInvoiceId = $config['costlockerId'];
         $invoice->data = json_decode(file_get_contents(__DIR__ . '/fixtures/invoice-data.json'), true);
         $invoice->data['request']['costlocker']['billing']['billing']['description']
             = $config['costlockerDescription'];
@@ -61,7 +72,7 @@ class MarkSentInvoiceTest extends \PHPUnit_Framework_TestCase
                 $this->costlockerRequest = json_encode(func_get_args());
                 return true;
             })
-        );
+        )->andReturn(new Response());
         $uc = new MarkSentInvoice($client);
         $uc($invoice);
     }

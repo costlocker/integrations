@@ -95,6 +95,11 @@ class Invoice
         return $this->data['request']['costlocker']['billing']['billing']['description'] ?? '';
     }
 
+    public function getCurrentCostlockerAmount()
+    {
+        return $this->data['request']['costlocker']['billing']['billing']['total_amount'] ?? null;
+    }
+
     public function getIssuedDate()
     {
         return $this->data['response']['issued_on'] ?? '';

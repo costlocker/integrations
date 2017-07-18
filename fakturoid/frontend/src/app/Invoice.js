@@ -254,7 +254,7 @@ export default function Invoice(props) {
     />;
   }
   if (
-    invoice.status === 'READY' ||
+    invoice.status === 'READY' || invoice.status === 'NEW' ||
     (invoice.status === 'ALREADY_IMPORTED' && props.form.get('isForced'))
   ) {
     return buildSubnav(<InvoiceEditor {...props} costlocker={props.invoice.costlocker} />);

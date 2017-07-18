@@ -71,11 +71,11 @@ class CreateInvoice
         $invoice->data['response'] = json_decode($response->getBody(), true);
         $invoice->fakturoidInvoiceId = $invoice->data['response']['id'];
         $invoice->fakturoidInvoiceNumber = $invoice->data['response']['number'];
-        $this->database->persist($invoice);
 
         $this->markSentInvoice->__invoke($invoice);
+        $this->database->persist($invoice);
 
-        return new JsonResponse();
+        return new JsonResponse(['billing_id' => $invoice->costlockerInvoiceId]);
     }
 
     private function convertInvoiceType($type)

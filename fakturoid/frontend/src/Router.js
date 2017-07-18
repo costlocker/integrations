@@ -43,9 +43,9 @@ const fetchProjectInvoices = (project) =>
     .catch(setError)
     .then(invoices => appState.cursor(['costlocker']).set('projectInvoices', invoices));
 
-const fetchInvoice = ({ project, billing }) => {
+const fetchInvoice = ({ project, billing, amount }) => {
   fetchProjectInvoices(project);
-  return fetchFromApi(`/costlocker?project=${project}&billing=${billing}&query=billing`)
+  return fetchFromApi(`/costlocker?project=${project}&billing=${billing}&amount=${amount}&query=billing`)
     .catch(setError)
     .then(invoice => appState.cursor()
       .setIn(['costlocker', 'invoice'], invoice)
@@ -66,7 +66,7 @@ export const states = [
   },
   {
     name: 'invoice',
-    url: '/invoice?project&billing',
+    url: '/invoice?project&billing&amount',
     data: {
       title: (params) => {
         if (!params.billing || !params.project) {
@@ -115,14 +115,19 @@ export const states = [
                 appState.cursor(['app']).set('isSendingForm', false);
                 setError(error);
               })
-              .then(() =>
-                fetchInvoice(params).then(
+              .then((createdInvoice) =>
+                fetchInvoice(params).then(() => {
                   appState.cursor().update(
                     app => app
                       .setIn(['app', 'isSendingForm'], false)
                       .setIn(['invoice', 'isForced'], false)
-                  )
-                )
+                  );
+                  redirectToRoute('invoice', {
+                    project: params.project,
+                    billing: createdInvoice.billing_id,
+                    amount: null,
+                  });
+                })
               );
           }
         }}

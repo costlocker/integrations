@@ -13,6 +13,7 @@ class GetInvoice
     const STATUS_NOT_DRAFT = 'NOT_DRAFT';
     const STATUS_ALREADY_IMPORTED = 'ALREADY_IMPORTED';
     const STATUS_CAN_BE_IMPORTED = 'READY';
+    const STATUS_NEW = 'NEW';
 
     private $client;
     private $database;
@@ -40,7 +41,7 @@ class GetInvoice
         $billingId = $r->query->get('billing');
         $json = json_decode($response->getBody(), true)['data'];
         $items = $this->separateItems($json['items']);
-        $billing = $this->findDraftBilling($items['billing'], $billingId);
+        $billing = $this->findDraftBilling($items['billing'], $billingId, $r->query->get('amount'));
         $invoice = $this->database->findInvoice($billingId);
         return [
             'status' => $this->billingToStatus($billing, $invoice),
@@ -90,12 +91,26 @@ class GetInvoice
         return $results;
     }
 
-    private function findDraftBilling(array $items, $invoiceId)
+    private function findDraftBilling(array $items, $invoiceId, $amount)
     {
         foreach ($items as $item) {
             if ($item['item']['billing_id'] == $invoiceId) {
                 return $item;
             }
+        }
+        if ($invoiceId == self::STATUS_NEW && $amount > 0) {
+            return [
+                'item' => [
+                    'type' => 'billing',
+                    'billing_id' => null,
+                ],
+                'billing' => [
+                    'description' => '',
+                    'total_amount' => (float) $amount,
+                    'date' => date('Y-m-d'),
+                    'status' => 'draft',
+                ],
+            ];
         }
         return null;
     }
@@ -107,6 +122,9 @@ class GetInvoice
         }
         if ($i) {
             return self::STATUS_ALREADY_IMPORTED;
+        }
+        if (!$billing['item']['billing_id']) {
+            return self::STATUS_NEW;
         }
         return $billing['billing']['status'] == 'draft' ? self::STATUS_CAN_BE_IMPORTED : self::STATUS_NOT_DRAFT;
     }
