@@ -17,6 +17,7 @@ const appState = immstruct({
     isSendingForm: false,
   },
   fakturoid: {
+    slug: null,
     subjects: null,
   },
   costlocker: {

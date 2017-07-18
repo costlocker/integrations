@@ -22,6 +22,7 @@ const fetchUser = (queryString) =>
           .setIn(['auth', 'isLoading'], false)
           .setIn(['auth', 'costlocker'], user.costlocker)
           .setIn(['auth', 'fakturoid'], user.fakturoid)
+          .setIn(['fakturoid', 'slug'], user.fakturoid ? user.fakturoid.account.slug : '')
           .setIn(['auth', 'isLoggedInFakturoid'], user.isLoggedInFakturoid)
           .setIn(['app', 'csrfToken'], user.csrfToken)
           .setIn(['app', 'isDisabled'], user.isAddonDisabled)
@@ -200,7 +201,14 @@ export const states = [
       fakturoidAuth={appState.cursor(['auth', 'fakturoid']).deref()}
       isLoggedInFakturoid={appState.cursor(['auth', 'isLoggedInFakturoid']).deref()}
       loginUrls={loginUrls}
-      loginError={props.transition.params().loginError} />,
+      loginError={props.transition.params().loginError}
+      form={{
+        get: (type) => appState.cursor(['fakturoid', type]).deref(),
+        set: (type) => (e) => appState.cursor(['fakturoid']).set(
+          type,
+          e.target.type === 'checkbox' ? e.target.checked : e.target.value
+        ),
+      }} />,
   },
 ];
 

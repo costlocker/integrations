@@ -2,10 +2,9 @@ import React from 'react';
 
 import { Errors, ExternalLink } from '../ui/Components';
 
-export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturoid, loginUrls, loginError }) {
-  const fakturoidUrl = fakturoidAuth
-    ? `https://app.fakturoid.cz/${fakturoidAuth.account.slug}`
-    : 'https://app.fakturoid.cz';
+export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturoid, loginUrls, loginError, form }) {
+  const currentSlug = form.get('slug');
+  const fakturoidUrl = `https://app.fakturoid.cz/${currentSlug}`;
   return (
     <div>
       <div className="row text-center">
@@ -32,15 +31,18 @@ export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturo
                   defaultValue={fakturoidAuth ? fakturoidAuth.person.email : null} />
               </div>
               <div className="form-group">
-                <label htmlFor="token">API token</label>
-                <input type="text" className="form-control" id="token" name="token" />
-                <p className="help-block">It's not password! You can find the token in <strong>Já &rarr; API klíč</strong></p>
+                <label htmlFor="token">Fakturoid slug (subdomain)</label>
+                <input type="text" className="form-control" id="slug" name="slug" placeholder="YOUR_SLUG"
+                  value={form.get('slug')} onChange={form.set('slug')} />
+                <p className="help-block">You can see slug in fakturoid url <strong>https://app.fakturoid.cz/{currentSlug ? currentSlug : 'YOUR_SLUG'}/dashboard</strong>.</p>
               </div>
               <div className="form-group">
-                <label htmlFor="token">Fakturoid slug (subdomain)</label>
-                <input type="text" className="form-control" id="slug" name="slug"
-                  defaultValue={fakturoidAuth ? fakturoidAuth.account.slug : null} />
-                <p className="help-block">You can see slug in fakturoid url <strong>https://app.fakturoid.cz/YOUR_SLUG/dashboard</strong>.</p>
+                <label htmlFor="token">API token</label>
+                <input type="text" className="form-control" id="token" name="token" />
+                <p className="help-block">
+                  It's not password! You can find the token in&nbsp;
+                  <a href={`${fakturoidUrl}/user`} target="_blank" rel="noopener noreferrer">Já &rarr; API klíč</a>
+                </p>
               </div>
               <button type="submit" className="btn btn-primary btn-block">{isLoggedInFakturoid ? 'Switch account' : 'Login'}</button>
             </form>
