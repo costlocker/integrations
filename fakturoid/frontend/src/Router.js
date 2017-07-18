@@ -33,14 +33,6 @@ if (isNotLoggedInCostlocker()) {
   fetchUser(window.location.search);
 }
 
-const fetchInvoice = ({ project, billing }) =>
-  fetchFromApi(`/costlocker?project=${project}&billing=${billing}&query=billing`)
-    .catch(setError)
-    .then(invoice => appState.cursor()
-      .setIn(['costlocker', 'invoice'], invoice)
-      .setIn(['invoice', 'subject'], invoice.fakturoid ? invoice.fakturoid.template.subject : null)
-    );
-
 const fetchLatestInvoices = () =>
   fetchFromApi(`/costlocker`)
     .catch(setError)
@@ -50,6 +42,16 @@ const fetchProjectInvoices = (project) =>
   fetchFromApi(`/costlocker?project=${project}`)
     .catch(setError)
     .then(invoices => appState.cursor(['costlocker']).set('projectInvoices', invoices));
+
+const fetchInvoice = ({ project, billing }) => {
+  fetchProjectInvoices(project);
+  return fetchFromApi(`/costlocker?project=${project}&billing=${billing}&query=billing`)
+    .catch(setError)
+    .then(invoice => appState.cursor()
+      .setIn(['costlocker', 'invoice'], invoice)
+      .setIn(['invoice', 'subject'], invoice.fakturoid ? invoice.fakturoid.template.subject : null)
+    );
+};
 
 const fetchSubjects = () =>
   fetchFromApi('/fakturoid')
@@ -148,7 +150,6 @@ export const states = [
           const params = $transition$.params();
           if (params.billing && params.project) {
             fetchInvoice(params);
-            fetchProjectInvoices(params.project);
           } else {
             fetchLatestInvoices();
           }
