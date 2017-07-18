@@ -1,8 +1,13 @@
 
-# Costlocker integrations
+# Costlocker integrations https://integrations.costlocker.com/
 
+* [Synchronize Costlocker and Basecamp projects](/basecamp) - https://basecamp.integrations.costlocker.com
+* [Create invoices in Fakturoid](/fakturoid) - https://fakturoid.integrations.costlocker.com
+* [Import projects from Harvest to Costlocker](/harvest) - https://harvest.integrations.costlocker.com
 
-## Shared Postgres 
+## Docker
+
+### Shared Postgres 
 
 Postgres is connected via `network` and `external_links`.
 At first create the network `docker network create costlocker_addons`.
@@ -14,7 +19,7 @@ ERROR: Network costlocker_addons declared as external, but could not be found.
 Please create the network manually using `docker network create costlocker_addons` and try again.
 ```
 
-### Shared service
+#### Shared service
 
 ```yaml
 version: "2"
@@ -33,7 +38,7 @@ networks:
       name: costlocker_addons
 ```
 
-### Addon
+#### Addon
 
 ```yaml
 version: "2"
