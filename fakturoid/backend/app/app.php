@@ -38,7 +38,15 @@ $app['database'] = function ($app) {
 };
 
 $app['redirectUrls'] = function ($app) {
-    return new \Costlocker\Integrations\Auth\RedirectToApp($app['session'], getenv('APP_FRONTED_URL'));
+    return new \Costlocker\Integrations\Auth\RedirectToApp(
+        $app['session'],
+        getenv('APP_FRONTED_URL'),
+        $app['url_generator']->generate(
+            'costlockerLogin',
+            [],
+            \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL
+        )
+    );
 };
 
 $app['oauth.costlocker'] = function () {
@@ -100,12 +108,18 @@ $app
     });
 
 $app
+    ->get('/redirect', function (Request $r) use ($app) {
+        $strategy = new Costlocker\Integrations\Auth\ProcessCostlockerRedirect(
+            $app['redirectUrls'],
+            $app['client.check']
+        );
+        return $strategy($r);
+    });
+
+$app
     ->get('/user', function () use ($app) {
         $isAddonDisabled = $app['client.check']->verifyTokens();
         return $app['client.user']($isAddonDisabled);
-    })
-    ->before(function (Request $r, $app) {
-        $app['redirectUrls']->loadInvoiceFromRequest($r);
     });
 
 $app
@@ -118,7 +132,8 @@ $app
             $app['redirectUrls']
         );
         return $strategy($r);
-    });
+    })
+    ->bind('costlockerLogin');
 
 $app
     ->post('/oauth/fakturoid', function (Request $r) use ($app) {

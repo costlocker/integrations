@@ -31,7 +31,7 @@ class RedirectToAppTest extends \Costlocker\Integrations\GivenApi
     {
         $this->request([
             'method' => 'GET',
-            'url' => "/user?{$queryString}",
+            'url' => "/redirect?{$queryString}",
         ]);
         $this->assertThatUserIsRedirectedTo('/invoice');
     }
@@ -48,7 +48,7 @@ class RedirectToAppTest extends \Costlocker\Integrations\GivenApi
     {
         $this->request([
             'method' => 'GET',
-            'url' => "/user{$this->billingSpecification}",
+            'url' => "/redirect{$this->billingSpecification}",
         ]);
     }
 

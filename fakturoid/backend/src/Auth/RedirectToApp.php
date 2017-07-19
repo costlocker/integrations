@@ -10,11 +10,13 @@ class RedirectToApp
 {
     private $session;
     private $appUrl;
+    private $loginUrl;
 
-    public function __construct(SessionInterface $s, $appUrl)
+    public function __construct(SessionInterface $s, $appUrl, $oauthLoginUrl)
     {
         $this->session = $s;
         $this->appUrl = $appUrl;
+        $this->loginUrl = $oauthLoginUrl;
     }
 
     public function loadInvoiceFromRequest(Request $r)
@@ -24,16 +26,21 @@ class RedirectToApp
         }
     }
 
-    public function goToInvoice()
+    public function goToInvoice($requestQueryString = '')
     {
         $invoiceData = $this->session->remove('queryString');
-        $queryString = $invoiceData ? "?{$invoiceData}" : '';
+        $queryString = $invoiceData ? "?{$invoiceData}" : $requestQueryString;
         return new RedirectResponse("{$this->appUrl}/invoice{$queryString}");
     }
 
     public function goToHomepage()
     {
         return new RedirectResponse($this->appUrl);
+    }
+
+    public function goToCostlockerLogin()
+    {
+        return new RedirectResponse($this->loginUrl);
     }
 
     public function loginError($errorMessage)

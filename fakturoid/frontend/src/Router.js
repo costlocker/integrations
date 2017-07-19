@@ -13,8 +13,8 @@ export let redirectToRoute = (route) => console.log('app is not ready', route);
 export let isRouteActive = () => false;
 const setError = e => appState.cursor(['app']).set('error', e);
 
-const fetchUser = (queryString) =>
-  fetchFromApi(`/user${queryString}`)
+const fetchUser = () =>
+  fetchFromApi(`/user`)
     .catch(setError)
     .then((user) => {
       appState.cursor().update(
@@ -33,7 +33,7 @@ const fetchUser = (queryString) =>
     });
 
 if (isNotLoggedInCostlocker()) {
-  fetchUser(window.location.search);
+  fetchUser();
 }
 
 const fetchLatestInvoices = () =>
