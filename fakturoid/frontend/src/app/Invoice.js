@@ -280,6 +280,6 @@ export default function Invoice(props) {
     </div>);
   }
   return <Page
-    view={<Errors title="Unknown billing" error="Billing not found in Costlocker" />}
+    view={<Errors title="Unknown billing" error="Billing not found in Costlocker, or you aren't authorized to see the project" />}
   />;
 }
