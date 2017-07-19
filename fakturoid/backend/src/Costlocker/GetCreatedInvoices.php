@@ -22,7 +22,7 @@ class GetCreatedInvoices
     {
         $invoices = $r->query->get('project')
             ? $this->database->findProjectInvoices($r->query->get('project'))
-            : $this->database->findLatestInvoices($this->getUser->getFakturoidAccount(), 20);
+            : $this->database->findLatestInvoices($this->getUser->getCostlockerUser(), 20);
         return array_map(
             function (Invoice $i) {
                 return [

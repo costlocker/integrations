@@ -41,11 +41,11 @@ class Database
         );
     }
 
-    public function findLatestInvoices(FakturoidAccount $account, $limit)
+    public function findLatestInvoices(CostlockerUser $u, $limit)
     {
         return $this->findInvoices(
-            'fu.fakturoidAccount = :account',
-            ['account' => $account],
+            'cu.costlockerCompany = :company',
+            ['company' => $u->costlockerCompany],
             $limit
         );
     }
