@@ -61,6 +61,11 @@ const fetchSubjects = () =>
     .catch(setError)
     .then(projects => appState.cursor(['fakturoid']).set('subjects', projects));
 
+const reloadSubjects = () =>
+  pushToApi('/fakturoid?action=downloadSubjects', {})
+    .catch(setError)
+    .then(() => fetchSubjects().then(() => alert('Customers reloaded')));
+
 export const states = [
   {
     name: 'homepage',
@@ -119,6 +124,11 @@ export const states = [
                 if (!createdInvoice || !createdInvoice.id) {
                   appState.cursor(['app']).set('isSendingForm', false);
                   const encodedError = JSON.stringify(createdInvoice);
+                  if (encodedError.indexOf('Kontakt neexistuje.')) {
+                    alert('Select an existing customer in Fakturoid.');
+                    reloadSubjects();
+                    return;
+                  }
                   const error = new Error('Invoice not created');
                   error.stack = `${error.stack}\n${encodedError}`;
                   setError(error);
@@ -151,9 +161,7 @@ export const states = [
         }}
         reloadSubjects={(e) => {
           e.preventDefault();
-          pushToApi('/fakturoid?action=downloadSubjects', {})
-            .catch(setError)
-            .then(() => fetchSubjects().then(() => alert('Customers reloaded')))
+          reloadSubjects();
         }}
       />
     },
