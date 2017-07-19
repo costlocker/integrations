@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, Link, Errors, roundNumber, Number } from '../ui/Components';
 import InvoicesList from './InvoicesList';
 import { PageWithSubnav, Page } from '../ui/App';
+import { isDevelopmentMode } from '../config';
 
 const InvoiceDetail = ({ costlocker }) => (
   <table className="table">
@@ -268,11 +269,13 @@ export default function Invoice(props) {
         </a>
       </div>
       <div className="col-sm-6 text-right">
+        {isDevelopmentMode &&
         <Button
           title="Create invoice once again"
           className="btn btn-warning"
           action={props.forceUpdate}
         />
+        }
       </div>
     </div>);
   }
