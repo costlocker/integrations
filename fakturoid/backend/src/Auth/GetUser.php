@@ -28,7 +28,7 @@ class GetUser
             'isAddonDisabled' => $isAddonDisabled,
             'costlocker' => $clUser->data,
             'fakturoid' => $clUser->fakturoidUser ? $this->transformFakturoidUser($clUser->fakturoidUser): null,
-            'isLoggedInFakturoid' => $this->session->get('fakturoid') && $clUser->fakturoidUser ? true : false,
+            'isLoggedInFakturoid' => $this->isLoggedInFakturoid($clUser),
             'csrfToken' => $this->session->get('csrfToken'),
         ]);
     }
@@ -69,5 +69,12 @@ class GetUser
                 'name' => $u->fakturoidAccount->name,
             ],
         ];
+    }
+
+    public function isLoggedInFakturoid(CostlockerUser $clUser)
+    {
+        return $this->session->get('fakturoid')
+            && $clUser->fakturoidUser
+            && $clUser->fakturoidUser->fakturoidId == $this->session->get('fakturoid')['userId'];
     }
 }

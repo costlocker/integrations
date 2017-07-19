@@ -38,6 +38,7 @@ class CostlockerUser
     public $data;
 
     /**
+     * @var FakturoidUser
      * @ORM\ManyToOne(targetEntity="FakturoidUser")
      * @ORM\JoinColumn(name="fa_user_id", nullable=true, referencedColumnName="id", onDelete="SET NULL")
      */
