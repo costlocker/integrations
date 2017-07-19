@@ -16,6 +16,7 @@ class AuthorizeInCostlocker
     private $provider;
     private $persistUser;
     private $logger;
+    private $logoutUser;
     private $redirectToApp;
 
     public function __construct(
@@ -23,12 +24,14 @@ class AuthorizeInCostlocker
         GenericProvider $p,
         PersistCostlockerUser $db,
         LoggerInterface $l,
+        LogoutUser $u,
         RedirectToApp $r
     ) {
         $this->session = $s;
         $this->provider = $p;
         $this->persistUser = $db;
         $this->logger = $l;
+        $this->logoutUser = $u;
         $this->redirectToApp = $r;
     }
 
@@ -79,9 +82,7 @@ class AuthorizeInCostlocker
 
     private function sendError($errorMessage)
     {
-        $this->session->remove('costlocker');
-        $this->session->remove('costlockerLogin');
-        $this->session->remove('csrfToken');
+        $this->logoutUser->__invoke();
         return $this->redirectToApp->loginError($errorMessage);
     }
 }

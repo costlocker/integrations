@@ -73,6 +73,10 @@ $app['client.check'] = function ($app) {
     );
 };
 
+$app['logout'] = function ($app) {
+    return new Costlocker\Integrations\Auth\LogoutUser($app['session'], $app['redirectUrls']);
+};
+
 $app['fakturoid.downloadSubjects'] = function ($app) {
     return new Costlocker\Integrations\Fakturoid\DownloadSubjects(
         $app['client.fakturoid'],
@@ -129,6 +133,7 @@ $app
             $app['oauth.costlocker'],
             new Costlocker\Integrations\Database\PersistCostlockerUser($app['database']),
             $app['logger'],
+            $app['logout'],
             $app['redirectUrls']
         );
         return $strategy($r);
@@ -161,8 +166,7 @@ $app
 
 $app
     ->post('/logout', function () use ($app) {
-        $strategy = new Costlocker\Integrations\Auth\LogoutUser($app['session'], $app['redirectUrls']);
-        return $strategy();
+        return $app['logout']();
     });
 
 $app
