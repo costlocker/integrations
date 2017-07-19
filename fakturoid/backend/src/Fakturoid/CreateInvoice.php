@@ -9,6 +9,7 @@ use Costlocker\Integrations\Costlocker\MarkSentInvoice;
 use Costlocker\Integrations\Database\Database;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Costlocker\Integrations\Api\ResponseHelper;
 
 class CreateInvoice
 {
@@ -65,7 +66,7 @@ class CreateInvoice
         );
 
         if ($response->getStatusCode() != 201) {
-            return new JsonResponse(['error' => (string) $response->getBody()], 400);
+            return ResponseHelper::error((string) $response->getBody());
         }
 
         $invoice->data['response'] = json_decode($response->getBody(), true);

@@ -114,11 +114,16 @@ export const states = [
             };
             appState.cursor(['app']).set('isSendingForm', true);
             pushToApi('/fakturoid?action=createInvoice', request)
-              .catch(error => {
-                appState.cursor(['app']).set('isSendingForm', false);
-                setError(error);
-              })
-              .then((createdInvoice) =>
+              .catch(error => error.response.json())
+              .then((createdInvoice) => {
+                if (!createdInvoice || !createdInvoice.id) {
+                  appState.cursor(['app']).set('isSendingForm', false);
+                  const encodedError = JSON.stringify(createdInvoice);
+                  const error = new Error('Invoice not created');
+                  error.stack = `${error.stack}\n${encodedError}`;
+                  setError(error);
+                  return;
+                }
                 fetchInvoice(params).then(() => {
                   appState.cursor().update(
                     app => app
@@ -140,8 +145,8 @@ export const states = [
                     billing: createdInvoice.billing_id,
                     amount: null,
                   });
-                })
-              );
+                });
+              });
           }
         }}
         reloadSubjects={(e) => {
