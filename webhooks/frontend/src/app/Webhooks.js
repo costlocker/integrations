@@ -1,5 +1,6 @@
 import React from 'react';
 import Loading from '../ui/Loading'
+import { Link } from '../ui/Components';
 
 export default function Webhooks({ webhooks }) {
   if (!webhooks) {
@@ -13,6 +14,7 @@ export default function Webhooks({ webhooks }) {
       <tr>
         <th>URL</th>
         <th>Events</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -20,6 +22,9 @@ export default function Webhooks({ webhooks }) {
         <tr key={w.uuid}>
           <td>{w.url}</td>
           <td>{w.events.join(', ')}</td>
+          <td>
+            <Link title="Example" route="example" params={{ uuid: w.uuid }} className="btn btn-info btn-sm" />
+          </td>
         </tr>
       ))}
     </tbody>

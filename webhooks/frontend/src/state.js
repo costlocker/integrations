@@ -15,13 +15,20 @@ const appState = immstruct({
   },
   webhooks: {
     list: null,
+    example: null,
   },
 });
 
 const isNotLoggedInCostlocker = () =>
   appState.cursor(['auth', 'costlocker']).deref() === null;
 
-const apiUrl = () => `${appState.cursor(['login', 'host']).deref()}/api-public/v2`;
+const apiUrl = (path) => {
+  if (path.indexOf('http') === 0) {
+    return path;
+  }
+  const apiUrl = `${appState.cursor(['login', 'host']).deref()}/api-public/v2`;
+  return `${apiUrl}${path}`;
+};
 
 const apiAuth = () => {
   const credentials = `costlocker/webhooks:${appState.cursor(['login', 'token']).deref()}`;

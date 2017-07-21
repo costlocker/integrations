@@ -4,6 +4,7 @@ import { appState, isNotLoggedInCostlocker } from './state';
 import { fetchFromApi } from './api';
 import Login from './app/Login';
 import Webhooks from './app/Webhooks';
+import WebhookExample from './app/WebhookExample';
 
 export let redirectToRoute = (route) => console.log('app is not ready', route);
 export let isRouteActive = () => false;
@@ -51,6 +52,14 @@ const fetchWebhooks = () =>
     .catch(setError)
     .then(webhooks => appState.cursor(['webhooks']).set('list', webhooks.data));
 
+const fetchWebhookDetail = (webhook) =>
+  fetchFromApi(webhook.links.example)
+    .catch(setError)
+    .then(webhook => appState.cursor(['webhooks']).set('example', {
+      headers: [],
+      body: webhook
+    }));
+
 export const states = [
   {
     name: 'homepage',
@@ -73,6 +82,37 @@ export const states = [
           if (!appState.cursor(['webhooks', 'list']).deref()) {
             fetchWebhooks();
           }
+        }
+      },
+    ],
+  },
+  {
+    name: 'example',
+    url: '/webhooks/:uuid/example',
+    data: {
+      title: 'Webhook Example'
+    },
+    component: (props) => <WebhookExample
+      webhook={props.resolves.loadWebhook}
+      example={appState.cursor(['webhooks', 'example']).deref()}
+    />,
+    resolve: [
+      {
+        token: 'loadWebhook',
+        deps: ['$transition$'],
+        resolveFn: ($transition$) => {
+          const uuid = $transition$.params().uuid;
+          let webhook = null;
+          (appState.cursor(['webhooks', 'list']).deref() || []).forEach(w => {
+            if (w.uuid === uuid) {
+              webhook = w;
+            }
+          })
+          if (!webhook) {
+            redirectToRoute('webhooks');
+          }
+          fetchWebhookDetail(webhook);
+          return webhook;
         }
       },
     ],
@@ -137,6 +177,7 @@ export const config = (router) => {
     if (e) {
       e.preventDefault();
     }
+    console.log('redirect', route, params);
     router.stateService.go(route, params, { location: true });
   };
   isRouteActive = router.stateService.is;

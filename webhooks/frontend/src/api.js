@@ -13,13 +13,13 @@ const handleErrors = (response) => {
 };
 
 const fetchFromApi = (path: string) =>
-  fetch(`${apiUrl()}${path}`, { headers: apiAuth() })
+  fetch(apiUrl(path), { headers: apiAuth() })
     .then(handleErrors)
     .then(response => response.json());
 
 const pushToApi = (path: string, data: Object) =>
   fetch(
-    `${apiUrl()}${path}`,
+    apiUrl(path),
     {
       method: 'POST',
       headers: {
