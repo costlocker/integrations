@@ -1,5 +1,5 @@
 
-import { apiUrl } from './state';
+import { apiUrl, apiAuth } from './state';
 
 const handleErrors = (response) => {
   if (!response.ok) {
@@ -13,7 +13,7 @@ const handleErrors = (response) => {
 };
 
 const fetchFromApi = (path: string) =>
-  fetch(`${apiUrl()}${path}`, { credentials: 'include' })
+  fetch(`${apiUrl()}${path}`, { headers: apiAuth() })
     .then(handleErrors)
     .then(response => response.json());
 
@@ -23,6 +23,7 @@ const pushToApi = (path: string, data: Object) =>
     {
       method: 'POST',
       headers: {
+        ...apiAuth(),
         'Content-Type': 'application/json',
       },
       credentials: 'include',

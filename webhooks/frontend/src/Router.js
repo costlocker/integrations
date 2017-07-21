@@ -1,13 +1,49 @@
 import React from 'react';
 
 import { appState, isNotLoggedInCostlocker } from './state';
+import { fetchFromApi } from './api';
 import Login from './app/Login';
 
 export let redirectToRoute = (route) => console.log('app is not ready', route);
 export let isRouteActive = () => false;
 const setError = e => appState.cursor(['app']).set('error', e);
 
-appState.cursor(['auth']).set('isLoading', false);
+const fetchUser = () => {
+  const data = appState.cursor(['login']).deref();
+  if (!data.get('host') || !data.get('token')) {
+    appState.cursor().update(
+      app => app
+        .setIn(['auth', 'isLoading'], false)
+        .setIn(['auth', 'costlocker'], null)
+        .setIn(['login', 'error'], null)
+    );
+    return;
+  }
+  fetchFromApi(`/me`)
+    .catch(() => {
+      appState.cursor().update(
+        app => app
+          .setIn(['auth', 'isLoading'], false)
+          .setIn(['auth', 'costlocker'], null)
+          .setIn(['login', 'error'], 'Invalid Token')
+      );
+    })
+    .then((user) => {
+      if (!user || !user.data) {
+        return;
+      }
+      appState.cursor().update(
+        app => app
+          .setIn(['auth', 'isLoading'], false)
+          .setIn(['auth', 'costlocker'], user.data)
+          .setIn(['login', 'error'], null)
+      );
+    });
+}
+
+if (isNotLoggedInCostlocker()) {
+  fetchUser();
+}
 
 export const states = [
   {
@@ -31,7 +67,7 @@ export const states = [
         ),
         submit: (e) => {
           e.preventDefault();
-          console.log(appState.cursor(['login']).deref().toJS());
+          fetchUser();
         },
       }} />,
   },
