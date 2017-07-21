@@ -1,0 +1,12 @@
+{
+  "name": "costlocker-bootstrap",
+  "version": "0.1",
+  "main" : "build/index.css",
+  "dependencies": {
+    "bootstrap-sass": "3"
+  },
+  "scripts": {
+    "build": "sass src/index.scss build/index.css --sourcemap=none --style compressed",
+    "start": "sass --watch src/index.scss:build/index.css --sourcemap=none"
+  }
+}

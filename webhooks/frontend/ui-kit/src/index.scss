@@ -1,0 +1,150 @@
+$blue: #119ee0;
+
+$body-bg: #fff;
+$breadcrumb-bg: #f2f2f2;
+$highlight-bg: #f7ecb5;
+$highlight-ligth-bg: #fcf8e3;
+$navbar-default-bg: #333;
+$navbar-default-link-color: $breadcrumb-bg;
+$navbar-default-link-hover-color: $blue;
+$navbar-default-link-active-color: $navbar-default-bg;
+$navbar-default-link-active-bg: $breadcrumb-bg;
+$navbar-default-link-hover-bg: $navbar-default-bg;
+$navbar-default-border: $navbar-default-bg;
+$breadcrumb-separator: '';
+$font-size-base: 14px;
+$font-size-h1: floor(($font-size-base * 2.2));
+$font-size-h2: floor(($font-size-base * 1.6));
+$font-size-h3: floor(($font-size-base * 1.2));
+$border-radius-base: 0;
+$border-radius-large: 0;
+$border-radius-small: 0;
+$input-bg: #fafafa;
+
+// Core variables and mixins
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/variables";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/mixins";
+
+// Reset and dependencies
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/normalize";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/print";
+
+// Core CSS
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/scaffolding";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/type";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/grid";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/tables";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/forms";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/buttons";
+
+// Components
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/component-animations";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/navs";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/navbar";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/breadcrumbs";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/labels";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/badges";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/alerts";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/panels";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/progress-bars";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/button-groups";
+
+// Utility classes
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/utilities";
+
+// custom css
+#root {
+    padding-bottom: 2em;
+}
+
+.cover {
+    margin-top: 1em;
+}
+
+.navbar {
+    border: 0;
+    margin-bottom: 0;
+    border-bottom: 3px solid $breadcrumb-bg;
+    .navbar-brand {
+        padding: 5px;
+        a {
+            text-decoration: none;
+            color: $text-muted;
+        }
+        img {
+            height: 100%;
+        }
+    }
+    .navbar-text {
+        color: $gray-lighter;
+        a {
+            color: $body-bg;
+        }
+    }
+}
+
+.nav-breadcrumbs {
+    padding: 0;
+    background: $breadcrumb-bg;
+    margin-bottom: 1em;
+    .breadcrumb {
+        margin: 0;
+        padding: 0;
+        li {
+            padding-left: 0.5ex;
+            padding: 1em 1ex;
+            margin: 0 1em 0 0;
+            &.active {
+                font-weight: bold;
+                border-bottom: 3px solid $blue;
+            }
+        }
+        li:before {
+            padding: 0;
+        }
+    }
+}
+
+[data-unavailable] {
+    opacity: 0.6;
+    input {
+        pointer-events: none;
+    }
+}
+
+.table {
+    .highlight {
+        background: $highlight-bg !important;
+    }
+    .highlight-light {
+        background: $highlight-ligth-bg !important;
+    }
+    .bg-danger {
+        background-color: #f2dede !important;
+    }
+}
+
+.table-inline {
+    background: transparent !important;
+    margin-bottom: 0;
+    th, td {
+        text-align: center;
+        border: 0 !important;
+        vertical-align: middle;
+        padding: 3px;
+    }
+    thead {
+        opacity: 0.5;
+        font-size: 0.8em;
+    }
+}
+
+.error-page {
+    margin: 2em 0;
+    pre {
+        display: block;
+        font-family: monospace;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+}

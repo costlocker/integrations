@@ -1,0 +1,23 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "immstruct": "^2.0.0",
+    "immutable": "^3.8.1",
+    "react": "15.4.2",
+    "react-dom": "15.4.2",
+    "ui-router-react": "^0.4.0"
+  },
+  "devDependencies": {
+    "react-scripts": "1.0.7"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "yarn run build-css && react-scripts build",
+    "build-css": "(cd ui-kit && yarn build)",
+    "watch-css": "(cd ui-kit && yarn start)",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
