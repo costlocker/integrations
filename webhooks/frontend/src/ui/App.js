@@ -53,10 +53,11 @@ export function App({ auth, isRouteActive }) {
                 <img title="Costlocker" alt="Costlocker" src="https://cdn-images-1.medium.com/max/1200/1*BLdn5GGWwijxJkcr0I0rgg.png" />
               </a>
             </div>
-            <span className="navbar-text">Webhooks</span>
+            <span className="navbar-text">Webhooks Manager</span>
           </div>
           <div>
             {auth.get('costlocker') ? <Navigation isRouteActive={isRouteActive} routes={[
+              { route: 'webhooks', title: 'Webhooks' },
             ]} /> : ''}
           </div>
           <div className="navbar-right text-right">

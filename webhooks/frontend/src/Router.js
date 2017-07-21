@@ -3,6 +3,7 @@ import React from 'react';
 import { appState, isNotLoggedInCostlocker } from './state';
 import { fetchFromApi } from './api';
 import Login from './app/Login';
+import Webhooks from './app/Webhooks';
 
 export let redirectToRoute = (route) => console.log('app is not ready', route);
 export let isRouteActive = () => false;
@@ -45,11 +46,36 @@ if (isNotLoggedInCostlocker()) {
   fetchUser();
 }
 
+const fetchWebhooks = () =>
+  fetchFromApi('/webhooks')
+    .catch(setError)
+    .then(webhooks => appState.cursor(['webhooks']).set('list', webhooks.data));
+
 export const states = [
   {
     name: 'homepage',
     url: '/',
     redirectTo: 'login',
+  },
+  {
+    name: 'webhooks',
+    url: '/webhooks',
+    data: {
+      title: 'Webhooks'
+    },
+    component: (props) => <Webhooks
+      webhooks={appState.cursor(['webhooks', 'list']).deref()}
+    />,
+    resolve: [
+      {
+        token: 'loadWebhooks',
+        resolveFn: () => {
+          if (!appState.cursor(['webhooks', 'list']).deref()) {
+            fetchWebhooks();
+          }
+        }
+      },
+    ],
   },
   {
     name: 'login',

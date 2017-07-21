@@ -13,6 +13,9 @@ const appState = immstruct({
     token: '',
     host: 'https://new-n1.costlocker.com',
   },
+  webhooks: {
+    list: null,
+  },
 });
 
 const isNotLoggedInCostlocker = () =>
