@@ -20,7 +20,7 @@ export default function WebhookFrom({ form }) {
       <div className="row">
         <div className="col-sm-12">
           <h1>Create a webhook</h1>
-          {errors.length &&
+          {errors && errors.length &&
           <div className="row">
             <div className="col-sm-12">
               <div className="alert alert-danger">

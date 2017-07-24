@@ -29,7 +29,7 @@ const appState = immstruct({
       url: '',
       events: Set(),
     },
-    errors: [],
+    errors: null,
   },
 });
 

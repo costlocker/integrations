@@ -34,16 +34,16 @@ const fetchFromApi = (path: string, isDebug: boolean) =>
     });
 
 
-const pushToApi = (path: string, data: Object) =>
+const pushToApi = (path: string, dataOrMethod: Object) =>
   fetch(
     apiUrl(path),
     {
-      method: 'POST',
+      method: dataOrMethod === 'DELETE' ? dataOrMethod : 'POST',
       headers: {
         ...apiAuth(),
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body: dataOrMethod === 'DELETE' ? null : JSON.stringify(dataOrMethod),
     }
   )
     .then(handleErrors)

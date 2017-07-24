@@ -14,6 +14,11 @@ export default function Webhook({ webhook }) {
         route: 'webhook.example',
         params: { uuid: webhook.uuid },
       },
+      {
+        name: 'Delete',
+        route: 'webhook.delete',
+        params: { uuid: webhook.uuid },
+      },
     ]}
     content={(view) => (
       <div>
@@ -25,6 +30,7 @@ export default function Webhook({ webhook }) {
             <span key={event} className="label label-default">{event}</span>
           ))}
         </div>
+        <hr />
         {view}
       </div>
     )}

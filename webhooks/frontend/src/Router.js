@@ -6,6 +6,7 @@ import Login from './app/Login';
 import Webhooks from './app/Webhooks';
 import Webhook from './app/Webhook';
 import WebhookForm from './app/WebhookForm';
+import WebhookDelete from './app/WebhookDelete';
 import WebhookExample from './app/WebhookExample';
 import WebhookDeliveries from './app/WebhookDeliveries';
 
@@ -235,6 +236,51 @@ export const states = [
             return;
           }
           fetchWebhookDetail(webhook, 'webhook');
+          return webhook;
+        }
+      },
+    ],
+  },
+  {
+    name: 'webhook.delete',
+    url: '/delete',
+    data: {
+      title: 'Webhook Delete',
+      api: params => `/webhooks/${params.uuid}`,
+      method: 'DELETE',
+    },
+    component: (props) => <WebhookDelete
+      errors={appState.cursor(['webhook', 'errors']).deref()}
+      deleteWebhook={(e) => {
+        e.preventDefault();
+        pushToApi(props.resolves.loadWebhook.links.webhook, 'DELETE')
+          .catch(error => error.response.json())
+          .then((response) => {
+            if (response.errors) {
+              appState.cursor(['webhook']).set('errors', response.errors);
+              return;
+            }
+            fetchWebhooks().then(() => redirectToRoute('webhooks'));
+          })
+      }}
+    />,
+    resolve: [
+      {
+        token: 'loadWebhook',
+        deps: ['$transition$'],
+        resolveFn: async ($transition$) => {
+          const uuid = $transition$.params().uuid;
+          let webhook = null;
+          const webhooks = appState.cursor(['webhooks', 'list']).deref() || await fetchWebhooks();
+          webhooks.forEach(w => {
+            if (w.uuid === uuid) {
+              webhook = w;
+            }
+          })
+          if (!webhook) {
+            redirectToRoute('webhooks');
+            return;
+          }
           return webhook;
         }
       },
