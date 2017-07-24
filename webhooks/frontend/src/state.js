@@ -8,8 +8,11 @@ const appState = immstruct({
   },
   app: {
     currentState: null,
-    apiEndpoint: null,
-    apiRequest: null,
+  },
+  curl: {
+    method: null,
+    url: null,
+    data: null,
   },
   login: {
     error: null,

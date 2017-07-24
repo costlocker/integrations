@@ -66,11 +66,12 @@ const fetchWebhookDetail = (webhook, type) =>
 const webhookFormToJS = () => appState.cursor(['webhook', 'request']).deref().toJS();
 
 const reloadFormExample = () => (
-  appState.on('next-animation-frame', function (newStructure, oldStructure) {
+  appState.on('next-animation-frame', function (newStructure, oldStructure, keyPath) {
     const newRequest = newStructure.get('webhook').get('request').toJS();
     const oldRequest = oldStructure.get('webhook').get('request').toJS();
-    if (oldRequest !== newRequest) {
-      appState.cursor(['app']).set('apiRequest', newRequest);
+    const isPostMethod = newStructure.get('curl').get('method') === 'POST';
+    if (isPostMethod && oldRequest !== newRequest && keyPath !== ['curl', 'data']) {
+      appState.cursor(['curl']).set('data', newRequest);
     }
   })
 );
@@ -110,6 +111,7 @@ export const states = [
     data: {
       title: 'Create a webhook',
       api: '/webhooks',
+      method: 'POST',
       request: webhookFormToJS,
     },
     component: (props) => <WebhookForm
@@ -286,11 +288,12 @@ const hooks = [
       const getTitle = typeof stateTitle === 'function' ? stateTitle : () => stateTitle;
       document.title = `${getTitle(params)} | Costlocker Webhooks`;
       // rerender to change active state in menu - stateService.go reloads only <UIView>
-      appState.cursor(['app']).update(
+      appState.cursor([]).update(
         app => app
-          .setIn(['currentState'], state.name)
-          .setIn(['apiEndpoint'], typeof state.data.api === 'function' ? state.data.api(params) : state.data.api)
-          .setIn(['apiRequest'], state.data.request ? state.data.request(params) : null)
+          .setIn(['app', 'currentState'], state.name)
+          .setIn(['curl', 'url'], typeof state.data.api === 'function' ? state.data.api(params) : state.data.api)
+          .setIn(['curl', 'method'], state.data.method ? state.data.method : 'GET')
+          .setIn(['curl', 'data'], state.data.request ? state.data.request(params) : null)
       );
     },
     priority: 10,
