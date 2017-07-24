@@ -14,7 +14,9 @@ import ErrorsView from './app/errors/ErrorsView';
 
 export let redirectToRoute = (route) => console.log('app is not ready', route);
 export let isRouteActive = () => false;
+
 const setError = e => appState.cursor(['app']).set('error', e);
+const errors = new Errors(appState);
 
 const fetchUser = () => {
   const data = appState.cursor(['login']).deref();
@@ -27,25 +29,24 @@ const fetchUser = () => {
     );
     return;
   }
-  fetchFromApi(`/me`)
-    .catch(() => {
-      appState.cursor().update(
-        app => app
-          .setIn(['auth', 'isLoading'], false)
-          .setIn(['auth', 'costlocker'], null)
-          .setIn(['login', 'error'], 'Invalid Token')
-      );
-    })
-    .then((user) => {
-      if (!user || !user.data) {
-        return;
+  return fetchFromApi(`/me`)
+    .catch(error => error.response.json())
+    .then((response) => {
+      if (errors.loadErrorsFromApiResponse(response)) {
+        appState.cursor().update(
+          app => app
+            .setIn(['auth', 'isLoading'], false)
+            .setIn(['auth', 'costlocker'], null)
+        );
+        return false;
       }
       appState.cursor().update(
         app => app
           .setIn(['auth', 'isLoading'], false)
-          .setIn(['auth', 'costlocker'], user.data)
+          .setIn(['auth', 'costlocker'], response.data)
           .setIn(['login', 'error'], null)
       );
+      return true;
     });
 }
 
@@ -80,8 +81,6 @@ const reloadFormExample = () => (
 );
 
 reloadFormExample();
-
-const errors = new Errors(appState);
 
 export const states = [
   {
@@ -296,6 +295,7 @@ export const states = [
     },
     component: (props) => <Login
       costlockerAuth={appState.cursor(['auth', 'costlocker']).deref()}
+      errors={<ErrorsView errors={errors} />}
       form={{
         get: (type) => appState.cursor(['login', type]).deref(),
         set: (type) => (e) => appState.cursor(['login']).set(
@@ -304,7 +304,7 @@ export const states = [
         ),
         submit: (e) => {
           e.preventDefault();
-          fetchUser();
+          fetchUser().then((isLoggedIn) => isLoggedIn ? redirectToRoute('webhooks') : null);
         },
       }} />,
   },

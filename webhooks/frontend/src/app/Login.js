@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { Errors, ExternalLink } from '../ui/Components';
+import { ExternalLink } from '../ui/Components';
 
-export default function Login({ costlockerAuth, form }) {
+export default function Login({ costlockerAuth, form, errors }) {
   return (
     <div>
       <div className="row">
@@ -17,11 +17,7 @@ export default function Login({ costlockerAuth, form }) {
 
           <h2>Costlocker <ExternalLink url="https://new.costlocker.com" /></h2>
           <form onSubmit={form.submit}>
-            <div className="row text-center">
-              <div className="col-sm-12">
-                <Errors title="Login error" error={form.get('error')} />
-              </div>
-            </div>
+            {errors}
             <div className="form-group">
               <label htmlFor="token">Personal Access Token</label>
               <input required type="text" className="form-control" id="token" name="token" placeholder="Token"

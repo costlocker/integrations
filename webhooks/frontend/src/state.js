@@ -16,7 +16,6 @@ const appState = immstruct({
     data: null,
   },
   login: {
-    error: null,
     token: '',
     host: 'https://new-n1.costlocker.com',
   },
