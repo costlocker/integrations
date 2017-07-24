@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { ExternalLink } from '../ui/Components';
+import { ExternalLink, Link } from '../ui/Components';
 
-export default function Login({ costlockerAuth, form, errors }) {
+export default function Login({ costlockerAuth, form, errors, logout }) {
   return (
     <div>
       <div className="row">
@@ -32,9 +32,22 @@ export default function Login({ costlockerAuth, form, errors }) {
               <input required type="text" className="form-control" id="host" name="host"
                 value={form.get('host')} onChange={form.set('host')} />
             </div>
+            {costlockerAuth ? (
+            <div className="row">
+              <div className="col-sm-9">
+                <button type="submit" className="btn btn-primary btn-block">
+                  Switch account
+                </button>
+              </div>
+              <div className="col-sm-3">
+                <Link title="Logout" action={logout} className="btn btn-default btn-block" />
+              </div>
+            </div>
+            ) : (
             <button type="submit" className="btn btn-primary btn-block">
-              {costlockerAuth ? <span>Switch account</span> : 'Login'}
+              Login
             </button>
+            )}
           </form>
         </div>
       </div>

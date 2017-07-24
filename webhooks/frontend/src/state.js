@@ -1,5 +1,8 @@
 import immstruct from 'immstruct';
 import { Set } from 'immutable';
+import Session from './app/Session';
+
+const session = new Session();
 
 const appState = immstruct({
   auth: {
@@ -15,10 +18,7 @@ const appState = immstruct({
     url: null,
     request: null,
   },
-  login: {
-    token: '',
-    host: 'https://new-n1.costlocker.com',
-  },
+  login: session.getCurrentUser(),
   webhooks: {
     list: null,
     example: null,
@@ -48,4 +48,4 @@ const apiAuth = () => {
   };
 };
 
-export { appState, isNotLoggedInCostlocker, apiUrl, apiAuth };
+export { appState, isNotLoggedInCostlocker, apiUrl, apiAuth, session };

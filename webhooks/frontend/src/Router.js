@@ -1,7 +1,7 @@
 import React from 'react';
 import { Set } from 'immutable';
 
-import { appState, isNotLoggedInCostlocker } from './state';
+import { appState, isNotLoggedInCostlocker, session } from './state';
 import { fetchFromCostlocker, pushToCostlocker } from './api';
 import { PageWithSubpages } from './ui/App';
 import Login from './app/Login';
@@ -27,7 +27,6 @@ const fetchUser = () => {
       app => app
         .setIn(['auth', 'isLoading'], false)
         .setIn(['auth', 'costlocker'], null)
-        .setIn(['login', 'error'], null)
     );
     return;
   }
@@ -42,11 +41,11 @@ const fetchUser = () => {
         );
         return false;
       }
+      session.login(data.toJS());
       appState.cursor().update(
         app => app
           .setIn(['auth', 'isLoading'], false)
           .setIn(['auth', 'costlocker'], response.data)
-          .setIn(['login', 'error'], null)
       );
       return true;
     });
@@ -385,6 +384,10 @@ export const states = [
     component: (props) => <Login
       costlockerAuth={appState.cursor(['auth', 'costlocker']).deref()}
       errors={<ErrorsView errors={errors} />}
+      logout={() => {
+        session.logout();
+        appState.cursor(['auth']).set('costlocker', null);
+      }}
       form={{
         get: (type) => appState.cursor(['login', type]).deref(),
         set: (type) => (e) => appState.cursor(['login']).set(
