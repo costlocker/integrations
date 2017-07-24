@@ -145,6 +145,18 @@ export const states = [
         },
       }}
     />,
+    resolve: [
+      {
+        token: 'resetForm',
+        resolveFn: () => {
+          appState.cursor(['webhook']).update(
+            form => form
+              .setIn(['url'], '')
+              .setIn(['events'], Set())
+          );
+        }
+      },
+    ],
   },
   {
     name: 'webhook',
