@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { UIRouter, pushStateLocationPlugin } from 'ui-router-react';
+import { UIRouter, pushStateLocationPlugin } from '@uirouter/react';
 
 import { isDevelopmentMode } from './config';
 import { appState } from './state';

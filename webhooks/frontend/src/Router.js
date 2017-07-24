@@ -413,7 +413,8 @@ const hooks = [
       }
     },
     callback: (transition) => {
-      transition.router.stateService.target('login', transition.params(), { location: true })
+      transition.abort();
+      redirectToRoute('login');
     },
     priority: 10,
   },
