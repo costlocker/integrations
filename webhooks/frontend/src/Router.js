@@ -73,6 +73,7 @@ export const states = [
     url: '/webhooks',
     data: {
       title: 'Webhooks',
+      api: '/webhooks',
     },
     component: (props) => <Webhooks
       webhooks={appState.cursor(['webhooks', 'list']).deref()}
@@ -122,6 +123,7 @@ export const states = [
     url: '/example',
     data: {
       title: 'Webhook Example',
+      api: params => `/webhooks/${params.uuid}/test`,
     },
     component: (props) => <WebhookExample
       webhook={props.resolves.loadWebhook}
@@ -155,6 +157,7 @@ export const states = [
     url: '/deliveries',
     data: {
       title: 'Webhook Example',
+      api: params => `/webhooks/${params.uuid}`,
     },
     component: (props) => <WebhookDeliveries
       webhook={props.resolves.loadWebhook}
@@ -188,6 +191,7 @@ export const states = [
     url: '/login',
     data: {
       title: 'Login',
+      api: '/me',
     },
     component: (props) => <Login
       costlockerAuth={appState.cursor(['auth', 'costlocker']).deref()}
@@ -233,6 +237,7 @@ const hooks = [
       appState.cursor(['app']).update(
         app => app
           .setIn(['currentState'], state.name)
+          .setIn(['apiEndpoint'], typeof state.data.api === 'function' ? state.data.api(params) : state.data.api)
       );
     },
     priority: 10,

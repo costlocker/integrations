@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "clipboard": "^1.7.1",
     "immstruct": "^2.0.0",
     "immutable": "^3.8.1",
     "react": "15.4.2",

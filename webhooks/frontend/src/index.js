@@ -4,10 +4,11 @@ import { UIRouter, pushStateLocationPlugin } from 'ui-router-react';
 
 import { isDevelopmentMode } from './config';
 import { appState } from './state';
-import { states, config, isRouteActive } from './Router';
+import { states, config } from './Router';
 import { App } from './ui/App';
 import Loading from './ui/Loading';
 import ErrorPage from './ui/ErrorPage';
+import CurlExample from './app/CurlExample';
 import './ui/index.css'
 
 export const plugins = [pushStateLocationPlugin];
@@ -21,7 +22,7 @@ const render = () => {
   } else {
     content =
       <UIRouter states={states} config={config} plugins={plugins}>
-        <App auth={appState.cursor(['auth']).deref()} isRouteActive={isRouteActive} />
+        <App auth={appState.cursor(['auth']).deref()} footer={<CurlExample appState={appState} />} />
       </UIRouter>;
   }
   ReactDOM.render(content, document.getElementById('root'));

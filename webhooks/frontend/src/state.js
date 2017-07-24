@@ -7,6 +7,7 @@ const appState = immstruct({
   },
   app: {
     currentState: null,
+    apiEndpoint: null,
   },
   login: {
     error: null,

@@ -47,7 +47,7 @@ export const Page = ({ view }) =>
     </div>
   </div>;
 
-export function App({ auth, isRouteActive }) {
+export function App({ auth, footer }) {
   return (
     <div>
       <nav className="navbar navbar-default">
@@ -77,6 +77,11 @@ export function App({ auth, isRouteActive }) {
       ) : (
         <Page view={<UIView />} />
       )}
+      <footer className="footer">
+        <div className="container">
+          {footer}
+        </div>
+      </footer>
     </div>
   );
 };
