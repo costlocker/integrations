@@ -63,6 +63,7 @@ export function App({ auth, footer }) {
           <div>
             {auth.get('costlocker') ? <Navigation routes={[
               { route: 'webhooks', title: 'Webhooks', activeRoute: 'webhook' },
+              { route: 'webhooks-create', title: 'Create a webhook' },
             ]} /> : ''}
           </div>
           <div className="navbar-right text-right">

@@ -5,6 +5,7 @@ import { fetchFromApi } from './api';
 import Login from './app/Login';
 import Webhooks from './app/Webhooks';
 import Webhook from './app/Webhook';
+import WebhookForm from './app/WebhookForm';
 import WebhookExample from './app/WebhookExample';
 import WebhookDeliveries from './app/WebhookDeliveries';
 
@@ -62,6 +63,18 @@ const fetchWebhookDetail = (webhook, type) =>
     .catch(setError)
     .then(response => appState.cursor(['webhooks']).set(type, response));
 
+const reloadFormExample = () => (
+  appState.on('next-animation-frame', function (newStructure, oldStructure, keyPath) {
+    const newRequest = newStructure.get('webhook').toJS();
+    const oldRequest = oldStructure.get('webhook').toJS();
+    if (keyPath.length && keyPath[0] === 'webhook' && oldRequest !== newRequest) {
+      appState.cursor(['app']).set('apiRequest', newRequest);
+    }
+  })
+);
+
+reloadFormExample();
+
 export const states = [
   {
     name: 'homepage',
@@ -88,6 +101,29 @@ export const states = [
         }
       },
     ],
+  },
+  {
+    name: 'webhooks-create',
+    url: '/webhooks/create',
+    data: {
+      title: 'Create a webhook',
+      api: '/webhooks',
+      request: () => appState.cursor(['webhook']).deref().toJS(),
+    },
+    component: (props) => <WebhookForm
+      form={{
+        get: (type) => appState.cursor(['webhook', type]).deref(),
+        set: (type) => (e) => appState.cursor(['webhook']).set(
+          type,
+          e.target.type === 'checkbox' ? e.target.checked : e.target.value
+        ),
+        updateEvents: (updater) => appState.cursor(['webhook', 'events']).update(updater),
+        submit: (e) => {
+          e.preventDefault();
+          console.log(appState.cursor(['webhook']).deref().toJS());
+        },
+      }}
+    />,
   },
   {
     name: 'webhook',
@@ -238,6 +274,7 @@ const hooks = [
         app => app
           .setIn(['currentState'], state.name)
           .setIn(['apiEndpoint'], typeof state.data.api === 'function' ? state.data.api(params) : state.data.api)
+          .setIn(['apiRequest'], state.data.request ? state.data.request(params) : null)
       );
     },
     priority: 10,

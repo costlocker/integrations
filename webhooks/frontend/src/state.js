@@ -1,4 +1,5 @@
 import immstruct from 'immstruct';
+import { Set } from 'immutable';
 
 const appState = immstruct({
   auth: {
@@ -8,6 +9,7 @@ const appState = immstruct({
   app: {
     currentState: null,
     apiEndpoint: null,
+    apiRequest: null,
   },
   login: {
     error: null,
@@ -18,6 +20,10 @@ const appState = immstruct({
     list: null,
     example: null,
     webhook: null,
+  },
+  webhook: {
+    url: '',
+    events: Set(),
   },
 });
 
