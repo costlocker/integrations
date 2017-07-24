@@ -1,5 +1,5 @@
 
-import { apiUrl, apiAuth } from './state';
+import { apiAuth } from './state';
 import { proxyUrl } from './config';
 
 const handleErrors = (response) => {
@@ -28,17 +28,17 @@ const fetchViaProxy = (url, settings, isDebug: boolean) =>
       }),
   });
 
-const fetchFromCostlocker = (path: string, isDebug: boolean) =>
-  fetchViaProxy(apiUrl(path), { headers: apiAuth() }, isDebug)
+const fetchFromCostlocker = (url: string, isDebug: boolean) =>
+  fetchViaProxy(url, { headers: apiAuth() }, isDebug)
     .then(handleErrors)
     .then(response => {
       return response.json();
     });
 
 
-const pushToCostlocker = (path: string, dataOrMethod: Object) =>
+const pushToCostlocker = (url: string, dataOrMethod: Object) =>
   fetchViaProxy(
-    apiUrl(path),
+    url,
     {
       method: dataOrMethod === 'DELETE' ? dataOrMethod : 'POST',
       headers: {

@@ -15,7 +15,7 @@ const appState = immstruct({
   },
   curl: {
     method: null,
-    url: null,
+    endpoint: null,
     request: null,
   },
   login: session.getCurrentUser(),
@@ -33,14 +33,6 @@ const appState = immstruct({
 const isNotLoggedInCostlocker = () =>
   appState.cursor(['auth', 'costlocker']).deref() === null;
 
-const apiUrl = (path) => {
-  if (path.indexOf('http') === 0) {
-    return path;
-  }
-  const apiUrl = `${appState.cursor(['login', 'host']).deref()}/api-public/v2`;
-  return `${apiUrl}${path}`;
-};
-
 const apiAuth = () => {
   const credentials = `costlocker/webhooks:${appState.cursor(['login', 'token']).deref()}`;
   return {
@@ -48,4 +40,15 @@ const apiAuth = () => {
   };
 };
 
-export { appState, isNotLoggedInCostlocker, apiUrl, apiAuth, session };
+const apiUrl = (path) => {
+  const apiUrl = `${appState.cursor(['login', 'host']).deref()}/api-public/v2`;
+  return `${apiUrl}${path}`;
+};
+
+const endpoints = {
+  me: () => apiUrl('/me'),
+  webhooks: () => apiUrl('/webhooks'),
+  webhook: (webhook, type) => webhook.links[type],
+};
+
+export { appState, isNotLoggedInCostlocker, apiAuth, endpoints, session };

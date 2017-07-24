@@ -13,10 +13,8 @@ const initClipboard = () => {
 const getCurlCommand = (appState) => {
   const login = appState.cursor(['login']).deref();
   const curl = appState.cursor(['curl']).deref();
-  const url = `${login.get('host')}/api-public/v2${curl.get('url') || '/'}`;
-  const auth = `test_webhooks:${login.get('token')}`;
   const data = curl.get('method') === 'POST' ? ` -d '${JSON.stringify(curl.get('request')())}'` : '';
-  return `curl -X ${curl.get('method')} "${url}"${data} -u "${auth}"`;
+  return `curl -X ${curl.get('method')} "${ curl.get('endpoint')}"${data} -u "test_webhooks:${login.get('token')}"`;
 }
 
 export default function CurlExample({ appState }) {

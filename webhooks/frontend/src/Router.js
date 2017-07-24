@@ -1,7 +1,7 @@
 import React from 'react';
 import { Set } from 'immutable';
 
-import { appState, isNotLoggedInCostlocker, session } from './state';
+import { appState, isNotLoggedInCostlocker, endpoints, session } from './state';
 import { fetchFromCostlocker, pushToCostlocker } from './api';
 import { PageWithSubpages } from './ui/App';
 import Login from './app/Login';
@@ -30,7 +30,7 @@ const fetchUser = () => {
     );
     return;
   }
-  return fetchFromCostlocker(`/me`)
+  return fetchFromCostlocker(endpoints.me())
     .catch(error => error.response.json())
     .then((response) => {
       if (errors.loadErrorsFromApiResponse(response)) {
@@ -56,7 +56,7 @@ if (isNotLoggedInCostlocker()) {
 }
 
 const fetchWebhooks = () =>
-  fetchFromCostlocker('/webhooks')
+  fetchFromCostlocker(endpoints.webhooks())
     .catch(setError)
     .then(webhooks => {
       appState.cursor(['webhooks']).set('list', webhooks.data);
@@ -64,11 +64,12 @@ const fetchWebhooks = () =>
     });
 
 const fetchWebhookDetail = (webhook, type) =>
-  fetchFromCostlocker(webhook.links[type], type === 'example')
+  fetchFromCostlocker(endpoints.webhook(webhook, type), type === 'example')
     .catch(setError)
     .then(response => appState.cursor(['webhooks']).set(type, response));
 
 const webhookFormToJS = () => appState.cursor(['webhook']).deref().toJS();
+const webhookTitle = (title) => (getWebhook) => `${title} > ${getWebhook().url}`;
 
 export const states = [
   {
@@ -99,7 +100,7 @@ export const states = [
     url: '/',
     data: {
       title: 'Webhooks',
-      api: '/webhooks',
+      endpoint: endpoints.webhooks(),
     },
     component: (props) => <Webhooks
       webhooks={appState.cursor(['webhooks', 'list']).deref()}
@@ -120,8 +121,8 @@ export const states = [
     url: '/create',
     data: {
       title: 'Create a webhook',
-      api: '/webhooks',
       method: 'POST',
+      endpoint: endpoints.webhooks(),
       request: webhookFormToJS,
     },
     component: (props) => <WebhookForm
@@ -139,8 +140,8 @@ export const states = [
         },
         submit: (e) => {
           e.preventDefault();
-          const request = props.transition.to().data.request(props.transition.params());
-          pushToCostlocker('/webhooks', request)
+          const definition = props.transition.to().data;
+          pushToCostlocker(definition.endpoint, definition.request(props.transition.params()))
             .catch(error => error.response.json())
             .then((response) => {
               if (errors.loadErrorsFromApiResponse(response)) {
@@ -169,7 +170,7 @@ export const states = [
     url: '/webhooks/:uuid',
     redirectTo: 'webhook.example',
     component: (props) => <Webhook
-      webhook={appState.cursor(['webhooks', 'list']).deref()[props.resolves.webhookIndex]}
+      webhook={props.resolves.currentWebhook()}
     />,
     resolve: [
       {
@@ -189,7 +190,12 @@ export const states = [
             return;
           }
           return index;
-        }
+        },
+      },
+      {
+        token: 'currentWebhook',
+        deps: ['webhookIndex'],
+        resolveFn: (webhookIndex) => () => appState.cursor(['webhooks', 'list']).deref()[webhookIndex],
       },
     ],
   },
@@ -197,8 +203,8 @@ export const states = [
     name: 'webhook.example',
     url: '/example',
     data: {
-      title: 'Webhook Example',
-      api: params => `/webhooks/${params.uuid}/test`,
+      title: webhookTitle('Webhook example'),
+      endpoint: (currentWebhook) => endpoints.webhook(currentWebhook, 'example'),
     },
     component: (props) => <WebhookExample
       webhook={props.resolves.loadWebhook}
@@ -231,8 +237,8 @@ export const states = [
     name: 'webhook.deliveries',
     url: '/deliveries',
     data: {
-      title: 'Webhook Example',
-      api: params => `/webhooks/${params.uuid}`,
+      title: webhookTitle('Recent deliveries'),
+      endpoint: (currentWebhook) => endpoints.webhook(currentWebhook, 'webhook'),
     },
     component: (props) => <WebhookDeliveries
       webhook={props.resolves.loadWebhook}
@@ -265,15 +271,13 @@ export const states = [
     name: 'webhook.update',
     url: '/update',
     data: {
-      title: 'Update a webhook',
-      api: '/webhooks',
+      title: webhookTitle('Update a webhook'),
       method: 'POST',
-      request: (params) => (
-        {
-          uuid: params.uuid,
-          ...webhookFormToJS(),
-        }
-      ),
+      endpoint: endpoints.webhooks(),
+      request: (currentWebhook) => ({
+        uuid: currentWebhook.uuid,
+        ...webhookFormToJS(),
+      }),
     },
     component: (props) => <WebhookForm
       updatedWebhook={props.resolves.loadWebhook}
@@ -291,8 +295,8 @@ export const states = [
         },
         submit: (e) => {
           e.preventDefault();
-          const request = props.transition.to().data.request(props.transition.params());
-          pushToCostlocker('/webhooks', request)
+          const definition = props.transition.to().data;
+          pushToCostlocker(definition.endpoint, definition.request(props.transition.params()))
             .catch(error => error.response.json())
             .then((response) => {
               if (errors.loadErrorsFromApiResponse(response)) {
@@ -334,9 +338,9 @@ export const states = [
     name: 'webhook.delete',
     url: '/delete',
     data: {
-      title: 'Webhook Delete',
-      api: params => `/webhooks/${params.uuid}`,
+      title: webhookTitle('Delete a webhook'),
       method: 'DELETE',
+      endpoint: (currentWebhook) => endpoints.webhook(currentWebhook, 'webhook'),
     },
     component: (props) => <WebhookDelete
       errors={<ErrorsView errors={errors} />}
@@ -379,7 +383,7 @@ export const states = [
     url: '/login',
     data: {
       title: 'Login',
-      api: '/me',
+      endpoint: endpoints.me(),
     },
     component: (props) => <Login
       costlockerAuth={appState.cursor(['auth', 'costlocker']).deref()}
@@ -422,18 +426,17 @@ const hooks = [
     event: 'onSuccess',
     criteria: { to: state => state.data && state.data.title },
     callback: (transition) => {
-      const params = transition.params();
       const state = transition.to();
       const stateTitle = state.data.title;
       const getTitle = typeof stateTitle === 'function' ? stateTitle : () => stateTitle;
-      document.title = `${getTitle(params)} | Costlocker Webhooks`;
-      // rerender to change active state in menu - stateService.go reloads only <UIView>
+      const getWebhook = transition.injector().get('currentWebhook') || (() => null);
+      document.title = `${getTitle(getWebhook)} | Costlocker Webhooks`;
       appState.cursor([]).update(
         app => errors.reset(app)
-          .setIn(['app', 'currentState'], state.name)
-          .setIn(['curl', 'url'], typeof state.data.api === 'function' ? state.data.api(params) : state.data.api)
-          .setIn(['curl', 'method'], state.data.method ? state.data.method : 'GET')
-          .setIn(['curl', 'request'], state.data.request ? () => state.data.request(params) : null)
+          .setIn(['app', 'currentState'], state.name) // rerender menu - stateService.go reloads only <UIView>
+          .setIn(['curl', 'method'], state.data.method || 'GET')
+          .setIn(['curl', 'endpoint'], typeof state.data.endpoint === 'function' ? state.data.endpoint(getWebhook()) : state.data.endpoint)
+          .setIn(['curl', 'request'], state.data.method === 'POST' ? () => state.data.request(getWebhook()) : null)
       );
     },
     priority: 10,
