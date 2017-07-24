@@ -1,6 +1,7 @@
 import React from 'react';
 import Loading from '../ui/Loading'
 import { Link } from '../ui/Components';
+import { WebhookEvents } from './Webhook';
 
 export default function Webhooks({ webhooks }) {
   if (!webhooks) {
@@ -14,20 +15,21 @@ export default function Webhooks({ webhooks }) {
     <table className="table table-striped table-hover vertical-align">
       <thead>
         <tr>
-          <th>URL</th>
-          <th>Events</th>
+          <th>Webhook</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
         {webhooks.map(w => (
           <tr key={w.uuid}>
-            <td>{w.url}</td>
-            <td>{w.events.join(', ')}</td>
             <td>
-              <Link title="Recent deliveries" route="webhook.deliveries" params={{ uuid: w.uuid }} className="btn btn-primary btn-sm" />
-              <Link title="Example" route="webhook.example" params={{ uuid: w.uuid }} className="btn btn-info btn-sm" />
-              <Link title="Update" route="webhook.update" params={{ uuid: w.uuid }} className="btn btn-warning btn-sm" />
+              {w.url}
+              <WebhookEvents webhook={w} />
+            </td>
+            <td className="text-right">
+              <Link title="Recent deliveries" route="webhook.deliveries" params={{ uuid: w.uuid }} className="btn btn-success" />
+              <Link title="Example" route="webhook.example" params={{ uuid: w.uuid }} className="btn btn-info" />
+              <Link title="Update" route="webhook.update" params={{ uuid: w.uuid }} className="btn btn-warning" />
             </td>
           </tr>
         ))}

@@ -1,7 +1,18 @@
 import React from 'react';
 import { PageWithSubpages } from '../ui/App';
 
-export default function Webhook({ webhook }) {
+export function WebhookEvents({ webhook }) {
+  return <div>
+    {webhook.events.map((event) => (
+      <span key={event}>
+        <span className="label label-primary">{event}</span>
+        &nbsp;
+      </span>
+    ))}
+  </div>;
+};
+
+export function Webhook({ webhook }) {
   return <PageWithSubpages
     pages={[
       {
@@ -31,9 +42,7 @@ export default function Webhook({ webhook }) {
           <h1>
             {webhook.url}
           </h1>
-          {webhook.events.map((event) => (
-            <span key={event} className="label label-default">{event}</span>
-          ))}
+          <WebhookEvents webhook={webhook} />
         </div>
         <hr />
         {view}

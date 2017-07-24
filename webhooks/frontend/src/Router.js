@@ -5,7 +5,7 @@ import { appState, isNotLoggedInCostlocker } from './state';
 import { fetchFromApi, pushToApi } from './api';
 import Login from './app/Login';
 import Webhooks from './app/Webhooks';
-import Webhook from './app/Webhook';
+import { Webhook } from './app/Webhook';
 import WebhookForm from './app/WebhookForm';
 import WebhookDelete from './app/WebhookDelete';
 import WebhookExample from './app/WebhookExample';
