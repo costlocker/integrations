@@ -3,6 +3,7 @@ import { Set } from 'immutable';
 
 import { appState, isNotLoggedInCostlocker } from './state';
 import { fetchFromApi, pushToApi } from './api';
+import { PageWithSubpages } from './ui/App';
 import Login from './app/Login';
 import Webhooks from './app/Webhooks';
 import { Webhook } from './app/Webhook';
@@ -92,6 +93,24 @@ export const states = [
   {
     name: 'webhooks',
     url: '/webhooks',
+    redirectTo: 'webhooks.list',
+    component: (props) => <PageWithSubpages
+    pages={[
+      {
+        name: 'Webhooks',
+        route: 'webhooks.list',
+      },
+      {
+        name: 'Create a webhook',
+        route: 'webhooks.create',
+      },
+    ]}
+    content={view => view}
+  />,
+  },
+  {
+    name: 'webhooks.list',
+    url: '/',
     data: {
       title: 'Webhooks',
       api: '/webhooks',
@@ -111,8 +130,8 @@ export const states = [
     ],
   },
   {
-    name: 'webhooks-create',
-    url: '/webhooks/create',
+    name: 'webhooks.create',
+    url: '/create',
     data: {
       title: 'Create a webhook',
       api: '/webhooks',
@@ -161,7 +180,7 @@ export const states = [
   {
     name: 'webhook',
     url: '/webhooks/:uuid',
-    redirectTo: 'login',
+    redirectTo: 'webhook.example',
     component: (props) => <Webhook
       webhook={appState.cursor(['webhooks', 'list']).deref()[props.resolves.webhookIndex]}
     />,
@@ -435,8 +454,8 @@ export const config = (router) => {
     router.stateService.go(route, params, { location: true });
   };
   isRouteActive = (route) => {
-    if (route === 'webhook') {
-      return router.stateService.current.name.indexOf('webhook.') !== -1;
+    if (route === 'webhook' || route === 'webhooks') {
+      return router.stateService.current.name.indexOf(`${route}.`) !== -1;
     }
     return router.stateService.is(route);
   };

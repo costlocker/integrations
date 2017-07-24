@@ -36,7 +36,7 @@ const Navigation = ({ routes }) => {
   );
 };
 
-const hasSubnavigation = () => isRouteActive('webhook');
+const hasSubnavigation = () => !isRouteActive('login');
 
 export const Page = ({ view }) =>
   <div className='container'>
@@ -58,13 +58,14 @@ export function App({ auth, footer }) {
                 <img title="Costlocker" alt="Costlocker" src="https://cdn-images-1.medium.com/max/1200/1*BLdn5GGWwijxJkcr0I0rgg.png" />
               </a>
             </div>
-            <span className="navbar-text">Webhooks Manager</span>
           </div>
           <div>
-            {auth.get('costlocker') ? <Navigation routes={[
-              { route: 'webhooks', title: 'Webhooks', activeRoute: 'webhook' },
-              { route: 'webhooks-create', title: 'Create a webhook' },
-            ]} /> : ''}
+            {auth.get('costlocker') ?
+              <Navigation routes={[
+                { route: 'webhooks', title: 'Webhooks', activeRoute: 'webhook' },
+              ]} /> :
+              <span className="navbar-text">Webhooks</span>
+            }
           </div>
           <div className="navbar-right text-right">
             <Navigation routes={[
