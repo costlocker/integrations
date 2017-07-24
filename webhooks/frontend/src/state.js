@@ -13,7 +13,7 @@ const appState = immstruct({
   curl: {
     method: null,
     url: null,
-    data: null,
+    request: null,
   },
   login: {
     token: '',

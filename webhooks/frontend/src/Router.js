@@ -71,19 +71,6 @@ const fetchWebhookDetail = (webhook, type) =>
 
 const webhookFormToJS = () => appState.cursor(['webhook']).deref().toJS();
 
-const reloadFormExample = () => (
-  appState.on('next-animation-frame', function (newStructure, oldStructure, keyPath) {
-    const newRequest = JSON.stringify(newStructure.get('webhook'));
-    const oldRequest = JSON.stringify(oldStructure.get('webhook'));
-    const isPostMethod = newStructure.get('curl').get('method') === 'POST';
-    if (isPostMethod && oldRequest !== newRequest && keyPath !== ['curl', 'data']) {
-      appState.cursor(['curl']).set('data', newRequest);
-    }
-  })
-);
-
-reloadFormExample();
-
 export const states = [
   {
     name: 'homepage',
@@ -153,7 +140,8 @@ export const states = [
         },
         submit: (e) => {
           e.preventDefault();
-          pushToApi('/webhooks', webhookFormToJS())
+          const request = props.transition.to().data.request(props.transition.params());
+          pushToApi('/webhooks', request)
             .catch(error => error.response.json())
             .then((response) => {
               if (errors.loadErrorsFromApiResponse(response)) {
@@ -278,9 +266,15 @@ export const states = [
     name: 'webhook.update',
     url: '/update',
     data: {
-      title: 'Webhook Update',
-      api: params => `/webhooks/${params.uuid}`,
+      title: 'Update a webhook',
+      api: '/webhooks',
       method: 'POST',
+      request: (params) => (
+        {
+          uuid: params.uuid,
+          ...webhookFormToJS(),
+        }
+      ),
     },
     component: (props) => <WebhookForm
       updatedWebhook={props.resolves.loadWebhook}
@@ -298,10 +292,8 @@ export const states = [
         },
         submit: (e) => {
           e.preventDefault();
-          pushToApi('/webhooks', {
-            uuid: props.resolves.loadWebhook.uuid,
-            ...webhookFormToJS(),
-          })
+          const request = props.transition.to().data.request(props.transition.params());
+          pushToApi('/webhooks', request)
             .catch(error => error.response.json())
             .then((response) => {
               if (errors.loadErrorsFromApiResponse(response)) {
@@ -437,7 +429,7 @@ const hooks = [
           .setIn(['app', 'currentState'], state.name)
           .setIn(['curl', 'url'], typeof state.data.api === 'function' ? state.data.api(params) : state.data.api)
           .setIn(['curl', 'method'], state.data.method ? state.data.method : 'GET')
-          .setIn(['curl', 'data'], state.data.request ? state.data.request(params) : null)
+          .setIn(['curl', 'request'], state.data.request ? () => state.data.request(params) : null)
       );
     },
     priority: 10,
