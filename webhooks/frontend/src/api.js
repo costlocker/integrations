@@ -43,7 +43,6 @@ const pushToApi = (path: string, data: Object) =>
         ...apiAuth(),
         'Content-Type': 'application/json',
       },
-      credentials: 'include',
       body: JSON.stringify(data),
     }
   )

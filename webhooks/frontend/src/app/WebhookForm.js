@@ -14,11 +14,22 @@ const events = {
 };
 
 export default function WebhookFrom({ form }) {
+  const errors = form.errors();
   return (
     <div>
       <div className="row">
         <div className="col-sm-12">
           <h1>Create a webhook</h1>
+          {errors.length &&
+          <div className="row">
+            <div className="col-sm-12">
+              <div className="alert alert-danger">
+                <strong>Please fix following errors before resubmitting the form:</strong><br />
+                <pre><code>{JSON.stringify(errors, null, 2)}</code></pre>
+              </div>
+            </div>
+          </div>
+          }
           <form onSubmit={form.submit}>
             <div className="form-group">
               <label htmlFor="url">URL</label>

@@ -6,7 +6,15 @@ export default function Login({ costlockerAuth, form }) {
   return (
     <div>
       <div className="row">
-        <div className="col-sm-12">
+        <div className="col-sm-6 col-sm-offset-3">
+          <br />
+          <div className="alert alert-warning">
+            <strong>APP for DEVELOPERS <ExternalLink url="https://costlocker.github.io/" /></strong><br />
+            Be aware that this app is designed for API developers.
+            You'll see a lot of <code>JSON</code>. If you don't know,
+            what is <code>JSON</code>, <code>curl</code>&hellip;, then it can be hard to understand this app.
+          </div>
+
           <h2>Costlocker <ExternalLink url="https://new.costlocker.com" /></h2>
           <form onSubmit={form.submit}>
             <div className="row text-center">

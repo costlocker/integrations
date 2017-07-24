@@ -22,8 +22,11 @@ const appState = immstruct({
     webhook: null,
   },
   webhook: {
-    url: '',
-    events: Set(),
+    request: {
+      url: '',
+      events: Set(),
+    },
+    errors: [],
   },
 });
 

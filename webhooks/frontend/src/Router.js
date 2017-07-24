@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { appState, isNotLoggedInCostlocker } from './state';
-import { fetchFromApi } from './api';
+import { fetchFromApi, pushToApi } from './api';
 import Login from './app/Login';
 import Webhooks from './app/Webhooks';
 import Webhook from './app/Webhook';
@@ -63,11 +63,13 @@ const fetchWebhookDetail = (webhook, type) =>
     .catch(setError)
     .then(response => appState.cursor(['webhooks']).set(type, response));
 
+const webhookFormToJS = () => appState.cursor(['webhook', 'request']).deref().toJS();
+
 const reloadFormExample = () => (
-  appState.on('next-animation-frame', function (newStructure, oldStructure, keyPath) {
-    const newRequest = newStructure.get('webhook').toJS();
-    const oldRequest = oldStructure.get('webhook').toJS();
-    if (keyPath.length && keyPath[0] === 'webhook' && oldRequest !== newRequest) {
+  appState.on('next-animation-frame', function (newStructure, oldStructure) {
+    const newRequest = newStructure.get('webhook').get('request').toJS();
+    const oldRequest = oldStructure.get('webhook').get('request').toJS();
+    if (oldRequest !== newRequest) {
       appState.cursor(['app']).set('apiRequest', newRequest);
     }
   })
@@ -108,19 +110,33 @@ export const states = [
     data: {
       title: 'Create a webhook',
       api: '/webhooks',
-      request: () => appState.cursor(['webhook']).deref().toJS(),
+      request: webhookFormToJS,
     },
     component: (props) => <WebhookForm
       form={{
-        get: (type) => appState.cursor(['webhook', type]).deref(),
-        set: (type) => (e) => appState.cursor(['webhook']).set(
+        errors: () => appState.cursor(['webhook', 'errors']).deref(),
+        get: (type) => appState.cursor(['webhook', 'request', type]).deref(),
+        set: (type) => (e) => appState.cursor(['webhook', 'request']).set(
           type,
           e.target.type === 'checkbox' ? e.target.checked : e.target.value
         ),
-        updateEvents: (updater) => appState.cursor(['webhook', 'events']).update(updater),
+        checkEvent: (e) => {
+          appState.cursor(['webhook', 'request', 'events']).update(
+            set => e.target.checked ? set.add(e.target.value) : set.delete(e.target.value)
+          );
+        },
         submit: (e) => {
           e.preventDefault();
-          console.log(appState.cursor(['webhook']).deref().toJS());
+          pushToApi('/webhooks', webhookFormToJS())
+            .catch(error => error.response.json())
+            .then((response) => {
+              console.log(response, webhookFormToJS());
+              if (response.errors) {
+                appState.cursor(['webhook']).set('errors', response.errors);
+                return;
+              }
+              fetchWebhooks().then(() => redirectToRoute('webhook.example', { uuid: response.data[0].uuid }));
+            })
         },
       }}
     />,
