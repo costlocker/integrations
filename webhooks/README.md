@@ -60,5 +60,6 @@ Take a look into [history](https://github.com/costlocker/integrations), if you a
   ServerName webhooks.integrations-costlocker.dev
   DocumentRoot "/path-to/webhooks/frontend/build"
   RewriteEngine On
+  Alias /api  "/path-to/webhooks/backend/web"
 </VirtualHost>
 ```

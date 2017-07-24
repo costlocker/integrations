@@ -1,5 +1,6 @@
 
 import { apiUrl, apiAuth } from './state';
+import { proxyUrl } from './config';
 
 const handleErrors = (response) => {
   if (!response.ok) {
@@ -12,30 +13,31 @@ const handleErrors = (response) => {
   return response;
 };
 
-const headersToObject = (headers) => {
-  const list = {};
-  for (var header of headers) {
-    list[header[0]] = header[1];
-  }
-  return list;
-};
+const fetchViaProxy = (url, settings, isDebug: boolean) =>
+  fetch(proxyUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        method: settings.method || 'GET',
+        url: url,
+        isDebug: isDebug,
+        headers: settings.headers,
+        body: settings.body || null,
+      }),
+  });
 
 const fetchFromApi = (path: string, isDebug: boolean) =>
-  fetch(apiUrl(path), { headers: apiAuth() })
+  fetchViaProxy(apiUrl(path), { headers: apiAuth() }, isDebug)
     .then(handleErrors)
-    .then(async response => {
-      if (isDebug) {
-        return {
-          headers: headersToObject(response.headers.entries()),
-          body: await response.json(),
-        };
-      }
+    .then(response => {
       return response.json();
     });
 
 
 const pushToApi = (path: string, dataOrMethod: Object) =>
-  fetch(
+  fetchViaProxy(
     apiUrl(path),
     {
       method: dataOrMethod === 'DELETE' ? dataOrMethod : 'POST',
