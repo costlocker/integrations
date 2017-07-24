@@ -16,6 +16,7 @@ const appState = immstruct({
   webhooks: {
     list: null,
     example: null,
+    webhook: null,
   },
 });
 

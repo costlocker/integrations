@@ -12,10 +12,27 @@ const handleErrors = (response) => {
   return response;
 };
 
-const fetchFromApi = (path: string) =>
+const headersToObject = (headers) => {
+  const list = {};
+  for (var header of headers) {
+    list[header[0]] = header[1];
+  }
+  return list;
+};
+
+const fetchFromApi = (path: string, isDebug: boolean) =>
   fetch(apiUrl(path), { headers: apiAuth() })
     .then(handleErrors)
-    .then(response => response.json());
+    .then(async response => {
+      if (isDebug) {
+        return {
+          headers: headersToObject(response.headers.entries()),
+          body: await response.json(),
+        };
+      }
+      return response.json();
+    });
+
 
 const pushToApi = (path: string, data: Object) =>
   fetch(

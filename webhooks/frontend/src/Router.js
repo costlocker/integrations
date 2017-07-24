@@ -4,7 +4,9 @@ import { appState, isNotLoggedInCostlocker } from './state';
 import { fetchFromApi } from './api';
 import Login from './app/Login';
 import Webhooks from './app/Webhooks';
+import Webhook from './app/Webhook';
 import WebhookExample from './app/WebhookExample';
+import WebhookDeliveries from './app/WebhookDeliveries';
 
 export let redirectToRoute = (route) => console.log('app is not ready', route);
 export let isRouteActive = () => false;
@@ -50,15 +52,15 @@ if (isNotLoggedInCostlocker()) {
 const fetchWebhooks = () =>
   fetchFromApi('/webhooks')
     .catch(setError)
-    .then(webhooks => appState.cursor(['webhooks']).set('list', webhooks.data));
+    .then(webhooks => {
+      appState.cursor(['webhooks']).set('list', webhooks.data);
+      return webhooks.data;
+    });
 
-const fetchWebhookDetail = (webhook) =>
-  fetchFromApi(webhook.links.example)
+const fetchWebhookDetail = (webhook, type) =>
+  fetchFromApi(webhook.links[type], type === 'example')
     .catch(setError)
-    .then(webhook => appState.cursor(['webhooks']).set('example', {
-      headers: [],
-      body: webhook
-    }));
+    .then(response => appState.cursor(['webhooks']).set(type, response));
 
 export const states = [
   {
@@ -70,7 +72,7 @@ export const states = [
     name: 'webhooks',
     url: '/webhooks',
     data: {
-      title: 'Webhooks'
+      title: 'Webhooks',
     },
     component: (props) => <Webhooks
       webhooks={appState.cursor(['webhooks', 'list']).deref()}
@@ -87,10 +89,39 @@ export const states = [
     ],
   },
   {
-    name: 'example',
-    url: '/webhooks/:uuid/example',
+    name: 'webhook',
+    url: '/webhooks/:uuid',
+    redirectTo: 'login',
+    component: (props) => <Webhook
+      webhook={props.resolves.loadWebhook}
+    />,
+    resolve: [
+      {
+        token: 'loadWebhook',
+        deps: ['$transition$'],
+        resolveFn: async ($transition$) => {
+          const uuid = $transition$.params().uuid;
+          let webhook = null;
+          const webhooks = appState.cursor(['webhooks', 'list']).deref() || await fetchWebhooks();
+          webhooks.forEach(w => {
+            if (w.uuid === uuid) {
+              webhook = w;
+            }
+          })
+          if (!webhook) {
+            redirectToRoute('webhooks');
+            return;
+          }
+          return webhook;
+        }
+      },
+    ],
+  },
+  {
+    name: 'webhook.example',
+    url: '/example',
     data: {
-      title: 'Webhook Example'
+      title: 'Webhook Example',
     },
     component: (props) => <WebhookExample
       webhook={props.resolves.loadWebhook}
@@ -100,18 +131,53 @@ export const states = [
       {
         token: 'loadWebhook',
         deps: ['$transition$'],
-        resolveFn: ($transition$) => {
+        resolveFn: async ($transition$) => {
           const uuid = $transition$.params().uuid;
           let webhook = null;
-          (appState.cursor(['webhooks', 'list']).deref() || []).forEach(w => {
+          const webhooks = appState.cursor(['webhooks', 'list']).deref() || await fetchWebhooks();
+          webhooks.forEach(w => {
             if (w.uuid === uuid) {
               webhook = w;
             }
           })
           if (!webhook) {
             redirectToRoute('webhooks');
+            return;
           }
-          fetchWebhookDetail(webhook);
+          fetchWebhookDetail(webhook, 'example');
+          return webhook;
+        }
+      },
+    ],
+  },
+  {
+    name: 'webhook.deliveries',
+    url: '/deliveries',
+    data: {
+      title: 'Webhook Example',
+    },
+    component: (props) => <WebhookDeliveries
+      webhook={props.resolves.loadWebhook}
+      detail={appState.cursor(['webhooks', 'webhook']).deref()}
+    />,
+    resolve: [
+      {
+        token: 'loadWebhook',
+        deps: ['$transition$'],
+        resolveFn: async ($transition$) => {
+          const uuid = $transition$.params().uuid;
+          let webhook = null;
+          const webhooks = appState.cursor(['webhooks', 'list']).deref() || await fetchWebhooks();
+          webhooks.forEach(w => {
+            if (w.uuid === uuid) {
+              webhook = w;
+            }
+          })
+          if (!webhook) {
+            redirectToRoute('webhooks');
+            return;
+          }
+          fetchWebhookDetail(webhook, 'webhook');
           return webhook;
         }
       },
@@ -121,7 +187,7 @@ export const states = [
     name: 'login',
     url: '/login',
     data: {
-      title: 'Login'
+      title: 'Login',
     },
     component: (props) => <Login
       costlockerAuth={appState.cursor(['auth', 'costlocker']).deref()}
@@ -164,7 +230,10 @@ const hooks = [
       const getTitle = typeof stateTitle === 'function' ? stateTitle : () => stateTitle;
       document.title = `${getTitle(params)} | Costlocker Webhooks`;
       // rerender to change active state in menu - stateService.go reloads only <UIView>
-      appState.cursor(['app']).set('currentState', state.name);
+      appState.cursor(['app']).update(
+        app => app
+          .setIn(['currentState'], state.name)
+      );
     },
     priority: 10,
   },
@@ -177,9 +246,13 @@ export const config = (router) => {
     if (e) {
       e.preventDefault();
     }
-    console.log('redirect', route, params);
     router.stateService.go(route, params, { location: true });
   };
-  isRouteActive = router.stateService.is;
+  isRouteActive = (route) => {
+    if (route === 'webhook') {
+      return router.stateService.current.name.indexOf('webhook.') !== -1;
+    }
+    return router.stateService.is(route);
+  };
   hooks.forEach(hook => router.transitionService[hook.event](hook.criteria, hook.callback, { priority: hook.priority }));
 }

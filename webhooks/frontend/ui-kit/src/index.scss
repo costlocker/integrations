@@ -122,6 +122,9 @@ $input-bg: #fafafa;
     .bg-danger {
         background-color: #f2dede !important;
     }
+    &.vertical-align td {
+        vertical-align: middle !important;
+    }
 }
 
 .table-inline {

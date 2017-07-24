@@ -1,6 +1,7 @@
 import React from 'react';
 import { UIView } from 'ui-router-react';
 import { Link } from './Components';
+import { isRouteActive } from '../Router';
 
 const CostlockerUser = ({ user }) => {
   return (
@@ -23,15 +24,19 @@ const User = ({ auth }) => {
   </div>;
 }
 
-const Navigation = ({ isRouteActive, routes }) => {
+const Navigation = ({ routes }) => {
   return (
     <ul className="nav navbar-nav">
-      {routes.map(({ route, params, title }) => (
-        <li key={route} className={isRouteActive(route) ? 'active' : null}><Link route={route} params={params} title={title} /></li>
+      {routes.map(({ route, params, title, activeRoute }) => (
+        <li key={route} className={isRouteActive(route) || isRouteActive(activeRoute) ? 'active' : null}>
+          <Link route={route} params={params} title={title} />
+        </li>
       ))}
     </ul>
   );
 };
+
+const hasSubnavigation = () => isRouteActive('webhook');
 
 export const Page = ({ view }) =>
   <div className='container'>
@@ -56,18 +61,47 @@ export function App({ auth, isRouteActive }) {
             <span className="navbar-text">Webhooks Manager</span>
           </div>
           <div>
-            {auth.get('costlocker') ? <Navigation isRouteActive={isRouteActive} routes={[
-              { route: 'webhooks', title: 'Webhooks' },
+            {auth.get('costlocker') ? <Navigation routes={[
+              { route: 'webhooks', title: 'Webhooks', activeRoute: 'webhook' },
             ]} /> : ''}
           </div>
           <div className="navbar-right text-right">
-            <Navigation isRouteActive={isRouteActive} routes={[
+            <Navigation routes={[
               { route: 'login', title: auth.get('costlocker') ? <User auth={auth} /> : 'Login' },
             ]} />
           </div>
         </div>
       </nav>
-      <Page view={<UIView />} />
+      {hasSubnavigation() ? (
+        <UIView />
+      ) : (
+        <Page view={<UIView />} />
+      )}
     </div>
   );
+};
+
+export const PageWithSubpages = ({ pages, content }) => {
+  const getCss = (route, defaultClass) => {
+    return isRouteActive(route) ? `${defaultClass} active` : defaultClass;
+  };
+
+  return <div>
+    <nav className="nav-breadcrumbs">
+      <div className="container">
+        <div className="row">
+          <div className="col-sm-12">
+            <ol className="breadcrumb">
+              {pages.map(page => (
+                <li key={page.route} className={getCss(page.route, null)}>
+                  <Link title={page.name} {...page} />
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <Page view={content(<UIView />)} />
+  </div>;
 };
