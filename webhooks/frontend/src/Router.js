@@ -151,26 +151,26 @@ export const states = [
     url: '/webhooks/:uuid',
     redirectTo: 'login',
     component: (props) => <Webhook
-      webhook={props.resolves.loadWebhook}
+      webhook={appState.cursor(['webhooks', 'list']).deref()[props.resolves.webhookIndex]}
     />,
     resolve: [
       {
-        token: 'loadWebhook',
+        token: 'webhookIndex',
         deps: ['$transition$'],
         resolveFn: async ($transition$) => {
           const uuid = $transition$.params().uuid;
-          let webhook = null;
+          let index = null;
           const webhooks = appState.cursor(['webhooks', 'list']).deref() || await fetchWebhooks();
-          webhooks.forEach(w => {
+          webhooks.forEach((w, i) => {
             if (w.uuid === uuid) {
-              webhook = w;
+              index = i;
             }
           })
-          if (!webhook) {
+          if (index === null) {
             redirectToRoute('webhooks');
             return;
           }
-          return webhook;
+          return index;
         }
       },
     ],
