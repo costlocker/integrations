@@ -2,7 +2,7 @@ import React from 'react';
 import { Set } from 'immutable';
 
 import { appState, isNotLoggedInCostlocker } from './state';
-import { fetchFromApi, pushToApi } from './api';
+import { fetchFromCostlocker, pushToCostlocker } from './api';
 import { PageWithSubpages } from './ui/App';
 import Login from './app/Login';
 import Webhooks from './app/Webhooks';
@@ -31,7 +31,7 @@ const fetchUser = () => {
     );
     return;
   }
-  return fetchFromApi(`/me`)
+  return fetchFromCostlocker(`/me`)
     .catch(error => error.response.json())
     .then((response) => {
       if (errors.loadErrorsFromApiResponse(response)) {
@@ -57,7 +57,7 @@ if (isNotLoggedInCostlocker()) {
 }
 
 const fetchWebhooks = () =>
-  fetchFromApi('/webhooks')
+  fetchFromCostlocker('/webhooks')
     .catch(setError)
     .then(webhooks => {
       appState.cursor(['webhooks']).set('list', webhooks.data);
@@ -65,7 +65,7 @@ const fetchWebhooks = () =>
     });
 
 const fetchWebhookDetail = (webhook, type) =>
-  fetchFromApi(webhook.links[type], type === 'example')
+  fetchFromCostlocker(webhook.links[type], type === 'example')
     .catch(setError)
     .then(response => appState.cursor(['webhooks']).set(type, response));
 
@@ -141,7 +141,7 @@ export const states = [
         submit: (e) => {
           e.preventDefault();
           const request = props.transition.to().data.request(props.transition.params());
-          pushToApi('/webhooks', request)
+          pushToCostlocker('/webhooks', request)
             .catch(error => error.response.json())
             .then((response) => {
               if (errors.loadErrorsFromApiResponse(response)) {
@@ -293,7 +293,7 @@ export const states = [
         submit: (e) => {
           e.preventDefault();
           const request = props.transition.to().data.request(props.transition.params());
-          pushToApi('/webhooks', request)
+          pushToCostlocker('/webhooks', request)
             .catch(error => error.response.json())
             .then((response) => {
               if (errors.loadErrorsFromApiResponse(response)) {
@@ -343,7 +343,7 @@ export const states = [
       errors={<ErrorsView errors={errors} />}
       deleteWebhook={(e) => {
         e.preventDefault();
-        pushToApi(props.resolves.loadWebhook.links.webhook, 'DELETE')
+        pushToCostlocker(props.resolves.loadWebhook.links.webhook, 'DELETE')
           .catch(error => error.response.json())
           .then((response) => {
             if (errors.loadErrorsFromApiResponse(response)) {

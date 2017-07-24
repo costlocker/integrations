@@ -14,7 +14,7 @@ const handleErrors = (response) => {
 };
 
 const fetchViaProxy = (url, settings, isDebug: boolean) =>
-  fetch(proxyUrl, {
+  fetch(`${proxyUrl}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -28,7 +28,7 @@ const fetchViaProxy = (url, settings, isDebug: boolean) =>
       }),
   });
 
-const fetchFromApi = (path: string, isDebug: boolean) =>
+const fetchFromCostlocker = (path: string, isDebug: boolean) =>
   fetchViaProxy(apiUrl(path), { headers: apiAuth() }, isDebug)
     .then(handleErrors)
     .then(response => {
@@ -36,7 +36,7 @@ const fetchFromApi = (path: string, isDebug: boolean) =>
     });
 
 
-const pushToApi = (path: string, dataOrMethod: Object) =>
+const pushToCostlocker = (path: string, dataOrMethod: Object) =>
   fetchViaProxy(
     apiUrl(path),
     {
@@ -51,4 +51,19 @@ const pushToApi = (path: string, dataOrMethod: Object) =>
     .then(handleErrors)
     .then(response => response.json());
 
-export { fetchFromApi, pushToApi };
+const pushToApi = (path: string, data: Object) =>
+  fetch(
+    `${proxyUrl}${path}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(data),
+    }
+  )
+  .then(handleErrors)
+  .then(response => response.json());
+
+export { fetchFromCostlocker, pushToCostlocker, pushToApi };

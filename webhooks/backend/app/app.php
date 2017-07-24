@@ -44,4 +44,13 @@ $app
         return $proxy($r);
     });
 
+$app
+    ->post('/log', function (Request $r) use ($app) {
+        $app['logger']->error(
+            "Frontend error '{$r->request->get('error')}'",
+            ['stack' => explode("\n", $r->request->get('stack')), 'user' => $r->request->get('user')]
+        );
+        return new JsonResponse(200);
+    });
+
 return $app;
