@@ -13,12 +13,14 @@ const events = {
   ],
 };
 
-export default function WebhookFrom({ form, errors }) {
+export default function WebhookFrom({ form, errors, updatedWebhook }) {
   return (
     <div>
       <div className="row">
         <div className="col-sm-12">
+          {!updatedWebhook &&
           <h1>Create a webhook</h1>
+          }
           {errors}
           <form onSubmit={form.submit}>
             <div className="form-group">
@@ -38,7 +40,7 @@ export default function WebhookFrom({ form, errors }) {
             </div>
             ))}
             <button type="submit" className="btn btn-primary btn-block">
-              Create a webhook
+              {updatedWebhook ? 'Update a webhook' : 'Create a webhook'}
             </button>
           </form>
         </div>

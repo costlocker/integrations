@@ -27,6 +27,7 @@ export default function Webhooks({ webhooks }) {
             <td>
               <Link title="Recent deliveries" route="webhook.deliveries" params={{ uuid: w.uuid }} className="btn btn-primary btn-sm" />
               <Link title="Example" route="webhook.example" params={{ uuid: w.uuid }} className="btn btn-info btn-sm" />
+              <Link title="Update" route="webhook.update" params={{ uuid: w.uuid }} className="btn btn-warning btn-sm" />
             </td>
           </tr>
         ))}

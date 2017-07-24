@@ -15,6 +15,11 @@ export default function Webhook({ webhook }) {
         params: { uuid: webhook.uuid },
       },
       {
+        name: 'Update',
+        route: 'webhook.update',
+        params: { uuid: webhook.uuid },
+      },
+      {
         name: 'Delete',
         route: 'webhook.delete',
         params: { uuid: webhook.uuid },

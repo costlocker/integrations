@@ -1,4 +1,5 @@
 import React from 'react';
+import { Set } from 'immutable';
 
 import { appState, isNotLoggedInCostlocker } from './state';
 import { fetchFromApi, pushToApi } from './api';
@@ -237,6 +238,71 @@ export const states = [
             return;
           }
           fetchWebhookDetail(webhook, 'webhook');
+          return webhook;
+        }
+      },
+    ],
+  },
+  {
+    name: 'webhook.update',
+    url: '/update',
+    data: {
+      title: 'Webhook Update',
+      api: params => `/webhooks/${params.uuid}`,
+      method: 'POST',
+    },
+    component: (props) => <WebhookForm
+      updatedWebhook={props.resolves.loadWebhook}
+      errors={<ErrorsView errors={errors} />}
+      form={{
+        get: (type) => appState.cursor(['webhook', type]).deref(),
+        set: (type) => (e) => appState.cursor(['webhook']).set(
+          type,
+          e.target.type === 'checkbox' ? e.target.checked : e.target.value
+        ),
+        checkEvent: (e) => {
+          appState.cursor(['webhook', 'events']).update(
+            set => e.target.checked ? set.add(e.target.value) : set.delete(e.target.value)
+          );
+        },
+        submit: (e) => {
+          e.preventDefault();
+          pushToApi('/webhooks', {
+            uuid: props.resolves.loadWebhook.uuid,
+            ...webhookFormToJS(),
+          })
+            .catch(error => error.response.json())
+            .then((response) => {
+              if (errors.loadErrorsFromApiResponse(response)) {
+                return;
+              }
+              fetchWebhooks().then(() => redirectToRoute('webhook.example', { uuid: response.data[0].uuid }));
+            })
+        },
+      }}
+    />,
+    resolve: [
+      {
+        token: 'loadWebhook',
+        deps: ['$transition$'],
+        resolveFn: async ($transition$) => {
+          const uuid = $transition$.params().uuid;
+          let webhook = null;
+          const webhooks = appState.cursor(['webhooks', 'list']).deref() || await fetchWebhooks();
+          webhooks.forEach(w => {
+            if (w.uuid === uuid) {
+              webhook = w;
+            }
+          })
+          if (!webhook) {
+            redirectToRoute('webhooks');
+            return;
+          }
+          appState.cursor(['webhook']).update(
+            form => form
+              .setIn(['url'], webhook.url)
+              .setIn(['events'], Set(webhook.events))
+          );
           return webhook;
         }
       },
