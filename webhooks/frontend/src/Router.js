@@ -9,6 +9,8 @@ import WebhookForm from './app/WebhookForm';
 import WebhookDelete from './app/WebhookDelete';
 import WebhookExample from './app/WebhookExample';
 import WebhookDeliveries from './app/WebhookDeliveries';
+import Errors from './app/errors/Errors';
+import ErrorsView from './app/errors/ErrorsView';
 
 export let redirectToRoute = (route) => console.log('app is not ready', route);
 export let isRouteActive = () => false;
@@ -64,12 +66,12 @@ const fetchWebhookDetail = (webhook, type) =>
     .catch(setError)
     .then(response => appState.cursor(['webhooks']).set(type, response));
 
-const webhookFormToJS = () => appState.cursor(['webhook', 'request']).deref().toJS();
+const webhookFormToJS = () => appState.cursor(['webhook']).deref().toJS();
 
 const reloadFormExample = () => (
   appState.on('next-animation-frame', function (newStructure, oldStructure, keyPath) {
-    const newRequest = newStructure.get('webhook').get('request').toJS();
-    const oldRequest = oldStructure.get('webhook').get('request').toJS();
+    const newRequest = JSON.stringify(newStructure.get('webhook'));
+    const oldRequest = JSON.stringify(oldStructure.get('webhook'));
     const isPostMethod = newStructure.get('curl').get('method') === 'POST';
     if (isPostMethod && oldRequest !== newRequest && keyPath !== ['curl', 'data']) {
       appState.cursor(['curl']).set('data', newRequest);
@@ -78,6 +80,8 @@ const reloadFormExample = () => (
 );
 
 reloadFormExample();
+
+const errors = new Errors(appState);
 
 export const states = [
   {
@@ -116,15 +120,15 @@ export const states = [
       request: webhookFormToJS,
     },
     component: (props) => <WebhookForm
+      errors={<ErrorsView errors={errors} />}
       form={{
-        errors: () => appState.cursor(['webhook', 'errors']).deref(),
-        get: (type) => appState.cursor(['webhook', 'request', type]).deref(),
-        set: (type) => (e) => appState.cursor(['webhook', 'request']).set(
+        get: (type) => appState.cursor(['webhook', type]).deref(),
+        set: (type) => (e) => appState.cursor(['webhook']).set(
           type,
           e.target.type === 'checkbox' ? e.target.checked : e.target.value
         ),
         checkEvent: (e) => {
-          appState.cursor(['webhook', 'request', 'events']).update(
+          appState.cursor(['webhook', 'events']).update(
             set => e.target.checked ? set.add(e.target.value) : set.delete(e.target.value)
           );
         },
@@ -133,9 +137,7 @@ export const states = [
           pushToApi('/webhooks', webhookFormToJS())
             .catch(error => error.response.json())
             .then((response) => {
-              console.log(response, webhookFormToJS());
-              if (response.errors) {
-                appState.cursor(['webhook']).set('errors', response.errors);
+              if (errors.loadErrorsFromApiResponse(response)) {
                 return;
               }
               fetchWebhooks().then(() => redirectToRoute('webhook.example', { uuid: response.data[0].uuid }));
@@ -250,14 +252,13 @@ export const states = [
       method: 'DELETE',
     },
     component: (props) => <WebhookDelete
-      errors={appState.cursor(['webhook', 'errors']).deref()}
+      errors={<ErrorsView errors={errors} />}
       deleteWebhook={(e) => {
         e.preventDefault();
         pushToApi(props.resolves.loadWebhook.links.webhook, 'DELETE')
           .catch(error => error.response.json())
           .then((response) => {
-            if (response.errors) {
-              appState.cursor(['webhook']).set('errors', response.errors);
+            if (errors.loadErrorsFromApiResponse(response)) {
               return;
             }
             fetchWebhooks().then(() => redirectToRoute('webhooks'));

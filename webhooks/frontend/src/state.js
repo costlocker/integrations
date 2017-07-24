@@ -8,6 +8,7 @@ const appState = immstruct({
   },
   app: {
     currentState: null,
+    errors: null,
   },
   curl: {
     method: null,
@@ -25,11 +26,8 @@ const appState = immstruct({
     webhook: null,
   },
   webhook: {
-    request: {
-      url: '',
-      events: Set(),
-    },
-    errors: null,
+    url: '',
+    events: Set(),
   },
 });
 
