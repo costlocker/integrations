@@ -336,7 +336,7 @@ const hooks = [
       document.title = `${getTitle(params)} | Costlocker Webhooks`;
       // rerender to change active state in menu - stateService.go reloads only <UIView>
       appState.cursor([]).update(
-        app => app
+        app => errors.reset(app)
           .setIn(['app', 'currentState'], state.name)
           .setIn(['curl', 'url'], typeof state.data.api === 'function' ? state.data.api(params) : state.data.api)
           .setIn(['curl', 'method'], state.data.method ? state.data.method : 'GET')

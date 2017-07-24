@@ -15,4 +15,6 @@ export default class Errors {
     this.appState.cursor(['app']).set('errors', response.errors);
     return true;
   };
+
+  reset = (app) => app.setIn(['app', 'errors'], []);
 }
