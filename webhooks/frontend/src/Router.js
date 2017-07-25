@@ -82,18 +82,18 @@ export const states = [
     url: '/webhooks',
     redirectTo: 'webhooks.list',
     component: (props) => <PageWithSubpages
-    pages={[
-      {
-        name: 'Webhooks',
-        route: 'webhooks.list',
-      },
-      {
-        name: 'Create a webhook',
-        route: 'webhooks.create',
-      },
-    ]}
-    content={view => view}
-  />,
+      pages={[
+        {
+          name: 'Webhooks',
+          route: 'webhooks.list',
+        },
+        {
+          name: 'Create a webhook',
+          route: 'webhooks.create',
+        },
+      ]}
+      content={view => view}
+    />,
   },
   {
     name: 'webhooks.list',
@@ -141,7 +141,7 @@ export const states = [
         submit: (e) => {
           e.preventDefault();
           const definition = props.transition.to().data;
-          pushToCostlocker(definition.endpoint, definition.request(props.transition.params()))
+          pushToCostlocker(definition.endpoint, definition.request())
             .catch(error => error.response.json())
             .then((response) => {
               if (errors.loadErrorsFromApiResponse(response)) {
@@ -178,18 +178,9 @@ export const states = [
         deps: ['$transition$'],
         resolveFn: async ($transition$) => {
           const uuid = $transition$.params().uuid;
-          let index = null;
           const webhooks = appState.cursor(['webhooks', 'list']).deref() || await fetchWebhooks();
-          webhooks.forEach((w, i) => {
-            if (w.uuid === uuid) {
-              index = i;
-            }
-          })
-          if (index === null) {
-            redirectToRoute('webhooks');
-            return;
-          }
-          return index;
+          const index = webhooks.findIndex(w => w.uuid === uuid);
+          return index >= 0 ? index : redirectToRoute('webhooks');
         },
       },
       {
@@ -207,29 +198,14 @@ export const states = [
       endpoint: (currentWebhook) => endpoints.webhook(currentWebhook, 'example'),
     },
     component: (props) => <WebhookExample
-      webhook={props.resolves.loadWebhook}
+      webhook={props.resolves.currentWebhook()}
       example={appState.cursor(['webhooks', 'example']).deref()}
     />,
     resolve: [
       {
         token: 'loadWebhook',
-        deps: ['$transition$'],
-        resolveFn: async ($transition$) => {
-          const uuid = $transition$.params().uuid;
-          let webhook = null;
-          const webhooks = appState.cursor(['webhooks', 'list']).deref() || await fetchWebhooks();
-          webhooks.forEach(w => {
-            if (w.uuid === uuid) {
-              webhook = w;
-            }
-          })
-          if (!webhook) {
-            redirectToRoute('webhooks');
-            return;
-          }
-          fetchWebhookDetail(webhook, 'example');
-          return webhook;
-        }
+        deps: ['currentWebhook'],
+        resolveFn: currentWebhook => fetchWebhookDetail(currentWebhook(), 'example'),
       },
     ],
   },
@@ -247,23 +223,8 @@ export const states = [
     resolve: [
       {
         token: 'loadWebhook',
-        deps: ['$transition$'],
-        resolveFn: async ($transition$) => {
-          const uuid = $transition$.params().uuid;
-          let webhook = null;
-          const webhooks = appState.cursor(['webhooks', 'list']).deref() || await fetchWebhooks();
-          webhooks.forEach(w => {
-            if (w.uuid === uuid) {
-              webhook = w;
-            }
-          })
-          if (!webhook) {
-            redirectToRoute('webhooks');
-            return;
-          }
-          fetchWebhookDetail(webhook, 'webhook');
-          return webhook;
-        }
+        deps: ['currentWebhook'],
+        resolveFn: currentWebhook => fetchWebhookDetail(currentWebhook(), 'webhook'),
       },
     ],
   },
@@ -296,7 +257,7 @@ export const states = [
         submit: (e) => {
           e.preventDefault();
           const definition = props.transition.to().data;
-          pushToCostlocker(definition.endpoint, definition.request(props.transition.params()))
+          pushToCostlocker(definition.endpoint, definition.request(props.resolves.currentWebhook()))
             .catch(error => error.response.json())
             .then((response) => {
               if (errors.loadErrorsFromApiResponse(response)) {
@@ -310,27 +271,15 @@ export const states = [
     resolve: [
       {
         token: 'loadWebhook',
-        deps: ['$transition$'],
-        resolveFn: async ($transition$) => {
-          const uuid = $transition$.params().uuid;
-          let webhook = null;
-          const webhooks = appState.cursor(['webhooks', 'list']).deref() || await fetchWebhooks();
-          webhooks.forEach(w => {
-            if (w.uuid === uuid) {
-              webhook = w;
-            }
-          })
-          if (!webhook) {
-            redirectToRoute('webhooks');
-            return;
-          }
+        deps: ['currentWebhook'],
+        resolveFn: (currentWebhook) => {
+          const webhook = currentWebhook();
           appState.cursor(['webhook']).update(
             form => form
               .setIn(['url'], webhook.url)
               .setIn(['events'], Set(webhook.events))
           );
-          return webhook;
-        }
+        },
       },
     ],
   },
@@ -346,7 +295,8 @@ export const states = [
       errors={<ErrorsView errors={errors} />}
       deleteWebhook={(e) => {
         e.preventDefault();
-        pushToCostlocker(props.resolves.loadWebhook.links.webhook, 'DELETE')
+        const definition = props.transition.to().data;
+        pushToCostlocker(definition.endpoint(props.resolves.currentWebhook()), 'DELETE')
           .catch(error => error.response.json())
           .then((response) => {
             if (errors.loadErrorsFromApiResponse(response)) {
@@ -356,27 +306,6 @@ export const states = [
           })
       }}
     />,
-    resolve: [
-      {
-        token: 'loadWebhook',
-        deps: ['$transition$'],
-        resolveFn: async ($transition$) => {
-          const uuid = $transition$.params().uuid;
-          let webhook = null;
-          const webhooks = appState.cursor(['webhooks', 'list']).deref() || await fetchWebhooks();
-          webhooks.forEach(w => {
-            if (w.uuid === uuid) {
-              webhook = w;
-            }
-          })
-          if (!webhook) {
-            redirectToRoute('webhooks');
-            return;
-          }
-          return webhook;
-        }
-      },
-    ],
   },
   {
     name: 'login',
