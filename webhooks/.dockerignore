@@ -1,0 +1,6 @@
+.git
+frontend/node_modules/
+frontend/public/
+frontend/src/
+frontend/ui-kit/
+backend/tests/
