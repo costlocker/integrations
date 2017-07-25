@@ -8,7 +8,10 @@ export default function Webhooks({ webhooks }) {
     return <Loading title='Loading webhooks' />;
   }
   if (!webhooks.length) {
-    return <p className="text-muted">No webhooks</p>;
+    return <div>
+      <p className="text-muted">No webhooks</p>
+      <Link title="Create a first webhook" route="webhooks.create" className="btn btn-success" />
+    </div>;
   }
   return <div>
     <h1>Webhooks</h1>
