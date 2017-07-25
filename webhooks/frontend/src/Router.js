@@ -277,7 +277,7 @@ export const states = [
     />,
     resolve: [
       {
-        token: 'loadWebhook',
+        token: 'loadWebhookDetail',
         deps: ['currentWebhook'],
         resolveFn: currentWebhook => fetchWebhookDetail(currentWebhook(), 'example'),
       },
@@ -291,12 +291,12 @@ export const states = [
       endpoint: (currentWebhook) => endpoints.webhook(currentWebhook, 'webhook'),
     },
     component: (props) => <WebhookDeliveries
-      webhook={props.resolves.loadWebhook}
+      webhook={props.resolves.currentWebhook()}
       detail={appState.cursor(['webhooks', 'webhook']).deref()}
     />,
     resolve: [
       {
-        token: 'loadWebhook',
+        token: 'loadWebhookDetail',
         deps: ['currentWebhook'],
         resolveFn: currentWebhook => fetchWebhookDetail(currentWebhook(), 'webhook'),
       },
