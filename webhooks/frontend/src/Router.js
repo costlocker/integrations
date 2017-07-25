@@ -2,7 +2,7 @@ import React from 'react';
 import { Set } from 'immutable';
 
 import { appState, isNotLoggedInCostlocker, endpoints, session } from './state';
-import { fetchFromCostlocker, pushToCostlocker } from './api';
+import { fetchFromCostlocker, pushToCostlocker } from './api';
 import { PageWithSubpages } from './ui/App';
 import Login from './app/Login';
 import Webhooks from './app/Webhooks';
@@ -70,6 +70,20 @@ const fetchWebhookDetail = (webhook, type) =>
 
 const webhookFormToJS = () => appState.cursor(['webhook']).deref().toJS();
 const webhookTitle = (title) => (getWebhook) => `${title} > ${getWebhook().url}`;
+const updateWebhooks = (props, redirect) => (e) => {
+  e.preventDefault();
+  const currentWebhook = props.resolves.currentWebhook ? props.resolves.currentWebhook() : null;
+  const definition = props.transition.to().data;
+  const resolve = (field) => typeof definition[field] === 'function' ? definition[field](currentWebhook) : definition[field];
+  return pushToCostlocker(resolve('endpoint'), resolve('request') || definition.method)
+    .catch(error => error.response.json())
+    .then((response) => {
+      if (errors.loadErrorsFromApiResponse(response)) {
+        return;
+      }
+      fetchWebhooks().then(() => redirect(response));
+    });
+};
 const createWebhookForm = () => (
   (props) => <WebhookForm
     updatedWebhook={props.resolves.currentWebhook}
@@ -85,19 +99,7 @@ const createWebhookForm = () => (
           set => e.target.checked ? set.add(e.target.value) : set.delete(e.target.value)
         );
       },
-      submit: (e) => {
-        e.preventDefault();
-        const currentWebhook = props.resolves.currentWebhook || (() => null); // not defined in create
-        const definition = props.transition.to().data;
-        pushToCostlocker(definition.endpoint, definition.request(currentWebhook()))
-          .catch(error => error.response.json())
-          .then((response) => {
-            if (errors.loadErrorsFromApiResponse(response)) {
-              return;
-            }
-            fetchWebhooks().then(() => redirectToRoute('webhook.example', { uuid: response.data[0].uuid }));
-          })
-      },
+      submit: updateWebhooks(props, (response) => redirectToRoute('webhook.example', { uuid: response.data[0].uuid })),
     }}
   />
 );
@@ -259,18 +261,7 @@ export const states = [
     },
     component: (props) => <WebhookDelete
       errors={<ErrorsView errors={errors} />}
-      deleteWebhook={(e) => {
-        e.preventDefault();
-        const definition = props.transition.to().data;
-        pushToCostlocker(definition.endpoint(props.resolves.currentWebhook()), 'DELETE')
-          .catch(error => error.response.json())
-          .then((response) => {
-            if (errors.loadErrorsFromApiResponse(response)) {
-              return;
-            }
-            fetchWebhooks().then(() => redirectToRoute('webhooks'));
-          })
-      }}
+      deleteWebhook={updateWebhooks(props, () => redirectToRoute('webhooks'))}
     />,
   },
   {
