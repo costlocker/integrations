@@ -75,7 +75,33 @@ export const states = [
   {
     name: 'homepage',
     url: '/',
-    redirectTo: 'login',
+    redirectTo: 'webhooks',
+  },
+  {
+    name: 'login',
+    url: '/login',
+    data: {
+      title: 'Login',
+      endpoint: endpoints.me(),
+    },
+    component: (props) => <Login
+      costlockerAuth={appState.cursor(['auth', 'costlocker']).deref()}
+      errors={<ErrorsView errors={errors} />}
+      logout={() => {
+        session.logout();
+        appState.cursor(['auth']).set('costlocker', null);
+      }}
+      form={{
+        get: (type) => appState.cursor(['login', type]).deref(),
+        set: (type) => (e) => appState.cursor(['login']).set(
+          type,
+          e.target.type === 'checkbox' ? e.target.checked : e.target.value
+        ),
+        submit: (e) => {
+          e.preventDefault();
+          fetchUser().then((isLoggedIn) => isLoggedIn ? redirectToRoute('webhooks') : null);
+        },
+      }} />,
   },
   {
     name: 'webhooks',
@@ -191,44 +217,6 @@ export const states = [
     ],
   },
   {
-    name: 'webhook.example',
-    url: '/example',
-    data: {
-      title: webhookTitle('Webhook example'),
-      endpoint: (currentWebhook) => endpoints.webhook(currentWebhook, 'example'),
-    },
-    component: (props) => <WebhookExample
-      webhook={props.resolves.currentWebhook()}
-      example={appState.cursor(['webhooks', 'example']).deref()}
-    />,
-    resolve: [
-      {
-        token: 'loadWebhook',
-        deps: ['currentWebhook'],
-        resolveFn: currentWebhook => fetchWebhookDetail(currentWebhook(), 'example'),
-      },
-    ],
-  },
-  {
-    name: 'webhook.deliveries',
-    url: '/deliveries',
-    data: {
-      title: webhookTitle('Recent deliveries'),
-      endpoint: (currentWebhook) => endpoints.webhook(currentWebhook, 'webhook'),
-    },
-    component: (props) => <WebhookDeliveries
-      webhook={props.resolves.loadWebhook}
-      detail={appState.cursor(['webhooks', 'webhook']).deref()}
-    />,
-    resolve: [
-      {
-        token: 'loadWebhook',
-        deps: ['currentWebhook'],
-        resolveFn: currentWebhook => fetchWebhookDetail(currentWebhook(), 'webhook'),
-      },
-    ],
-  },
-  {
     name: 'webhook.update',
     url: '/update',
     data: {
@@ -308,30 +296,42 @@ export const states = [
     />,
   },
   {
-    name: 'login',
-    url: '/login',
+    name: 'webhook.example',
+    url: '/example',
     data: {
-      title: 'Login',
-      endpoint: endpoints.me(),
+      title: webhookTitle('Webhook example'),
+      endpoint: (currentWebhook) => endpoints.webhook(currentWebhook, 'example'),
     },
-    component: (props) => <Login
-      costlockerAuth={appState.cursor(['auth', 'costlocker']).deref()}
-      errors={<ErrorsView errors={errors} />}
-      logout={() => {
-        session.logout();
-        appState.cursor(['auth']).set('costlocker', null);
-      }}
-      form={{
-        get: (type) => appState.cursor(['login', type]).deref(),
-        set: (type) => (e) => appState.cursor(['login']).set(
-          type,
-          e.target.type === 'checkbox' ? e.target.checked : e.target.value
-        ),
-        submit: (e) => {
-          e.preventDefault();
-          fetchUser().then((isLoggedIn) => isLoggedIn ? redirectToRoute('webhooks') : null);
-        },
-      }} />,
+    component: (props) => <WebhookExample
+      webhook={props.resolves.currentWebhook()}
+      example={appState.cursor(['webhooks', 'example']).deref()}
+    />,
+    resolve: [
+      {
+        token: 'loadWebhook',
+        deps: ['currentWebhook'],
+        resolveFn: currentWebhook => fetchWebhookDetail(currentWebhook(), 'example'),
+      },
+    ],
+  },
+  {
+    name: 'webhook.deliveries',
+    url: '/deliveries',
+    data: {
+      title: webhookTitle('Recent deliveries'),
+      endpoint: (currentWebhook) => endpoints.webhook(currentWebhook, 'webhook'),
+    },
+    component: (props) => <WebhookDeliveries
+      webhook={props.resolves.loadWebhook}
+      detail={appState.cursor(['webhooks', 'webhook']).deref()}
+    />,
+    resolve: [
+      {
+        token: 'loadWebhook',
+        deps: ['currentWebhook'],
+        resolveFn: currentWebhook => fetchWebhookDetail(currentWebhook(), 'webhook'),
+      },
+    ],
   },
 ];
 
