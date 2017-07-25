@@ -41,7 +41,7 @@ class LogErrorsAndExceptions implements ServiceProviderInterface
                         new Raven_Client($app['monolog.dsn'], [
                             'environment' => getenv('APP_ENV'),
                             'tags' => [
-                                'app' => 'fakturoid',
+                                'app' => 'webhooks',
                                 'php_version' => phpversion(),
                             ],
                         ]),
