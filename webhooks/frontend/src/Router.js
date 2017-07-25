@@ -70,6 +70,37 @@ const fetchWebhookDetail = (webhook, type) =>
 
 const webhookFormToJS = () => appState.cursor(['webhook']).deref().toJS();
 const webhookTitle = (title) => (getWebhook) => `${title} > ${getWebhook().url}`;
+const createWebhookForm = () => (
+  (props) => <WebhookForm
+    updatedWebhook={props.resolves.currentWebhook}
+    errors={<ErrorsView errors={errors} />}
+    form={{
+      get: (type) => appState.cursor(['webhook', type]).deref(),
+      set: (type) => (e) => appState.cursor(['webhook']).set(
+        type,
+        e.target.type === 'checkbox' ? e.target.checked : e.target.value
+      ),
+      checkEvent: (e) => {
+        appState.cursor(['webhook', 'events']).update(
+          set => e.target.checked ? set.add(e.target.value) : set.delete(e.target.value)
+        );
+      },
+      submit: (e) => {
+        e.preventDefault();
+        const currentWebhook = props.resolves.currentWebhook || (() => null); // not defined in create
+        const definition = props.transition.to().data;
+        pushToCostlocker(definition.endpoint, definition.request(currentWebhook()))
+          .catch(error => error.response.json())
+          .then((response) => {
+            if (errors.loadErrorsFromApiResponse(response)) {
+              return;
+            }
+            fetchWebhooks().then(() => redirectToRoute('webhook.example', { uuid: response.data[0].uuid }));
+          })
+      },
+    }}
+  />
+);
 
 export const states = [
   {
@@ -151,36 +182,10 @@ export const states = [
       endpoint: endpoints.webhooks(),
       request: webhookFormToJS,
     },
-    component: (props) => <WebhookForm
-      errors={<ErrorsView errors={errors} />}
-      form={{
-        get: (type) => appState.cursor(['webhook', type]).deref(),
-        set: (type) => (e) => appState.cursor(['webhook']).set(
-          type,
-          e.target.type === 'checkbox' ? e.target.checked : e.target.value
-        ),
-        checkEvent: (e) => {
-          appState.cursor(['webhook', 'events']).update(
-            set => e.target.checked ? set.add(e.target.value) : set.delete(e.target.value)
-          );
-        },
-        submit: (e) => {
-          e.preventDefault();
-          const definition = props.transition.to().data;
-          pushToCostlocker(definition.endpoint, definition.request())
-            .catch(error => error.response.json())
-            .then((response) => {
-              if (errors.loadErrorsFromApiResponse(response)) {
-                return;
-              }
-              fetchWebhooks().then(() => redirectToRoute('webhook.example', { uuid: response.data[0].uuid }));
-            })
-        },
-      }}
-    />,
+    component: createWebhookForm(),
     resolve: [
       {
-        token: 'resetForm',
+        token: 'loadForm',
         resolveFn: () => {
           appState.cursor(['webhook']).update(
             form => form
@@ -228,37 +233,10 @@ export const states = [
         ...webhookFormToJS(),
       }),
     },
-    component: (props) => <WebhookForm
-      updatedWebhook={props.resolves.loadWebhook}
-      errors={<ErrorsView errors={errors} />}
-      form={{
-        get: (type) => appState.cursor(['webhook', type]).deref(),
-        set: (type) => (e) => appState.cursor(['webhook']).set(
-          type,
-          e.target.type === 'checkbox' ? e.target.checked : e.target.value
-        ),
-        checkEvent: (e) => {
-          appState.cursor(['webhook', 'events']).update(
-            set => e.target.checked ? set.add(e.target.value) : set.delete(e.target.value)
-          );
-        },
-        submit: (e) => {
-          e.preventDefault();
-          const definition = props.transition.to().data;
-          pushToCostlocker(definition.endpoint, definition.request(props.resolves.currentWebhook()))
-            .catch(error => error.response.json())
-            .then((response) => {
-              if (errors.loadErrorsFromApiResponse(response)) {
-                return;
-              }
-              fetchWebhooks().then(() => redirectToRoute('webhook.example', { uuid: response.data[0].uuid }));
-            })
-        },
-      }}
-    />,
+    component: createWebhookForm(),
     resolve: [
       {
-        token: 'loadWebhook',
+        token: 'loadForm',
         deps: ['currentWebhook'],
         resolveFn: (currentWebhook) => {
           const webhook = currentWebhook();
