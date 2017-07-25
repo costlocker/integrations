@@ -1,3 +1,4 @@
+import { isDevelopmentMode } from '../config';
 
 const session = sessionStorage;
 
@@ -5,7 +6,7 @@ export default class Session {
 
   getCurrentUser = () => ({
     token: session.getItem('token') || '',
-    host: session.getItem('host') || 'https://new-n1.costlocker.com',
+    host: (isDevelopmentMode ? session.getItem('host') : null) || 'https://new-n1.costlocker.com',
   })
 
   login = ({ host, token }) => {

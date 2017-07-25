@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { ExternalLink, Link } from '../ui/Components';
+import { isDevelopmentMode } from '../config';
 
 export default function Login({ costlockerAuth, form, errors, logout }) {
   return (
@@ -27,11 +28,13 @@ export default function Login({ costlockerAuth, form, errors, logout }) {
                 <a href={`${form.get('host')}/api-token`} target="_blank" rel="noopener noreferrer">/api-token</a>
               </p>
             </div>
+            {isDevelopmentMode &&
             <div className="form-group">
               <label htmlFor="host">Costlocker API</label>
               <input required type="text" className="form-control" id="host" name="host"
                 value={form.get('host')} onChange={form.set('host')} />
             </div>
+            }
             {costlockerAuth ? (
             <div className="row">
               <div className="col-sm-9">
