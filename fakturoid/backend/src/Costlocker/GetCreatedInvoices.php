@@ -45,6 +45,7 @@ class GetCreatedInvoices
                         'number' => $i->fakturoidInvoiceNumber,
                         'link' => $i->data['response']['html_url'],
                         'amount' => $i->data['response']['total'],
+                        'issuedAt' => $i->data['request']['fakturoid']['issuedAt'] ?? $i->createdAt->format('Y-m-d'),
                         'template' => [
                             'actions' => $this->guessActions(array_keys($i->data['request']['fakturoid']['lines'])),
                         ],

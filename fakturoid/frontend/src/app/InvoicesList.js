@@ -100,14 +100,32 @@ export default function InvoicesList({ invoices, subjects }) {
   return <table className="table table-striped">
     <thead>
       <tr>
-        <th width="150">Date</th>
-        <th>User</th>
-        <th>Client / Customer</th>
-        <th>Project / Invoice</th>
+        <th>Client</th>
+        <th>ID</th>
+        <th>Issued</th>
+        <th>Price</th>
+        <th>Price with VAT</th>
+        <th>Links</th>
       </tr>
     </thead>
     <tbody>
-      {lines}
+      {invoices.map((invoice) => (
+        <tr key={invoice.id} className={isHighlighted(invoice.id) ? 'highlight' : ''}>
+          <td>
+            {invoice.costlocker.project.client.name}<br />
+            <small className="text-muted">{invoice.fakturoid.type}</small>
+          </td>
+          <td>{invoice.fakturoid.number}</td>
+          <td>{invoice.fakturoid.issuedAt}</td>
+          <th>{invoice.costlocker.billing.billing.total_amount}</th>
+          <th>{roundNumber(invoice.fakturoid.amount)}</th>
+          <td>
+            <ExternalLink url={invoice.costlocker.link} title="Open project" />
+            &nbsp;
+            <ExternalLink url={invoice.fakturoid.link} title="Open invoice" />
+          </td>
+        </tr>
+      ))}
     </tbody>
   </table>;
 }
