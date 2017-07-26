@@ -32,15 +32,6 @@ class Database
         return array_shift($entities);
     }
 
-    public function findProjectInvoices($costlockerProjectId)
-    {
-        return $this->findInvoices(
-            'i.costlockerProject = :project',
-            ['project' => (int) $costlockerProjectId],
-            100
-        );
-    }
-
     public function findLatestInvoices(CostlockerUser $u, $limit)
     {
         return $this->findInvoices(
