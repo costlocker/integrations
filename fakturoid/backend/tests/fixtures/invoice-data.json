@@ -7,6 +7,10 @@
             "type": "invoice",
             "hasVat": false,
             "vat": 0,
+            "issuedAt": "2017-07-26",
+            "due": 14,
+            "orderNumber": "HR001-1",
+            "noteBeforeLines": "before",
             "lines":{
                 "default": {
                     "name":"my description",

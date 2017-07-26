@@ -33,6 +33,10 @@ const appState = immstruct({
     type: 'invoice',
     hasVat: false,
     vat: 21,
+    issuedAt: new Date().toISOString().split('T')[0],
+    due: 14,
+    orderNumber: '',
+    noteBeforeLines: '',
     lines: OrderedMap(),
   },
   subject: {

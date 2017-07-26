@@ -92,6 +92,41 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         />
       </p>
     </div>
+    <div className="row">
+      <div className="col-sm-3">
+        <div className="form-group">
+          <label htmlFor="issuedAt">Issued at</label>
+          <input
+            type="text" className="form-control" name="issuedAt" id="issuedAt"
+            value={form.get('issuedAt')} onChange={form.set('issuedAt')}
+          />
+        </div>
+      </div>
+      <div className="col-sm-3">
+        <div className="form-group">
+          <label htmlFor="due">Due</label>
+          <input
+            className="form-control" type="number" id="due" min="1" max="100" step="1"
+            value={form.get('due')} onChange={form.set('due')}
+          />
+        </div>
+      </div>
+    </div>
+    <div className="form-group">
+      <label htmlFor="orderNumber">Order Number</label>
+      <input
+        type="text" className="form-control" name="orderNumber" id="orderNumber"
+        value={form.get('orderNumber')} onChange={form.set('orderNumber')}
+      />
+    </div>
+    <div className="form-group">
+      <label htmlFor="noteBeforeLines">Note before invoice lines</label>
+      <textarea
+        className="form-control" name="noteBeforeLines" id="noteBeforeLines" rows="4"
+        value={form.get('noteBeforeLines')} onChange={form.set('noteBeforeLines')}
+      >
+      </textarea>
+    </div>
     <div className="form-group">
       <div className="row">
         <div className="col-sm-10">

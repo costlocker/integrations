@@ -47,6 +47,10 @@ class CreateInvoice
                 'subject_id' => $invoice->fakturoidSubject,
                 'private_note' => $r->request->get('fakturoid')['note'],
                 'vat_price_mode' => 'without_vat',
+                'issued_on' => $r->request->get('fakturoid')['issuedAt'],
+                'due' => $r->request->get('fakturoid')['due'],
+                'order_number' => $r->request->get('fakturoid')['orderNumber'],
+                'note' => $r->request->get('fakturoid')['noteBeforeLines'],
                 'lines' => array_values(array_filter(array_map(
                     function (array $line) {
                         if ($line['quantity'] <= 0) {
