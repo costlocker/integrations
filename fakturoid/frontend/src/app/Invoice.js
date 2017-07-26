@@ -81,7 +81,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           </select>
         </div>
         <div className="col-sm-4">
-          <Link route='createSubject' title="Add a new Fakturoid client" className="btn btn-success btn-block" />
+          <Link action={() => console.log('create in fakturoid')} title="Add a new Fakturoid client" className="btn btn-success btn-block" />
         </div>
       </div>
       <p className="help-block">

@@ -209,12 +209,6 @@ $app
                 new \Costlocker\Integrations\Costlocker\MarkSentInvoice($app['client.costlocker']),
                 $app['database']
             );
-        } elseif ($action == 'createSubject') {
-            $strategy = new Costlocker\Integrations\Fakturoid\CreateSubject(
-                $app['client.fakturoid'],
-                $app['client.user'],
-                $app['database']
-            );
         } elseif ($action == 'downloadSubjects') {
             $strategy = function () use ($app) {
                 $account = $app['client.user']->getFakturoidAccount();

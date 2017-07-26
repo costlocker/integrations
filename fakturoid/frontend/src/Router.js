@@ -6,7 +6,6 @@ import Login from './app/Login';
 import Invoice from './app/Invoice';
 import InvoiceLines from './app/InvoiceLines'
 import InvoiceTutorial from './app/InvoiceTutorial';
-import NewSubject from './app/NewSubject';
 import Loading from './ui/Loading';
 
 export let redirectToRoute = (route) => console.log('app is not ready', route);
@@ -187,40 +186,6 @@ export const states = [
         }
       }
     ],
-  },
-  {
-    name: 'createSubject',
-    url: '/customer',
-    data: {
-      title: 'Create customer'
-    },
-    component: () => <NewSubject
-      form={{
-        get: (type) => appState.cursor(['subject', type]).deref(),
-        set: (type) => (e) => appState.cursor(['subject']).set(
-          type,
-          e.target.type === 'checkbox' ? e.target.checked : e.target.value
-        ),
-        submit: (e) => {
-          e.preventDefault();
-          const request = appState.cursor(['subject']).deref().toJS();
-          const costlocker = appState.cursor(['costlocker', 'invoice']).deref().costlocker;
-          let params = {};
-          if (costlocker) {
-            params = {
-              project: costlocker.project.id,
-              billing: costlocker.billing.item.billing_id,
-            };
-          }
-          pushToApi('/fakturoid?action=createSubject', request)
-            .catch(setError)
-            .then((response) => {
-              appState.cursor().update(app => app.setIn(['fakturoid', 'subjects'], null));
-              redirectToRoute('invoice', params);
-            });
-        }
-      }}
-    />,
   },
   {
     name: 'login',

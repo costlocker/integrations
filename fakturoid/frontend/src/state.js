@@ -39,9 +39,6 @@ const appState = immstruct({
     noteBeforeLines: '',
     lines: OrderedMap(),
   },
-  subject: {
-    name: '',
-  },
 });
 
 const isNotLoggedInCostlocker = () =>
