@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Link, Errors, roundNumber, Number } from '../ui/Components';
+import { Button, Link, Errors, roundNumber, Number, ExternalLink, FakturoidLink } from '../ui/Components';
 import InvoicesList from './InvoicesList';
 import { PageWithSubnav, Page } from '../ui/App';
 import { isDevelopmentMode } from '../config';
@@ -81,7 +81,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           </select>
         </div>
         <div className="col-sm-4">
-          <Link action={() => console.log('create in fakturoid')} title="Add a new Fakturoid client" className="btn btn-success btn-block" />
+          <FakturoidLink title="Add a new Fakturoid client" path="/subjects/new" className="btn btn-success btn-block" />
         </div>
       </div>
       <p className="help-block">
@@ -298,9 +298,7 @@ export default function Invoice(props) {
   } else if (invoice.status === 'ALREADY_IMPORTED') {
     return buildSubnav(<div className="row">
       <div className="col-sm-6 text-left">
-        <a href={invoice.fakturoid.link} className="btn btn-success" target="_blank" rel="noopener noreferrer">
-          {`Open invoice #${invoice.fakturoid.number} in Fakturoid`}
-        </a>
+        <ExternalLink url={invoice.fakturoid.link} title={`Open invoice #${invoice.fakturoid.number} in Fakturoid`} className="btn btn-success" />
       </div>
       <div className="col-sm-6 text-right">
         {isDevelopmentMode &&

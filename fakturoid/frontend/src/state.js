@@ -49,4 +49,6 @@ const isNotLoggedInFakturoid = () =>
 
 const getCsrfToken = () => appState.cursor(['app', 'csrfToken']).deref();
 
-export { appState, isNotLoggedInCostlocker, isNotLoggedInFakturoid, getCsrfToken };
+const fakturoidHost = () => appState.cursor(['fakturoid', 'slug']).deref();
+
+export { appState, isNotLoggedInCostlocker, isNotLoggedInFakturoid, getCsrfToken, fakturoidHost };

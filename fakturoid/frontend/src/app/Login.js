@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Errors, ExternalLink } from '../ui/Components';
+import { Errors, ExternalLink, FakturoidLink } from '../ui/Components';
 
 export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturoid, loginUrls, loginError, form }) {
   const currentSlug = form.get('slug');
@@ -41,7 +41,7 @@ export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturo
                 <input type="text" className="form-control" id="token" name="token" />
                 <p className="help-block">
                   It's not password! You can find the token in&nbsp;
-                  <a href={`${fakturoidUrl}/user`} target="_blank" rel="noopener noreferrer">Já &rarr; API klíč</a>
+                  <FakturoidLink path="/user" title="Já &rarr; API klíč" />
                 </p>
               </div>
               <button type="submit" className="btn btn-primary btn-block">

@@ -1,6 +1,7 @@
 import React from 'react';
 import { redirectToRoute } from '../Router';
 import { appHost } from '../config';
+import { fakturoidHost } from '../state';
 
 const Errors = ({ title, error }) => {
   if (!error) {
@@ -15,8 +16,10 @@ const Errors = ({ title, error }) => {
   );
 };
 
-const ExternalLink = ({ url }) => (
-  <a href={url} target="_blank" rel="noopener noreferrer"><i className="fa fa-external-link"></i></a>
+const ExternalLink = ({ url, title, className }) => (
+  <a href={url} className={className} target="_blank" rel="noopener noreferrer">
+    {title ? title : <i className="fa fa-external-link"></i>}
+  </a>
 );
 
 const Button = ({ title, route, params, action, className }) => {
@@ -35,6 +38,9 @@ const Link = ({ title, route, params, action, className }) => {
 
 const CostlockerLink = ({ title, path }) => <a href={`${appHost}${path}`}>{title}</a>
 
+const FakturoidLink = ({ title, path, className }) =>
+  <ExternalLink title={title} url={`https://app.fakturoid.cz/${fakturoidHost()}${path}`} className={className} />
+
 const roundNumber = value => {
   const rounded = Math.round(value * 100) / 100;
   return isNaN(rounded) ? null : rounded;
@@ -44,4 +50,4 @@ const Number = ({ value }) => <span title={value}>{roundNumber(value)}</span>;
 
 const Image = ({ src }) => <img src={src} alt="" className="img-responsive img-thumbnail" />
 
-export { Errors, ExternalLink, Button, Link, CostlockerLink, roundNumber, Number, Image };
+export { Errors, ExternalLink, Button, Link, CostlockerLink, FakturoidLink, roundNumber, Number, Image };
