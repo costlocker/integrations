@@ -72,6 +72,7 @@ const webhookFormToJS = () => appState.cursor(['webhook']).deref().toJS();
 const webhookTitle = (title) => (getWebhook) => `${title} > ${getWebhook().url}`;
 const updateWebhooks = (props, redirect) => (e) => {
   e.preventDefault();
+  appState.cursor(['app']).set('isSendingForm', true);
   const currentWebhook = props.resolves.currentWebhook ? props.resolves.currentWebhook() : null;
   const definition = props.transition.to().data;
   const resolve = (field) => typeof definition[field] === 'function' ? definition[field](currentWebhook) : definition[field];
@@ -332,6 +333,7 @@ const hooks = [
       appState.cursor([]).update(
         app => errors.reset(app)
           .setIn(['app', 'currentState'], state.name) // rerender menu - stateService.go reloads only <UIView>
+          .setIn(['app', 'isSendingForm'], false)
           .setIn(['curl', 'method'], state.data.method || 'GET')
           .setIn(['curl', 'endpoint'], typeof state.data.endpoint === 'function' ? state.data.endpoint(getWebhook()) : state.data.endpoint)
           .setIn(['curl', 'request'], state.data.method === 'POST' ? () => state.data.request(getWebhook()) : null)

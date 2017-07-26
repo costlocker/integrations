@@ -11,7 +11,9 @@ const appState = immstruct({
   },
   app: {
     currentState: null,
+    // form
     errors: null,
+    isSendingForm: false,
   },
   curl: {
     method: null,

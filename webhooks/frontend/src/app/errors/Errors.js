@@ -12,7 +12,11 @@ export default class Errors {
     if (!response.errors) {
       return false;
     }
-    this.appState.cursor(['app']).set('errors', response.errors);
+    this.appState.cursor(['app']).update(
+      app => app
+        .setIn(['errors'], response.errors)
+        .setIn(['isSendingForm'], false)
+    );
     return true;
   };
 

@@ -1,6 +1,8 @@
 import React from 'react';
 import { UIView } from '@uirouter/react';
 import { Link } from './Components';
+import Loading from './Loading';
+import { appState } from '../state';
 import { isRouteActive } from '../Router';
 
 const CostlockerUser = ({ user }) => {
@@ -92,6 +94,9 @@ export const PageWithSubpages = ({ pages, content }) => {
   const getCss = (route, defaultClass) => {
     return isRouteActive(route) ? `${defaultClass} active` : defaultClass;
   };
+  const view = appState.cursor(['app', 'isSendingForm']).deref()
+    ? <Loading title="Processing a change" />
+    : content(<UIView />);
 
   return <div>
     <nav className="nav-breadcrumbs">
@@ -109,6 +114,6 @@ export const PageWithSubpages = ({ pages, content }) => {
         </div>
       </div>
     </nav>
-    <Page view={content(<UIView />)} />
+    <Page view={view} />
   </div>;
 };
