@@ -96,7 +96,8 @@ const AddLinesModal = ({ title, activityTabs }) => {
                 <Link title={`Select all (${items.length})`} action={checkAll(items)} className="btn btn-link" />
                 <Button
                   title="Add selected"
-                  action={() => {
+                  action={(e) => {
+                    e.preventDefault();
                     type.action();
                     closeModal();
                   }}
@@ -139,7 +140,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           .filter((value, index, self) => self.indexOf(value) === index) // unique
           .map(JSON.parse); // convert to object
       },
-      actions: () => lines.addPeople(costlocker.project.budget.peoplecosts)(),
+      action: () => lines.addPeople(costlocker.project.budget.peoplecosts)(),
     },
     activities: {
       id: 'activities',
@@ -163,7 +164,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           name: expense.expense.description,
         })
       ),
-      action: () => lines.addActivities(costlocker.project.budget.expenses)(),
+      action: () => lines.addExpenses(costlocker.project.budget.expenses)(),
     },
   };
   const getActiveTabs = visibleTabs => visibleTabs.map(id => activityTabs[id]);
