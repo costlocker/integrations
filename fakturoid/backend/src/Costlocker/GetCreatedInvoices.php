@@ -20,7 +20,50 @@ class GetCreatedInvoices
 
     public function __invoke(Request $r)
     {
-        $invoices = $this->database->findLatestInvoices($this->getUser->getCostlockerUser(), 20);
+        $filters = $this->buildFilters($r);
+        $invoices = $this->database->findLatestInvoices($this->getUser->getCostlockerUser(), $filters, 20);
+        return $this->invoicesToJson($invoices);
+    }
+
+    private function buildFilters(Request $r)
+    {
+        $filters = [];
+        foreach ($this->getFilters() as $field => $buildFilter) {
+            if ($r->query->get($field)) {
+                $filters[$field] = $buildFilter($r->query->get($field));
+            }
+        }
+        return $filters;
+    }
+
+    private function getFilters()
+    {
+        return [
+            'type' => function ($value) {
+                return [
+                    "i.data #>> '{request,fakturoid,type}' = :type",
+                    $value
+                ];
+            },
+            'query' => function ($value) {
+                return [
+                    <<<SQL
+                        LOWER(CONCAT(
+                            '_', i.data #>> '{request,costlocker,project,name}',
+                            '_', i.data #>> '{request,costlocker,project,client,name}',
+                            '_', fa_invoice_id,
+                            '_'
+                        )) LIKE LOWER(:query)
+SQL
+                    ,
+                    "%{$value}%"
+                ];
+            },
+        ];
+    }
+
+    private function invoicesToJson(array $invoices)
+    {
         return array_map(
             function (Invoice $i) {
                 return [

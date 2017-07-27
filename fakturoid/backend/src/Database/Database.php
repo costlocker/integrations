@@ -5,7 +5,9 @@ namespace Costlocker\Integrations\Database;
 use Doctrine\ORM\EntityManagerInterface;
 use Costlocker\Integrations\Entities\Invoice;
 use Costlocker\Integrations\Entities\CostlockerUser;
+use Costlocker\Integrations\Entities\FakturoidUser;
 use Costlocker\Integrations\Entities\FakturoidAccount;
+use Doctrine\ORM\Query\ResultSetMapping;
 
 /** @SuppressWarnings(PHPMD.TooManyPublicMethods) */
 class Database
@@ -32,26 +34,46 @@ class Database
         return array_shift($entities);
     }
 
-    public function findLatestInvoices(CostlockerUser $u, $limit)
+    public function findLatestInvoices(CostlockerUser $u, array $userFilters, $limit)
     {
-        return $this->findInvoices(
-            'cu.costlockerCompany = :company',
-            ['company' => $u->costlockerCompany],
-            $limit
-        );
-    }
+        $filters = ['company' => ['cu.cl_company_id = :company', $u->costlockerCompany]] + $userFilters;
 
-    public function findInvoices($condition, $params, $limit)
-    {
-        $dql =<<<DQL
-            SELECT i, cu, fu
-            FROM Costlocker\Integrations\Entities\Invoice i
-            JOIN i.costlockerUser cu
-            JOIN i.fakturoidUser fu
+        $conditions = [];
+        $params = [];
+        foreach ($filters as $field => list($condition, $param)) {
+            $conditions[] = "({$condition})";
+            $params += [$field => $param];
+        }
+        $condition = implode(' AND ', $conditions);
+        $sql =<<<SQL
+            SELECT i.id, i.cl_user_id, i.fa_user_id,
+                   i.data as i_data, i.fa_invoice_number, i.created_at,
+                   cu.id as cu_id, cu.data as cu_data, 
+                   fu.id as fu_id, fu.data as fu_data
+            FROM invoices i
+            JOIN cl_users cu ON i.cl_user_id = cu.id
+            JOIN fa_users fu ON i.fa_user_id = fu.id
             WHERE {$condition}
             ORDER BY i.id DESC
-DQL;
-        return $this->entityManager->createQuery($dql)->setMaxResults($limit)->execute($params);
+            LIMIT {$limit}
+SQL;
+
+        $rsm = new ResultSetMapping();
+        $rsm->addEntityResult(Invoice::class, 'i');
+        $rsm->addFieldResult('i', 'id', 'id');
+        $rsm->addFieldResult('i', 'i_data', 'data');
+        $rsm->addFieldResult('i', 'created_at', 'createdAt');
+        $rsm->addFieldResult('i', 'fa_invoice_number', 'fakturoidInvoiceId');
+        $rsm->addMetaResult('i', 'cl_user_id', 'costlockerUser');
+        $rsm->addMetaResult('i', 'fa_user_id', 'fakturoidUser');
+        $rsm->addJoinedEntityResult(CostlockerUser::class, 'cu', 'i', 'costlockerUser');
+        $rsm->addFieldResult('cu', 'cu_id', 'id');
+        $rsm->addFieldResult('cu', 'cu_data', 'data');
+        $rsm->addJoinedEntityResult(FakturoidUser::class, 'fu', 'i', 'fakturoidUser');
+        $rsm->addFieldResult('fu', 'fu_id', 'id');
+        $rsm->addFieldResult('fu', 'fu_data', 'data');
+        $query = $this->entityManager->createNativeQuery($sql, $rsm);
+        return $query->execute($params);
     }
 
     public function findLatestSubjectForClient($costlockerClientId)
