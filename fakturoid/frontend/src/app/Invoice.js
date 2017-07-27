@@ -283,7 +283,7 @@ export default function Invoice(props) {
         {
           id: 'project',
           name: 'Previously imported project invoices',
-          content: () => <InvoicesList invoices={props.projectInvoices} subjects={props.fakturoidSubjects} />,
+          content: () => <InvoicesList invoices={props.invoices} subjects={props.fakturoidSubjects} />,
         },
       ]}
     />;

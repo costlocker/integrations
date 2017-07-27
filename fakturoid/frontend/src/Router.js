@@ -35,18 +35,13 @@ if (isNotLoggedInCostlocker()) {
   fetchUser();
 }
 
-const fetchLatestInvoices = () =>
+const fetchInvoices = () =>
   fetchFromApi(`/costlocker`)
     .catch(setError)
-    .then(invoices => appState.cursor(['costlocker']).set('latestInvoices', invoices));
-
-const fetchProjectInvoices = (project) =>
-  fetchFromApi(`/costlocker?project=${project}`)
-    .catch(setError)
-    .then(invoices => appState.cursor(['costlocker']).set('projectInvoices', invoices));
+    .then(invoices => appState.cursor(['costlocker']).set('invoices', invoices));
 
 const fetchInvoice = ({ project, billing, amount }) => {
-  fetchProjectInvoices(project);
+  fetchInvoices();
   return fetchFromApi(`/costlocker?project=${project}&billing=${billing}&amount=${amount}&query=billing`)
     .catch(setError)
     .then(invoice => appState.cursor()
@@ -87,7 +82,7 @@ export const states = [
       const subjects = appState.cursor(['fakturoid', 'subjects']).deref();
       if (!params.billing || !params.project) {
         return <InvoiceTutorial
-          latestInvoices={appState.cursor(['costlocker', 'latestInvoices']).deref()}
+          invoices={appState.cursor(['costlocker', 'invoices']).deref()}
           subjects={subjects}
         />;
       }
@@ -101,7 +96,7 @@ export const states = [
       return <Invoice
         invoice={invoice}
         fakturoidSubjects={subjects}
-        projectInvoices={appState.cursor(['costlocker', 'projectInvoices']).deref()}
+        invoices={appState.cursor(['costlocker', 'invoices']).deref()}
         lines={new InvoiceLines(appState.cursor(['invoice', 'lines']))}
         forceUpdate={() => appState.cursor(['invoice']).set('isForced', true)}
         form={{
@@ -181,7 +176,7 @@ export const states = [
           if (params.billing && params.project) {
             fetchInvoice(params);
           } else {
-            fetchLatestInvoices();
+            fetchInvoices();
           }
         }
       }

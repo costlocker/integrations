@@ -3,7 +3,7 @@ import InvoicesList from './InvoicesList';
 import { PageWithSubnav } from '../ui/App';
 import { CostlockerLink, Image } from '../ui/Components';
 
-export default function InvoiceTutorial({ latestInvoices, subjects, renderContent }) {
+export default function InvoiceTutorial({ invoices, subjects, renderContent }) {
   return <PageWithSubnav
     tabs={[
       {
@@ -43,7 +43,7 @@ export default function InvoiceTutorial({ latestInvoices, subjects, renderConten
       {
         id: 'invoices',
         name: 'Latest invoices',
-        content: () => <InvoicesList invoices={latestInvoices} subjects={subjects} />,
+        content: () => <InvoicesList invoices={invoices} subjects={subjects} />,
       },
     ]}
   />;
