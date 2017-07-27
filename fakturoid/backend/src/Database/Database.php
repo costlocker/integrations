@@ -63,7 +63,7 @@ SQL;
         $rsm->addFieldResult('i', 'id', 'id');
         $rsm->addFieldResult('i', 'i_data', 'data');
         $rsm->addFieldResult('i', 'created_at', 'createdAt');
-        $rsm->addFieldResult('i', 'fa_invoice_number', 'fakturoidInvoiceId');
+        $rsm->addFieldResult('i', 'fa_invoice_number', 'fakturoidInvoiceNumber');
         $rsm->addMetaResult('i', 'cl_user_id', 'costlockerUser');
         $rsm->addMetaResult('i', 'fa_user_id', 'fakturoidUser');
         $rsm->addJoinedEntityResult(CostlockerUser::class, 'cu', 'i', 'costlockerUser');

@@ -51,7 +51,7 @@ class GetCreatedInvoices
                         LOWER(CONCAT(
                             '_', i.data #>> '{request,costlocker,project,name}',
                             '_', i.data #>> '{request,costlocker,project,client,name}',
-                            '_', fa_invoice_id,
+                            '_', fa_invoice_number,
                             '_'
                         )) LIKE LOWER(:query)
 SQL
