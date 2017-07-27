@@ -33,6 +33,77 @@ const loadVat = (subjects, form) => {
   });
 };
 
+const AddLinesModal = ({ title, activityTabs }) => {
+  const hasMultipleTabs =  activityTabs.length > 1;
+  const isActive = type => hasMultipleTabs
+    ? type.id === (appState.cursor(['invoiceModal', 'activeTab']).deref() || activityTabs[0].id)
+    : true;
+  const changeTab = (e) => appState.cursor(['invoiceModal']).set('activeTab', e.target.value);
+
+  const checkItem = (e) => appState.cursor(['invoiceModal', 'checkedIds']).update(
+    set => e.target.checked ? set.add(e.target.value) : set.delete(e.target.value)
+  );
+  const isChecked = item => appState.cursor(['invoiceModal', 'checkedIds']).deref().contains(item.id);
+  const checkAll = items => () => appState.cursor(['invoiceModal', 'checkedIds']).update(
+    set => {
+      let updated = set;
+      items.forEach(item => {
+        updated = updated.add(item.id);
+      })
+      return updated;
+    }
+  );
+  return <CenteredModal
+    type={title}
+    link={{
+      title:  title,
+      className: "btn btn-primary",
+    }}
+    content={
+      (closeModal) =>
+        <div>
+          <h2>{title}</h2>
+          {hasMultipleTabs ? (
+          <div className="btn-group btn-group-justified">
+            {activityTabs.map(type => (
+              <label key={type.id} className={isActive(type) ? 'btn btn-primary active' : 'btn btn-default'}>
+                <input
+                  type="radio" name="type" value={type.id} className="hide"
+                  checked={isActive(type)} onChange={changeTab} /> {type.title}
+              </label>
+            ))}
+          </div>
+          ) : null}
+          {activityTabs.map(type => {
+            const items = type.items();
+            return <div key={type.id} className={isActive(type) ? 'show' : 'hide'}>
+              <form className="form">
+                {items.map(item => (
+                  <label key={item.id} className="checkbox">
+                    <input
+                      type="checkbox"
+                      checked={isChecked(item)} onChange={checkItem} value={item.id}
+                    />
+                    {item.name}
+                  </label>
+                ))}
+                <Link title={`Select all (${items.length})`} action={checkAll(items)} className="btn btn-link" />
+                <Button
+                  title="Add selected"
+                  action={() => {
+                    type.action();
+                    closeModal();
+                  }}
+                  className="btn btn-success btn-block"
+                />
+              </form>
+            </div>;
+          })}
+        </div>
+    }
+  />;
+}
+
 const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubjects }) => {
   lines.addDefaultIfIsEmpty({
     name: costlocker.billing.billing.description
@@ -45,8 +116,8 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
   const billedAmount = costlocker.billing.billing.total_amount;
   loadVat(fakturoidSubjects, form);
 
-  const activityTabs = [
-    {
+  const activityTabs = {
+    people: {
       id: 'people',
       title: "People",
       items: () => {
@@ -64,7 +135,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
       },
       actions: () => lines.addPeople(costlocker.project.budget.peoplecosts)(),
     },
-    {
+    activities: {
       id: 'activities',
       title: "Activities",
       items: () => costlocker.project.budget.peoplecosts.map(
@@ -76,17 +147,20 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
       ),
       action: () => lines.addActivities(costlocker.project.budget.peoplecosts)(),
     },
-  ];
-  const activeTab = appState.cursor(['invoiceModal', 'activeTab']).deref() || 'people';
-  const changeTab = (e) => appState.cursor(['invoiceModal']).set('activeTab', e.target.value);
-
-  const checkItem = (e) => appState.cursor(['invoiceModal', 'checkedIds']).update(
-    set => e.target.checked ? set.add(e.target.value) : set.delete(e.target.value)
-  );
-  const isChecked = item => appState.cursor(['invoiceModal', 'checkedIds']).deref().contains(item.id);
-  const checkAll = items => () => appState.cursor(['invoiceModal', 'checkedIds']).update(
-    set => set.clear().union(items.map(item => item.id))
-  );
+    expenses: {
+      id: 'expenses',
+      title: "Expenses",
+      items: () => costlocker.project.budget.expenses.map(
+        expense => ({
+          id: `expense-${expense.item.expense_id}`,
+          type: 'expenses',
+          name: expense.expense.description,
+        })
+      ),
+      action: () => lines.addActivities(costlocker.project.budget.expenses)(),
+    },
+  };
+  const getActiveTabs = visibleTabs => visibleTabs.map(id => activityTabs[id]);
 
   return <form className="form" onSubmit={form.submit}>
     <div>
@@ -177,75 +251,10 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         <div className="col-sm-10">
           <div className="btn-toolbar">
             <div className="btn-group">
-              <CenteredModal
-                type="activities"
-                link={{
-                  title: "Add activities or people",
-                  className: "btn btn-primary",
-                }}
-                content={
-                  (closeModal) =>
-                    <div>
-                      <h2>Add people or activities</h2>
-                      <div className="btn-group btn-group-justified">
-                        {activityTabs.map(type => (
-                          <label key={type.id} className={activeTab === type.id ? 'btn btn-primary active' : 'btn btn-default'}>
-                            <input
-                              type="radio" name="type" value={type.id} className="hide"
-                              checked={activeTab === type.id} onChange={changeTab} /> {type.title}
-                          </label>
-                        ))}
-                      </div>
-                      {activityTabs.map(type => {
-                        const items = type.items();
-                        return <div key={type.id} className={type.id === activeTab ? 'show' : 'hide'}>
-                          <form className="form">
-                            {items.map(item => (
-                              <label key={item.id} className="checkbox">
-                                <input
-                                  type="checkbox"
-                                  checked={isChecked(item)} onChange={checkItem} value={item.id}
-                                />
-                                {item.name}
-                              </label>
-                            ))}
-                            <Link title={`Select all (${items.length})`} action={checkAll(items)} className="btn btn-link" />
-                            <Button
-                              title="Add selected"
-                              action={() => {
-                                type.action();
-                                closeModal();
-                              }}
-                              className="btn btn-success btn-block"
-                            />
-                          </form>
-                        </div>;
-                      })}
-                    </div>
-                }
-              />
+              <AddLinesModal title="Add people or activities" activityTabs={getActiveTabs(['people', 'activities'])} />
             </div>
             <div className="btn-group">
-              <CenteredModal
-                type="expenses"
-                link={{
-                  title: "Add expenses",
-                  className: "btn btn-primary",
-                }}
-                content={
-                  (closeModal) =>
-                    <div>
-                      <Link
-                        title="Add expenses"
-                        action={() => {
-                          lines.addExpenses(costlocker.project.budget.expenses)();
-                          closeModal();
-                        }}
-                        className="btn btn-primary"
-                      />
-                    </div>
-                }
-              />
+              <AddLinesModal title="Add expenses" activityTabs={getActiveTabs(['expenses'])} />
             </div>
             <div className="btn-group">
               <Link
