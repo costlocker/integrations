@@ -54,6 +54,8 @@ $input-bg: #fafafa;
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/utilities";
 
 // custom css
+@import "./image-tooltip";
+
 #root {
     padding-bottom: 2em;
 }

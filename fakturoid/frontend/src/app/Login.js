@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { Errors, ExternalLink, FakturoidLink } from '../ui/Components';
+import { Errors, ExternalLink, FakturoidLink, ImageTooltip } from '../ui/Components';
+import slug from '../images/slug.png';
+import token from '../images/token.png';
 
 export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturoid, loginUrls, loginError, form }) {
   const currentSlug = form.get('slug');
@@ -31,17 +33,19 @@ export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturo
                   defaultValue={fakturoidAuth ? fakturoidAuth.person.email : null} />
               </div>
               <div className="form-group">
-                <label htmlFor="token">Fakturoid slug (subdomain)</label>
+                <label htmlFor="token">
+                  Fakturoid slug (subdomain) <ImageTooltip url={slug} />
+                </label>
                 <input type="text" className="form-control" id="slug" name="slug" placeholder="YOUR_SLUG"
                   value={form.get('slug')} onChange={form.set('slug')} />
-                <p className="help-block">You can see slug in fakturoid url <strong>https://app.fakturoid.cz/{currentSlug ? currentSlug : 'YOUR_SLUG'}/dashboard</strong>.</p>
               </div>
               <div className="form-group">
-                <label htmlFor="token">API token</label>
+                <label htmlFor="token">
+                  API token <ImageTooltip url={token} />
+                </label>
                 <input type="text" className="form-control" id="token" name="token" />
                 <p className="help-block">
-                  It's not password! You can find the token in&nbsp;
-                  <FakturoidLink path="/user" title="Já &rarr; API klíč" />
+                  <FakturoidLink path="/user" title="Find your API token here" />
                 </p>
               </div>
               <button type="submit" className="btn btn-primary btn-block">

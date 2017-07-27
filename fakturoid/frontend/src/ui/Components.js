@@ -50,4 +50,10 @@ const Number = ({ value }) => <span title={value}>{roundNumber(value)}</span>;
 
 const Image = ({ src }) => <img src={src} alt="" className="img-responsive img-thumbnail" />
 
-export { Errors, ExternalLink, Button, Link, CostlockerLink, FakturoidLink, roundNumber, Number, Image };
+const ImageTooltip = ({ url }) =>
+  <div className="image-tooltip">
+    <i className="fa fa-question-circle" />
+    <img src={url} alt="" />
+  </div>;
+
+export { Errors, ExternalLink, Button, Link, CostlockerLink, FakturoidLink, roundNumber, Number, Image, ImageTooltip };
