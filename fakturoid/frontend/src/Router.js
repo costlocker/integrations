@@ -35,10 +35,33 @@ if (isNotLoggedInCostlocker()) {
   fetchUser();
 }
 
-const fetchInvoices = () =>
-  fetchFromApi(`/costlocker`)
+let lastQuery = null;
+
+const fetchInvoices = (customFilter) => {
+  const filter = customFilter ? customFilter : appState.cursor(['search']).deref();
+  const query = `/costlocker?type=${filter.get('type')}&query=${filter.get('query')}`;
+  if (query === lastQuery) {
+    return;
+  }
+  lastQuery = query;
+  return fetchFromApi(query)
     .catch(setError)
     .then(invoices => appState.cursor(['costlocker']).set('invoices', invoices));
+}
+
+let timeout = null;
+const fulltextInvoiceSearch = () => {
+  fetchInvoices();
+  timeout = null;
+};
+const isSearchUpdated = (field, keyPath) => keyPath.length === 2 && keyPath[0] === 'search' && keyPath[1] === field;
+appState.on('next-animation-frame', function (newStructure, oldStructure, keyPath) {
+  if (isSearchUpdated('type', keyPath)) {
+    fetchInvoices(newStructure.get('search'));
+  } else if (isSearchUpdated('query', keyPath) && !timeout) {
+    timeout = setTimeout(fulltextInvoiceSearch, 400);
+  }
+});
 
 const fetchInvoice = ({ project, billing, amount }) => {
   fetchInvoices();

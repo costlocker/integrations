@@ -25,6 +25,10 @@ const appState = immstruct({
     invoice: null,
     invoices: [],
   },
+  search: {
+    type: '',
+    query: '',
+  },
   invoice: {
     isForced: false,
     subject: '',
