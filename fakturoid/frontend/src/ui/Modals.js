@@ -9,11 +9,12 @@ const isOpened = (type) => appState.cursor(['app', 'openedModals']).deref().cont
 
 Modal.defaultStyles.overlay.backgroundColor = 'rgba(0, 0, 0, 0.5)';
 
-const CenteredModal = ({ type, link, content }) =>
+const CenteredModal = ({ type, link, content, onOpen }) =>
   <div>
     <Link {...link } action={openModal(type)} />
     <Modal
       isOpen={isOpened(type)}
+      onAfterOpen={onOpen}
       onRequestClose={closeModal(type)}
       className={{
         base: 'modal',

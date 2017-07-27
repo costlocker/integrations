@@ -53,8 +53,14 @@ const AddLinesModal = ({ title, activityTabs }) => {
       return updated;
     }
   );
+  const initModal = () => appState.cursor(['invoiceModal']).update(
+    modal => modal
+      .setIn(['activeTab'], '')
+      .setIn(['checkedIds'], modal.get('checkedIds').clear())
+  );
   return <CenteredModal
     type={title}
+    onOpen={initModal}
     link={{
       title:  title,
       className: "btn btn-primary",
