@@ -43,6 +43,10 @@ const appState = immstruct({
     noteBeforeLines: '',
     lines: OrderedMap(),
   },
+  invoiceModal: {
+    activeTab: '',
+    checkedIds: Set(),
+  },
 });
 
 const isNotLoggedInCostlocker = () =>
