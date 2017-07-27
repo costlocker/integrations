@@ -3,6 +3,7 @@ import { Button, Link, Errors, roundNumber, Number, ExternalLink, FakturoidLink 
 import InvoicesList from './InvoicesList';
 import { PageWithSubnav, Page } from '../ui/App';
 import { isDevelopmentMode } from '../config';
+import { CenteredModal } from '../ui/Modals';
 
 const InvoiceDetail = ({ costlocker }) => (
   <div>
@@ -132,11 +133,59 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         <div className="col-sm-10">
           <div className="btn-toolbar">
             <div className="btn-group">
-              <Link title="Add activities" action={lines.addActivities(costlocker.project.budget.peoplecosts)} className="btn btn-primary" />
-              <Link title="Add people" action={lines.addPeople(costlocker.project.budget.peoplecosts)} className="btn btn-primary" />
+              <CenteredModal
+                type="activities"
+                link={{
+                  title: "Add activities or people",
+                  className: "btn btn-primary",
+                }}
+                content={
+                  (closeModal) =>
+                    <div>
+                      <Link
+                        title="Add activities"
+                        action={() => {
+                          lines.addActivities(costlocker.project.budget.peoplecosts)();
+                          closeModal();
+                        }}
+                        className="btn btn-primary"
+                      />
+                      <br />
+                      <Link
+                        title="Add people"
+                        action={() => {
+                          lines.addPeople(costlocker.project.budget.peoplecosts)();
+                          closeModal();
+                        }}
+                        className="btn btn-primary"
+                      />
+                    </div>
+                }
+              />
             </div>
             <div className="btn-group">
-              <Link title="Add expenses" action={lines.addExpenses(costlocker.project.budget.expenses)} className="btn btn-primary" />
+              <CenteredModal
+                type="expenses"
+                link={{
+                  title: "Add expenses",
+                  className: "btn btn-primary",
+                }}
+                content={
+                  (closeModal) =>
+                    <div>
+                      <Link
+                        title="Add expenses"
+                        action={() => {
+                          lines.addExpenses(costlocker.project.budget.expenses)();
+                          closeModal();
+                        }}
+                        className="btn btn-primary"
+                      />
+                    </div>
+                }
+              />
+            </div>
+            <div className="btn-group">
               <Link
                 title="Add discount" action={lines.addDiscount(costlocker.project.budget.discount)}
                 className={`btn btn-primary ${costlocker.project.budget.discount ? '' : 'disabled'}`} />

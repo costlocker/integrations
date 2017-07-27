@@ -1,5 +1,5 @@
 import immstruct from 'immstruct';
-import { OrderedMap } from 'immutable';
+import { OrderedMap, Set } from 'immutable';
 
 const appState = immstruct({
   auth: {
@@ -16,6 +16,7 @@ const appState = immstruct({
     error: null,
     isSendingForm: false,
     lastCreatedInvoice: null,
+    openedModals: Set(),
   },
   fakturoid: {
     slug: null,
