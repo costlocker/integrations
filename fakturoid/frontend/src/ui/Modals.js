@@ -28,10 +28,8 @@ const CenteredModal = ({ type, link, content, onOpen }) =>
     >
       <div className="modal-dialog">
         <div className="modal-content">
-          <div className="text-right">
-            <Button title={<span className="fa fa-times" />} action={closeModal(type)} className="btn btn-link" />
-          </div>
           <div className="modal-body">
+            <Button title={<span className="fa fa-times" />} action={closeModal(type)} className="btn btn-link pull-right" />
             {content(closeModal(type))}
           </div>
         </div>
