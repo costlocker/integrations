@@ -1,5 +1,6 @@
 import React from 'react';
-import { CostlockerLink, Image, Link } from './Components';
+import { CostlockerLink, Link } from './Components';
+import { Image } from './Images';
 import { pushToApi } from '../api';
 
 const reloadPage = () => window.location.reload(false);

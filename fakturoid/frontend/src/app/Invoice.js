@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, Link, Errors, roundNumber, Number, ExternalLink, FakturoidLink, CostlockerLink, Image } from '../ui/Components';
+import { Button, Link, Errors, roundNumber, Number, ExternalLink, FakturoidLink, CostlockerLink } from '../ui/Components';
+import { Image } from '../ui/Images';
 import { PageWithSubnav } from '../ui/App';
 import { isDevelopmentMode } from '../config';
 import { CenteredModal } from '../ui/Modals';

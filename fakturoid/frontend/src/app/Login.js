@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { Errors, ExternalLink, FakturoidLink, ImageTooltip } from '../ui/Components';
+import { Errors, ExternalLink, FakturoidLink } from '../ui/Components';
+import { ImageTooltip } from '../ui/Images';
 import slug from '../images/slug.png';
 import token from '../images/token.png';
 

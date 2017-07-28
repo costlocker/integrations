@@ -1,6 +1,7 @@
 import React from 'react';
 import { UIView } from 'ui-router-react';
-import { Link, Logo } from './Components';
+import { Link } from './Components';
+import { Logo } from './Images';
 import { appState } from '../state';
 
 const User = ({ name, company }) => {
