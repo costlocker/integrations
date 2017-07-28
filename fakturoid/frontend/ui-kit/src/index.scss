@@ -228,6 +228,11 @@ $input-bg: #fafafa;
     margin-top: 2em;
 }
 
+.form-control.text-danger {
+    font-weight: bold;
+    color: $brand-danger !important;
+}
+
 .ps-10 {
     padding: 0 10px;
 }

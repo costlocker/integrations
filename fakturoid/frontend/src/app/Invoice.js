@@ -339,6 +339,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         ) : null}
         {items.map((line) => {
           const isLineIgnored = line.get('quantity') <= 0;
+          const cssPrice = id === 'discount' ? "form-control text-right text-danger" : "form-control text-right";
           return <div
             key={line.get('id')}
             className={isLineIgnored ? 'row form-grid bg-danger' : 'row form-grid'}
@@ -377,13 +378,13 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
             </div>
             <div className="col-sm-2 text-right">
               <input
-                className="form-control text-right" type="number" step="any" required size="10"
+                className={cssPrice} type="number" step="any" required size="10"
                 value={roundNumber(line.get('unit_amount'))} onChange={lines.updateFieldInLine('unit_amount', line)}
               />
             </div>
             <div className="col-sm-2 text-right">
               <input
-                className="form-control text-right" type="number" step="any" required
+                className={cssPrice} type="number" step="any" required
                 disabled value={roundNumber(line.get('total_amount'))}
               />
             </div>
