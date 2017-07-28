@@ -18,8 +18,10 @@ const ImageTooltip = ({ url }) =>
     <Image src={url} />
   </div>;
 
-const Logo = ({ app }) =>
-  <img src={logos[`${app}.png`]} srcset={`${logos[`${app}@2x.png`]} 2x`}
+const Logo = ({ app, color }) => {
+  const filename = color ? `${app}-${color}` : app;
+  return <img src={logos[`${filename}.png`]} srcSet={`${logos[`${filename}@2x.png`]} 2x`}
     title={app} alt={app} className="logo" />;
+};
 
 export { Image, ImageTooltip, Logo };

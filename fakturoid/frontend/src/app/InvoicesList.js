@@ -1,5 +1,6 @@
 import React from 'react';
 import { ExternalLink, roundNumber } from '../ui/Components';
+import { Logo } from '../ui/Images';
 import { appState } from '../state';
 
 const isHighlighted = id => id === appState.cursor(['app', 'lastCreatedInvoice']).deref();
@@ -43,7 +44,7 @@ export default function InvoicesList({ invoices, subjects }) {
     </form>
     <br /><br />
     {invoices.length ? (
-      <table className="table table-striped">
+      <table className="table table-striped table-valign">
         <thead>
           <tr>
             <th>Client</th>
@@ -66,9 +67,11 @@ export default function InvoicesList({ invoices, subjects }) {
               <th>{invoice.costlocker.billing.billing.total_amount}</th>
               <th>{roundNumber(invoice.fakturoid.amount)}</th>
               <td>
-                <ExternalLink url={invoice.costlocker.link} title="Open project" />
+                <ExternalLink url={invoice.costlocker.link} className="text-primary first"
+                  title={<span><Logo app="costlocker" color="blue" />Open project</span>} />
                 &nbsp;
-                <ExternalLink url={invoice.fakturoid.link} title="Open invoice" />
+                <ExternalLink url={invoice.fakturoid.link} className="text-success"
+                  title={<span><Logo app="fakturoid" />Open invoice</span>} />
               </td>
             </tr>
           ))}

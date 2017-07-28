@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Link, Errors, roundNumber, Number, ExternalLink, FakturoidLink, CostlockerLink } from '../ui/Components';
-import { Image } from '../ui/Images';
+import { Image, Logo } from '../ui/Images';
 import { PageWithSubnav } from '../ui/App';
 import { isDevelopmentMode } from '../config';
 import { CenteredModal } from '../ui/Modals';
@@ -222,7 +222,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     <div className="form-group">
       <label htmlFor="fakturoidSubject">Fakturoid client</label>
       <div className="row">
-        <div className="col-sm-9">
+        <div className="col-sm-8">
           <select required
             className="form-control" name="fakturoidSubject" id="fakturoidSubject"
             value={form.get('subject')} onChange={form.set('subject')}
@@ -233,8 +233,11 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
             ))}
           </select>
         </div>
-        <div className="col-sm-3">
-          <FakturoidLink title="Add a new Fakturoid client" path="/subjects/new" className="btn btn-success btn-block" />
+        <div className="col-sm-4">
+          <FakturoidLink
+            title={<span className="text-success"><Logo app="fakturoid" /> Add a new Fakturoid client</span>}
+            path="/subjects/new" className="btn btn-link"
+          />
         </div>
       </div>
       <p className="help-block">

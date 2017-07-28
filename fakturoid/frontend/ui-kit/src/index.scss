@@ -66,6 +66,11 @@ $input-bg: #fafafa;
     margin-top: 1em;
 }
 
+.logo {
+    display: inline-block;
+    max-height: 28px;
+}
+
 .navbar {
     border: 0;
     margin-bottom: 0;
@@ -87,19 +92,10 @@ $input-bg: #fafafa;
         }
     }
     .navbar-right {
-        li.active a {
-            background: $navbar-default-bg !important;
-            color: $navbar-default-link-color !important;
-        }
         a {
             padding: 6px 6px 3px;
             vertical-align: baseline;
             position: relative;
-        }
-        .logo {
-            margin: 0 1em;
-            display: inline-block;
-            vertical-align: baseline;
         }
         .user {
             display: inline-block;
@@ -107,6 +103,10 @@ $input-bg: #fafafa;
             strong {
                 display: block;
             }
+        }
+        .logo {
+            margin: 0 1em;
+            vertical-align: baseline;
         }
     }
 }
@@ -184,6 +184,18 @@ $input-bg: #fafafa;
     }
     .bg-danger {
         background-color: #f2dede !important;
+    }
+    &.table-valign {
+        td, th {
+            vertical-align: middle;
+        }
+        .logo {
+            margin: 0 1ex 0 1em;
+            vertical-align: middle;
+        }
+        .first .logo {
+            margin-left: 0;
+        }
     }
 }
 

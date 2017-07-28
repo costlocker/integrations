@@ -25,12 +25,12 @@ const FakturoidUser = ({ user, isLoggedIn }) => {
   }
 };
 
-const Users = ({ auth }) => {
+const Users = ({ auth, isRouteActive }) => {
   if (!auth.get('costlocker')) {
     return null;
   }
   return <div>
-    <Logo app="costlocker" />
+    <Logo app="costlocker" color={isRouteActive('login') ? 'blue' : 'white'} />
     <CostlockerUser user={auth.get('costlocker')} />
     <Logo app="fakturoid" />
     <FakturoidUser user={auth.get('fakturoid')} isLoggedIn={auth.get('isLoggedInFakturoid')} />
@@ -70,7 +70,7 @@ export function App({ auth, isRouteActive }) {
           </div>
           <div className="navbar-right text-right">
             <Navigation isRouteActive={isRouteActive} routes={[
-              { route: 'login', title: auth.get('costlocker') ? <Users auth={auth} /> : 'Login' },
+              { route: 'login', title: auth.get('costlocker') ? <Users auth={auth} isRouteActive={isRouteActive} /> : 'Login' },
             ]} />
           </div>
         </div>
