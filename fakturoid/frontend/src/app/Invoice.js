@@ -33,7 +33,7 @@ const loadVat = (subjects, form) => {
   });
 };
 
-const AddLinesModal = ({ title, activityTabs }) => {
+const AddLinesModal = ({ title, activityTabs, addItems }) => {
   const hasMultipleTabs =  activityTabs.length > 1;
   const isActive = type => hasMultipleTabs
     ? type.id === (appState.cursor(['invoiceModal', 'activeTab']).deref() || activityTabs[0].id)
@@ -53,6 +53,7 @@ const AddLinesModal = ({ title, activityTabs }) => {
       return updated;
     }
   );
+  const getCheckedItems = items => items.filter(isChecked);
   const initModal = () => appState.cursor(['invoiceModal']).update(
     modal => modal
       .setIn(['activeTab'], '')
@@ -98,7 +99,7 @@ const AddLinesModal = ({ title, activityTabs }) => {
                   title="Add selected"
                   action={(e) => {
                     e.preventDefault();
-                    type.action();
+                    addItems(getCheckedItems(items));
                     closeModal();
                   }}
                   className="btn btn-success btn-block"
@@ -130,9 +131,12 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
       items: () => {
         const people = costlocker.project.budget.peoplecosts.map(activityCost => (
             activityCost.people.map(personCost => (JSON.stringify({
-              id: `person-${personCost.item.person_id}`,
-              type: 'people',
-              name: `${personCost.person.first_name} ${personCost.person.last_name}`,
+              id: `people-${activityCost.item.activity_id}-${personCost.item.person_id}`,
+              name: `${activityCost.activity.name} - ${personCost.person.first_name} ${personCost.person.last_name}`,
+              quantity: personCost.hours.budget,
+              unit: 'h',
+              unit_amount: activityCost.activity.hourly_rate,
+              total_amount: activityCost.activity.hourly_rate * personCost.hours.budget,
             })))
           ));
         //
@@ -140,7 +144,6 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           .filter((value, index, self) => self.indexOf(value) === index) // unique
           .map(JSON.parse); // convert to object
       },
-      action: () => lines.addPeople(costlocker.project.budget.peoplecosts)(),
     },
     activities: {
       id: 'activities',
@@ -148,11 +151,13 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
       items: () => costlocker.project.budget.peoplecosts.map(
         activityCost => ({
           id: `activity-${activityCost.item.activity_id}`,
-          type: 'activities',
           name: activityCost.activity.name,
+          quantity: activityCost.hours.budget,
+          unit: 'h',
+          unit_amount: activityCost.activity.hourly_rate,
+          total_amount: activityCost.activity.hourly_rate * activityCost.hours.budget,
         })
       ),
-      action: () => lines.addActivities(costlocker.project.budget.peoplecosts)(),
     },
     expenses: {
       id: 'expenses',
@@ -160,11 +165,13 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
       items: () => costlocker.project.budget.expenses.map(
         expense => ({
           id: `expense-${expense.item.expense_id}`,
-          type: 'expenses',
           name: expense.expense.description,
+          quantity: 1,
+          unit: 'ks',
+          unit_amount: expense.expense.billed.total_amount,
+          total_amount: expense.expense.billed.total_amount,
         })
       ),
-      action: () => lines.addExpenses(costlocker.project.budget.expenses)(),
     },
   };
   const getActiveTabs = visibleTabs => visibleTabs.map(id => activityTabs[id]);
@@ -258,10 +265,10 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         <div className="col-sm-10">
           <div className="btn-toolbar">
             <div className="btn-group">
-              <AddLinesModal title="Add people or activities" activityTabs={getActiveTabs(['people', 'activities'])} />
+              <AddLinesModal title="Add people or activities" activityTabs={getActiveTabs(['people', 'activities'])} addItems={lines.addItems} />
             </div>
             <div className="btn-group">
-              <AddLinesModal title="Add expenses" activityTabs={getActiveTabs(['expenses'])} />
+              <AddLinesModal title="Add expenses" activityTabs={getActiveTabs(['expenses'])} addItems={lines.addItems} />
             </div>
             <div className="btn-group">
               <Link

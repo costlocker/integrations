@@ -23,57 +23,12 @@ export default class InvoiceLines {
     }
   }
 
-  addExpenses = (expenses) => () => {
+  addItems = (items) => {
     this.update(lines => {
       let updated = lines;
       updated = this.removeDefaultIfExists(updated);
-      expenses.forEach(expense => {
-        updated = this.addLine(updated, {
-          id: `expense-${expense.item.expense_id}`,
-          name: expense.expense.description,
-          quantity: 1,
-          unit: 'ks',
-          unit_amount: expense.expense.billed.total_amount,
-          total_amount: expense.expense.billed.total_amount,
-        });
-      });
-      return updated;
-    });
-  }
-
-  addActivities = (peoplecosts) => () => {
-    this.update(lines => {
-      let updated = lines;
-      updated = this.removeDefaultIfExists(updated);
-      peoplecosts.forEach(activityCost => {
-        updated = this.addLine(updated, {
-          id: `activity-${activityCost.item.activity_id}`,
-          name: activityCost.activity.name,
-          quantity: activityCost.hours.budget,
-          unit: 'h',
-          unit_amount: activityCost.activity.hourly_rate,
-          total_amount: activityCost.activity.hourly_rate * activityCost.hours.budget,
-        });
-      });
-      return updated;
-    });
-  }
-
-  addPeople = (peoplecosts) => () => {
-    this.update(lines => {
-      let updated = lines;
-      updated = this.removeDefaultIfExists(updated);
-      peoplecosts.forEach(activityCost => {
-        activityCost.people.forEach(personCost => {
-          updated = this.addLine(updated, {
-            id: `people-${activityCost.item.activity_id}-${personCost.item.person_id}`,
-            name: `${activityCost.activity.name} - ${personCost.person.first_name} ${personCost.person.last_name}`,
-            quantity: personCost.hours.budget,
-            unit: 'h',
-            unit_amount: activityCost.activity.hourly_rate,
-            total_amount: activityCost.activity.hourly_rate * personCost.hours.budget,
-          });
-        });
+      items.forEach(item => {
+        updated = this.addLine(updated, item);
       });
       return updated;
     });
