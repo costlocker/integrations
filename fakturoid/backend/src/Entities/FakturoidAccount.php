@@ -30,7 +30,10 @@ class FakturoidAccount
     /**
      * @ORM\Column(type="json_array")
      */
-    private $subjects = [];
+    private $data = [
+        'account' => null,
+        'subjects' => [],
+    ];
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -49,18 +52,18 @@ class FakturoidAccount
 
     public function resetSubjects()
     {
-        $this->subjects = [];
+        $this->data['subjects'] = [];
     }
 
     public function addSubjects(array $subjects)
     {
         foreach ($subjects as $subject) {
-            $this->subjects[$subject['id']] = $subject;
+            $this->data['subjects'][$subject['id']] = $subject;
         }
     }
 
     public function getSubjects()
     {
-        return $this->subjects;
+        return $this->data['subjects'];
     }
 }
