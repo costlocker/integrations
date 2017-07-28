@@ -30,7 +30,7 @@ class FakturoidAccount
     /**
      * @ORM\Column(type="json_array")
      */
-    public $subjects = [];
+    private $subjects = [];
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -47,10 +47,20 @@ class FakturoidAccount
         $this->createdAt = new \DateTime();
     }
 
+    public function resetSubjects()
+    {
+        $this->subjects = [];
+    }
+
     public function addSubjects(array $subjects)
     {
         foreach ($subjects as $subject) {
             $this->subjects[$subject['id']] = $subject;
         }
+    }
+
+    public function getSubjects()
+    {
+        return $this->subjects;
     }
 }

@@ -16,7 +16,7 @@ class GuessSubject
     public function __invoke($costlockerClientName)
     {
         $account = $this->getUser->getFakturoidAccount();
-        foreach ($account->subjects as $subject) {
+        foreach ($account->getSubjects() as $subject) {
             if ($this->isMatchingName($costlockerClientName, $subject['name'])) {
                 return $subject['id'];
             }

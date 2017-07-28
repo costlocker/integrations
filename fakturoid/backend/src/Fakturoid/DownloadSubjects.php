@@ -19,7 +19,7 @@ class DownloadSubjects
 
     public function __invoke(FakturoidAccount $account)
     {
-        $account->subjects = [];
+        $account->resetSubjects();
 
         $page = 1;
         $hasNextPage = true;

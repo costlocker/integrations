@@ -18,10 +18,10 @@ class GetSubjects
     public function __invoke()
     {
         $account = $this->getUser->getFakturoidAccount();
-        if (!$account->subjects) {
+        if (!$account->getSubjects()) {
             $this->downloadSubjects->__invoke($account);
         }
-        return $this->convertSubjects($account->subjects);
+        return $this->convertSubjects($account->getSubjects());
     }
 
     private function convertSubjects(array $apiSubjects)
