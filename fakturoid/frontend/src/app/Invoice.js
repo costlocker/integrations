@@ -162,8 +162,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
   const linesAmount = lines.calculateTotaAmount();
   const billedAmount = costlocker.maxBillableAmount;
   const isRevenueGreaterThanBilling = (billedAmount - linesAmount) >= -0.1;
-
-  const vat = 0;
+  const vat = lines.calculateVat();
 
   const hasAdvancedSettings = () => appState.cursor(['editor', 'hasAdvancedSettings']).deref();
   const toggleAdvancedSettings = () => appState.cursor(['editor']).set('hasAdvancedSettings', !hasAdvancedSettings());
@@ -444,20 +443,22 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
               <Number value={linesAmount} isElement />
             </div>
           </div>
-          <div className="row">
+          {Object.keys(vat.rates).map(rate => (
+          <div key={rate} className="row">
             <div className="col-sm-4 col-sm-offset-6 text-right">
-              VAT (<Number value={form.get('vat')} isElement />%)
+              VAT (<Number value={rate} isElement />%)
             </div>
             <div className="col-sm-2 text-right">
-              <Number value={vat} isElement />
+              <Number value={vat.rates[rate]} isElement />
             </div>
           </div>
+          ))}
           <div className="row">
             <div className="col-sm-4 col-sm-offset-6 text-right">
               <strong>Total amount (with VAT)</strong>
             </div>
             <div className="col-sm-2 text-right">
-              <strong><Number value={linesAmount + vat} isElement /></strong>
+              <strong><Number value={linesAmount + vat.total} isElement /></strong>
             </div>
           </div>
         </div>

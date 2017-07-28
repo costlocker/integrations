@@ -11,6 +11,22 @@ export default class InvoiceLines {
     return this.deref().reduce((sum, item) => item.get('total_amount') + sum, 0);
   }
 
+  calculateVat() {
+    const rates = {};
+    this.deref().forEach(item => {
+      if (item.get('vat')) {
+        if (!rates[item.get('vat')]) {
+          rates[item.get('vat')] = 0;
+        }
+        rates[item.get('vat')] += item.get('total_amount') * item.get('vat') / 100;
+      }
+    })
+    return {
+      total: Object.values(rates).reduce((sum, item) => item + sum, 0),
+      rates: rates
+    };
+  }
+
   addDefaultIfIsEmpty({ name, amount }) {
     if (!this.deref().size) {
       this.update(lines => this.addLine(lines, {
