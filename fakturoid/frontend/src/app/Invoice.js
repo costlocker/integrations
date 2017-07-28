@@ -1,4 +1,8 @@
 import React from 'react';
+import DatePicker from 'react-datepicker';
+import moment from 'moment';
+import 'react-datepicker/dist/react-datepicker.css';
+
 import { Button, Link, Errors, roundNumber, Number, ExternalLink, FakturoidLink, CostlockerLink, RadioButtons } from '../ui/Components';
 import { Image, Logo } from '../ui/Images';
 import { PageWithSubnav } from '../ui/App';
@@ -205,6 +209,9 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
   };
   const getActiveTabs = visibleTabs => visibleTabs.map(id => activityTabs[id]);
 
+  const issuedAt = moment(form.get('issuedAt'));
+  const dueDate = moment(issuedAt).add(form.get('due'), 'days');
+
   return <form className="form" onSubmit={form.submit}>
     <div>
       <input
@@ -254,12 +261,20 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
       </p>
     </div>
     <div className="row">
-      <div className="col-sm-3">
+      <div className="col-sm-4">
         <div className="form-group">
           <label htmlFor="issuedAt">Issued at</label>
-          <input
-            type="text" className="form-control" name="issuedAt" id="issuedAt"
-            value={form.get('issuedAt')} onChange={form.set('issuedAt')}
+          <DatePicker
+            dateFormat="DD.MM.YYYY"
+            className="form-control"
+            locale="cs"
+            selected={issuedAt}
+            onChange={date => form.set('issuedAt')({
+              target: {
+                type: 'value',
+                value: date.format('YYYY-MM-DD')
+              }
+            })}
           />
         </div>
       </div>
@@ -270,6 +285,12 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
             className="form-control" type="number" id="due" min="1" max="100" step="1"
             value={form.get('due')} onChange={form.set('due')}
           />
+        </div>
+      </div>
+      <div className="col-sm-3">
+        <div className="form-group">
+          <label>&nbsp;</label><br />
+          <span className="btn btn-link" disabled>{dueDate.format("dddd, DD.MM.YYYY")}</span>
         </div>
       </div>
     </div>
@@ -337,6 +358,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         </div>
       </div>
     </div>
+    <br />
     {lines.getGroupedLines().map(({ id, title, items }) => (
       <div key={ title } className={items.length || title === 'Other' ? 'show' : 'hide'}>
         <h4><span className={`fa ${activityTabs[id].icon}`} /> { title }</h4>

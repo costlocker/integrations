@@ -55,6 +55,7 @@ $input-bg: #fafafa;
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/utilities";
 
 // custom css
+@import "./datepicker";
 @import "./image-tooltip";
 @import "./modals";
 
@@ -247,3 +248,4 @@ $input-bg: #fafafa;
         border-bottom: 1px solid $breadcrumb-bg;
     }
 }
+
