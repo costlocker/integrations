@@ -33,6 +33,7 @@ class FakturoidUser
     public $fakturoidId;
 
     /**
+     * @var FakturoidAccount
      * @ORM\ManyToOne(targetEntity="FakturoidAccount")
      * @ORM\JoinColumn(name="fa_company_id", nullable=false, onDelete="CASCADE")
      */

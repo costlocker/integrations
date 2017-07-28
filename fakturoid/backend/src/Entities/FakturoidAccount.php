@@ -71,4 +71,9 @@ class FakturoidAccount
     {
         $this->data['account'] = $account;
     }
+
+    public function hasVat()
+    {
+        return ($this->data['account']['vat_mode'] ?? 'non_vat_payer') != 'non_vat_payer';
+    }
 }

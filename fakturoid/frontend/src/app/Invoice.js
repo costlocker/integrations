@@ -75,21 +75,6 @@ const InvoiceDetail = ({ costlocker }) => (
   </div>
 );
 
-const loadVat = (subjects, form) => {
-  let hasVat = false;
-  subjects.forEach(s => {
-    if (s.id == form.get('subject')) {
-      hasVat = s.has_vat;
-    }
-  })
-  form.set('hasVat')({
-    target: {
-      type: 'checkbox',
-      checked: hasVat,
-    }
-  });
-};
-
 const AddLinesModal = ({ type, title, activityTabs, addItems }) => {
   const hasMultipleTabs =  activityTabs.length > 1;
   const isActive = type => hasMultipleTabs
@@ -178,7 +163,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
   const billedAmount = costlocker.maxBillableAmount;
   const isRevenueGreaterThanBilling = (billedAmount - linesAmount) >= -0.1;
 
-  loadVat(fakturoidSubjects, form);
+  const hasVat = appState.cursor(['auth', 'fakturoid']).deref().account.has_vat;
   const vat = linesAmount * (form.get('vat')) / 100;
 
   const hasAdvancedSettings = () => appState.cursor(['editor', 'hasAdvancedSettings']).deref();
@@ -447,7 +432,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           errorClassName="warning"
         />
       ) : null}
-      {form.get('hasVat') ? (
+      {hasVat ? (
         <div>
           <div className="row">
             <div className="col-sm-4 col-sm-offset-6 text-right">
