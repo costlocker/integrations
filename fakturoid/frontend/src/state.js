@@ -43,7 +43,7 @@ const appState = immstruct({
     noteBeforeLines: '',
     lines: OrderedMap(),
   },
-  invoiceModal: {
+  editor: {
     activeTab: '',
     checkedIds: Set(),
   },

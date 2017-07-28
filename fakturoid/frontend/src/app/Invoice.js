@@ -89,15 +89,15 @@ const loadVat = (subjects, form) => {
 const AddLinesModal = ({ type, title, activityTabs, addItems }) => {
   const hasMultipleTabs =  activityTabs.length > 1;
   const isActive = type => hasMultipleTabs
-    ? type.id === (appState.cursor(['invoiceModal', 'activeTab']).deref() || activityTabs[0].id)
+    ? type.id === (appState.cursor(['editor', 'activeTab']).deref() || activityTabs[0].id)
     : true;
-  const changeTab = (e) => appState.cursor(['invoiceModal']).set('activeTab', e.target.value);
+  const changeTab = (e) => appState.cursor(['editor']).set('activeTab', e.target.value);
 
-  const checkItem = (e) => appState.cursor(['invoiceModal', 'checkedIds']).update(
+  const checkItem = (e) => appState.cursor(['editor', 'checkedIds']).update(
     set => e.target.checked ? set.add(e.target.value) : set.delete(e.target.value)
   );
-  const isChecked = item => appState.cursor(['invoiceModal', 'checkedIds']).deref().contains(item.id);
-  const checkAll = items => () => appState.cursor(['invoiceModal', 'checkedIds']).update(
+  const isChecked = item => appState.cursor(['editor', 'checkedIds']).deref().contains(item.id);
+  const checkAll = items => () => appState.cursor(['editor', 'checkedIds']).update(
     set => {
       let updated = set;
       items.forEach(item => {
@@ -107,7 +107,7 @@ const AddLinesModal = ({ type, title, activityTabs, addItems }) => {
     }
   );
   const getCheckedItems = items => items.filter(isChecked);
-  const initModal = () => appState.cursor(['invoiceModal']).update(
+  const initModal = () => appState.cursor(['editor']).update(
     modal => modal
       .setIn(['activeTab'], '')
       .setIn(['checkedIds'], modal.get('checkedIds').clear())
