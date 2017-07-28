@@ -64,8 +64,8 @@ export default class InvoiceLines {
 
   getAllPeople = (items) => () => {
     const people = {};
-    items.map(activityCost => (
-      activityCost.people.map(personCost => {
+    items.forEach(activityCost => (
+      activityCost.people.forEach(personCost => {
         const id = `people-${activityCost.item.activity_id}-${personCost.item.person_id}`;
         people[id] = {
           id: id,
