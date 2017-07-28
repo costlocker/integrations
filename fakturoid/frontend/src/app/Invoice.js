@@ -128,50 +128,17 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     people: {
       id: 'people',
       title: "People",
-      items: () => {
-        const people = costlocker.project.budget.peoplecosts.map(activityCost => (
-            activityCost.people.map(personCost => (JSON.stringify({
-              id: `people-${activityCost.item.activity_id}-${personCost.item.person_id}`,
-              name: `${activityCost.activity.name} - ${personCost.person.first_name} ${personCost.person.last_name}`,
-              quantity: personCost.hours.budget,
-              unit: 'h',
-              unit_amount: activityCost.activity.hourly_rate,
-              total_amount: activityCost.activity.hourly_rate * personCost.hours.budget,
-            })))
-          ));
-        //
-        return [].concat.apply([], people) // reduce 2d arrays
-          .filter((value, index, self) => self.indexOf(value) === index) // unique
-          .map(JSON.parse); // convert to object
-      },
+      items: lines.getAllPeople(costlocker.project.budget.peoplecosts),
     },
     activities: {
       id: 'activities',
       title: "Activities",
-      items: () => costlocker.project.budget.peoplecosts.map(
-        activityCost => ({
-          id: `activity-${activityCost.item.activity_id}`,
-          name: activityCost.activity.name,
-          quantity: activityCost.hours.budget,
-          unit: 'h',
-          unit_amount: activityCost.activity.hourly_rate,
-          total_amount: activityCost.activity.hourly_rate * activityCost.hours.budget,
-        })
-      ),
+      items: lines.getAllActivities(costlocker.project.budget.peoplecosts),
     },
     expenses: {
       id: 'expenses',
       title: "Expenses",
-      items: () => costlocker.project.budget.expenses.map(
-        expense => ({
-          id: `expense-${expense.item.expense_id}`,
-          name: expense.expense.description,
-          quantity: 1,
-          unit: 'ks',
-          unit_amount: expense.expense.billed.total_amount,
-          total_amount: expense.expense.billed.total_amount,
-        })
-      ),
+      items: lines.getAllExpenses(costlocker.project.budget.expenses),
     },
   };
   const getActiveTabs = visibleTabs => visibleTabs.map(id => activityTabs[id]);

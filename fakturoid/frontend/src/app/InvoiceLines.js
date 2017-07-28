@@ -34,6 +34,46 @@ export default class InvoiceLines {
     });
   }
 
+  getAllActivities = (items) => () => items.map(
+    activityCost => ({
+      id: `activity-${activityCost.item.activity_id}`,
+      name: activityCost.activity.name,
+      quantity: activityCost.hours.budget,
+      unit: 'h',
+      unit_amount: activityCost.activity.hourly_rate,
+      total_amount: activityCost.activity.hourly_rate * activityCost.hours.budget,
+    })
+  )
+
+  getAllPeople = (items) => () => {
+    const people = {};
+    items.map(activityCost => (
+      activityCost.people.map(personCost => {
+        const id = `people-${activityCost.item.activity_id}-${personCost.item.person_id}`;
+        people[id] = {
+          id: id,
+          name: `${activityCost.activity.name} - ${personCost.person.first_name} ${personCost.person.last_name}`,
+          quantity: personCost.hours.budget,
+          unit: 'h',
+          unit_amount: activityCost.activity.hourly_rate,
+          total_amount: activityCost.activity.hourly_rate * personCost.hours.budget,
+        };
+      })
+    ))
+    return Object.values(people);
+  }
+
+  getAllExpenses = (items) => () => items.map(
+    expense => ({
+      id: `expense-${expense.item.expense_id}`,
+      name: expense.expense.description,
+      quantity: 1,
+      unit: 'ks',
+      unit_amount: expense.expense.billed.total_amount,
+      total_amount: expense.expense.billed.total_amount,
+    })
+  )
+
   addDiscount = (discount) => () => {
     if (discount <= 0) {
       return;
