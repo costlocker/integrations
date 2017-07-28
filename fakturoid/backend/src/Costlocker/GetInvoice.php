@@ -70,6 +70,9 @@ class GetInvoice
                     ],
                 ],
                 'billing' => $billing,
+                'link' =>
+                    getenv('CL_HOST') .
+                    "/projects/detail/{$r->query->get('project')}/billing",
             ],
             'fakturoid' => $this->invoiceToJson($invoice) + [
                 'template' => [

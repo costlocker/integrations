@@ -7,13 +7,8 @@ import { CenteredModal } from '../ui/Modals';
 import { appState } from '../state';
 import billing from '../images/billing.png';
 
-const InvoiceTutorial = ({ header }) =>
-  <div className="text-center">
-    <div className="row">
-      <div className="col-sm-12">
-        {header}
-      </div>
-    </div>
+const InvoiceTutorial = () =>
+  <div>
     <div className="row">
       <div className="col-sm-12">
         <h1>You are all set!</h1>
@@ -31,6 +26,37 @@ const InvoiceTutorial = ({ header }) =>
         <CostlockerLink path="/dashboard/billing-outlook" title="Cool, take me back to Costlocker!" className="btn btn-success btn-lg" />
       </div>
     </div>
+  </div>;
+
+const ImportedInvoice = ({ invoice, forceUpdate }) =>
+  <div className="text-center">
+    <div className="row">
+      <div className="col-sm-12">
+        <h1>Invoice successfuly created!</h1>
+        <br />
+        <p>
+          The invoice was imported to Fakturoid.<br />
+          You can now view the invoice in Fakturoid or go back to Costlocker
+        </p>
+      </div>
+    </div>
+    <div className="row">
+      <div className="col-sm-12">
+        <ExternalLink url={invoice.fakturoid.link} title="Open in Fakturoid" className="btn btn-primary" />
+        <small className="text-muted ps-10">or</small>
+        <ExternalLink url={invoice.costlocker.link} title="Go back to Costlocker" className="btn btn-default" />
+      </div>
+    </div>
+    {isDevelopmentMode &&
+    <div>
+      <hr />
+      <Button
+        title="Create invoice once again"
+        className="btn btn-warning"
+        action={forceUpdate}
+      />
+    </div>
+    }
   </div>;
 
 const InvoiceDetail = ({ costlocker }) => (
@@ -417,64 +443,57 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
   </form>;
 }
 
+const InvoicesPages = ({ props, content, header, className }) =>
+  <PageWithSubnav
+    tabs={[
+      {
+        id: 'invoice',
+        name: 'New invoice',
+        content: () => <div className="row">
+          <div className={className}>
+            {header}
+            {content}
+          </div>
+        </div>,
+      },
+      {
+        id: 'project',
+        name: 'Previously imported invoices',
+        content: () => <InvoicesList invoices={props.invoices} subjects={props.fakturoidSubjects} />,
+      },
+    ]}
+  />;
+
 export default function Invoice(props) {
   const invoice = props.invoice;
-  const buildSubnav = (content, className) => {
-    return <PageWithSubnav
-      tabs={[
-        {
-          id: 'invoice',
-          name: 'New invoice',
-          content: () => <div className="row">
-            <div className={className || "col-sm-10 col-sm-offset-1"}>
-              {props.invoice.costlocker ? (
-                <InvoiceDetail costlocker={props.invoice.costlocker} />
-              ) : null}
-              {content}
-            </div>
-          </div>,
-        },
-        {
-          id: 'project',
-          name: 'Previously imported invoices',
-          content: () => <InvoicesList invoices={props.invoices} subjects={props.fakturoidSubjects} />,
-        },
-      ]}
+  const buildInvoice = (content) =>
+    <InvoicesPages
+      props={props} content={content} className="col-sm-10 col-sm-offset-1"
+      header={<InvoiceDetail costlocker={props.invoice.costlocker} />}
     />;
-  }
+  const buildTutorial = (header) =>
+    <InvoicesPages
+      props={props} content={<InvoiceTutorial />} className="col-sm-12 text-center"
+      header={header}
+  />;
+
   if (
     invoice.status === 'READY' || invoice.status === 'NEW' ||
     (invoice.status === 'ALREADY_IMPORTED' && props.form.get('isForced'))
   ) {
-    return buildSubnav(<InvoiceEditor {...props} costlocker={props.invoice.costlocker} />);
+    return buildInvoice(<InvoiceEditor {...props} costlocker={props.invoice.costlocker} />);
   } else if (invoice.status === 'NOT_DRAFT') {
-    return buildSubnav(<Errors title="Invalid invoice state" error="Billing is already invoiced in Costlocker" />);
+    return buildInvoice(<Errors title="Invalid invoice state" error="Billing is already invoiced in Costlocker" />);
   } else if (invoice.status === 'ALREADY_IMPORTED') {
-    return buildSubnav(<div className="row">
-      <div className="col-sm-6 text-left">
-        <ExternalLink url={invoice.fakturoid.link} title={`Open invoice #${invoice.fakturoid.number} in Fakturoid`} className="btn btn-success" />
-      </div>
-      <div className="col-sm-6 text-right">
-        {isDevelopmentMode &&
-        <Button
-          title="Create invoice once again"
-          className="btn btn-warning"
-          action={props.forceUpdate}
-        />
-        }
-      </div>
-    </div>);
+    return <InvoicesPages props={props} content={<ImportedInvoice {...props} />} className="col-sm-12" />;
   } else if (invoice.status === 'UNKNOWN') {
-    return buildSubnav(
-      <InvoiceTutorial
-        header={<Errors
-          title="Unknown billing"
-          error="Billing not found in Costlocker, or you aren't authorized to see the project"
-          errorClassName="warning"
-        />}
-      />,
-      'col-sm-12'
+    return buildTutorial(
+      <Errors
+        title="Unknown billing"
+        error="Billing not found in Costlocker, or you aren't authorized to see the project"
+        errorClassName="warning"
+      />
     );
   }
-  return buildSubnav(<InvoiceTutorial />, 'col-sm-12');
+  return buildTutorial();
 }
