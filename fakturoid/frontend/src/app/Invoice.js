@@ -169,7 +169,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     <div className="form-group">
       <label htmlFor="fakturoidSubject">Fakturoid client</label>
       <div className="row">
-        <div className="col-sm-8">
+        <div className="col-sm-9">
           <select required
             className="form-control" name="fakturoidSubject" id="fakturoidSubject"
             value={form.get('subject')} onChange={form.set('subject')}
@@ -180,7 +180,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
             ))}
           </select>
         </div>
-        <div className="col-sm-4">
+        <div className="col-sm-3">
           <FakturoidLink title="Add a new Fakturoid client" path="/subjects/new" className="btn btn-success btn-block" />
         </div>
       </div>
@@ -258,12 +258,11 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         <h4>{ title }</h4>
         {items.length ? (
         <div className="row text-muted">
-          <div className="col-sm-2"><small>Quantity</small></div>
-          <div className="col-sm-2"><small>Unit</small></div>
-          <div className="col-sm-3"><small>Name</small></div>
+          <div className="col-sm-1"><small>Quantity</small></div>
+          <div className="col-sm-1"><small>Unit</small></div>
+          <div className="col-sm-6"><small>Name</small></div>
           <div className="col-sm-2 text-right"><small>Price per unit</small></div>
           <div className="col-sm-2 text-right"><small>Total price</small></div>
-          <div className="col-sm-1"><small></small></div>
         </div>
         ) : null}
         {items.map((line) => {
@@ -273,19 +272,32 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
             className={isLineIgnored ? 'row form-grid bg-danger' : 'row form-grid'}
             title={isLineIgnored ? 'Line will be ignored and not imported to Fakturoid' : null}
           >
-            <div className="col-sm-2">
+
+            <div className="btn-group">
+              {lines.hasMultipleLines() ? (
+              <Link
+                title={<span className="fa fa-times text-danger" />} className="btn btn-link"
+                action={lines.removeLine(line)}
+              />
+              ) : <span className="btn btn-link disabled"><span className="fa fa-times text-muted" /></span>}
+              <Link
+                title={<span className="fa fa-filter text-muted" />} className="btn btn-link"
+                action={lines.convertLineToOnePiece(line)}
+              />
+            </div>
+            <div className="col-sm-1 first">
               <input
-                className="form-control" type="number" step="any" required
+                className="form-control text-right" type="number" step="any" required
                 value={line.get('quantity')} onChange={lines.updateFieldInLine('quantity', line)}
               />
             </div>
-            <div className="col-sm-2">
+            <div className="col-sm-1">
               <input
                 className="form-control" type="text"
                 value={line.get('unit')} onChange={lines.updateFieldInLine('unit', line)}
               />
             </div>
-            <div className="col-sm-3">
+            <div className="col-sm-6">
               <input
                 className="form-control" type="text" required
                 value={line.get('name')} onChange={lines.updateFieldInLine('name', line)}
@@ -303,14 +315,6 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
                 disabled value={roundNumber(line.get('total_amount'))}
               />
             </div>
-            <div className="col-sm-1">
-              {lines.hasMultipleLines() ? (
-                <Link
-                  title={<span className="fa fa-times text-danger" />} className="btn btn-link"
-                  action={lines.removeLine(line)}
-                />
-              ) : <span className="btn btn-link disabled"><span className="fa fa-times text-muted" /></span>}
-            </div>
           </div>;
         })}
         {title === 'Other' ? (
@@ -326,7 +330,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     {form.get('hasVat') ? (
       <div className="form-summary">
         <div className="row">
-          <div className="col-sm-4 col-sm-offset-5 text-right">
+          <div className="col-sm-4 col-sm-offset-6 text-right">
             Total amount (without VAT)
           </div>
           <div className="col-sm-2 text-right">
@@ -334,7 +338,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           </div>
         </div>
         <div className="row">
-          <div className="col-sm-4 col-sm-offset-5 text-right">
+          <div className="col-sm-4 col-sm-offset-6 text-right">
             VAT
           </div>
           <div className="col-sm-2 text-right">
@@ -342,7 +346,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           </div>
         </div>
         <div className="row">
-          <div className="col-sm-4 col-sm-offset-5 text-right">
+          <div className="col-sm-4 col-sm-offset-6 text-right">
             <strong>Total amount (with VAT)</strong>
           </div>
           <div className="col-sm-2 text-right">
@@ -353,7 +357,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     ) : (
       <div className="form-summary">
         <div className="row">
-          <div className="col-sm-4 col-sm-offset-5 text-right">
+          <div className="col-sm-4 col-sm-offset-6 text-right">
             Total amount
           </div>
           <div className="col-sm-2 text-right">
@@ -364,7 +368,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     )}
     {Math.abs(billedAmount - linesAmount) <= 0.1 ? (
       <div className="row">
-        <div className="col-sm-2 col-sm-offset-9">
+        <div className="col-sm-2 col-sm-offset-10">
           <button type="submit" className="btn btn-primary btn-block">Create Invoice</button>
         </div>
       </div>

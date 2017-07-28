@@ -116,6 +116,19 @@ export default class InvoiceLines {
     ));
   }
 
+  convertLineToOnePiece = (line) => () => {
+    this.update(lines => (
+      lines.updateIn(
+        [line.get('id')],
+        value => value
+          .set('total_amount', value.get('quantity') * value.get('unit_amount'))
+          .set('unit_amount', value.get('quantity') * value.get('unit_amount'))
+          .set('quantity', 1)
+          .set('unit', 'ks')
+      )
+    ));
+  }
+
   removeLine = (line) => () => this.update(lines => lines.delete(line.get('id')))
 
   hasMultipleLines = () => this.deref().size > 1

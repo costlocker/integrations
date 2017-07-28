@@ -118,13 +118,35 @@ $input-bg: #fafafa;
 }
 
 .form-grid {
+    position: relative;
     > div {
         margin: 1ex 0;
+    }
+    .btn-group {
+        position: absolute;
+        top: 2px;
+        right: -60px;
+        z-index: 1000;
+        display: none;
+    }
+    &:hover .btn-group {
+        display: block;
+    }
+    // smaller padding between inputs
+    [class*="col-"] {
+        padding: 0 6px;
+        &.first { // .first-child, .first, .first-of-type doesn't work
+            padding-left: 15px;
+        }
+        &:last-child {
+            padding-right: 15px;
+        }
     }
 }
 .form-summary {
     border-top: 2px solid $gray;
     margin-top: 1em;
+    padding: 1em 0;
     .row {
         margin: 1ex 0;
     }
