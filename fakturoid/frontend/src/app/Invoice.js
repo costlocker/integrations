@@ -175,7 +175,8 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
   })
 
   const linesAmount = lines.calculateTotaAmount();
-  const billedAmount = costlocker.billing.billing.total_amount;
+  const billedAmount = costlocker.maxBillableAmount;
+  const isRevenueGreaterThanBilling = (billedAmount - linesAmount) >= -0.1;
   loadVat(fakturoidSubjects, form);
 
   const hasAdvancedSettings = () => appState.cursor(['editor', 'hasAdvancedSettings']).deref();
@@ -412,7 +413,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
             </div>
             <div className="col-sm-2 text-right">
               <input
-                className={cssPrice} type="number" step="any" required size="10"
+                className={cssPrice} type="text" step="any" required
                 value={roundNumber(line.get('unit_amount'))} onChange={lines.updateFieldInLine('unit_amount', line)}
               />
             </div>
@@ -436,57 +437,63 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         ) : null}
       </div>
     ))}
-    {form.get('hasVat') ? (
-      <div className="form-summary">
-        <div className="row">
-          <div className="col-sm-4 col-sm-offset-6 text-right">
-            Total amount (without VAT)
+    <div className="form-summary">
+      {!isRevenueGreaterThanBilling ? (
+        <Errors
+          title={`Total amount must be smaller or equal to '${roundNumber(billedAmount)}', otherwise the project revenue would be smaller than billing`}
+          error={`You cannot bill '${roundNumber(linesAmount)}', bring down quantity or unit amount in lines.`}
+          errorClassName="warning"
+        />
+      ) : null}
+      {form.get('hasVat') ? (
+        <div>
+          <div className="row">
+            <div className="col-sm-4 col-sm-offset-6 text-right">
+              Total amount (without VAT)
+            </div>
+            <div className="col-sm-2 text-right">
+              <Number value={linesAmount} isElement />
+            </div>
           </div>
-          <div className="col-sm-2 text-right">
-            <Number value={linesAmount} isElement />
+          <div className="row">
+            <div className="col-sm-4 col-sm-offset-6 text-right">
+              VAT
+            </div>
+            <div className="col-sm-2 text-right">
+              <Number value={form.get('vat')} isElement />%
+            </div>
           </div>
-        </div>
-        <div className="row">
-          <div className="col-sm-4 col-sm-offset-6 text-right">
-            VAT
-          </div>
-          <div className="col-sm-2 text-right">
-            <Number value={form.get('vat')} isElement />%
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-sm-4 col-sm-offset-6 text-right">
-            <strong>Total amount (with VAT)</strong>
-          </div>
-          <div className="col-sm-2 text-right">
-            <strong><Number value={linesAmount + linesAmount * (form.get('vat')) / 100} isElement /></strong>
-          </div>
-        </div>
-      </div>
-    ) : (
-      <div className="form-summary">
-        <div className="row">
-          <div className="col-sm-4 col-sm-offset-6 text-right">
-            Total amount
-          </div>
-          <div className="col-sm-2 text-right">
-            <strong><Number value={linesAmount} isElement /></strong>
+          <div className="row">
+            <div className="col-sm-4 col-sm-offset-6 text-right">
+              <strong>Total amount (with VAT)</strong>
+            </div>
+            <div className="col-sm-2 text-right">
+              <strong><Number value={linesAmount + linesAmount * (form.get('vat')) / 100} isElement /></strong>
+            </div>
           </div>
         </div>
-      </div>
-    )}
-    {Math.abs(billedAmount - linesAmount) <= 0.1 ? (
-      <div className="row">
-        <div className="col-sm-2 col-sm-offset-10">
+      ) : (
+        <div>
+          <div className="row">
+            <div className="col-sm-4 col-sm-offset-6 text-right">
+              Total amount
+            </div>
+            <div className="col-sm-2 text-right">
+              <strong><Number value={linesAmount} isElement /></strong>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+    <div className="row">
+      <div className="col-sm-2 col-sm-offset-10">
+        {isRevenueGreaterThanBilling ? (
           <button type="submit" className="btn btn-primary btn-block">Create Invoice</button>
-        </div>
+        ) : (
+          <span className="btn btn-danger btn-block" disabled title="Update total amount">Create Invoice</span>
+        )}
       </div>
-    ) : (
-      <Errors
-        title={`Billed amount '${roundNumber(billedAmount)}' in Costlocker is different than total amount in invoice lines '${roundNumber(linesAmount)}'`}
-        error="Update quantity or unit amount in lines, so that amount is same"
-      />
-    )}
+    </div>
     <div className="form-group">
       <label htmlFor="note">Note</label>
       <textarea

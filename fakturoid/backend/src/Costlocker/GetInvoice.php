@@ -70,6 +70,7 @@ class GetInvoice
                     ],
                 ],
                 'billing' => $billing,
+                'maxBillableAmount' => $this->getMaxBillableAmount($billing, $items['metrics']),
                 'link' =>
                     getenv('CL_HOST') .
                     "/projects/detail/{$r->query->get('project')}/billing",
@@ -91,17 +92,27 @@ class GetInvoice
             'billing' => [],
             'expense' => [],
             'discount' => 0,
+            'metrics' => [
+                'revenue' => 0,
+                'billing' => 0,
+            ],
         ];
         foreach ($items as $item) {
             $type = $item['item']['type'];
             if ($type == 'activity') {
                 $results['peoplecosts'][$item['item']['activity_id']] = $item + ['people' => []];
+                $results['metrics']['revenue'] += $item['hours']['budget'] * $item['activity']['hourly_rate'];
             } elseif ($type == 'person') {
                 $results['peoplecosts'][$item['item']['activity_id']]['people'][] = $item;
-            } elseif (in_array($type, ['billing', 'expense'])) {
+            } elseif ($type == 'expense') {
                 $results[$type][] = $item;
+                $results['metrics']['revenue'] += $item['expense']['billed']['total_amount'];
+            } elseif ($type == 'billing') {
+                $results[$type][] = $item;
+                $results['metrics']['billing'] += $item['billing']['total_amount'];
             } elseif ($type == 'discount') {
                 $results[$type] = $item['discount']['total_amount'];
+                $results['metrics']['revenue'] -= $item['discount']['total_amount'];
             }
         }
         $results['peoplecosts'] = array_values($results['peoplecosts']);
@@ -155,5 +166,10 @@ class GetInvoice
             'number' => $i->fakturoidInvoiceNumber,
             'link' => $i->data['response']['html_url'],
         ];
+    }
+
+    private function getMaxBillableAmount(array $billing, array $metrics)
+    {
+        return $billing['billing']['total_amount'] + floor($metrics['revenue'] - $metrics['billing']);
     }
 }
