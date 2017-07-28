@@ -252,99 +252,119 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           </div>
         </div>
       </div>
-      <table className="table">
-        <thead>
-          <tr>
-            <th width="100">Quantity</th>
-            <th width="100">Unit</th>
-            <th>Name</th>
-            <th>Price per unit</th>
-            <th>Total price</th>
-            <th width="10"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {lines.map((line) => {
-            const isLineIgnored = line.get('quantity') <= 0;
-            return <tr
-              key={line.get('id')}
-              className={isLineIgnored ? 'bg-danger' : null}
-              title={isLineIgnored ? 'Line will be ignored and not imported to Fakturoid' : null}
-            >
-              <td>
-                <input
-                  className="form-control" type="number" step="any" required
-                  value={line.get('quantity')} onChange={lines.updateFieldInLine('quantity', line)}
-                />
-              </td>
-              <td>
-                <input
-                  className="form-control" type="text"
-                  value={line.get('unit')} onChange={lines.updateFieldInLine('unit', line)}
-                />
-              </td>
-              <td>
-                <input
-                  className="form-control" type="text" required
-                  value={line.get('name')} onChange={lines.updateFieldInLine('name', line)}
-                />
-              </td>
-              <td>
-                <input
-                  className="form-control" type="number" step="any" required size="10"
-                  value={roundNumber(line.get('unit_amount'))} onChange={lines.updateFieldInLine('unit_amount', line)}
-                />
-              </td>
-              <td>
-                <input
-                  className="form-control" type="number" step="any" required
-                  disabled value={roundNumber(line.get('total_amount'))}
-                />
-              </td>
-              <td>
-                {lines.hasMultipleLines() ? (
-                  <Link
-                    title={<span className="fa fa-trash"></span>} className="btn btn-link text-danger"
-                    action={lines.removeLine(line)}
-                  />
-                ) : <span className="btn btn-link disabled fa fa-trash"></span>}
-              </td>
-            </tr>;
-          })}
-        </tbody>
-        {form.get('hasVat') ? (
-          <tfoot>
-            <tr>
-              <td colSpan="6">
-                <Link title="Add new empty line" action={lines.addEmptyLine()} className="btn btn-success" />
-              </td>
-            </tr>
-            <tr>
-              <th colSpan="4" className="text-right">Total amount (without VAT)</th>
-              <th colSpan="2"><Number value={linesAmount} isElement /></th>
-            </tr>
-            <tr>
-              <th colSpan="4" className="text-right">VAT</th>
-              <th colSpan="2"><Number value={form.get('vat')} isElement />%</th>
-            </tr>
-            <tr>
-              <th colSpan="4" className="text-right">Total amount (with VAT)</th>
-              <th colSpan="2"><Number value={linesAmount + linesAmount * (form.get('vat')) / 100} isElement /></th>
-            </tr>
-          </tfoot>
-        ) : (
-            <tfoot>
-              <tr>
-                <th colSpan="4" className="text-right">Total amount</th>
-                <th colSpan="2"><Number value={linesAmount} isElement /></th>
-              </tr>
-            </tfoot>
-          )}
-      </table>
     </div>
+    {lines.getGroupedLines().map(({ title, items }) => (
+      <div key={ title } className={items.length || title === 'Other' ? 'show' : 'hide'}>
+        <h4>{ title }</h4>
+        {items.length ? (
+        <div className="row text-muted">
+          <div className="col-sm-2"><small>Quantity</small></div>
+          <div className="col-sm-2"><small>Unit</small></div>
+          <div className="col-sm-3"><small>Name</small></div>
+          <div className="col-sm-2 text-right"><small>Price per unit</small></div>
+          <div className="col-sm-2 text-right"><small>Total price</small></div>
+          <div className="col-sm-1"><small></small></div>
+        </div>
+        ) : null}
+        {items.map((line) => {
+          const isLineIgnored = line.get('quantity') <= 0;
+          return <div
+            key={line.get('id')}
+            className={isLineIgnored ? 'row form-grid bg-danger' : 'row form-grid'}
+            title={isLineIgnored ? 'Line will be ignored and not imported to Fakturoid' : null}
+          >
+            <div className="col-sm-2">
+              <input
+                className="form-control" type="number" step="any" required
+                value={line.get('quantity')} onChange={lines.updateFieldInLine('quantity', line)}
+              />
+            </div>
+            <div className="col-sm-2">
+              <input
+                className="form-control" type="text"
+                value={line.get('unit')} onChange={lines.updateFieldInLine('unit', line)}
+              />
+            </div>
+            <div className="col-sm-3">
+              <input
+                className="form-control" type="text" required
+                value={line.get('name')} onChange={lines.updateFieldInLine('name', line)}
+              />
+            </div>
+            <div className="col-sm-2 text-right">
+              <input
+                className="form-control text-right" type="number" step="any" required size="10"
+                value={roundNumber(line.get('unit_amount'))} onChange={lines.updateFieldInLine('unit_amount', line)}
+              />
+            </div>
+            <div className="col-sm-2 text-right">
+              <input
+                className="form-control text-right" type="number" step="any" required
+                disabled value={roundNumber(line.get('total_amount'))}
+              />
+            </div>
+            <div className="col-sm-1">
+              {lines.hasMultipleLines() ? (
+                <Link
+                  title={<span className="fa fa-times text-danger" />} className="btn btn-link"
+                  action={lines.removeLine(line)}
+                />
+              ) : <span className="btn btn-link disabled"><span className="fa fa-times text-muted" /></span>}
+            </div>
+          </div>;
+        })}
+        {title === 'Other' ? (
+          <div className="row">
+            <div className="col-sm-2">
+              <br />
+              <Link title="Add new empty line" action={lines.addEmptyLine()} className="btn btn-success" />
+            </div>
+          </div>
+        ) : null}
+      </div>
+    ))}
+    {form.get('hasVat') ? (
+      <div className="form-summary">
+        <div className="row">
+          <div className="col-sm-4 col-sm-offset-5 text-right">
+            Total amount (without VAT)
+          </div>
+          <div className="col-sm-2 text-right">
+            <Number value={linesAmount} isElement />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-sm-4 col-sm-offset-5 text-right">
+            VAT
+          </div>
+          <div className="col-sm-2 text-right">
+            <Number value={form.get('vat')} isElement />%
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-sm-4 col-sm-offset-5 text-right">
+            <strong>Total amount (with VAT)</strong>
+          </div>
+          <div className="col-sm-2 text-right">
+            <strong><Number value={linesAmount + linesAmount * (form.get('vat')) / 100} isElement /></strong>
+          </div>
+        </div>
+      </div>
+    ) : (
+      <div className="form-summary">
+        <div className="row">
+          <div className="col-sm-4 col-sm-offset-5 text-right">
+            Total amount
+          </div>
+          <div className="col-sm-2 text-right">
+            <strong><Number value={linesAmount} isElement /></strong>
+          </div>
+        </div>
+      </div>
+    )}
     {Math.abs(billedAmount - linesAmount) <= 0.1 ? (
       <div className="row">
-        <div className="col-sm-4 col-sm-offset-8">
+        <div className="col-sm-2 col-sm-offset-9">
           <button type="submit" className="btn btn-primary btn-block">Create Invoice</button>
         </div>
       </div>
@@ -353,7 +373,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         title={`Billed amount '${roundNumber(billedAmount)}' in Costlocker is different than total amount in invoice lines '${roundNumber(linesAmount)}'`}
         error="Update quantity or unit amount in lines, so that amount is same"
       />
-      )}
+    )}
     <div className="form-group">
       <label htmlFor="note">Note</label>
       <textarea

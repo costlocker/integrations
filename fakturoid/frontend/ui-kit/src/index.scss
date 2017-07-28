@@ -117,6 +117,19 @@ $input-bg: #fafafa;
     }
 }
 
+.form-grid {
+    > div {
+        margin: 1ex 0;
+    }
+}
+.form-summary {
+    border-top: 2px solid $gray;
+    margin-top: 1em;
+    .row {
+        margin: 1ex 0;
+    }
+}
+
 .table {
     .highlight {
         background: $highlight-bg !important;

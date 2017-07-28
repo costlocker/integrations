@@ -120,6 +120,24 @@ export default class InvoiceLines {
 
   hasMultipleLines = () => this.deref().size > 1
 
+  getGroupedLines = () => {
+    const groups = {};
+    this.deref().forEach(item => {
+      const type = item.get('id').split('-')[0];
+      if (!groups[type]) {
+        groups[type] = [];
+      }
+      groups[type].push(item);
+    });
+    const getGroup = (type) => groups[type] || [];
+    return [
+      { title: 'People and Activities', items: getGroup('people').concat(getGroup('activity')) },
+      { title: 'Expenses', items: getGroup('expense') },
+      { title: 'Discount', items: getGroup('discount') },
+      { title: 'Other', items: getGroup('default').concat(getGroup('empty')) },
+    ];
+  }
+
   map = (callback) => this.deref().valueSeq().map(callback)
 
   addLine = (lines, rawData) => lines.set(rawData.id, Map(rawData))
