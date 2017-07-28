@@ -36,7 +36,7 @@ const Link = ({ title, route, params, action, className }) => {
   return <a href="" onClick={onClick} className={className}>{title}</a>;
 };
 
-const CostlockerLink = ({ title, path }) => <a href={`${appHost}${path}`}>{title}</a>
+const CostlockerLink = ({ title, path, className }) => <a href={`${appHost}${path}`} className={className}>{title}</a>
 
 const FakturoidLink = ({ title, path, className }) =>
   <ExternalLink title={title} url={`https://app.fakturoid.cz/${fakturoidHost()}${path}`} className={className} />
@@ -48,12 +48,12 @@ const roundNumber = value => {
 
 const Number = ({ value }) => <span title={value}>{roundNumber(value)}</span>;
 
-const Image = ({ src }) => <img src={src} alt="" className="img-responsive img-thumbnail" />
+const Image = (props) => <img {...props} alt="" />
 
 const ImageTooltip = ({ url }) =>
   <div className="image-tooltip">
     <i className="fa fa-question-circle" />
-    <img src={url} alt="" />
+    <Image src={url} />
   </div>;
 
 export { Errors, ExternalLink, Button, Link, CostlockerLink, FakturoidLink, roundNumber, Number, Image, ImageTooltip };
