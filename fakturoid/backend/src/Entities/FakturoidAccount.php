@@ -66,4 +66,9 @@ class FakturoidAccount
     {
         return $this->data['subjects'];
     }
+
+    public function setAccount(array $account)
+    {
+        $this->data['account'] = $account;
+    }
 }

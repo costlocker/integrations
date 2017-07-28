@@ -35,6 +35,9 @@ class DownloadSubjects
             $hasNextPage = is_int(strpos($response->getHeaderLine('Link'), "?page={$page}"));
         }
 
+        $response = $this->client->__invoke('/account.json');
+        $account->setAccount(json_decode($response->getBody(), true));
+
         $account->subjectsDownloadedAt = new \DateTime();
         $this->database->persist($account);
     }
