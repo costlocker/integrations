@@ -114,7 +114,10 @@ export const states = [
         invoice={invoice}
         fakturoidSubjects={subjects}
         invoices={<InvoicesList invoices={appState.cursor(['costlocker', 'invoices']).deref()} subjects={subjects} />}
-        lines={new InvoiceLines(appState.cursor(['invoice', 'lines']))}
+        lines={new InvoiceLines(
+          appState.cursor(['invoice', 'lines']),
+          appState.cursor(['auth', 'fakturoid']).deref().account.has_vat
+        )}
         forceUpdate={() => appState.cursor(['invoice']).set('isForced', true)}
         form={{
           get: (type) => appState.cursor(['invoice', type]).deref(),

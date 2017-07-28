@@ -38,8 +38,6 @@ class CreateInvoice
         ];
         unset($invoice->data['request']['costlocker']['project']['budget']);
 
-        $invoice->addVatToLines();
-
         $response = $this->client->__invoke(
             '/invoices.json',
             [

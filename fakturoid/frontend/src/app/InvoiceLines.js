@@ -2,8 +2,9 @@
 import { Map } from 'immutable';
 
 export default class InvoiceLines {
-  constructor(cursor) {
+  constructor(cursor, hasVat) {
     this.cursor = cursor;
+    this.hasVat = hasVat;
   }
 
   calculateTotaAmount() {
@@ -153,7 +154,10 @@ export default class InvoiceLines {
 
   map = (callback) => this.deref().valueSeq().map(callback)
 
-  addLine = (lines, rawData) => lines.set(rawData.id, Map(rawData))
+  addLine = (lines, rawData) => {
+    rawData.vat = this.hasVat ? 21 : 0;
+    return lines.set(rawData.id, Map(rawData));
+  }
 
   update = (callback) => this.cursor.update(callback)
 

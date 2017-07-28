@@ -35,7 +35,6 @@ const appState = immstruct({
     subject: '',
     note: '',
     type: 'invoice',
-    vat: 21,
     issuedAt: new Date().toISOString().split('T')[0],
     due: 14,
     orderNumber: '',

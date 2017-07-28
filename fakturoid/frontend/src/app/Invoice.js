@@ -163,8 +163,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
   const billedAmount = costlocker.maxBillableAmount;
   const isRevenueGreaterThanBilling = (billedAmount - linesAmount) >= -0.1;
 
-  const hasVat = appState.cursor(['auth', 'fakturoid']).deref().account.has_vat;
-  const vat = linesAmount * (form.get('vat')) / 100;
+  const vat = 0;
 
   const hasAdvancedSettings = () => appState.cursor(['editor', 'hasAdvancedSettings']).deref();
   const toggleAdvancedSettings = () => appState.cursor(['editor']).set('hasAdvancedSettings', !hasAdvancedSettings());
@@ -201,12 +200,6 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
   const dueDate = moment(issuedAt).add(form.get('due'), 'days');
 
   return <form className="form" onSubmit={form.submit}>
-    <div>
-      <input
-        className="form-control" type="hidden" id="vat" min="0" max="100" step="1"
-        value={form.get('vat')} required
-      />
-    </div>
     <div className="form-group">
       <label htmlFor="type">Invoice type</label><br />
       <RadioButtons
@@ -354,7 +347,8 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         <div className="row text-muted">
           <div className="col-sm-1"><small>Quantity</small></div>
           <div className="col-sm-1"><small>Unit</small></div>
-          <div className="col-sm-6"><small>Name</small></div>
+          <div className={lines.hasVat ? "col-sm-5" : "col-sm-6"}><small>Name</small></div>
+          {lines.hasVat ? <div className="col-sm-1"><small>VAT</small></div> : null}
           <div className="col-sm-2 text-right"><small>Price per unit</small></div>
           <div className="col-sm-2 text-right"><small>Total price</small></div>
         </div>
@@ -392,12 +386,20 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
                 value={line.get('unit')} onChange={lines.updateFieldInLine('unit', line)}
               />
             </div>
-            <div className="col-sm-6">
+            <div className={lines.hasVat ? "col-sm-5" : "col-sm-6"}>
               <input
                 className="form-control" type="text" required
                 value={line.get('name')} onChange={lines.updateFieldInLine('name', line)}
               />
             </div>
+            {lines.hasVat ? (
+            <div className="col-sm-1">
+              <input
+                className="form-control" type="text"
+                value={line.get('vat')} onChange={lines.updateFieldInLine('vat', line)}
+              />
+            </div>
+            ) : null}
             <div className="col-sm-2 text-right">
               <input
                 className={cssPrice} type="text" step="any" required
@@ -432,7 +434,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           errorClassName="warning"
         />
       ) : null}
-      {hasVat ? (
+      {lines.hasVat ? (
         <div>
           <div className="row">
             <div className="col-sm-4 col-sm-offset-6 text-right">

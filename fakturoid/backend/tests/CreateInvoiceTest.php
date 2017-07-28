@@ -16,29 +16,14 @@ class CreateInvoiceTest extends \PHPUnit_Framework_TestCase
     private $jsonRequest;
     private $createdInvoice;
 
-    /** @dataProvider provideVat */
-    public function testAddVat(array $settings, $expectedVat)
+    public function testAddVat()
     {
-        $this->givenRequest($settings);
+        $this->givenRequest();
         $this->whenInvoiceIsCreated();
-        $this->everyProductShouldHaveVat($expectedVat);
-    }
-
-    public function provideVat()
-    {
-        return [
-            'no VAT' => [
-                ['hasVat' => false, 'vat' => 21],
-                0
-            ],
-            'has VAT' => [
-                ['hasVat' => true, 'vat' => 21],
-                21
-            ],
-        ];
+        $this->everyProductShouldHaveVat(21);
     }
     
-    private function givenRequest(array $settings)
+    private function givenRequest(array $settings = [])
     {
         $this->jsonRequest = array_replace_recursive(
             json_decode(file_get_contents(__DIR__ . '/fixtures/invoice-data.json'), true)['request'],

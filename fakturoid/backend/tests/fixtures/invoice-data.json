@@ -5,8 +5,6 @@
             "subject":"2910929",
             "note": "my private note",
             "type": "invoice",
-            "hasVat": false,
-            "vat": 0,
             "issuedAt": "2017-07-26",
             "due": 14,
             "orderNumber": "HR001-1",
@@ -16,7 +14,8 @@
                     "name":"my description",
                     "unit_amount": 100,
                     "quantity": 1,
-                    "unit": "ks"
+                    "unit": "ks",
+                    "vat": 21
                 }
             }
         },
