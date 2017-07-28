@@ -10,6 +10,7 @@ use Costlocker\Integrations\Fakturoid\GuessSubject;
 
 class GetInvoice
 {
+    const STATUS_NOTHING = 'NO_INVOICE';
     const STATUS_UNKNOWN = 'UNKNOWN';
     const STATUS_NOT_DRAFT = 'NOT_DRAFT';
     const STATUS_ALREADY_IMPORTED = 'ALREADY_IMPORTED';
@@ -29,6 +30,14 @@ class GetInvoice
 
     public function __invoke(Request $r)
     {
+        if (!$r->query->get('project') || !$r->query->get('project')) {
+            return [
+                'status' => self::STATUS_NOTHING,
+                'costlocker' => null,
+                'fakturoid' => null,
+            ];
+        }
+
         $response = $this->client->__invoke(
             "/projects/{$r->query->get('project')}?types=billing,expenses,peoplecosts,discounts"
         );

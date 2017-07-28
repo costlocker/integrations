@@ -5,7 +5,6 @@ import { fetchFromApi, pushToApi, loginUrls } from './api';
 import Login from './app/Login';
 import Invoice from './app/Invoice';
 import InvoiceLines from './app/InvoiceLines'
-import InvoiceTutorial from './app/InvoiceTutorial';
 import Loading from './ui/Loading';
 
 export let redirectToRoute = (route) => console.log('app is not ready', route);
@@ -65,7 +64,7 @@ appState.on('next-animation-frame', function (newStructure, oldStructure, keyPat
 
 const fetchInvoice = ({ project, billing, amount }) => {
   fetchInvoices();
-  return fetchFromApi(`/costlocker?project=${project}&billing=${billing}&amount=${amount}&query=billing`)
+  return fetchFromApi(`/costlocker?project=${project || ''}&billing=${billing || ''}&amount=${amount || ''}&query=billing`)
     .catch(setError)
     .then(invoice => appState.cursor()
       .setIn(['costlocker', 'invoice'], invoice)
@@ -103,12 +102,6 @@ export const states = [
     component: (props) => {
       const params = props.transition.params();
       const subjects = appState.cursor(['fakturoid', 'subjects']).deref();
-      if (!params.billing || !params.project) {
-        return <InvoiceTutorial
-          invoices={appState.cursor(['costlocker', 'invoices']).deref()}
-          subjects={subjects}
-        />;
-      }
       const invoice = appState.cursor(['costlocker', 'invoice']).deref();
       if (!subjects || !invoice) {
         return <Loading title="Loading fakturoid clients, Costlocker invoice" />;
@@ -196,11 +189,8 @@ export const states = [
         deps: ['$transition$'],
         resolveFn: ($transition$) => {
           const params = $transition$.params();
-          if (params.billing && params.project) {
-            fetchInvoice(params);
-          } else {
-            fetchInvoices();
-          }
+          fetchInvoice(params);
+          fetchInvoices();
         }
       }
     ],

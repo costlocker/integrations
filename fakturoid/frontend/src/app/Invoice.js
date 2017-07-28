@@ -1,10 +1,37 @@
 import React from 'react';
-import { Button, Link, Errors, roundNumber, Number, ExternalLink, FakturoidLink } from '../ui/Components';
+import { Button, Link, Errors, roundNumber, Number, ExternalLink, FakturoidLink, CostlockerLink, Image } from '../ui/Components';
 import InvoicesList from './InvoicesList';
-import { PageWithSubnav, Page } from '../ui/App';
+import { PageWithSubnav } from '../ui/App';
 import { isDevelopmentMode } from '../config';
 import { CenteredModal } from '../ui/Modals';
 import { appState } from '../state';
+import billing from '../images/billing.png';
+
+const InvoiceTutorial = ({ header }) =>
+  <div className="text-center">
+    <div className="row">
+      <div className="col-sm-12">
+        {header}
+      </div>
+    </div>
+    <div className="row">
+      <div className="col-sm-12">
+        <h1>You are all set!</h1>
+        <br />
+        You will now see button <strong className="btn btn-primary">Create invoice</strong> in Billing interface of a project.
+      </div>
+    </div>
+    <div className="row">
+      <div className="col-sm-12">
+        <Image src={billing} className="img-responsive center-block" />
+      </div>
+    </div>
+    <div className="row">
+      <div className="col-sm-12">
+        <CostlockerLink path="/dashboard/billing-outlook" title="Cool, take me back to Costlocker!" className="btn btn-success btn-lg" />
+      </div>
+    </div>
+  </div>;
 
 const InvoiceDetail = ({ costlocker }) => (
   <div>
@@ -392,22 +419,24 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
 
 export default function Invoice(props) {
   const invoice = props.invoice;
-  const buildSubnav = (content) => {
+  const buildSubnav = (content, className) => {
     return <PageWithSubnav
       tabs={[
         {
           id: 'invoice',
           name: 'New invoice',
           content: () => <div className="row">
-            <div className="col-sm-10 col-sm-offset-1">
-              <InvoiceDetail costlocker={props.invoice.costlocker} />
+            <div className={className || "col-sm-10 col-sm-offset-1"}>
+              {props.invoice.costlocker ? (
+                <InvoiceDetail costlocker={props.invoice.costlocker} />
+              ) : null}
               {content}
             </div>
           </div>,
         },
         {
           id: 'project',
-          name: 'Previously imported project invoices',
+          name: 'Previously imported invoices',
           content: () => <InvoicesList invoices={props.invoices} subjects={props.fakturoidSubjects} />,
         },
       ]}
@@ -435,8 +464,17 @@ export default function Invoice(props) {
         }
       </div>
     </div>);
+  } else if (invoice.status === 'UNKNOWN') {
+    return buildSubnav(
+      <InvoiceTutorial
+        header={<Errors
+          title="Unknown billing"
+          error="Billing not found in Costlocker, or you aren't authorized to see the project"
+          errorClassName="warning"
+        />}
+      />,
+      'col-sm-12'
+    );
   }
-  return <Page
-    view={<Errors title="Unknown billing" error="Billing not found in Costlocker, or you aren't authorized to see the project" />}
-  />;
+  return buildSubnav(<InvoiceTutorial />, 'col-sm-12');
 }
