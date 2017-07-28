@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Link, Errors, roundNumber, Number, ExternalLink, FakturoidLink, CostlockerLink } from '../ui/Components';
+import { Button, Link, Errors, roundNumber, Number, ExternalLink, FakturoidLink, CostlockerLink, RadioButtons } from '../ui/Components';
 import { Image, Logo } from '../ui/Images';
 import { PageWithSubnav } from '../ui/App';
 import { isDevelopmentMode } from '../config';
@@ -124,15 +124,12 @@ const AddLinesModal = ({ type, title, activityTabs, addItems }) => {
         <div>
           <h2>{title}</h2>
           {hasMultipleTabs ? (
-          <div className="btn-group btn-group-justified">
-            {activityTabs.map(type => (
-              <label key={type.id} className={isActive(type) ? 'btn btn-primary active' : 'btn btn-default'}>
-                <input
-                  type="radio" name="type" value={type.id} className="hide"
-                  checked={isActive(type)} onChange={changeTab} /> {type.title}
-              </label>
-            ))}
-          </div>
+          <RadioButtons
+            items={activityTabs}
+            isActive={isActive}
+            onChange={changeTab}
+            className="btn-group-justified"
+          />
           ) : null}
           {activityTabs.map(type => {
             const items = type.items();
@@ -217,19 +214,15 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     </div>
     <div className="form-group">
       <label htmlFor="type">Invoice type</label><br />
-      <div className="btn-group">
-        {[
+      <RadioButtons
+        items={[
           { id: 'invoice', title: 'Invoice' },
           { id: 'proforma.full', title: 'Proforma (full)' },
           { id: 'proforma.partial', title: 'Proforma (partial)' },
-        ].map(type => (
-          <label key={type.id} className={form.get('type') === type.id ? 'btn btn-primary active' : 'btn btn-default'}>
-            <input
-              type="radio" name="type" value={type.id} className="hide"
-              checked={form.get('type') === type.id} onChange={form.set('type')} /> {type.title}
-          </label>
-        ))}
-      </div>
+        ]}
+        isActive={type => form.get('type') === type.id}
+        onChange={form.set('type')}
+      />
     </div>
     <div className="form-group">
       <label htmlFor="fakturoidSubject">Fakturoid client</label>

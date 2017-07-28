@@ -48,4 +48,15 @@ const roundNumber = value => {
 
 const Number = ({ value }) => <span title={value}>{roundNumber(value)}</span>;
 
-export { Errors, ExternalLink, Button, Link, CostlockerLink, FakturoidLink, roundNumber, Number };
+const RadioButtons = ({ items, isActive, onChange, className }) =>
+  <div className={`btn-group ${className}`}>
+    {items.map(type => (
+      <label key={type.id} className={isActive(type) ? 'btn btn-primary active' : 'btn btn-default'}>
+        <input
+          type="radio" name="type" value={type.id} className="hide"
+          checked={isActive(type)} onChange={onChange} /> {type.title}
+      </label>
+    ))}
+  </div>;
+
+export { Errors, ExternalLink, Button, Link, CostlockerLink, FakturoidLink, roundNumber, Number, RadioButtons };

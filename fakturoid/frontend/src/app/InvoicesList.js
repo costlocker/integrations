@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExternalLink, roundNumber } from '../ui/Components';
+import { ExternalLink, roundNumber, RadioButtons } from '../ui/Components';
 import { Logo } from '../ui/Images';
 import { appState } from '../state';
 
@@ -14,20 +14,16 @@ export default function InvoicesList({ invoices, subjects }) {
     <form className="form row">
       <div className="col-sm-5">
         <div className="form-group">
-          <div className="btn-group">
-            {[
+          <RadioButtons
+            items={[
               { title: 'All', id: '' },
               { title: 'Standard', id: 'invoice' },
               { title: 'Proforma (full)', id: 'proforma.full' },
               { title: 'Proforma (partial)', id: 'proforma.partial' },
-            ].map(type => (
-              <label key={type.id} className={filter.get('type') === type.id ? 'btn btn-primary active' : 'btn btn-default'}>
-                <input
-                  type="radio" name="type" value={type.id} className="hide"
-                  checked={filter.get('type') === type.id} onChange={setFilter('type')} /> {type.title}
-              </label>
-            ))}
-          </div>
+            ]}
+            isActive={type => filter.get('type') === type.id}
+            onChange={setFilter('type')}
+          />
         </div>
       </div>
       <div className="col-sm-3 col-sm-offset-4">
