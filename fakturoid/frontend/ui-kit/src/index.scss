@@ -236,3 +236,14 @@ $input-bg: #fafafa;
 .ps-10 {
     padding: 0 10px;
 }
+
+.btn-horizontal {
+    display: block;
+    text-align: center;
+    &.up {
+        border-top: 1px solid $breadcrumb-bg;
+    }
+    &.down {
+        border-bottom: 1px solid $breadcrumb-bg;
+    }
+}

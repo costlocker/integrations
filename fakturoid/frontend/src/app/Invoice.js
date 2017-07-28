@@ -177,6 +177,9 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
   const billedAmount = costlocker.billing.billing.total_amount;
   loadVat(fakturoidSubjects, form);
 
+  const hasAdvancedSettings = () => appState.cursor(['editor', 'hasAdvancedSettings']).deref();
+  const toggleAdvancedSettings = () => appState.cursor(['editor']).set('hasAdvancedSettings', !hasAdvancedSettings());
+
   const activityTabs = {
     people: {
       id: 'people',
@@ -277,21 +280,37 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         </div>
       </div>
     </div>
-    <div className="form-group">
-      <label htmlFor="orderNumber">Order Number</label>
-      <input
-        type="text" className="form-control" name="orderNumber" id="orderNumber"
-        value={form.get('orderNumber')} onChange={form.set('orderNumber')}
+    {hasAdvancedSettings() ? (
+      <div>
+        <div className="well">
+          <div className="form-group">
+            <label htmlFor="orderNumber">Order Number</label>
+            <input
+              type="text" className="form-control" name="orderNumber" id="orderNumber"
+              value={form.get('orderNumber')} onChange={form.set('orderNumber')}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="noteBeforeLines">Note before invoice lines</label>
+            <textarea
+              className="form-control" name="noteBeforeLines" id="noteBeforeLines" rows="4"
+              value={form.get('noteBeforeLines')} onChange={form.set('noteBeforeLines')}
+            >
+            </textarea>
+          </div>
+        </div>
+        <Link
+          title={<span>Hide advanced settings <span className="fa fa-arrow-up" /></span>}
+          className="btn btn-horizontal up"
+          action={toggleAdvancedSettings} />
+      </div>
+    ) : (
+      <Link
+        title={<span>Show advanced settings <span className="fa fa-arrow-down" /></span>}
+        className="btn btn-horizontal down"
+        action={toggleAdvancedSettings}
       />
-    </div>
-    <div className="form-group">
-      <label htmlFor="noteBeforeLines">Note before invoice lines</label>
-      <textarea
-        className="form-control" name="noteBeforeLines" id="noteBeforeLines" rows="4"
-        value={form.get('noteBeforeLines')} onChange={form.set('noteBeforeLines')}
-      >
-      </textarea>
-    </div>
+    )}
     <div className="form-group">
       <div className="row">
         <div className="col-sm-10">

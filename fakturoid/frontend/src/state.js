@@ -44,6 +44,7 @@ const appState = immstruct({
     lines: OrderedMap(),
   },
   editor: {
+    hasAdvancedSettings: false,
     activeTab: '',
     checkedIds: Set(),
   },
