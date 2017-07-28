@@ -86,6 +86,29 @@ $input-bg: #fafafa;
             color: $body-bg;
         }
     }
+    .navbar-right {
+        li.active a {
+            background: $navbar-default-bg !important;
+            color: $navbar-default-link-color !important;
+        }
+        a {
+            padding: 6px 6px 3px;
+            vertical-align: baseline;
+            position: relative;
+        }
+        .logo {
+            margin: 0 1em;
+            display: inline-block;
+            vertical-align: baseline;
+        }
+        .user {
+            display: inline-block;
+            text-align: left;
+            strong {
+                display: block;
+            }
+        }
+    }
 }
 
 .nav-breadcrumbs {
