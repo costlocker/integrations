@@ -86,7 +86,7 @@ const loadVat = (subjects, form) => {
   });
 };
 
-const AddLinesModal = ({ title, activityTabs, addItems }) => {
+const AddLinesModal = ({ type, title, activityTabs, addItems }) => {
   const hasMultipleTabs =  activityTabs.length > 1;
   const isActive = type => hasMultipleTabs
     ? type.id === (appState.cursor(['invoiceModal', 'activeTab']).deref() || activityTabs[0].id)
@@ -113,7 +113,7 @@ const AddLinesModal = ({ title, activityTabs, addItems }) => {
       .setIn(['checkedIds'], modal.get('checkedIds').clear())
   );
   return <CenteredModal
-    type={title}
+    type={type}
     onOpen={initModal}
     link={{
       title:  title,
@@ -181,17 +181,26 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     people: {
       id: 'people',
       title: "People",
+      icon: 'fa-users',
       items: lines.getAllPeople(costlocker.project.budget.peoplecosts),
     },
     activities: {
       id: 'activities',
       title: "Activities",
+      icon: 'fa-users',
       items: lines.getAllActivities(costlocker.project.budget.peoplecosts),
     },
     expenses: {
       id: 'expenses',
       title: "Expenses",
+      icon: 'fa-pie-chart',
       items: lines.getAllExpenses(costlocker.project.budget.expenses),
+    },
+    discount: {
+      icon: 'fa-percent',
+    },
+    other: {
+      icon: 'fa-gear',
     },
   };
   const getActiveTabs = visibleTabs => visibleTabs.map(id => activityTabs[id]);
@@ -288,14 +297,19 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         <div className="col-sm-10">
           <div className="btn-toolbar">
             <div className="btn-group">
-              <AddLinesModal title="Add people or activities" activityTabs={getActiveTabs(['people', 'activities'])} addItems={lines.addItems} />
+              <AddLinesModal
+                type="activities" title={<span><span className={`fa ${activityTabs.people.icon}`} /> Add people or activities</span>}
+                activityTabs={getActiveTabs(['people', 'activities'])} addItems={lines.addItems} />
             </div>
             <div className="btn-group">
-              <AddLinesModal title="Add expenses" activityTabs={getActiveTabs(['expenses'])} addItems={lines.addItems} />
+              <AddLinesModal
+                type="expenses" title={<span><span className={`fa ${activityTabs.expenses.icon}`} /> Add expenses</span>}
+                activityTabs={getActiveTabs(['expenses'])} addItems={lines.addItems} />
             </div>
             <div className="btn-group">
               <Link
-                title="Add discount" action={lines.addDiscount(costlocker.project.budget.discount)}
+                title={<span><span className={`fa ${activityTabs.discount.icon}`} /> Add discount</span>}
+                action={lines.addDiscount(costlocker.project.budget.discount)}
                 className={`btn btn-primary ${costlocker.project.budget.discount ? '' : 'disabled'}`} />
             </div>
           </div>
@@ -303,15 +317,17 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         <div className="col-sm-2">
           <div className="btn-toolbar">
             <div className="btn-group-justified">
-              <Link title="Reset lines" action={lines.removeAllLines()} className="btn btn-default" />
+              <Link
+                title={<span><span className="fa fa-refresh" /> Reset lines</span>}
+                action={lines.removeAllLines()} className="btn btn-default" />
             </div>
           </div>
         </div>
       </div>
     </div>
-    {lines.getGroupedLines().map(({ title, items }) => (
+    {lines.getGroupedLines().map(({ id, title, items }) => (
       <div key={ title } className={items.length || title === 'Other' ? 'show' : 'hide'}>
-        <h4>{ title }</h4>
+        <h4><span className={`fa ${activityTabs[id].icon}`} /> { title }</h4>
         {items.length ? (
         <div className="row text-muted">
           <div className="col-sm-1"><small>Quantity</small></div>
@@ -377,7 +393,9 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           <div className="row">
             <div className="col-sm-2">
               <br />
-              <Link title="Add new empty line" action={lines.addEmptyLine()} className="btn btn-success" />
+              <Link
+                title={<span><span className="fa fa-plus-circle" /> Add a new line</span>}
+                action={lines.addEmptyLine()} className="btn btn-success" />
             </div>
           </div>
         ) : null}

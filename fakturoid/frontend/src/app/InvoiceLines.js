@@ -144,10 +144,10 @@ export default class InvoiceLines {
     });
     const getGroup = (type) => groups[type] || [];
     return [
-      { title: 'People and Activities', items: getGroup('people').concat(getGroup('activity')) },
-      { title: 'Expenses', items: getGroup('expense') },
-      { title: 'Discount', items: getGroup('discount') },
-      { title: 'Other', items: getGroup('default').concat(getGroup('empty')) },
+      { id: 'people', title: 'People and Activities', icon: 'fa-users', items: getGroup('people').concat(getGroup('activity')) },
+      { id: 'expenses', title: 'Expenses', icon: 'fa-pie-chart', items: getGroup('expense') },
+      { id: 'discount', title: 'Discount', icon: 'fa-percent', items: getGroup('discount') },
+      { id: 'other', title: 'Other', icon: 'fa-gear', items: getGroup('default').concat(getGroup('empty')) },
     ];
   }
 
