@@ -4,6 +4,7 @@ import { appState, isNotLoggedInCostlocker, isNotLoggedInFakturoid } from './sta
 import { fetchFromApi, pushToApi, loginUrls } from './api';
 import Login from './app/Login';
 import Invoice from './app/Invoice';
+import InvoicesList from './app/InvoicesList';
 import InvoiceLines from './app/InvoiceLines'
 import Loading from './ui/Loading';
 
@@ -112,7 +113,7 @@ export const states = [
       return <Invoice
         invoice={invoice}
         fakturoidSubjects={subjects}
-        invoices={appState.cursor(['costlocker', 'invoices']).deref()}
+        invoices={<InvoicesList invoices={appState.cursor(['costlocker', 'invoices']).deref()} subjects={subjects} />}
         lines={new InvoiceLines(appState.cursor(['invoice', 'lines']))}
         forceUpdate={() => appState.cursor(['invoice']).set('isForced', true)}
         form={{

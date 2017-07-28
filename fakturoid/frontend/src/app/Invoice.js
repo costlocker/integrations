@@ -1,6 +1,5 @@
 import React from 'react';
 import { Button, Link, Errors, roundNumber, Number, ExternalLink, FakturoidLink, CostlockerLink, Image } from '../ui/Components';
-import InvoicesList from './InvoicesList';
 import { PageWithSubnav } from '../ui/App';
 import { isDevelopmentMode } from '../config';
 import { CenteredModal } from '../ui/Modals';
@@ -447,7 +446,7 @@ const InvoicesPages = ({ props, content, header, className }) =>
   <PageWithSubnav
     tabs={[
       {
-        id: 'invoice',
+        id: 'new',
         name: 'New invoice',
         content: () => <div className="row">
           <div className={className}>
@@ -457,9 +456,9 @@ const InvoicesPages = ({ props, content, header, className }) =>
         </div>,
       },
       {
-        id: 'project',
+        id: 'invoices',
         name: 'Previously imported invoices',
-        content: () => <InvoicesList invoices={props.invoices} subjects={props.fakturoidSubjects} />,
+        content: () => props.invoices,
       },
     ]}
   />;
