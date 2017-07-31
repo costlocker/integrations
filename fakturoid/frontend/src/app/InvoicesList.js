@@ -13,7 +13,7 @@ export default function InvoicesList({ invoices, subjects }) {
   };
   return <div>
     <form className="form row">
-      <div className="col-sm-5">
+      <div className="col-sm-6">
         <div className="form-group">
           <RadioButtons
             items={['', 'invoice', 'proforma.full', 'proforma.partial'].map(
@@ -24,7 +24,7 @@ export default function InvoicesList({ invoices, subjects }) {
           />
         </div>
       </div>
-      <div className="col-sm-3 col-sm-offset-4">
+      <div className="col-sm-3 col-sm-offset-3">
         <div className="form-group">
           <div className="input-group">
             <span className="input-group-addon" id="basic-addon1"><i className="fa fa-search" /></span>

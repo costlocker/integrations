@@ -43,7 +43,7 @@ export default {
     submit: 'Add selected',
   },
   invoiceLines: {
-    people: 'people',
+    people: 'People',
     peopleAndActivites: 'People and Activities',
     activities: "Activities",
     expenses: "Expenses",

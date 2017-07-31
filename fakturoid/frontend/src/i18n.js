@@ -1,6 +1,6 @@
 
-import en from './locale/en';
-const messages = en;
+import cs from './locale/cs';
+const messages = cs;
 
 const trans = (message, values) => {
   const keys = message.split('.');
