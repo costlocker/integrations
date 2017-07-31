@@ -21,9 +21,19 @@ const FakturoidUser = ({ user, isLoggedIn }) => {
   if (isLoggedIn) {
     return <User name={user.person.full_name} company={user.account.name} />;
   } else {
-    return <em>Not logged in Fakturoid</em>;
+    return <User name="Login" company="Fakturoid" />;
   }
 };
+
+const AnonymousUser = ({ isRouteActive }) => (
+  <div>
+    <Logo app="costlocker" color={isRouteActive('login') ? 'blue' : 'white'} />
+    <div className="user">
+      <strong>Login</strong>
+      <small>Costlocker</small>
+    </div>
+  </div>
+)
 
 const Users = ({ auth, isRouteActive }) => {
   if (!auth.get('costlocker')) {
@@ -70,7 +80,10 @@ export function App({ auth, isRouteActive }) {
           </div>
           <div className="navbar-right text-right">
             <Navigation isRouteActive={isRouteActive} routes={[
-              { route: 'login', title: auth.get('costlocker') ? <Users auth={auth} isRouteActive={isRouteActive} /> : 'Login' },
+              { route: 'login', title: auth.get('costlocker')
+                ? <Users auth={auth} isRouteActive={isRouteActive} />
+                : <AnonymousUser isRouteActive={isRouteActive} />
+              },
             ]} />
           </div>
         </div>

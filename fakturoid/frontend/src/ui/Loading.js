@@ -7,7 +7,7 @@ export default function Loading({ title }) {
         <div className="col-sm-12">
           <div className="progress">
             <div className="progress-bar progress-bar-striped active" role="progressbar" style={{ width: '100%' }}>
-              <span className="sr-only">Loading...</span>
+              <span className="sr-only"><span className="fa fa-spinner"></span></span>
             </div>
           </div>
         </div>
