@@ -26,7 +26,8 @@ export default {
     token: 'API token',
     tokenHelp: 'Přejít na stránku s tokenem',
     requiredCostlocker: 'Nejdříve se musíte přihlásit do Costlockeru',
-    loginTo: ({ app }) => `Přihlásit se ${app}`,
+    loginCostlocker: 'Přihlásit se do Costlockeru',
+    loginFakturoid: 'Přihlásit se do Fakturoidu',
     switchAccount: 'Změnit účet',
   },
   // InvoiceList.js

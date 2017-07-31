@@ -22,7 +22,7 @@ export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturo
           <a href={loginUrls.costlocker} className="btn btn-primary">
             {costlockerAuth
               ? <span>{ trans('login.switchAccount') } <strong>{costlockerAuth.company.name}</strong></span>
-              : trans('login.loginTo', { app: 'Costlocker' })}
+              : trans('login.loginCostlocker')}
           </a>
         </div>
         <div className="col-sm-6">
@@ -53,7 +53,7 @@ export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturo
               <button type="submit" className="btn btn-primary btn-block">
                 {isLoggedInFakturoid
                   ? <span>{ trans('login.switchAccount') } <strong>{currentSlug}</strong></span>
-                  : trans('login.loginTo', { app: 'Fakturoid' })}
+                  : trans('login.loginFakturoid')}
               </button>
             </form>
           ) : (

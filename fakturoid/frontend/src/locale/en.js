@@ -26,7 +26,8 @@ export default {
     token: 'API token',
     tokenHelp: 'Find your API token here',
     requiredCostlocker: 'At first you have to login to Costlocker',
-    loginTo: ({ app }) => `Login to ${app}`,
+    loginCostlocker: 'Login to Costlocker',
+    loginFakturoid: 'Login to Fakturoid',
     switchAccount: 'Switch account',
   },
   // InvoiceList.js
