@@ -168,8 +168,11 @@ class GetInvoice
         ];
     }
 
-    private function getMaxBillableAmount(array $billing, array $metrics)
+    private function getMaxBillableAmount(array $billing = null, array $metrics = null)
     {
+        if (!$billing) {
+            return 0;
+        }
         return $billing['billing']['total_amount'] + floor($metrics['revenue'] - $metrics['billing']);
     }
 }
