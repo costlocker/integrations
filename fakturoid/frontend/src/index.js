@@ -5,6 +5,7 @@ import { UIRouter, pushStateLocationPlugin } from 'ui-router-react';
 import { isDevelopmentMode } from './config';
 import { appState } from './state';
 import { states, config, isRouteActive } from './Router';
+import { addLocaleData } from './i18n';
 import { App } from './ui/App';
 import Loading from './ui/Loading';
 import ErrorPage from './ui/ErrorPage';
@@ -12,6 +13,8 @@ import DisabledAddon from './ui/DisabledAddon';
 import './ui/index.css'
 
 export const plugins = [pushStateLocationPlugin];
+
+addLocaleData('cs');
 
 const render = () => {
   let content = null;

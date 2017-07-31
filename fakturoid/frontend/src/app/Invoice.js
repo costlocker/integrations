@@ -253,7 +253,6 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           <DatePicker
             dateFormat="DD.MM.YYYY"
             className="form-control"
-            locale="cs"
             selected={issuedAt}
             onChange={date => form.set('issuedAt')({
               target: {
