@@ -9,9 +9,13 @@ const isHighlighted = id => id === appState.cursor(['app', 'lastCreatedInvoice']
 export default function InvoicesList({ invoices, subjects }) {
   const filter = appState.cursor(['search']);
   const setFilter = (field) => (e) => {
-    appState.cursor(['search']).set(field, e.target.value);
+    appState.cursor(['search']).update(
+      s => s
+        .setIn([field], e.target.value)
+        .setIn(['isSearching'], true)
+    );
   };
-  return <div>
+  return <div className={filter.get('isSearching') ? 'reloading' : null}>
     <form className="form row">
       <div className="col-sm-6">
         <div className="form-group">

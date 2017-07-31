@@ -29,6 +29,7 @@ const appState = immstruct({
   search: {
     type: '',
     query: '',
+    isSearching: false,
   },
   invoice: {
     isForced: false,

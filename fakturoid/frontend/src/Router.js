@@ -48,7 +48,11 @@ const fetchInvoices = (customFilter) => {
   lastQuery = query;
   return fetchFromApi(query)
     .catch(setError)
-    .then(invoices => appState.cursor(['costlocker']).set('invoices', invoices));
+    .then(invoices => appState.cursor().update(
+      app => app
+        .setIn(['costlocker', 'invoices'], invoices)
+        .setIn(['search', 'isSearching'], false)
+      ));
 }
 
 let timeout = null;
@@ -56,8 +60,13 @@ const fulltextInvoiceSearch = () => {
   fetchInvoices();
   timeout = null;
 };
-const isSearchUpdated = (field, keyPath) => keyPath.length === 2 && keyPath[0] === 'search' && keyPath[1] === field;
+
 appState.on('next-animation-frame', function (newStructure, oldStructure, keyPath) {
+  const isSearchUpdated = (field, keyPath) =>
+    keyPath.length === 1 &&
+    keyPath[0] === 'search' &&
+    newStructure.getIn(['search', field]) != oldStructure.getIn(['search', field]);
+
   if (isSearchUpdated('type', keyPath)) {
     fetchInvoices(newStructure.get('search'));
   } else if (isSearchUpdated('query', keyPath) && !timeout) {
