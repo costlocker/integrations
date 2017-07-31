@@ -133,7 +133,8 @@ const AddLinesModal = ({ type, title, activityTabs, addItems }) => {
                 ))}
                 <Link
                   title={ trans('invoiceModal.checkAll', { count: items.length}) }
-                  action={checkAll(items)} className="btn btn-link" />
+                  action={checkAll(items)} />
+                <br /><br />
                 <Button
                   title={ trans('invoiceModal.submit') }
                   action={(e) => {
