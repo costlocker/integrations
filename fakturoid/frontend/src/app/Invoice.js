@@ -9,15 +9,16 @@ import { PageWithSubnav } from '../ui/App';
 import { isDevelopmentMode } from '../config';
 import { CenteredModal } from '../ui/Modals';
 import { appState } from '../state';
+import { trans } from '../i18n';
 import billing from '../images/billing.png';
 
 const InvoiceTutorial = () =>
   <div>
     <div className="row">
       <div className="col-sm-12">
-        <h1>You are all set!</h1>
+        <h1>{ trans('tutorial.title') }</h1>
         <br />
-        You will now see button <strong className="btn btn-primary">Create invoice</strong> in Billing interface of a project.
+        { trans('tutorial.description', { costlockerButton: <strong className="btn btn-primary">Create invoice</strong> }) }
       </div>
     </div>
     <div className="row">
@@ -27,7 +28,7 @@ const InvoiceTutorial = () =>
     </div>
     <div className="row">
       <div className="col-sm-12">
-        <CostlockerLink path="/dashboard/billing-outlook" title="Cool, take me back to Costlocker!" className="btn btn-success btn-lg" />
+        <CostlockerLink path="/dashboard/billing-outlook" title={ trans('tutorial.linkCostlocker') } className="btn btn-success btn-lg" />
       </div>
     </div>
   </div>;
@@ -36,26 +37,23 @@ const ImportedInvoice = ({ invoice, forceUpdate }) =>
   <div className="text-center">
     <div className="row">
       <div className="col-sm-12">
-        <h1>Invoice successfuly created!</h1>
+        <h1>{ trans('createdInvoice.title') }</h1>
         <br />
-        <p>
-          The invoice was imported to Fakturoid.<br />
-          You can now view the invoice in Fakturoid or go back to Costlocker
-        </p>
+        <p>{ trans('createdInvoice.description') }</p>
       </div>
     </div>
     <div className="row">
       <div className="col-sm-12">
-        <ExternalLink url={invoice.fakturoid.link} title="Open in Fakturoid" className="btn btn-primary" />
-        <small className="text-muted ps-10">or</small>
-        <ExternalLink url={invoice.costlocker.link} title="Go back to Costlocker" className="btn btn-default" />
+        <ExternalLink url={invoice.fakturoid.link} title={ trans('createdInvoice.linkFakturoid') } className="btn btn-primary" />
+        <small className="text-muted ps-10">{ trans('createdInvoice.linkSeparator') }</small>
+        <ExternalLink url={invoice.costlocker.link} title={ trans('createdInvoice.linkCostlocker') } className="btn btn-default" />
       </div>
     </div>
     {isDevelopmentMode &&
     <div>
       <hr />
       <Button
-        title="Create invoice once again"
+        title="Force create (DEV)"
         className="btn btn-warning"
         action={forceUpdate}
       />
@@ -66,7 +64,7 @@ const ImportedInvoice = ({ invoice, forceUpdate }) =>
 const InvoiceDetail = ({ costlocker }) => (
   <div>
     <h1>
-      New Invoice
+      { trans('page.invoice') }
       {costlocker.project.project_id.id ? <span> / {costlocker.project.project_id.id}</span> : null}
     </h1>
     <p>
@@ -133,9 +131,11 @@ const AddLinesModal = ({ type, title, activityTabs, addItems }) => {
                     {item.name}
                   </label>
                 ))}
-                <Link title={`Select all (${items.length})`} action={checkAll(items)} className="btn btn-link" />
+                <Link
+                  title={ trans('invoiceModal.checkAll', { count: items.length}) }
+                  action={checkAll(items)} className="btn btn-link" />
                 <Button
-                  title="Add selected"
+                  title={ trans('invoiceModal.submit') }
                   action={(e) => {
                     e.preventDefault();
                     addItems(getCheckedItems(items));
@@ -166,34 +166,39 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
 
   const hasAdvancedSettings = () => appState.cursor(['editor', 'hasAdvancedSettings']).deref();
   const toggleAdvancedSettings = () => appState.cursor(['editor']).set('hasAdvancedSettings', !hasAdvancedSettings());
+  const advancedSettingsLink = (direction) =>
+    <Link
+      title={<span>{ trans(`editor.advancedSettings.${direction}`) } <span className={`fa fa-arrow-${direction}`} /></span>}
+      className={`btn btn-horizontal ${direction}`}
+      action={toggleAdvancedSettings} />;
 
   const activityTabs = {
     people: {
       id: 'people',
-      title: "People",
-      summary: 'People and Activities',
+      title: trans('invoiceLines.people'),
+      summary: trans('invoiceLines.peopleAndActivites'),
       icon: 'fa-users',
       items: lines.getAllPeople(costlocker.project.budget.peoplecosts),
     },
     activities: {
       id: 'activities',
-      title: "Activities",
+      title: trans('invoiceLines.activities'),
       icon: 'fa-users',
       items: lines.getAllActivities(costlocker.project.budget.peoplecosts),
     },
     expenses: {
       id: 'expenses',
-      title: "Expenses",
+      title: trans('invoiceLines.expenses'),
       icon: 'fa-pie-chart',
       items: lines.getAllExpenses(costlocker.project.budget.expenses),
     },
     discount: {
       icon: 'fa-percent',
-      title: 'Discount',
+      title: trans('invoiceLines.discount'),
     },
     other: {
       icon: 'fa-gear',
-      title: 'Other',
+      title: trans('invoiceLines.other'),
     },
   };
   const getActiveTabs = visibleTabs => visibleTabs.map(id => activityTabs[id]);
@@ -203,19 +208,17 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
 
   return <form className="form" onSubmit={form.submit}>
     <div className="form-group">
-      <label htmlFor="type">Invoice type</label><br />
+      <label htmlFor="type">{ trans('editor.type') }</label><br />
       <RadioButtons
-        items={[
-          { id: 'invoice', title: 'Invoice' },
-          { id: 'proforma.full', title: 'Proforma (full)' },
-          { id: 'proforma.partial', title: 'Proforma (partial)' },
-        ]}
+        items={['invoice', 'proforma.full', 'proforma.partial'].map(
+          id => ({ id: id, title: trans(`invoiceTypes.${id}`) })
+        )}
         isActive={type => form.get('type') === type.id}
         onChange={form.set('type')}
       />
     </div>
     <div className="form-group">
-      <label htmlFor="fakturoidSubject">Fakturoid client</label>
+      <label htmlFor="fakturoidSubject">{ trans('editor.subject') }</label>
       <div className="row">
         <div className="col-sm-8">
           <select required
@@ -230,15 +233,15 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         </div>
         <div className="col-sm-4">
           <FakturoidLink
-            title={<span className="text-success"><Logo app="fakturoid" /> Add a new Fakturoid client</span>}
+            title={<span className="text-success"><Logo app="fakturoid" /> { trans('editor.createSubject') }</span>}
             path="/subjects/new" className="btn btn-link"
           />
         </div>
       </div>
       <p className="help-block">
-        Can't see a specific client? <Link
+        { trans('editor.outdatedSubjects') } <Link
           action={reloadSubjects}
-          title={<span><i className="fa fa-refresh" /> Try refreshing the list</span>}
+          title={<span><i className="fa fa-refresh" /> { trans('editor.reloadSubjects') }</span>}
           className="btn btn-link"
         />
       </p>
@@ -246,7 +249,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     <div className="row">
       <div className="col-sm-4">
         <div className="form-group">
-          <label htmlFor="issuedAt">Issued at</label>
+          <label htmlFor="issuedAt">{ trans('editor.issuedAt') }</label>
           <DatePicker
             dateFormat="DD.MM.YYYY"
             className="form-control"
@@ -263,7 +266,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
       </div>
       <div className="col-sm-3">
         <div className="form-group">
-          <label htmlFor="due">Due</label>
+          <label htmlFor="due">{ trans('editor.due') }</label>
           <input
             className="form-control" type="number" id="due" min="1" max="100" step="1"
             value={form.get('due')} onChange={form.set('due')}
@@ -281,14 +284,14 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
       <div>
         <div className="well">
           <div className="form-group">
-            <label htmlFor="orderNumber">Order Number</label>
+            <label htmlFor="orderNumber">{ trans('editor.orderNumber') }</label>
             <input
               type="text" className="form-control" name="orderNumber" id="orderNumber"
               value={form.get('orderNumber')} onChange={form.set('orderNumber')}
             />
           </div>
           <div className="form-group">
-            <label htmlFor="noteBeforeLines">Note before invoice lines</label>
+            <label htmlFor="noteBeforeLines">{ trans('editor.noteBeforeLines') }</label>
             <textarea
               className="form-control" name="noteBeforeLines" id="noteBeforeLines" rows="4"
               value={form.get('noteBeforeLines')} onChange={form.set('noteBeforeLines')}
@@ -296,17 +299,10 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
             </textarea>
           </div>
         </div>
-        <Link
-          title={<span>Hide advanced settings <span className="fa fa-arrow-up" /></span>}
-          className="btn btn-horizontal up"
-          action={toggleAdvancedSettings} />
+        {advancedSettingsLink('up')}
       </div>
     ) : (
-      <Link
-        title={<span>Show advanced settings <span className="fa fa-arrow-down" /></span>}
-        className="btn btn-horizontal down"
-        action={toggleAdvancedSettings}
-      />
+      advancedSettingsLink('down')
     )}
     <div className="form-group">
       <div className="row">
@@ -314,18 +310,18 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           <div className="btn-toolbar">
             <div className="btn-group">
               <AddLinesModal
-                type="activities" title={<span><span className={`fa ${activityTabs.people.icon}`} /> Add people or activities</span>}
+                type="activities" title={<span><span className={`fa ${activityTabs.people.icon}`} /> { trans('invoiceLines.actions.peopleAndActivites') }</span>}
                 activityTabs={getActiveTabs(['people', 'activities'])} addItems={lines.addItems} />
             </div>
             <div className="btn-group">
               <AddLinesModal
-                type="expenses" title={<span><span className={`fa ${activityTabs.expenses.icon}`} /> Add expenses</span>}
+                type="expenses" title={<span><span className={`fa ${activityTabs.expenses.icon}`} /> { trans('invoiceLines.actions.expenses') }</span>}
                 activityTabs={getActiveTabs(['expenses'])} addItems={lines.addItems} />
             </div>
             <div className="btn-group">
               <Link
-                title={<span><span className={`fa ${activityTabs.discount.icon}`} /> Add discount</span>}
-                action={lines.addDiscount(costlocker.project.budget.discount, 'Discount')}
+                title={<span><span className={`fa ${activityTabs.discount.icon}`} /> { trans('invoiceLines.actions.discount') }</span>}
+                action={lines.addDiscount(costlocker.project.budget.discount, trans('invoiceLines.discount'))}
                 className={`btn btn-primary ${costlocker.project.budget.discount ? '' : 'disabled'}`} />
             </div>
           </div>
@@ -334,7 +330,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           <div className="btn-toolbar">
             <div className="btn-group-justified">
               <Link
-                title={<span><span className="fa fa-refresh" /> Reset lines</span>}
+                title={<span><span className="fa fa-refresh" /> { trans('invoiceLines.actions.reset') }</span>}
                 action={lines.removeAllLines()} className="btn btn-default" />
             </div>
           </div>
@@ -342,17 +338,17 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
       </div>
     </div>
     <br />
-    {lines.getGroupedLines().map(({ id, title, items }) => (
-      <div key={ id } className={items.length || title === 'Other' ? 'show' : 'hide'}>
+    {lines.getGroupedLines().map(({ id, items }) => (
+      <div key={ id } className={items.length || id === 'other' ? 'show' : 'hide'}>
         <h4><span className={`fa ${activityTabs[id].icon}`} /> { activityTabs[id].summary || activityTabs[id].title }</h4>
         {items.length ? (
         <div className="row text-muted">
-          <div className="col-sm-1"><small>Quantity</small></div>
-          <div className="col-sm-1"><small>Unit</small></div>
-          <div className={lines.hasVat ? "col-sm-5" : "col-sm-6"}><small>Name</small></div>
-          {lines.hasVat ? <div className="col-sm-1"><small>VAT</small></div> : null}
-          <div className="col-sm-2 text-right"><small>Price per unit</small></div>
-          <div className="col-sm-2 text-right"><small>Total price</small></div>
+          <div className="col-sm-1"><small>{ trans('invoiceLines.item.quantity') }</small></div>
+          <div className="col-sm-1"><small>{ trans('invoiceLines.item.unit') }</small></div>
+          <div className={lines.hasVat ? "col-sm-5" : "col-sm-6"}><small>{ trans('invoiceLines.item.name') }</small></div>
+          {lines.hasVat ? <div className="col-sm-1"><small>{ trans('invoiceLines.item.vat') }</small></div> : null}
+          <div className="col-sm-2 text-right"><small>{ trans('invoiceLines.item.unit_amount') }</small></div>
+          <div className="col-sm-2 text-right"><small>{ trans('invoiceLines.item.total_amount') }</small></div>
         </div>
         ) : null}
         {items.map((line) => {
@@ -361,7 +357,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           return <div
             key={line.get('id')}
             className={isLineIgnored ? 'row form-grid bg-danger' : 'row form-grid'}
-            title={isLineIgnored ? 'Line will be ignored and not imported to Fakturoid' : null}
+            title={isLineIgnored ? trans('invoiceLines.item.invalid') : null}
           >
 
             <div className="btn-group">
@@ -416,12 +412,12 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
             </div>
           </div>;
         })}
-        {title === 'Other' ? (
+        {id === 'other' ? (
           <div className="row">
             <div className="col-sm-2">
               <br />
               <Link
-                title={<span><span className="fa fa-plus-circle" /> Add a new line</span>}
+                title={<span><span className="fa fa-plus-circle" /> { trans('invoiceLines.actions.newLine') }</span>}
                 action={lines.addEmptyLine()} className="btn btn-success" />
             </div>
           </div>
@@ -431,8 +427,8 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     <div className="form-summary">
       {!isRevenueGreaterThanBilling ? (
         <Errors
-          title={`Total amount must be smaller or equal to '${roundNumber(billedAmount)}', otherwise the project revenue would be smaller than billing`}
-          error={`You cannot bill '${roundNumber(linesAmount)}', bring down quantity or unit amount in lines.`}
+          title={trans('editor.revenueError.title', { billedAmount: roundNumber(billedAmount) }) }
+          error={trans('editor.revenueError.error', { linesAmount: roundNumber(linesAmount) }) }
           errorClassName="warning"
         />
       ) : null}
@@ -440,7 +436,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         <div>
           <div className="row">
             <div className="col-sm-4 col-sm-offset-6 text-right">
-              Total amount (without VAT)
+              { trans('summary.totalWithoutVAT') }
             </div>
             <div className="col-sm-2 text-right">
               <Number value={linesAmount} isElement />
@@ -449,7 +445,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           {Object.keys(vat.rates).map(rate => (
           <div key={rate} className="row">
             <div className="col-sm-4 col-sm-offset-6 text-right">
-              VAT (<Number value={rate} isElement />%)
+              { trans('summary.vat') } (<Number value={rate} isElement />%)
             </div>
             <div className="col-sm-2 text-right">
               <Number value={vat.rates[rate]} isElement />
@@ -458,7 +454,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           ))}
           <div className="row">
             <div className="col-sm-4 col-sm-offset-6 text-right">
-              <strong>Total amount (with VAT)</strong>
+              <strong>{ trans('summary.totalWithVAT') }</strong>
             </div>
             <div className="col-sm-2 text-right">
               <strong><Number value={linesAmount + vat.total} isElement /></strong>
@@ -469,7 +465,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         <div>
           <div className="row">
             <div className="col-sm-4 col-sm-offset-6 text-right">
-              Total amount
+              { trans('summary.total') }
             </div>
             <div className="col-sm-2 text-right">
               <strong><Number value={linesAmount} isElement /></strong>
@@ -481,17 +477,17 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     <div className="row">
       <div className="col-sm-2 col-sm-offset-10">
         {isRevenueGreaterThanBilling ? (
-          <button type="submit" className="btn btn-primary btn-block">Create Invoice</button>
+          <button type="submit" className="btn btn-primary btn-block">{ trans('editor.submit') }</button>
         ) : (
-          <span className="btn btn-danger btn-block" disabled title="Update total amount">Create Invoice</span>
+          <span className="btn btn-danger btn-block" disabled title="Update total amount">{ trans('editor.submit') }</span>
         )}
       </div>
     </div>
     <div className="form-group">
-      <label htmlFor="note">Note</label>
+      <label htmlFor="note">{ trans('editor.note.title') }</label>
       <textarea
         className="form-control" name="note" id="note" rows="4"
-        placeholder="Add private note to invoice..."
+        placeholder={ trans('editor.note.placeholder') }
         value={form.get('note')} onChange={form.set('note')}
       >
       </textarea>
@@ -504,7 +500,7 @@ const InvoicesPages = ({ props, content, header, className }) =>
     tabs={[
       {
         id: 'new',
-        name: 'New invoice',
+        name: trans('page.invoice'),
         content: () => <div className="row">
           <div className={className}>
             {header}
@@ -514,7 +510,7 @@ const InvoicesPages = ({ props, content, header, className }) =>
       },
       {
         id: 'invoices',
-        name: 'Previously imported invoices',
+        name: trans('page.invoicesHistory'),
         content: () => props.invoices,
       },
     ]}
@@ -539,17 +535,12 @@ export default function Invoice(props) {
   ) {
     return buildInvoice(<InvoiceEditor {...props} costlocker={props.invoice.costlocker} />);
   } else if (invoice.status === 'NOT_DRAFT') {
-    return buildInvoice(<Errors title="Invalid invoice state" error="Billing is already invoiced in Costlocker" />);
+    return buildInvoice(<Errors { ...trans('invalidInvoice.notDraft') } />);
   } else if (invoice.status === 'ALREADY_IMPORTED') {
     return <InvoicesPages props={props} content={<ImportedInvoice {...props} />} className="col-sm-12" />;
   } else if (invoice.status === 'UNKNOWN') {
-    return buildTutorial(
-      <Errors
-        title="Unknown billing"
-        error="Billing not found in Costlocker, or you aren't authorized to see the project"
-        errorClassName="warning"
-      />
-    );
+    return buildTutorial(<Errors { ...trans('invalidInvoice.unknownBilling') } errorClassName="warning" />
+  );
   }
   return buildTutorial();
 }

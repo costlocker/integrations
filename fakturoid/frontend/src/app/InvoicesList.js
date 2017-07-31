@@ -2,6 +2,7 @@ import React from 'react';
 import { ExternalLink, roundNumber, RadioButtons } from '../ui/Components';
 import { Logo } from '../ui/Images';
 import { appState } from '../state';
+import { trans } from '../i18n';
 
 const isHighlighted = id => id === appState.cursor(['app', 'lastCreatedInvoice']).deref();
 
@@ -10,19 +11,13 @@ export default function InvoicesList({ invoices, subjects }) {
   const setFilter = (field) => (e) => {
     appState.cursor(['search']).set(field, e.target.value);
   };
-  const invoiceTypes = {
-    '': 'All',
-    'invoice': 'Standard',
-    'proforma.full': 'Proforma (full)',
-    'proforma.partial': 'Proforma (partial)',
-  };
   return <div>
     <form className="form row">
       <div className="col-sm-5">
         <div className="form-group">
           <RadioButtons
             items={['', 'invoice', 'proforma.full', 'proforma.partial'].map(
-              id => ({ id: id, title: invoiceTypes[id] })
+              id => ({ id: id, title: trans(`invoiceTypes.${id}`) })
             )}
             isActive={type => filter.get('type') === type.id}
             onChange={setFilter('type')}
@@ -34,7 +29,7 @@ export default function InvoicesList({ invoices, subjects }) {
           <div className="input-group">
             <span className="input-group-addon" id="basic-addon1"><i className="fa fa-search" /></span>
             <input
-              type="text" className="form-control" placeholder="Search" id="query"
+              type="text" className="form-control" placeholder={ trans('search.query') } id="query"
               value={filter.get('query')} onChange={setFilter('query')}
             />
           </div>
@@ -46,12 +41,12 @@ export default function InvoicesList({ invoices, subjects }) {
       <table className="table table-striped table-valign">
         <thead>
           <tr>
-            <th>Client</th>
-            <th>ID</th>
-            <th>Issued</th>
-            <th>Price</th>
-            <th>Price with VAT</th>
-            <th>Links</th>
+            <th>{ trans('invoices.client') }</th>
+            <th>{ trans('invoices.id') }</th>
+            <th>{ trans('invoices.issued') }</th>
+            <th>{ trans('invoices.price') }</th>
+            <th>{ trans('invoices.priceVAT') }</th>
+            <th>{ trans('invoices.links') }</th>
           </tr>
         </thead>
         <tbody>
@@ -59,7 +54,7 @@ export default function InvoicesList({ invoices, subjects }) {
             <tr key={invoice.id} className={isHighlighted(invoice.id) ? 'highlight' : ''}>
               <td>
                 {invoice.costlocker.project.client.name}<br />
-                <small className="text-muted">{invoiceTypes[invoice.fakturoid.type]}</small>
+                <small className="text-muted">{trans(`invoiceTypes.${invoice.fakturoid.type}`)}</small>
               </td>
               <td>{invoice.fakturoid.number}</td>
               <td>{invoice.fakturoid.issuedAt}</td>
@@ -67,17 +62,17 @@ export default function InvoicesList({ invoices, subjects }) {
               <th>{roundNumber(invoice.fakturoid.amount)}</th>
               <td>
                 <ExternalLink url={invoice.costlocker.link} className="text-primary first"
-                  title={<span><Logo app="costlocker" color="blue" />Open project</span>} />
+                  title={<span><Logo app="costlocker" color="blue" />{ trans('invoices.linkProject') }</span>} />
                 &nbsp;
                 <ExternalLink url={invoice.fakturoid.link} className="text-success"
-                  title={<span><Logo app="fakturoid" />Open invoice</span>} />
+                  title={<span><Logo app="fakturoid" />{ trans('invoices.linkInvoice') }</span>} />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
     ) : (
-      <p className="text-muted">No invoices found</p>
+      <p className="text-muted">{ trans('invoices.noResults') }</p>
     )}
   </div>;
 }

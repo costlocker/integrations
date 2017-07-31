@@ -16,7 +16,7 @@ export const plugins = [pushStateLocationPlugin];
 const render = () => {
   let content = null;
   if (appState.cursor(['auth', 'isLoading']).deref()) {
-    content = <Loading title='Loading Costlocker & Fakturoid integration' />;
+    content = <Loading title='loading.app' />;
   } else if (appState.cursor(['app', 'isDisabled']).deref()) {
     content = <DisabledAddon user={appState.cursor(['auth', 'costlocker']).deref()} />;
   } else if (appState.cursor(['app', 'error']).deref()) {

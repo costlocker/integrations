@@ -1,5 +1,6 @@
 import React from 'react';
 import { pushToApi } from '../api';
+import { trans } from '../i18n';
 
 const buildError = (jsError, currentUser) => ({
   date: (new Date()).toString(),
@@ -29,12 +30,11 @@ export default function ErrorPage({ appState, isDevelopmentMode }) {
         <div className="col-sm-6 col-sm-offset-3">
           <div className="panel panel-danger error-page">
             <div className="panel-heading">
-              <h1 className="panel-title">Oops, something went wrong</h1>
+              <h1 className="panel-title">{ trans('error.title') }</h1>
             </div>
             <div className="panel-body">
-              Try <a href={currentUrl}>reload the page</a>.
-              If the error is happening again, then
-              sends us following information as text to <a href="mailto: support@costlocker.com">support@costlocker.com</a>.
+              { trans('error.description', { currentUrl })} <a href="mailto: support@costlocker.com">
+                support@costlocker.com</a>.
             </div>
             <div className="panel-footer">
               <pre><code>{encodeError(data)}</code></pre>

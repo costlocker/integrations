@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { trans } from '../i18n';
 import { Errors, ExternalLink, FakturoidLink } from '../ui/Components';
 import { ImageTooltip } from '../ui/Images';
 import slug from '../images/slug.png';
@@ -12,7 +13,7 @@ export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturo
     <div>
       <div className="row text-center">
         <div className="col-sm-12">
-          <Errors title="Login error" error={loginError} />
+          <Errors title={ trans('login.error') } error={loginError} />
         </div>
       </div>
       <div className="row">
@@ -20,8 +21,8 @@ export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturo
           <h2>Costlocker <ExternalLink url="https://new.costlocker.com" /></h2>
           <a href={loginUrls.costlocker} className="btn btn-primary">
             {costlockerAuth
-              ? <span>Switch account <strong>{costlockerAuth.company.name}</strong></span>
-              : 'Login to Costlocker'}
+              ? <span>{ trans('login.switchAccount') } <strong>{costlockerAuth.company.name}</strong></span>
+              : trans('login.loginTo', { app: 'Costlocker' })}
           </a>
         </div>
         <div className="col-sm-6">
@@ -29,32 +30,34 @@ export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturo
           {costlockerAuth ? (
             <form action={loginUrls.fakturoid} method="POST">
               <div className="form-group">
-                <label htmlFor="email">Email address</label>
-                <input type="email" className="form-control" id="email" name="email" placeholder="Email"
+                <label htmlFor="email">{ trans('login.email') }</label>
+                <input type="email" className="form-control" id="email" name="email" placeholder="john@example.com"
                   defaultValue={fakturoidAuth ? fakturoidAuth.person.email : null} />
               </div>
               <div className="form-group">
                 <label htmlFor="token">
-                  Fakturoid slug (subdomain) <ImageTooltip url={slug} />
+                  { trans('login.slug') } <ImageTooltip url={slug} />
                 </label>
-                <input type="text" className="form-control" id="slug" name="slug" placeholder="YOUR_SLUG"
+                <input type="text" className="form-control" id="slug" name="slug" placeholder="slug"
                   value={form.get('slug')} onChange={form.set('slug')} />
               </div>
               <div className="form-group">
                 <label htmlFor="token">
-                  API token <ImageTooltip url={token} />
+                  { trans('login.token') } <ImageTooltip url={token} />
                 </label>
                 <input type="text" className="form-control" id="token" name="token" />
                 <p className="help-block">
-                  <FakturoidLink path="/user" title="Find your API token here" />
+                  <FakturoidLink path="/user" title={ trans('login.tokenHelp') } />
                 </p>
               </div>
               <button type="submit" className="btn btn-primary btn-block">
-                {isLoggedInFakturoid ? <span>Switch account <strong>{currentSlug}</strong></span> : 'Login'}
+                {isLoggedInFakturoid
+                  ? <span>{ trans('login.switchAccount') } <strong>{currentSlug}</strong></span>
+                  : trans('login.loginTo', { app: 'Fakturoid' })}
               </button>
             </form>
           ) : (
-              <p className="text-muted">At first you have to login to Costlocker</p>
+              <p className="text-muted">{ trans('login.requiredCostlocker') }</p>
             )}
         </div>
       </div>

@@ -2,6 +2,7 @@ import React from 'react';
 
 import { appState, isNotLoggedInCostlocker, isNotLoggedInFakturoid } from './state';
 import { fetchFromApi, pushToApi, loginUrls } from './api';
+import { trans } from './i18n';
 import Login from './app/Login';
 import Invoice from './app/Invoice';
 import InvoicesList from './app/InvoicesList';
@@ -11,6 +12,7 @@ import Loading from './ui/Loading';
 export let redirectToRoute = (route) => console.log('app is not ready', route);
 export let isRouteActive = () => false;
 const setError = e => appState.cursor(['app']).set('error', e);
+const notify = (message) => alert(trans(message));
 
 const fetchUser = () =>
   fetchFromApi(`/user`)
@@ -81,7 +83,7 @@ const fetchSubjects = () =>
 const reloadSubjects = () =>
   pushToApi('/fakturoid?action=downloadSubjects', {})
     .catch(setError)
-    .then(() => fetchSubjects().then(() => alert('Customers reloaded')));
+    .then(() => fetchSubjects().then(() => notify('notify.reloadSubjects')));
 
 export const states = [
   {
@@ -95,9 +97,9 @@ export const states = [
     data: {
       title: (params) => {
         if (!params.billing || !params.project) {
-          return 'Invoices';
+          return 'page.invoices';
         }
-        return 'Create invoice';
+        return 'page.invoice';
       },
     },
     component: (props) => {
@@ -105,10 +107,10 @@ export const states = [
       const subjects = appState.cursor(['fakturoid', 'subjects']).deref();
       const invoice = appState.cursor(['costlocker', 'invoice']).deref();
       if (!subjects || !invoice) {
-        return <Loading title="Loading fakturoid clients, Costlocker invoice" />;
+        return <Loading title="loading.invoice" />;
       }
       if (appState.cursor(['app', 'isSendingForm']).deref()) {
-        return <Loading title="Creating invoice in Fakturoid" />;
+        return <Loading title="loading.createInvoice" />;
       }
       return <Invoice
         invoice={invoice}
@@ -117,10 +119,7 @@ export const states = [
         lines={new InvoiceLines(
           appState.cursor(['invoice', 'lines']),
           appState.cursor(['auth', 'fakturoid']).deref().account.has_vat,
-          {
-            quantity: 'ks',
-            time: 'h',
-          }
+          trans('invoiceLines.units')
         )}
         forceUpdate={() => appState.cursor(['invoice']).set('isForced', true)}
         form={{
@@ -143,7 +142,7 @@ export const states = [
                   appState.cursor(['app']).set('isSendingForm', false);
                   const encodedError = JSON.stringify(createdInvoice);
                   if (encodedError.indexOf('Kontakt neexistuje.')) {
-                    alert('Select an existing customer in Fakturoid.');
+                    notify('notify.unknownSubject');
                     reloadSubjects();
                     return;
                   }
@@ -207,7 +206,7 @@ export const states = [
     name: 'login',
     url: '/login?loginError',
     data: {
-      title: 'Login'
+      title: 'page.login'
     },
     component: (props) => <Login
       costlockerAuth={appState.cursor(['auth', 'costlocker']).deref()}
@@ -251,7 +250,7 @@ const hooks = [
     },
     callback: (transition) => {
       if (!isNotLoggedInCostlocker()) {
-        alert('Login in Fakturoid before creating invoicing');
+        notify('notify.requiredFakturoid');
       }
       return transition.router.stateService.target('login', undefined, { location: true });
     },
@@ -265,7 +264,7 @@ const hooks = [
       const state = transition.to();
       const stateTitle = state.data.title;
       const getTitle = typeof stateTitle === 'function' ? stateTitle : () => stateTitle;
-      document.title = `${getTitle(params)} | Costlocker → Fakturoid`;
+      document.title = `${trans(getTitle(params))} | Costlocker → Fakturoid`;
       // rerender to change active state in menu - stateService.go reloads only <UIView>
       appState.cursor(['app']).set('currentState', state.name);
     },
