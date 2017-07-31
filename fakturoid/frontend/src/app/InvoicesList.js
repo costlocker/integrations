@@ -10,17 +10,20 @@ export default function InvoicesList({ invoices, subjects }) {
   const setFilter = (field) => (e) => {
     appState.cursor(['search']).set(field, e.target.value);
   };
+  const invoiceTypes = {
+    '': 'All',
+    'invoice': 'Standard',
+    'proforma.full': 'Proforma (full)',
+    'proforma.partial': 'Proforma (partial)',
+  };
   return <div>
     <form className="form row">
       <div className="col-sm-5">
         <div className="form-group">
           <RadioButtons
-            items={[
-              { title: 'All', id: '' },
-              { title: 'Standard', id: 'invoice' },
-              { title: 'Proforma (full)', id: 'proforma.full' },
-              { title: 'Proforma (partial)', id: 'proforma.partial' },
-            ]}
+            items={['', 'invoice', 'proforma.full', 'proforma.partial'].map(
+              id => ({ id: id, title: invoiceTypes[id] })
+            )}
             isActive={type => filter.get('type') === type.id}
             onChange={setFilter('type')}
           />
@@ -56,7 +59,7 @@ export default function InvoicesList({ invoices, subjects }) {
             <tr key={invoice.id} className={isHighlighted(invoice.id) ? 'highlight' : ''}>
               <td>
                 {invoice.costlocker.project.client.name}<br />
-                <small className="text-muted">{invoice.fakturoid.type}</small>
+                <small className="text-muted">{invoiceTypes[invoice.fakturoid.type]}</small>
               </td>
               <td>{invoice.fakturoid.number}</td>
               <td>{invoice.fakturoid.issuedAt}</td>
