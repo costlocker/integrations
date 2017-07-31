@@ -171,6 +171,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     people: {
       id: 'people',
       title: "People",
+      summary: 'People and Activities',
       icon: 'fa-users',
       items: lines.getAllPeople(costlocker.project.budget.peoplecosts),
     },
@@ -188,9 +189,11 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     },
     discount: {
       icon: 'fa-percent',
+      title: 'Discount',
     },
     other: {
       icon: 'fa-gear',
+      title: 'Other',
     },
   };
   const getActiveTabs = visibleTabs => visibleTabs.map(id => activityTabs[id]);
@@ -322,7 +325,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
             <div className="btn-group">
               <Link
                 title={<span><span className={`fa ${activityTabs.discount.icon}`} /> Add discount</span>}
-                action={lines.addDiscount(costlocker.project.budget.discount)}
+                action={lines.addDiscount(costlocker.project.budget.discount, 'Discount')}
                 className={`btn btn-primary ${costlocker.project.budget.discount ? '' : 'disabled'}`} />
             </div>
           </div>
@@ -340,8 +343,8 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     </div>
     <br />
     {lines.getGroupedLines().map(({ id, title, items }) => (
-      <div key={ title } className={items.length || title === 'Other' ? 'show' : 'hide'}>
-        <h4><span className={`fa ${activityTabs[id].icon}`} /> { title }</h4>
+      <div key={ id } className={items.length || title === 'Other' ? 'show' : 'hide'}>
+        <h4><span className={`fa ${activityTabs[id].icon}`} /> { activityTabs[id].summary || activityTabs[id].title }</h4>
         {items.length ? (
         <div className="row text-muted">
           <div className="col-sm-1"><small>Quantity</small></div>

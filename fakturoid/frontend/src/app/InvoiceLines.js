@@ -2,9 +2,10 @@
 import { Map } from 'immutable';
 
 export default class InvoiceLines {
-  constructor(cursor, hasVat) {
+  constructor(cursor, hasVat, units) {
     this.cursor = cursor;
     this.hasVat = hasVat;
+    this.units = units;
   }
 
   calculateTotaAmount() {
@@ -33,7 +34,7 @@ export default class InvoiceLines {
         id: 'default',
         name: name,
         quantity: 1,
-        unit: 'ks',
+        unit: this.units.quantity,
         unit_amount: amount,
         total_amount: amount,
       }));
@@ -56,7 +57,7 @@ export default class InvoiceLines {
       id: `activity-${activityCost.item.activity_id}`,
       name: activityCost.activity.name,
       quantity: activityCost.hours.budget,
-      unit: 'h',
+      unit: this.units.time,
       unit_amount: activityCost.activity.hourly_rate,
       total_amount: activityCost.activity.hourly_rate * activityCost.hours.budget,
     })
@@ -71,7 +72,7 @@ export default class InvoiceLines {
           id: id,
           name: `${activityCost.activity.name} - ${personCost.person.first_name} ${personCost.person.last_name}`,
           quantity: personCost.hours.budget,
-          unit: 'h',
+          unit: this.units.time,
           unit_amount: activityCost.activity.hourly_rate,
           total_amount: activityCost.activity.hourly_rate * personCost.hours.budget,
         };
@@ -85,21 +86,21 @@ export default class InvoiceLines {
       id: `expense-${expense.item.expense_id}`,
       name: expense.expense.description,
       quantity: 1,
-      unit: 'ks',
+      unit: this.units.quantity,
       unit_amount: expense.expense.billed.total_amount,
       total_amount: expense.expense.billed.total_amount,
     })
   )
 
-  addDiscount = (discount) => () => {
+  addDiscount = (discount, name) => () => {
     if (discount <= 0) {
       return;
     }
     this.update(lines => this.addLine(lines, {
       id: `discount`,
-      name: 'Discount',
+      name: name,
       quantity: 1,
-      unit: 'ks',
+      unit: this.units.quantity,
       unit_amount: -discount,
       total_amount: -discount,
     }));
@@ -161,10 +162,10 @@ export default class InvoiceLines {
     });
     const getGroup = (type) => groups[type] || [];
     return [
-      { id: 'people', title: 'People and Activities',items: getGroup('people').concat(getGroup('activity')) },
-      { id: 'expenses', title: 'Expenses', items: getGroup('expense') },
-      { id: 'discount', title: 'Discount', items: getGroup('discount') },
-      { id: 'other', title: 'Other', items: getGroup('default').concat(getGroup('empty')) },
+      { id: 'people',items: getGroup('people').concat(getGroup('activity')) },
+      { id: 'expenses', items: getGroup('expense') },
+      { id: 'discount', items: getGroup('discount') },
+      { id: 'other', items: getGroup('default').concat(getGroup('empty')) },
     ];
   }
 

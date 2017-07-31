@@ -116,7 +116,11 @@ export const states = [
         invoices={<InvoicesList invoices={appState.cursor(['costlocker', 'invoices']).deref()} subjects={subjects} />}
         lines={new InvoiceLines(
           appState.cursor(['invoice', 'lines']),
-          appState.cursor(['auth', 'fakturoid']).deref().account.has_vat
+          appState.cursor(['auth', 'fakturoid']).deref().account.has_vat,
+          {
+            quantity: 'ks',
+            time: 'h',
+          }
         )}
         forceUpdate={() => appState.cursor(['invoice']).set('isForced', true)}
         form={{
