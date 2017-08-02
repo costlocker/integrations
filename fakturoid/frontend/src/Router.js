@@ -39,10 +39,10 @@ if (isNotLoggedInCostlocker()) {
 
 let lastQuery = null;
 
-const fetchInvoices = (customFilter) => {
+const fetchInvoices = (customFilter, wasInvoiceCreated) => {
   const filter = customFilter ? customFilter : appState.cursor(['search']).deref();
   const query = `/costlocker?type=${filter.get('type')}&query=${filter.get('query')}`;
-  if (query === lastQuery) {
+  if (query === lastQuery && !wasInvoiceCreated) {
     return;
   }
   lastQuery = query;
@@ -74,8 +74,8 @@ appState.on('next-animation-frame', function (newStructure, oldStructure, keyPat
   }
 });
 
-const fetchInvoice = ({ project, billing, amount }) => {
-  fetchInvoices();
+const fetchInvoice = ({ project, billing, amount }, wasInvoiceCreated) => {
+  fetchInvoices(null, wasInvoiceCreated);
   return fetchFromApi(`/costlocker?project=${project || ''}&billing=${billing || ''}&amount=${amount || ''}&query=billing`)
     .catch(setError)
     .then(invoice => appState.cursor()
@@ -160,7 +160,7 @@ export const states = [
                   setError(error);
                   return;
                 }
-                fetchInvoice(params).then(() => {
+                fetchInvoice(params, true).then(() => {
                   appState.cursor().update(
                     app => app
                       .setIn(['app', 'isSendingForm'], false)
