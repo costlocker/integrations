@@ -132,7 +132,7 @@ export const states = [
             subjects={subjects}
             dateFormat={dateFormat}
             form={new Form({
-              keys: ['search'],
+              stateKey: 'search',
               alwaysSet: (s) => s.setIn(['isSearching'], true),
             })}
             isLastCreatedInvoice={id => id === appState.cursor(['app', 'lastCreatedInvoice']).deref()}
@@ -146,7 +146,7 @@ export const states = [
         dateFormat={dateFormat}
         forceUpdate={() => appState.cursor(['invoice']).set('isForced', true)}
         form={new Form({
-          keys: ['invoice'],
+          stateKey: 'invoice',
           submit: () => {
             const request = {
               fakturoid: appState.cursor(['invoice']).deref().toJS(),
@@ -232,7 +232,7 @@ export const states = [
       isLoggedInFakturoid={appState.cursor(['auth', 'isLoggedInFakturoid']).deref()}
       loginUrls={loginUrls}
       loginError={props.transition.params().loginError}
-      form={new Form(['fakturoid'])} />,
+      form={new Form('fakturoid')} />,
   },
 ];
 

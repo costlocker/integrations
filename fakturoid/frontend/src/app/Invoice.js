@@ -150,7 +150,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
   const isRevenueGreaterThanBilling = (billedAmount - linesAmount) >= -0.1;
   const vat = lines.calculateVat();
 
-  const editorForm = new Form(['editor']);
+  const editorForm = new Form('editor');
   const advancedSettingsLink = (direction) =>
     <Link
       title={<span>{ trans(`editor.advancedSettings.${direction}`) } <span className={`fa fa-arrow-${direction}`} /></span>}

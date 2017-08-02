@@ -1,18 +1,15 @@
 import { appState } from '../state';
 
-const defaultConfig = (keys) => ({
-  keys: keys,
+const defaultConfig = () => ({
+  stateKey: null,
   alwaysSet: state => state,
   submit: (e) => null,
 });
 
 export default class Form {
-  constructor(config) {
-    if (Array.isArray(config)) {
-      this.config = defaultConfig(config);
-    } else {
-      this.config = Object.assign(defaultConfig([]), config);
-    }
+  constructor(rawConfig) {
+    const config = typeof(rawConfig) === 'string' ? { stateKey: rawConfig } : rawConfig;
+    this.config = Object.assign(defaultConfig(), config);
   }
 
   get = (type) => this.cursor().deref().get(type);
@@ -53,5 +50,5 @@ export default class Form {
     this.config.submit();
   };
 
-  cursor = () => appState.cursor(this.config.keys);
+  cursor = () => appState.cursor([this.config.stateKey]);
 }
