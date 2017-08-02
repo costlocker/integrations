@@ -15,7 +15,7 @@ export default function Loading({ title }) {
       </div>
       <div className="row">
         <div className="col-sm-12 text-center">
-          <h1 className="text-muted">{ trans(title) }&hellip;</h1>
+          <h1 className="text-muted">{trans(title)}&hellip;</h1>
         </div>
       </div>
     </div>

@@ -23,7 +23,7 @@ export default function InvoicesList({ invoices, subjects, dateFormat, form, isL
           <div className="input-group">
             <span className="input-group-addon" id="basic-addon1"><i className="fa fa-search" /></span>
             <input
-              type="text" className="form-control" placeholder={ trans('search.query') } id="query"
+              type="text" className="form-control" placeholder={trans('search.query')} id="query"
               value={form.get('query')} onChange={form.set('query')}
             />
           </div>
@@ -35,12 +35,12 @@ export default function InvoicesList({ invoices, subjects, dateFormat, form, isL
       <table className="table table-striped table-valign">
         <thead>
           <tr>
-            <th>{ trans('invoices.client') }</th>
-            <th>{ trans('invoices.id') }</th>
-            <th>{ trans('invoices.issued') }</th>
-            <th>{ trans('invoices.price') }</th>
-            <th>{ trans('invoices.priceVAT') }</th>
-            <th>{ trans('invoices.links') }</th>
+            <th>{trans('invoices.client')}</th>
+            <th>{trans('invoices.id')}</th>
+            <th>{trans('invoices.issued')}</th>
+            <th>{trans('invoices.price')}</th>
+            <th>{trans('invoices.priceVAT')}</th>
+            <th>{trans('invoices.links')}</th>
           </tr>
         </thead>
         <tbody>
@@ -55,23 +55,23 @@ export default function InvoicesList({ invoices, subjects, dateFormat, form, isL
               <th>{roundNumber(invoice.fakturoid.amount)}</th>
               <td>{
                 invoice.fakturoid.hasVat
-                ? <strong>{roundNumber(invoice.fakturoid.amountWithVat)}</strong>
-                : <small className="text-muted">N/A</small>
+                  ? <strong>{roundNumber(invoice.fakturoid.amountWithVat)}</strong>
+                  : <small className="text-muted">N/A</small>
               }</td>
               <td title={invoice.costlocker.update.error}>
                 <ExternalLink url={invoice.costlocker.link}
                   className={invoice.costlocker.update.hasFailed ? "text-danger first" : "text-primary first"}
-                  title={<span><Logo app="costlocker" color="blue" />{ trans('invoices.linkProject') }</span>} />
+                  title={<span><Logo app="costlocker" color="blue" />{trans('invoices.linkProject')}</span>} />
                 &nbsp;
                 <ExternalLink url={invoice.fakturoid.link} className="text-success"
-                  title={<span><Logo app="fakturoid" />{ trans('invoices.linkInvoice') }</span>} />
+                  title={<span><Logo app="fakturoid" />{trans('invoices.linkInvoice')}</span>} />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
     ) : (
-      <p className="text-muted">{ trans('invoices.noResults') }</p>
-    )}
+        <p className="text-muted">{trans('invoices.noResults')}</p>
+      )}
   </div>;
 }

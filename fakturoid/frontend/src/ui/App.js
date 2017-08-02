@@ -3,7 +3,7 @@ import { UIView } from 'ui-router-react';
 import { Link } from './Components';
 import { Logo } from './Images';
 import { appState } from '../state';
-import { trans } from '../i18n';
+import { trans } from '../i18n';
 
 const User = ({ name, company }) => {
   return (
@@ -81,9 +81,10 @@ export function App({ auth, isRouteActive }) {
           </div>
           <div className="navbar-right text-right">
             <Navigation isRouteActive={isRouteActive} routes={[
-              { route: 'login', title: auth.get('costlocker')
-                ? <Users auth={auth} isRouteActive={isRouteActive} />
-                : <AnonymousUser isRouteActive={isRouteActive} />
+              {
+                route: 'login', title: auth.get('costlocker')
+                  ? <Users auth={auth} isRouteActive={isRouteActive} />
+                  : <AnonymousUser isRouteActive={isRouteActive} />
               },
             ]} />
           </div>

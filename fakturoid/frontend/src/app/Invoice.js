@@ -16,9 +16,9 @@ const InvoiceTutorial = () =>
   <div>
     <div className="row">
       <div className="col-sm-12">
-        <h1>{ trans('tutorial.title') }</h1>
+        <h1>{trans('tutorial.title')}</h1>
         <br />
-        { trans('tutorial.description', { costlockerButton: <strong className="btn btn-primary">Create invoice</strong> }) }
+        {trans('tutorial.description', { costlockerButton: <strong className="btn btn-primary">Create invoice</strong> })}
       </div>
     </div>
     <div className="row">
@@ -28,7 +28,7 @@ const InvoiceTutorial = () =>
     </div>
     <div className="row">
       <div className="col-sm-12">
-        <CostlockerLink path="/dashboard/billing-outlook" title={ trans('tutorial.linkCostlocker') } className="btn btn-success btn-lg" />
+        <CostlockerLink path="/dashboard/billing-outlook" title={trans('tutorial.linkCostlocker')} className="btn btn-success btn-lg" />
       </div>
     </div>
   </div>;
@@ -37,34 +37,34 @@ const ImportedInvoice = ({ invoice, forceUpdate }) =>
   <div className="text-center">
     <div className="row">
       <div className="col-sm-12">
-        <h1>{ trans('createdInvoice.title') }</h1>
+        <h1>{trans('createdInvoice.title')}</h1>
         <br />
-        <p>{ trans('createdInvoice.description') }</p>
+        <p>{trans('createdInvoice.description')}</p>
       </div>
     </div>
     <div className="row">
       <div className="col-sm-12">
-        <ExternalLink url={invoice.fakturoid.link} title={ trans('createdInvoice.linkFakturoid') } className="btn btn-primary" />
-        <small className="text-muted ps-10">{ trans('createdInvoice.linkSeparator') }</small>
-        <ExternalLink url={invoice.costlocker.link} title={ trans('createdInvoice.linkCostlocker') } className="btn btn-default" />
+        <ExternalLink url={invoice.fakturoid.link} title={trans('createdInvoice.linkFakturoid')} className="btn btn-primary" />
+        <small className="text-muted ps-10">{trans('createdInvoice.linkSeparator')}</small>
+        <ExternalLink url={invoice.costlocker.link} title={trans('createdInvoice.linkCostlocker')} className="btn btn-default" />
       </div>
     </div>
     {isDevelopmentMode &&
-    <div>
-      <hr />
-      <Button
-        title="Force create (DEV)"
-        className="btn btn-warning"
-        action={forceUpdate}
-      />
-    </div>
+      <div>
+        <hr />
+        <Button
+          title="Force create (DEV)"
+          className="btn btn-warning"
+          action={forceUpdate}
+        />
+      </div>
     }
   </div>;
 
 const InvoiceDetail = ({ costlocker }) => (
   <div>
     <h1>
-      { trans('page.invoice') }
+      {trans('page.invoice')}
       {costlocker.project.project_id.id ? <span> / {costlocker.project.project_id.id}</span> : null}
     </h1>
     <p>
@@ -73,8 +73,8 @@ const InvoiceDetail = ({ costlocker }) => (
   </div>
 );
 
-const AddLinesModal = ({ type, title, activityTabs, addItems, editorForm }) => {
-  const hasMultipleTabs =  activityTabs.length > 1;
+const AddLinesModal = ({  type, title, activityTabs, addItems, editorForm }) => {
+  const hasMultipleTabs = activityTabs.length > 1;
   const isActive = type => hasMultipleTabs
     ? type.id === (editorForm.get('activeTab') || activityTabs[0].id)
     : true;
@@ -86,7 +86,7 @@ const AddLinesModal = ({ type, title, activityTabs, addItems, editorForm }) => 
         .setIn(['checkedIds'], editorForm.get('checkedIds').clear())
     )}
     link={{
-      title:  title,
+      title: title,
       className: "btn btn-primary",
     }}
     content={
@@ -94,12 +94,12 @@ const AddLinesModal = ({ type, title, activityTabs, addItems, editorForm }) => 
         <div>
           <h2>{title}</h2>
           {hasMultipleTabs ? (
-          <RadioButtons
-            items={activityTabs}
-            isActive={isActive}
-            onChange={editorForm.set('activeTab')}
-            className="btn-group-justified"
-          />
+            <RadioButtons
+              items={activityTabs}
+              isActive={isActive}
+              onChange={editorForm.set('activeTab')}
+              className="btn-group-justified"
+            />
           ) : null}
           {activityTabs.map(type => {
             const items = type.items();
@@ -116,11 +116,11 @@ const AddLinesModal = ({ type, title, activityTabs, addItems, editorForm }) => 
                   </label>
                 ))}
                 <Link
-                  title={ trans('invoiceModal.checkAll', { count: items.length}) }
-                  action={editorForm.checkAll('checkedIds', items.map(item => item.id))} />
+                  title={trans('invoiceModal.checkAll', { count: items.length })}
+                  action={editorForm.checkAll('checkedIds', items.map(item =>  item.id))} />
                 <br /><br />
                 <Button
-                  title={ trans('invoiceModal.submit') }
+                  title={trans('invoiceModal.submit')}
                   action={(e) => {
                     e.preventDefault();
                     const checkedItems = items.filter(item => editorForm.isChecked('checkedIds', item.id));
@@ -153,7 +153,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
   const editorForm = new Form('editor');
   const advancedSettingsLink = (direction) =>
     <Link
-      title={<span>{ trans(`editor.advancedSettings.${direction}`) } <span className={`fa fa-arrow-${direction}`} /></span>}
+      title={<span>{trans(`editor.advancedSettings.${direction}`)} <span className={`fa fa-arrow-${direction}`} /></span>}
       className={`btn btn-horizontal ${direction}`}
       action={editorForm.toggle('hasAdvancedSettings')} />;
 
@@ -193,7 +193,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
 
   return <form className="form" onSubmit={form.submit}>
     <div className="form-group">
-      <label htmlFor="type">{ trans('editor.type') }</label><br />
+      <label htmlFor="type">{trans('editor.type')}</label><br />
       <RadioButtons
         items={['invoice', 'proforma.full', 'proforma.partial'].map(
           id => ({ id: id, title: trans(`invoiceTypes.${id}`) })
@@ -203,7 +203,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
       />
     </div>
     <div className="form-group">
-      <label htmlFor="fakturoidSubject">{ trans('editor.subject') }</label>
+      <label htmlFor="fakturoidSubject">{trans('editor.subject')}</label>
       <div className="row">
         <div className="col-sm-8">
           <select required
@@ -218,15 +218,15 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         </div>
         <div className="col-sm-4">
           <FakturoidLink
-            title={<span className="text-success"><Logo app="fakturoid" /> { trans('editor.createSubject') }</span>}
+            title={<span className="text-success"><Logo app="fakturoid" /> {trans('editor.createSubject')}</span>}
             path="/subjects/new" className="btn btn-link"
           />
         </div>
       </div>
       <p className="help-block">
-        { trans('editor.outdatedSubjects') } <Link
+        {trans('editor.outdatedSubjects')} <Link
           action={reloadSubjects}
-          title={<span><i className="fa fa-refresh" /> { trans('editor.reloadSubjects') }</span>}
+          title={<span><i className="fa fa-refresh" /> {trans('editor.reloadSubjects')}</span>}
           className="btn btn-link"
         />
       </p>
@@ -234,7 +234,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     <div className="row">
       <div className="col-sm-4">
         <div className="form-group">
-          <label htmlFor="issuedAt">{ trans('editor.issuedAt') }</label>
+          <label htmlFor="issuedAt">{trans('editor.issuedAt')}</label>
           <DatePicker
             dateFormat={dateFormat}
             className="form-control"
@@ -250,7 +250,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
       </div>
       <div className="col-sm-3">
         <div className="form-group">
-          <label htmlFor="due">{ trans('editor.due') }</label>
+          <label htmlFor="due">{trans('editor.due')}</label>
           <input
             className="form-control" type="number" id="due" min="1" max="100" step="1"
             value={form.get('due')} onChange={form.set('due')}
@@ -268,14 +268,14 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
       <div>
         <div className="well">
           <div className="form-group">
-            <label htmlFor="orderNumber">{ trans('editor.orderNumber') }</label>
+            <label htmlFor="orderNumber">{trans('editor.orderNumber')}</label>
             <input
               type="text" className="form-control" name="orderNumber" id="orderNumber"
               value={form.get('orderNumber')} onChange={form.set('orderNumber')}
             />
           </div>
           <div className="form-group">
-            <label htmlFor="noteBeforeLines">{ trans('editor.noteBeforeLines') }</label>
+            <label htmlFor="noteBeforeLines">{trans('editor.noteBeforeLines')}</label>
             <textarea
               className="form-control" name="noteBeforeLines" id="noteBeforeLines" rows="4"
               value={form.get('noteBeforeLines')} onChange={form.set('noteBeforeLines')}
@@ -286,8 +286,8 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         {advancedSettingsLink('up')}
       </div>
     ) : (
-      advancedSettingsLink('down')
-    )}
+        advancedSettingsLink('down')
+      )}
     <div className="form-group">
       <div className="row">
         <div className="col-sm-10">
@@ -295,18 +295,18 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
             <div className="btn-group">
               <AddLinesModal
                 editorForm={editorForm}
-                type="activities" title={<span><span className={`fa ${activityTabs.people.icon}`} /> { trans('invoiceLines.actions.peopleAndActivites') }</span>}
+                type="activities" title={<span><span className={`fa ${activityTabs.people.icon}`} /> {trans('invoiceLines.actions.peopleAndActivites')}</span>}
                 activityTabs={getActiveTabs(['people', 'activities'])} addItems={lines.addItems} />
             </div>
             <div className="btn-group">
               <AddLinesModal
                 editorForm={editorForm}
-                type="expenses" title={<span><span className={`fa ${activityTabs.expenses.icon}`} /> { trans('invoiceLines.actions.expenses') }</span>}
+                type="expenses" title={<span><span className={`fa ${activityTabs.expenses.icon}`} /> {trans('invoiceLines.actions.expenses')}</span>}
                 activityTabs={getActiveTabs(['expenses'])} addItems={lines.addItems} />
             </div>
             <div className="btn-group">
               <Link
-                title={<span><span className={`fa ${activityTabs.discount.icon}`} /> { trans('invoiceLines.actions.discount') }</span>}
+                title={<span><span className={`fa ${activityTabs.discount.icon}`} /> {trans('invoiceLines.actions.discount')}</span>}
                 action={lines.addDiscount(costlocker.project.budget.discount, trans('invoiceLines.discount'))}
                 className={`btn btn-primary ${costlocker.project.budget.discount ? '' : 'disabled'}`} />
             </div>
@@ -316,7 +316,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           <div className="btn-toolbar">
             <div className="btn-group-justified">
               <Link
-                title={<span><span className="fa fa-refresh" /> { trans('invoiceLines.actions.reset') }</span>}
+                title={<span><span className="fa fa-refresh" /> {trans('invoiceLines.actions.reset')}</span>}
                 action={lines.removeAllLines()} className="btn btn-default" />
             </div>
           </div>
@@ -325,17 +325,17 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     </div>
     <br />
     {lines.getGroupedLines().map(({ id, items }) => (
-      <div key={ id } className={items.length || id === 'other' ? 'show' : 'hide'}>
-        <h4><span className={`fa ${activityTabs[id].icon}`} /> { activityTabs[id].summary || activityTabs[id].title }</h4>
+      <div key={id} className={items.length || id === 'other' ? 'show' : 'hide'}>
+        <h4><span className={`fa ${activityTabs[id].icon}`} /> {activityTabs[id].summary || activityTabs[id].title}</h4>
         {items.length ? (
-        <div className="row text-muted">
-          <div className="col-sm-1"><small>{ trans('invoiceLines.item.quantity') }</small></div>
-          <div className="col-sm-1"><small>{ trans('invoiceLines.item.unit') }</small></div>
-          <div className={lines.hasVat ? "col-sm-5" : "col-sm-6"}><small>{ trans('invoiceLines.item.name') }</small></div>
-          {lines.hasVat ? <div className="col-sm-1"><small>{ trans('invoiceLines.item.vat') }</small></div> : null}
-          <div className="col-sm-2 text-right"><small>{ trans('invoiceLines.item.unit_amount') }</small></div>
-          <div className="col-sm-2 text-right"><small>{ trans('invoiceLines.item.total_amount') }</small></div>
-        </div>
+          <div className="row text-muted">
+            <div className="col-sm-1"><small>{trans('invoiceLines.item.quantity')}</small></div>
+            <div className="col-sm-1"><small>{trans('invoiceLines.item.unit')}</small></div>
+            <div className={lines.hasVat ? "col-sm-5" : "col-sm-6"}><small>{trans('invoiceLines.item.name')}</small></div>
+            {lines.hasVat ? <div className="col-sm-1"><small>{trans('invoiceLines.item.vat')}</small></div> : null}
+            <div className="col-sm-2 text-right"><small>{trans('invoiceLines.item.unit_amount')}</small></div>
+            <div className="col-sm-2 text-right"><small>{trans('invoiceLines.item.total_amount')}</small></div>
+          </div>
         ) : null}
         {items.map((line) => {
           const isLineIgnored = line.get('quantity') <= 0;
@@ -348,10 +348,10 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
 
             <div className="btn-group">
               {lines.hasMultipleLines() ? (
-              <Link
-                title={<span className="fa fa-times text-danger" />} className="btn btn-link"
-                action={lines.removeLine(line)}
-              />
+                <Link
+                  title={<span className="fa fa-times text-danger" />} className="btn btn-link"
+                  action={lines.removeLine(line)}
+                />
               ) : <span className="btn btn-link disabled"><span className="fa fa-times text-muted" /></span>}
               <Link
                 title={<span className="fa fa-filter text-muted" />} className="btn btn-link"
@@ -377,12 +377,12 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
               />
             </div>
             {lines.hasVat ? (
-            <div className="col-sm-1">
-              <input
-                className="form-control" type="text"
-                value={line.get('vat')} onChange={lines.updateFieldInLine('vat', line)}
-              />
-            </div>
+              <div className="col-sm-1">
+                <input
+                  className="form-control" type="text"
+                  value={line.get('vat')} onChange={lines.updateFieldInLine('vat', line)}
+                />
+              </div>
             ) : null}
             <div className="col-sm-2 text-right">
               <input
@@ -403,7 +403,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
             <div className="col-sm-2">
               <br />
               <Link
-                title={<span><span className="fa fa-plus-circle" /> { trans('invoiceLines.actions.newLine') }</span>}
+                title={<span><span className="fa fa-plus-circle" /> {trans('invoiceLines.actions.newLine')}</span>}
                 action={lines.addEmptyLine()} className="btn btn-success" />
             </div>
           </div>
@@ -413,8 +413,8 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     <div className="form-summary">
       {!isRevenueGreaterThanBilling ? (
         <Errors
-          title={trans('editor.revenueError.title', { billedAmount: roundNumber(billedAmount) }) }
-          error={trans('editor.revenueError.error', { linesAmount: roundNumber(linesAmount) }) }
+          title={trans('editor.revenueError.title', { billedAmount: roundNumber(billedAmount) })}
+          error={trans('editor.revenueError.error', { linesAmount: roundNumber(linesAmount) })}
           errorClassName="warning"
         />
       ) : null}
@@ -422,25 +422,25 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         <div>
           <div className="row">
             <div className="col-sm-4 col-sm-offset-6 text-right">
-              { trans('summary.totalWithoutVAT') }
+              {trans('summary.totalWithoutVAT')}
             </div>
             <div className="col-sm-2 text-right">
               <Number value={linesAmount} isElement />
             </div>
           </div>
           {Object.keys(vat.rates).map(rate => (
-          <div key={rate} className="row">
-            <div className="col-sm-4 col-sm-offset-6 text-right">
-              { trans('summary.vat') } (<Number value={rate} isElement />%)
+            <div key={rate} className="row">
+              <div className="col-sm-4 col-sm-offset-6 text-right">
+                {trans('summary.vat')} (<Number value={rate} isElement />%)
             </div>
-            <div className="col-sm-2 text-right">
-              <Number value={vat.rates[rate]} isElement />
+              <div className="col-sm-2 text-right">
+                <Number value={vat.rates[rate]} isElement />
+              </div>
             </div>
-          </div>
           ))}
           <div className="row">
             <div className="col-sm-4 col-sm-offset-6 text-right">
-              <strong>{ trans('summary.totalWithVAT') }</strong>
+              <strong>{trans('summary.totalWithVAT')}</strong>
             </div>
             <div className="col-sm-2 text-right">
               <strong><Number value={linesAmount + vat.total} isElement /></strong>
@@ -448,32 +448,32 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           </div>
         </div>
       ) : (
-        <div>
-          <div className="row">
-            <div className="col-sm-4 col-sm-offset-6 text-right">
-              { trans('summary.total') }
-            </div>
-            <div className="col-sm-2 text-right">
-              <strong><Number value={linesAmount} isElement /></strong>
+          <div>
+            <div className="row">
+              <div className="col-sm-4 col-sm-offset-6 text-right">
+                {trans('summary.total')}
+              </div>
+              <div className="col-sm-2 text-right">
+                <strong><Number value={linesAmount} isElement /></strong>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
     <div className="row">
       <div className="col-sm-2 col-sm-offset-10">
         {isRevenueGreaterThanBilling ? (
-          <button type="submit" className="btn btn-primary btn-block">{ trans('editor.submit') }</button>
+          <button type="submit" className="btn btn-primary btn-block">{trans('editor.submit')}</button>
         ) : (
-          <span className="btn btn-danger btn-block" disabled title="Update total amount">{ trans('editor.submit') }</span>
-        )}
+            <span className="btn btn-danger btn-block" disabled title="Update total amount">{trans('editor.submit')}</span>
+          )}
       </div>
     </div>
     <div className="form-group">
-      <label htmlFor="note">{ trans('editor.note.title') }</label>
+      <label htmlFor="note">{trans('editor.note.title')}</label>
       <textarea
         className="form-control" name="note" id="note" rows="4"
-        placeholder={ trans('editor.note.placeholder') }
+        placeholder={trans('editor.note.placeholder')}
         value={form.get('note')} onChange={form.set('note')}
       >
       </textarea>
@@ -513,7 +513,7 @@ export default function Invoice(props) {
     <InvoicesPages
       props={props} content={<InvoiceTutorial />} className="col-sm-12 text-center"
       header={header}
-  />;
+    />;
 
   if (
     invoice.status === 'READY' || invoice.status === 'NEW' ||
@@ -526,7 +526,7 @@ export default function Invoice(props) {
     return <InvoicesPages props={props} content={<ImportedInvoice {...props} />} className="col-sm-12" />;
   } else if (invoice.status === 'UNKNOWN') {
     return buildTutorial(<Errors { ...trans('invalidInvoice.unknownBilling') } errorClassName="warning" />
-  );
+    );
   }
   return buildTutorial();
 }

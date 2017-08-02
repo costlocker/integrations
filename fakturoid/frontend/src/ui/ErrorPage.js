@@ -30,10 +30,10 @@ export default function ErrorPage({ appState, isDevelopmentMode }) {
         <div className="col-sm-6 col-sm-offset-3">
           <div className="panel panel-danger error-page">
             <div className="panel-heading">
-              <h1 className="panel-title">{ trans('error.title') }</h1>
+              <h1 className="panel-title">{trans('error.title')}</h1>
             </div>
             <div className="panel-body">
-              { trans('error.description', { currentUrl })} <a href="mailto: support@costlocker.com">
+              {trans('error.description', { currentUrl })} <a href="mailto: support@costlocker.com">
                 support@costlocker.com</a>.
             </div>
             <div className="panel-footer">

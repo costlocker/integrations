@@ -13,7 +13,7 @@ import Loading from './ui/Loading';
 export let redirectToRoute = (route) => console.log('app is not ready', route);
 export let isRouteActive = () => false;
 const setError = e => appState.cursor(['app']).set('error', e);
-const notify = (message) => alert(trans(message));
+const notify = (message) => alert(trans(message));
 
 const fetchUser = () =>
   fetchFromApi(`/user`)
@@ -53,7 +53,7 @@ const fetchInvoices = (customFilter, wasInvoiceCreated) => {
       app => app
         .setIn(['costlocker', 'invoices'], invoices)
         .setIn(['search', 'isSearching'], false)
-      ));
+    ));
 }
 
 let timeout = null;

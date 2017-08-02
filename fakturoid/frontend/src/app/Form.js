@@ -8,7 +8,7 @@ const defaultConfig = () => ({
 
 export default class Form {
   constructor(rawConfig) {
-    const config = typeof(rawConfig) === 'string' ? { stateKey: rawConfig } : rawConfig;
+    const config = typeof (rawConfig) === 'string' ? { stateKey: rawConfig } : rawConfig;
     this.config = Object.assign(defaultConfig(), config);
   }
 

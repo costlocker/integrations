@@ -19,7 +19,7 @@ export default class InvoiceLines {
         if (!rates[item.get('vat')]) {
           rates[item.get('vat')] = 0;
         }
-        rates[item.get('vat')] += item.get('total_amount') * item.get('vat') / 100;
+        rates[item.get('vat')] += item.get('total_amount') *  item.get('vat') / 100;
       }
     })
     return {
@@ -52,7 +52,7 @@ export default class InvoiceLines {
     });
   }
 
-  getAllActivities = (items) => () => items.map(
+  getAllActivities = (items) => () =>  items.map(
     activityCost => ({
       id: `activity-${activityCost.item.activity_id}`,
       name: activityCost.activity.name,
@@ -63,7 +63,7 @@ export default class InvoiceLines {
     })
   )
 
-  getAllPeople = (items) => () => {
+  getAllPeople = (items) => () => {
     const people = {};
     items.forEach(activityCost => (
       activityCost.people.forEach(personCost => {
@@ -81,7 +81,7 @@ export default class InvoiceLines {
     return Object.values(people);
   }
 
-  getAllExpenses = (items) => () => items.map(
+  getAllExpenses = (items) => () => items.map(
     expense => ({
       id: `expense-${expense.item.expense_id}`,
       name: expense.expense.description,
@@ -162,7 +162,7 @@ export default class InvoiceLines {
     });
     const getGroup = (type) => groups[type] || [];
     return [
-      { id: 'people',items: getGroup('people').concat(getGroup('activity')) },
+      { id: 'people', items: getGroup('people').concat(getGroup('activity')) },
       { id: 'expenses', items: getGroup('expense') },
       { id: 'discount', items: getGroup('discount') },
       { id: 'other', items: getGroup('default').concat(getGroup('empty')) },
