@@ -88,6 +88,7 @@ SQL
                         'number' => $i->fakturoidInvoiceNumber,
                         'link' => $i->data['response']['html_url'],
                         'amount' => $i->data['response']['total'],
+                        'hasVat' => $i->data['response']['total'] != $i->data['response']['subtotal'],
                         'issuedAt' => $i->data['request']['fakturoid']['issuedAt'] ?? $i->createdAt->format('Y-m-d'),
                         'template' => [
                             'actions' => $this->guessActions(array_keys($i->data['request']['fakturoid']['lines'])),

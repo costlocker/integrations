@@ -63,7 +63,11 @@ export default function InvoicesList({ invoices, subjects }) {
               <td>{invoice.fakturoid.number}</td>
               <td>{invoice.fakturoid.issuedAt}</td>
               <th>{invoice.costlocker.billing.billing.total_amount}</th>
-              <th>{roundNumber(invoice.fakturoid.amount)}</th>
+              <td>{
+                invoice.fakturoid.hasVat
+                ? <strong>{roundNumber(invoice.fakturoid.amount)}</strong>
+                : <small className="text-muted">N/A</small>
+              }</td>
               <td>
                 <ExternalLink url={invoice.costlocker.link} className="text-primary first"
                   title={<span><Logo app="costlocker" color="blue" />{ trans('invoices.linkProject') }</span>} />
