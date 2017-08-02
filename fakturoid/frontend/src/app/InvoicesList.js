@@ -2,20 +2,9 @@ import React from 'react';
 import moment from 'moment';
 import { ExternalLink, roundNumber, RadioButtons } from '../ui/Components';
 import { Logo } from '../ui/Images';
-import { appState } from '../state';
 import { trans } from '../i18n';
 
-const isHighlighted = id => id === appState.cursor(['app', 'lastCreatedInvoice']).deref();
-
-export default function InvoicesList({ invoices, subjects, dateFormat }) {
-  const alwaysSet = (s) => s.setIn(['isSearching'], true);
-  const form = {
-    get: (type) => appState.cursor(['search', type]).deref(),
-    set: (type) => (e) => appState.cursor(['search']).update(
-      state => alwaysSet(state)
-        .setIn([type], e.target.type === 'checkbox' ? e.target.checked : e.target.value)
-    ),
-  };
+export default function InvoicesList({ invoices, subjects, dateFormat, form, isLastCreatedInvoice }) {
   return <div className={form.get('isSearching') ? 'reloading' : null}>
     <form className="form row">
       <div className="col-sm-6">
@@ -56,7 +45,7 @@ export default function InvoicesList({ invoices, subjects, dateFormat }) {
         </thead>
         <tbody>
           {invoices.map((invoice) => (
-            <tr key={invoice.id} className={isHighlighted(invoice.id) ? 'highlight' : ''}>
+            <tr key={invoice.id} className={isLastCreatedInvoice(invoice.id) ? 'highlight' : ''}>
               <td>
                 {invoice.costlocker.project.client.name}<br />
                 <small className="text-muted">{trans(`invoiceTypes.${invoice.fakturoid.type}`)}</small>

@@ -3,6 +3,7 @@ import React from 'react';
 import { appState, isNotLoggedInCostlocker, isNotLoggedInFakturoid } from './state';
 import { fetchFromApi, pushToApi, loginUrls } from './api';
 import { trans } from './i18n';
+import Form from './app/Form';
 import Login from './app/Login';
 import Invoice from './app/Invoice';
 import InvoicesList from './app/InvoicesList';
@@ -130,6 +131,11 @@ export const states = [
             invoices={appState.cursor(['costlocker', 'invoices']).deref()}
             subjects={subjects}
             dateFormat={dateFormat}
+            form={new Form({
+              keys: ['search'],
+              alwaysSet: (s) => s.setIn(['isSearching'], true),
+            })}
+            isLastCreatedInvoice={id => id === appState.cursor(['app', 'lastCreatedInvoice']).deref()}
           />
         }
         lines={new InvoiceLines(
@@ -231,13 +237,7 @@ export const states = [
       isLoggedInFakturoid={appState.cursor(['auth', 'isLoggedInFakturoid']).deref()}
       loginUrls={loginUrls}
       loginError={props.transition.params().loginError}
-      form={{
-        get: (type) => appState.cursor(['fakturoid', type]).deref(),
-        set: (type) => (e) => appState.cursor(['fakturoid']).set(
-          type,
-          e.target.type === 'checkbox' ? e.target.checked : e.target.value
-        ),
-      }} />,
+      form={new Form(['fakturoid'])} />,
   },
 ];
 
