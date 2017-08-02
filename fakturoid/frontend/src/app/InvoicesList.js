@@ -68,8 +68,9 @@ export default function InvoicesList({ invoices, subjects }) {
                 ? <strong>{roundNumber(invoice.fakturoid.amountWithVat)}</strong>
                 : <small className="text-muted">N/A</small>
               }</td>
-              <td>
-                <ExternalLink url={invoice.costlocker.link} className="text-primary first"
+              <td title={invoice.costlocker.update.error}>
+                <ExternalLink url={invoice.costlocker.link}
+                  className={invoice.costlocker.update.hasFailed ? "text-danger first" : "text-primary first"}
                   title={<span><Logo app="costlocker" color="blue" />{ trans('invoices.linkProject') }</span>} />
                 &nbsp;
                 <ExternalLink url={invoice.fakturoid.link} className="text-success"
