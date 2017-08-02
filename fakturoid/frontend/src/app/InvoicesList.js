@@ -8,15 +8,15 @@ import { trans } from '../i18n';
 const isHighlighted = id => id === appState.cursor(['app', 'lastCreatedInvoice']).deref();
 
 export default function InvoicesList({ invoices, subjects, dateFormat }) {
-  const filter = appState.cursor(['search']);
-  const setFilter = (field) => (e) => {
-    appState.cursor(['search']).update(
-      s => s
-        .setIn([field], e.target.value)
-        .setIn(['isSearching'], true)
-    );
+  const alwaysSet = (s) => s.setIn(['isSearching'], true);
+  const form = {
+    get: (type) => appState.cursor(['search', type]).deref(),
+    set: (type) => (e) => appState.cursor(['search']).update(
+      state => alwaysSet(state)
+        .setIn([type], e.target.type === 'checkbox' ? e.target.checked : e.target.value)
+    ),
   };
-  return <div className={filter.get('isSearching') ? 'reloading' : null}>
+  return <div className={form.get('isSearching') ? 'reloading' : null}>
     <form className="form row">
       <div className="col-sm-6">
         <div className="form-group">
@@ -24,8 +24,8 @@ export default function InvoicesList({ invoices, subjects, dateFormat }) {
             items={['', 'invoice', 'proforma.full', 'proforma.partial'].map(
               id => ({ id: id, title: trans(`invoiceTypes.${id}`) })
             )}
-            isActive={type => filter.get('type') === type.id}
-            onChange={setFilter('type')}
+            isActive={type => form.get('type') === type.id}
+            onChange={form.set('type')}
           />
         </div>
       </div>
@@ -35,7 +35,7 @@ export default function InvoicesList({ invoices, subjects, dateFormat }) {
             <span className="input-group-addon" id="basic-addon1"><i className="fa fa-search" /></span>
             <input
               type="text" className="form-control" placeholder={ trans('search.query') } id="query"
-              value={filter.get('query')} onChange={setFilter('query')}
+              value={form.get('query')} onChange={form.set('query')}
             />
           </div>
         </div>
