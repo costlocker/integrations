@@ -66,12 +66,14 @@ appState.on('next-animation-frame', function (newStructure, oldStructure, keyPat
   const isSearchUpdated = (field, keyPath) =>
     keyPath.length === 1 &&
     keyPath[0] === 'search' &&
-    newStructure.getIn(['search', field]) != oldStructure.getIn(['search', field]);
+    newStructure.getIn(['search', field]) !== oldStructure.getIn(['search', field]);
 
   if (isSearchUpdated('type', keyPath)) {
     fetchInvoices(newStructure.get('search'));
   } else if (isSearchUpdated('query', keyPath) && !timeout) {
     timeout = setTimeout(fulltextInvoiceSearch, 400);
+  } else if (isSearchUpdated('isSearching', keyPath)) {
+    appState.cursor(['search']).set('isSearching', false);
   }
 });
 
