@@ -8,9 +8,9 @@ import { Image, Logo } from '../ui/Images';
 import { PageWithSubnav } from '../ui/App';
 import { isDevelopmentMode } from '../config';
 import { CenteredModal } from '../ui/Modals';
-import { appState } from '../state';
 import { trans } from '../i18n';
 import billing from '../images/billing.png';
+import Form from './Form';
 
 const InvoiceTutorial = () =>
   <div>
@@ -73,35 +73,18 @@ const InvoiceDetail = ({ costlocker }) => (
   </div>
 );
 
-const AddLinesModal = ({ type, title, activityTabs, addItems }) => {
+const AddLinesModal = ({ type, title, activityTabs, addItems, editorForm }) => {
   const hasMultipleTabs =  activityTabs.length > 1;
   const isActive = type => hasMultipleTabs
-    ? type.id === (appState.cursor(['editor', 'activeTab']).deref() || activityTabs[0].id)
+    ? type.id === (editorForm.get('activeTab') || activityTabs[0].id)
     : true;
-  const changeTab = (e) => appState.cursor(['editor']).set('activeTab', e.target.value);
-
-  const checkItem = (e) => appState.cursor(['editor', 'checkedIds']).update(
-    set => e.target.checked ? set.add(e.target.value) : set.delete(e.target.value)
-  );
-  const isChecked = item => appState.cursor(['editor', 'checkedIds']).deref().contains(item.id);
-  const checkAll = items => () => appState.cursor(['editor', 'checkedIds']).update(
-    set => {
-      let updated = set;
-      items.forEach(item => {
-        updated = updated.add(item.id);
-      })
-      return updated;
-    }
-  );
-  const getCheckedItems = items => items.filter(isChecked);
-  const initModal = () => appState.cursor(['editor']).update(
-    modal => modal
-      .setIn(['activeTab'], '')
-      .setIn(['checkedIds'], modal.get('checkedIds').clear())
-  );
   return <CenteredModal
     type={type}
-    onOpen={initModal}
+    onOpen={() => editorForm.update(
+      editor => editor
+        .setIn(['activeTab'], '')
+        .setIn(['checkedIds'], editorForm.get('checkedIds').clear())
+    )}
     link={{
       title:  title,
       className: "btn btn-primary",
@@ -114,7 +97,7 @@ const AddLinesModal = ({ type, title, activityTabs, addItems }) => {
           <RadioButtons
             items={activityTabs}
             isActive={isActive}
-            onChange={changeTab}
+            onChange={editorForm.set('activeTab')}
             className="btn-group-justified"
           />
           ) : null}
@@ -126,20 +109,22 @@ const AddLinesModal = ({ type, title, activityTabs, addItems }) => {
                   <label key={item.id} className="checkbox">
                     <input
                       type="checkbox"
-                      checked={isChecked(item)} onChange={checkItem} value={item.id}
+                      checked={editorForm.isChecked('checkedIds', item.id)}
+                      onChange={editorForm.checkItem('checkedIds')} value={item.id}
                     />
                     {item.name}
                   </label>
                 ))}
                 <Link
                   title={ trans('invoiceModal.checkAll', { count: items.length}) }
-                  action={checkAll(items)} />
+                  action={editorForm.checkAll('checkedIds', items.map(item => item.id))} />
                 <br /><br />
                 <Button
                   title={ trans('invoiceModal.submit') }
                   action={(e) => {
                     e.preventDefault();
-                    addItems(getCheckedItems(items));
+                    const checkedItems = items.filter(item => editorForm.isChecked('checkedIds', item.id));
+                    addItems(checkedItems);
                     closeModal();
                   }}
                   className="btn btn-success btn-block"
@@ -165,13 +150,12 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
   const isRevenueGreaterThanBilling = (billedAmount - linesAmount) >= -0.1;
   const vat = lines.calculateVat();
 
-  const hasAdvancedSettings = () => appState.cursor(['editor', 'hasAdvancedSettings']).deref();
-  const toggleAdvancedSettings = () => appState.cursor(['editor']).set('hasAdvancedSettings', !hasAdvancedSettings());
+  const editorForm = new Form(['editor']);
   const advancedSettingsLink = (direction) =>
     <Link
       title={<span>{ trans(`editor.advancedSettings.${direction}`) } <span className={`fa fa-arrow-${direction}`} /></span>}
       className={`btn btn-horizontal ${direction}`}
-      action={toggleAdvancedSettings} />;
+      action={editorForm.toggle('hasAdvancedSettings')} />;
 
   const activityTabs = {
     people: {
@@ -280,7 +264,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         </div>
       </div>
     </div>
-    {hasAdvancedSettings() ? (
+    {editorForm.get('hasAdvancedSettings') ? (
       <div>
         <div className="well">
           <div className="form-group">
@@ -310,11 +294,13 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           <div className="btn-toolbar">
             <div className="btn-group">
               <AddLinesModal
+                editorForm={editorForm}
                 type="activities" title={<span><span className={`fa ${activityTabs.people.icon}`} /> { trans('invoiceLines.actions.peopleAndActivites') }</span>}
                 activityTabs={getActiveTabs(['people', 'activities'])} addItems={lines.addItems} />
             </div>
             <div className="btn-group">
               <AddLinesModal
+                editorForm={editorForm}
                 type="expenses" title={<span><span className={`fa ${activityTabs.expenses.icon}`} /> { trans('invoiceLines.actions.expenses') }</span>}
                 activityTabs={getActiveTabs(['expenses'])} addItems={lines.addItems} />
             </div>
