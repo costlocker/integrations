@@ -1,14 +1,17 @@
 import { appState } from '../state';
 
+const defaultConfig = (keys) => ({
+  keys: keys,
+  alwaysSet: state => state,
+  submit: (e) => null,
+});
+
 export default class Form {
   constructor(config) {
     if (Array.isArray(config)) {
-      this.config = {
-        keys: config,
-        alwaysSet: s => s,
-      };
+      this.config = defaultConfig(config);
     } else {
-      this.config = config;
+      this.config = Object.assign(defaultConfig([]), config);
     }
   }
 
@@ -44,6 +47,11 @@ export default class Form {
       return this.config.alwaysSet(updated);
     }
   );
+
+  submit = (e) => {
+    e.preventDefault();
+    this.config.submit();
+  };
 
   cursor = () => appState.cursor(this.config.keys);
 }

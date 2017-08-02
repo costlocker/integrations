@@ -145,14 +145,9 @@ export const states = [
         )}
         dateFormat={dateFormat}
         forceUpdate={() => appState.cursor(['invoice']).set('isForced', true)}
-        form={{
-          get: (type) => appState.cursor(['invoice', type]).deref(),
-          set: (type) => (e) => appState.cursor(['invoice']).set(
-            type,
-            e.target.type === 'checkbox' ? e.target.checked : e.target.value
-          ),
-          submit: (e) => {
-            e.preventDefault();
+        form={new Form({
+          keys: ['invoice'],
+          submit: () => {
             const request = {
               fakturoid: appState.cursor(['invoice']).deref().toJS(),
               costlocker: appState.cursor(['costlocker', 'invoice']).deref().costlocker,
@@ -197,8 +192,8 @@ export const states = [
                   });
                 });
               });
-          }
-        }}
+          },
+        })}
         reloadSubjects={(e) => {
           e.preventDefault();
           reloadSubjects();
