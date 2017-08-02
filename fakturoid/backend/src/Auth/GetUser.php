@@ -67,7 +67,7 @@ class GetUser
             'account' => [
                 'slug' => $u->fakturoidAccount->slug,
                 'name' => $u->fakturoidAccount->name,
-                'has_vat' => $u->fakturoidAccount->hasVat(),
+                'hasVat' => $u->fakturoidAccount->hasVat(),
             ],
         ];
     }
