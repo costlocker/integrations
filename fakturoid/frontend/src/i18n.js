@@ -4,7 +4,8 @@ let messages = {};
 
 const addLocaleData = (locale) => {
   messages = require(`./locale/${locale}.js`).default;
-  moment.locale(locale, require(`moment/locale/${locale}.js`));
+  require(`moment/locale/${locale}.js`);
+  moment.locale(locale);
 };
 
 const trans = (message, values) => {
