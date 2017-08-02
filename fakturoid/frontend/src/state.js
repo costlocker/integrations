@@ -12,6 +12,7 @@ const appState = immstruct({
     isDisabled: false,
     csrfToken: null,
     currentState: null, // helper for active menu items
+    dateFormat: 'D.M.YYYY',
     activeTab: '',
     error: null,
     isSendingForm: false,

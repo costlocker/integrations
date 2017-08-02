@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 import { ExternalLink, roundNumber, RadioButtons } from '../ui/Components';
 import { Logo } from '../ui/Images';
 import { appState } from '../state';
@@ -6,7 +7,7 @@ import { trans } from '../i18n';
 
 const isHighlighted = id => id === appState.cursor(['app', 'lastCreatedInvoice']).deref();
 
-export default function InvoicesList({ invoices, subjects }) {
+export default function InvoicesList({ invoices, subjects, dateFormat }) {
   const filter = appState.cursor(['search']);
   const setFilter = (field) => (e) => {
     appState.cursor(['search']).update(
@@ -61,7 +62,7 @@ export default function InvoicesList({ invoices, subjects }) {
                 <small className="text-muted">{trans(`invoiceTypes.${invoice.fakturoid.type}`)}</small>
               </td>
               <td>{invoice.fakturoid.number}</td>
-              <td>{invoice.fakturoid.issuedAt}</td>
+              <td>{moment(invoice.fakturoid.issuedAt).format(dateFormat)}</td>
               <th>{roundNumber(invoice.fakturoid.amount)}</th>
               <td>{
                 invoice.fakturoid.hasVat

@@ -121,15 +121,23 @@ export const states = [
       if (appState.cursor(['app', 'isSendingForm']).deref()) {
         return <Loading title="loading.createInvoice" />;
       }
+      const dateFormat = appState.cursor(['app', 'dateFormat']).deref();
       return <Invoice
         invoice={invoice}
         fakturoidSubjects={subjects}
-        invoices={<InvoicesList invoices={appState.cursor(['costlocker', 'invoices']).deref()} subjects={subjects} />}
+        invoices={
+          <InvoicesList
+            invoices={appState.cursor(['costlocker', 'invoices']).deref()}
+            subjects={subjects}
+            dateFormat={dateFormat}
+          />
+        }
         lines={new InvoiceLines(
           appState.cursor(['invoice', 'lines']),
           appState.cursor(['auth', 'fakturoid']).deref().account.hasVat,
           trans('invoiceLines.units')
         )}
+        dateFormat={dateFormat}
         forceUpdate={() => appState.cursor(['invoice']).set('isForced', true)}
         form={{
           get: (type) => appState.cursor(['invoice', type]).deref(),

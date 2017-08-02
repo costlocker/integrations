@@ -152,7 +152,7 @@ const AddLinesModal = ({ type, title, activityTabs, addItems }) => {
   />;
 }
 
-const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubjects }) => {
+const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubjects, dateFormat }) => {
   lines.addDefaultIfIsEmpty({
     name: costlocker.billing.billing.description
       ? costlocker.billing.billing.description
@@ -252,7 +252,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         <div className="form-group">
           <label htmlFor="issuedAt">{ trans('editor.issuedAt') }</label>
           <DatePicker
-            dateFormat="DD.MM.YYYY"
+            dateFormat={dateFormat}
             className="form-control"
             selected={issuedAt}
             onChange={date => form.set('issuedAt')({
@@ -276,7 +276,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
       <div className="col-sm-3">
         <div className="form-group">
           <label>&nbsp;</label><br />
-          <span className="btn btn-link" disabled>{dueDate.format("dddd, DD.MM.YYYY")}</span>
+          <span className="btn btn-link" disabled>{dueDate.format(`dddd, ${dateFormat}`)}</span>
         </div>
       </div>
     </div>
