@@ -89,7 +89,7 @@ class Invoice
 
     public function getCurrentCostlockerAmount()
     {
-        return $this->data['request']['costlocker']['billing']['billing']['total_amount'] ?? null;
+        return ((float) $this->data['response']['subtotal']) ?? null;
     }
 
     public function getIssuedDate()

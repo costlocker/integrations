@@ -35,29 +35,24 @@ class MarkSentInvoice
 
     private function getBillingItem(Invoice $invoice)
     {
-        $description = $invoice->getCurrentCostlockerDescription() ?: $invoice->fakturoidInvoiceNumber;
+        $item = [];
         if (!$invoice->costlockerInvoiceId) {
-            return [
-                'item' => [
-                    'type' => 'billing',
-                ],
-                'billing' => [
-                    'description' => $description,
-                    'status' => 'sent',
-                    'date' => $invoice->getIssuedDate(),
-                    'total_amount' => $invoice->getCurrentCostlockerAmount(),
-                ],
+            $item = [
+                'type' => 'billing',
+            ];
+        } else {
+            $item = [
+                'type' => 'billing',
+                'billing_id' => $invoice->costlockerInvoiceId,
             ];
         }
         return [
-            'item' => [
-                'type' => 'billing',
-                'billing_id' => $invoice->costlockerInvoiceId,
-            ],
+            'item' => $item,
             'billing' => [
-                'description' => $description,
+                'description' => $invoice->getCurrentCostlockerDescription() ?: $invoice->fakturoidInvoiceNumber,
                 'status' => 'sent',
                 'date' => $invoice->getIssuedDate(),
+                'total_amount' => $invoice->getCurrentCostlockerAmount(),
             ],
         ];
     }

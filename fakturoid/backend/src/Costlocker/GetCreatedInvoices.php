@@ -87,7 +87,8 @@ SQL
                         'lines' => array_values($i->data['request']['fakturoid']['lines']),
                         'number' => $i->fakturoidInvoiceNumber,
                         'link' => $i->data['response']['html_url'],
-                        'amount' => $i->data['response']['total'],
+                        'amount' => $i->data['response']['subtotal'],
+                        'amountWithVat' => $i->data['response']['total'],
                         'hasVat' => $i->data['response']['total'] != $i->data['response']['subtotal'],
                         'issuedAt' => $i->data['request']['fakturoid']['issuedAt'] ?? $i->createdAt->format('Y-m-d'),
                         'template' => [

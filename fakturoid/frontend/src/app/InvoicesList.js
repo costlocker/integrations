@@ -62,10 +62,10 @@ export default function InvoicesList({ invoices, subjects }) {
               </td>
               <td>{invoice.fakturoid.number}</td>
               <td>{invoice.fakturoid.issuedAt}</td>
-              <th>{invoice.costlocker.billing.billing.total_amount}</th>
+              <th>{roundNumber(invoice.fakturoid.amount)}</th>
               <td>{
                 invoice.fakturoid.hasVat
-                ? <strong>{roundNumber(invoice.fakturoid.amount)}</strong>
+                ? <strong>{roundNumber(invoice.fakturoid.amountWithVat)}</strong>
                 : <small className="text-muted">N/A</small>
               }</td>
               <td>
