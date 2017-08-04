@@ -87,7 +87,7 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
     && (isBasecampProjectCreated || selectedCostlockerProjects.size === 1);
 
   return <div>
-    <h1>{isExistingProjectEdited ? 'Edit project' : 'Connect Costlocker project to Basecamp'}</h1>
+    <h1>{isExistingProjectEdited ? 'Refresh project' : 'Connect Costlocker project to Basecamp'}</h1>
     <form className="form" onSubmit={syncForm.submit}>
       {editedProject ? (
       <div>

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { ExternalLink, Button } from '../ui/Components';
+import { Logo } from '../ui/Images';
 import Loading from '../ui/Loading';
 
 export default function Projects({ allProjects, disconnect }) {
@@ -19,35 +20,34 @@ export default function Projects({ allProjects, disconnect }) {
     <div className="row">
       <div className="col-sm-12">
         {projects.length ? (
-        <table className="table table-striped table-hover table-condensed">
+        <table className="table table-striped table-hover table-condensed table-valign">
           <thead>
             <tr>
               <th>Costlocker</th>
-              <th>Basecamp account</th>
+              <th>Basecamp</th>
               <th>Synchronization</th>
+              <th width='300'>Links</th>
               <th width='300' className="text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
             {projects.map(project => (
               <tr key={project.id}>
-                <td>{project.name} <span className="label label-default">{project.client.name}</span></td>
                 <td>
-                  {project.basecamps.map(basecamp => (
-                    <div key={basecamp.id}>
-                      <em>{basecamp.account.name} <span className="label label-default">{basecamp.account.product}</span></em>
-                      &nbsp;&nbsp; <ExternalLink url={basecamp.url} />
-                      <br />{basecamp.account.identity.email_address}
-                    </div>
-                  ))}
+                  {project.name} <span className="label label-default">{project.client.name}</span>
                 </td>
                 <td>
-                  {project.basecamps.map(basecamp => (
-                    <div key={basecamp.id}>
-                      {basecamp.settings.areTodosEnabled ? <span className="text-primary">Costlocker &rarr; Basecamp</span> : ''}<br />
-                      {basecamp.settings.areTasksEnabled ? <span className="text-success">Basecamp &rarr; Costlocker</span> : ''}
-                    </div>
-                  ))}
+                  <em>{project.basecamp.account.name} <span className="label label-default">{project.basecamp.account.product}</span></em>
+                </td>
+                <td>
+                  {project.basecamp.settings.areTodosEnabled ? <span className="text-primary">Costlocker &rarr; Basecamp</span> : ''}<br />
+                  {project.basecamp.settings.areTasksEnabled ? <span className="text-success">Basecamp &rarr; Costlocker</span> : ''}
+                </td>
+                <td>
+                  <ExternalLink url={project.url} className="text-primary first"
+                    title={<span><Logo app="costlocker" color="blue" /> Open project</span>} />
+                  <ExternalLink url={project.basecamp.url} className="text-success"
+                    title={<span><Logo app="basecamp" /> Open project</span>} />
                 </td>
                 <td className="text-right">
                   <Button route='sync' params={{ clProject: project.id }}

@@ -2,6 +2,7 @@ import React from 'react';
 
 import OAuthLogin from './OAuthLogin';
 import { ExternalLink, Button } from '../ui/Components';
+import { Logo } from '../ui/Images';
 
 export default function Login({ basecampUser, costlockerUser, loginUrls, loginError, accounts, disconnect }) {
   return (
@@ -31,7 +32,7 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, loginEr
         <div className="col-sm-12">
           <h4>Connected Accounts</h4>
           {accounts.length ? (
-          <table className="table table-striped table-condensed">
+          <table className="table table-striped table-condensed table-valign">
             <thead>
               <tr>
                 <th>Costlocker</th>
@@ -66,13 +67,17 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, loginEr
                   {account.identity.first_name} {account.identity.last_name}&nbsp;
                   <span className={labelCss}>{account.identity.email_address}</span>
                 </td>
-                <td>{account.name} <ExternalLink url={account.urlApp} /></td>
+                <td>{account.name}</td>
                 <td>{account.product}</td>
                 <td>{personAccount.connectedProjectsCount}</td>
-                <td>{personAccount.isMyAccount && !personAccount.connectedProjectsCount
-                  ? <Button action={() => disconnect(account.id)} title='Disconnect' className="btn btn-sm btn-danger" />
-                  : <button className="btn btn-default btn-sm" disabled="disabled" title='You can disconnect only your accounts that are not used in any project'>Disconnect</button>
-                }</td>
+                <td>
+                  {personAccount.isMyAccount && !personAccount.connectedProjectsCount
+                    ? <Button action={() => disconnect(account.id)} title='Disconnect' className="btn btn-sm btn-danger" />
+                    : <button className="btn btn-default btn-sm" disabled="disabled" title='You can disconnect only your accounts that are not used in any project'>Disconnect</button>
+                  }
+                  <ExternalLink url={account.urlApp} className="text-success"
+                    title={<span><Logo app="basecamp" /> Open</span>} />
+                </td>
               </tr>;
             })}
             </tbody>
