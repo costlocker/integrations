@@ -19,6 +19,7 @@ class BasecampProject
     public $id;
 
     /**
+     * @var CostlockerProject
      * @ORM\ManyToOne(targetEntity="CostlockerProject")
      * @ORM\JoinColumn(name="cl_project_id", nullable=false, onDelete="CASCADE")
      */

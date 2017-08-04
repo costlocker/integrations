@@ -10,11 +10,13 @@ class EventsRepository
 {
     private $entityManager;
     private $getUser;
+    private $converter;
 
-    public function __construct(EntityManagerInterface $em, GetUser $u)
+    public function __construct(EntityManagerInterface $em, GetUser $u, EventsToJson $c)
     {
         $this->entityManager = $em;
         $this->getUser = $u;
+        $this->converter = $c;
     }
 
     public function findUnprocessedEvents()
@@ -114,7 +116,6 @@ DQL;
             ->setMaxResults(50)
             ->execute($params);
 
-        $converter = new EventsToJson();
-        return $converter($entities);
+        return $this->converter->__invoke($entities);
     }
 }

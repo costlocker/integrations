@@ -30,7 +30,11 @@ $app['database'] = function ($app) {
 $app['database.events'] = function ($app) {
     return new \Costlocker\Integrations\Events\EventsRepository(
         $app['orm.em'],
-        $app['client.user']
+        $app['client.user'],
+        new Costlocker\Integrations\Events\EventsToJson(
+            $app['database'],
+            $app['client.basecamp']
+        )
     );
 };
 

@@ -14,3 +14,18 @@
         font-size: 0.8em;
     }
 }
+
+.table {
+    &.table-valign {
+        td, th {
+            vertical-align: middle;
+        }
+        .logo {
+            margin: 0 1ex 0 1em;
+            vertical-align: middle;
+        }
+        .first .logo {
+            margin-left: 0;
+        }
+    }
+}

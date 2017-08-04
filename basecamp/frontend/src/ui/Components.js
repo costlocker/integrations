@@ -14,8 +14,10 @@ const Errors = ({ title, error }) => {
   );
 };
 
-const ExternalLink = ({ url }) => (
-  <a href={url} target="_blank" rel="noopener noreferrer"><i className="fa fa-external-link"></i></a>
+const ExternalLink = ({ url, title, className }) => (
+  <a href={url} className={className} target="_blank" rel="noopener noreferrer">
+    {title ? title : <i className="fa fa-external-link"></i>}
+  </a>
 );
 
 const Button = ({ title, route, params, action, className }) => {

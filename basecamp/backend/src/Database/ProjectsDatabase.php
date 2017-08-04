@@ -57,6 +57,14 @@ class ProjectsDatabase implements SyncDatabase
         return $this->findProjectEntity('basecampProject', $id);
     }
 
+    public function findByInternalId($id)
+    {
+        if (!$id) {
+            return null;
+        }
+        return $this->findProjectEntity('id', $id, true);
+    }
+
     public function findAll()
     {
         $dql = $this->createDql();
@@ -68,9 +76,9 @@ class ProjectsDatabase implements SyncDatabase
         return $indexed;
     }
 
-    private function findProjectEntity($column, $projectId)
+    private function findProjectEntity($column, $projectId, $canBeDeleted = false)
     {
-        $dql = $this->createDql("bp.{$column} = :project AND");
+        $dql = $this->createDql("bp.{$column} = :project AND", $canBeDeleted);
         $params = [
             'project' => $projectId,
         ];
@@ -81,15 +89,16 @@ class ProjectsDatabase implements SyncDatabase
         return array_shift($entities);
     }
 
-    private function createDql($extraCondition = '')
+    private function createDql($extraCondition = '', $canBeDeleted = false)
     {
+        $deletedCondition = $canBeDeleted ? '1=1' : 'bp.deletedAt IS NULL AND bu.deletedAt IS NULL';
         return <<<DQL
             SELECT bp, bu, ba
             FROM Costlocker\Integrations\Entities\BasecampProject bp
             JOIN bp.costlockerProject cp
             JOIN bp.basecampUser bu
             JOIN bu.basecampAccount ba
-            WHERE {$extraCondition} bp.deletedAt IS NULL AND bu.deletedAt IS NULL
+            WHERE {$extraCondition} {$deletedCondition}
             ORDER BY bp.id DESC
 DQL;
     }

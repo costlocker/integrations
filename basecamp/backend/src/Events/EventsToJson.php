@@ -2,20 +2,33 @@
 
 namespace Costlocker\Integrations\Events;
 
+use Costlocker\Integrations\Database\ProjectsDatabase;
+use Costlocker\Integrations\Basecamp\BasecampAdapter;
+use Costlocker\Integrations\Entities\BasecampProject;
 use Costlocker\Integrations\Entities\Event;
 use Costlocker\Integrations\Sync\SyncChangelog;
 
 class EventsToJson
 {
+    private $database;
+    private $basecamps;
+
+    public function __construct(ProjectsDatabase $db, BasecampAdapter $b)
+    {
+        $this->database = $db;
+        $this->basecamps = $b;
+    }
+
     public function __invoke(array $events)
     {
         return array_map(
             function (Event $e) {
                 $isRequest = $e->event == Event::SYNC_REQUEST;
+                list($basecampProject, $description) = $this->parseEvent($e);
                 $date = $isRequest ? $e->createdAt : ($e->updatedAt ?: $e->createdAt);
                 return [
                     'id' => $e->id,
-                    'description' => $this->eventToDescription($e),
+                    'description' => $description,
                     'date' => $date->format('Y-m-d H:i:s'),
                     'user' => $e->costlockerUser ? $e->costlockerUser->data : null,
                     'status' => $this->eventToStatus($e),
@@ -28,15 +41,16 @@ class EventsToJson
                         SyncChangelog::arrayToStats('costlocker', $e->data['result']['costlocker'] ?? []),
                     ])),
                     'project' => [
-                        'costlocker' => $e->basecampProject ? $e->basecampProject->costlockerProject->id : null,
+                        'costlocker' => $basecampProject ? $basecampProject->costlockerProject->id : null,
                     ],
+                    'links' => $this->getLinks($basecampProject),
                 ];
             },
             $events
         );
     }
 
-    private function eventToDescription(Event $e)
+    private function parseEvent(Event $e)
     {
         $mapping = [
             Event::WEBHOOK_SYNC => 'webhook sync',
@@ -60,6 +74,7 @@ class EventsToJson
             Event::REGISTER_COSTLOCKER_WEBHOOK => 'Register costlocker webhook',
             Event::REGISTER_BASECAMP_WEBHOOK => 'Update basecamp webhook for project',
         ];
+        $basecampProject = null;
 
         $description = $mapping[$e->event] ?? '';
         if ($e->event == Event::SYNC_REQUEST) {
@@ -67,15 +82,15 @@ class EventsToJson
         } elseif ($e->event == Event::DISCONNECT_BASECAMP) {
             $description .= " {$e->data['basecamp']}";
         } elseif ($e->event == Event::DISCONNECT_PROJECT) {
-            $description .= " #{$e->data['project']}";
+            $id = $e->data['result'][0]['id'] ?? null;
+            $basecampProject = $this->database->findByInternalId($id);
         } elseif ($e->event == Event::WEBHOOK_BASECAMP) {
-            $description .=
-                " '{$e->data['basecampEvent']}' " .
-                "in project #{$e->basecampProject->costlockerProject->id}";
-        } elseif ($e->basecampProject) {
-            $description .= " #{$e->basecampProject->costlockerProject->id}";
+            $description .= " '{$e->data['basecampEvent']}' ";
         }
-        return $description;
+        return [
+            $e->basecampProject ?: $basecampProject,
+            $description
+        ];
     }
 
     private function eventToStatus(Event $e)
@@ -87,5 +102,17 @@ class EventsToJson
             ($e->event | Event::RESULT_PARTIAL_SUCCESS) => 'partial',
         ];
         return $statuses[$e->event] ?? null;
+    }
+
+    private function getLinks(BasecampProject $p = null)
+    {
+        if (!$p) {
+            return null;
+        }
+        return [
+            'costlocker' =>
+                getenv('CL_HOST') . "/projects/detail/{$p->costlockerProject->id}/cost-estimate",
+            'basecamp' => $this->basecamps->buildBasecampLink($p),
+        ];
     }
 }
