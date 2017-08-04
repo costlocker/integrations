@@ -17,7 +17,7 @@ const BasecampAccountSelect = ({ title, accounts, syncForm, isAccountNotAvailabl
     />
     {isAccountNotAvailable ? (
       <p className="help-block text-danger">
-        Selected basecamp account is not working. Did your trial expire? Try to <Link route="account" title="reconnect Basecamp account" />
+        Selected basecamp account is not working. Did your trial expire? Try to <Link route="accounts" title="reconnect Basecamp account" />
       </p>
     ) : null}
   </div>
