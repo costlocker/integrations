@@ -32,7 +32,7 @@ export default function Login({ basecampUser, costlockerUser, loginUrls, loginEr
         <div className="col-sm-12">
           <h4>Connected Accounts</h4>
           {accounts.length ? (
-          <table className="table table-striped table-condensed table-valign">
+          <table className="table table-striped table-valign">
             <thead>
               <tr>
                 <th>Costlocker</th>

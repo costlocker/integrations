@@ -20,7 +20,7 @@ export default function Projects({ allProjects, disconnect }) {
     <div className="row">
       <div className="col-sm-12">
         {projects.length ? (
-        <table className="table table-striped table-hover table-condensed table-valign">
+        <table className="table table-striped table-hover table-valign">
           <thead>
             <tr>
               <th>Costlocker</th>

@@ -96,7 +96,7 @@ export default function Events({ events, refresh }) {
     </div>
     <div className="row">
       <div className="col-sm-12">
-        <table className="table table-striped table-hover table-condensed table-valign">
+        <table className="table table-striped table-hover table-valign">
           <thead>
             <tr>
               <th>Date</th>
