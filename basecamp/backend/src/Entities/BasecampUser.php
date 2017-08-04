@@ -59,4 +59,12 @@ class BasecampUser
     {
         return !$this->deletedAt;
     }
+
+    public function countActiveProjects()
+    {
+        $active = $this->projects->filter(function (BasecampProject $p) {
+            return !$p->deletedAt;
+        });
+        return count($active);
+    }
 }
