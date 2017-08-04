@@ -1,5 +1,5 @@
 import immstruct from 'immstruct';
-import { Set } from 'immutable';
+import { OrderedSet } from 'immutable';
 import { defaultSyncSettings } from './app/SyncSettings';
 
 const appState = immstruct({
@@ -28,7 +28,7 @@ const appState = immstruct({
   },
   sync: {
     account: null,
-    costlockerProject: Set(),
+    costlockerProject: OrderedSet(),
     basecampProject: '',
     basecampClassicCompanyId: '',
     mode: 'create',
