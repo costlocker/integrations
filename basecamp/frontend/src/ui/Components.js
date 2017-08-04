@@ -5,10 +5,11 @@ const Errors = ({ title, error }) => {
   if (!error) {
     return null;
   }
+  const decodedUrlError = decodeURIComponent(error).replace(/%20/g, ' '); // hotfix for '%2520' spaces
   return (
     <div className="alert alert-danger">
       <strong>{title}</strong><br />
-      {decodeURIComponent(error)}
+      {decodedUrlError}
     </div>
   );
 };

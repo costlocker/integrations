@@ -7,7 +7,7 @@ export default function Login({ costlockerAuth, loginUrls, loginError }) {
   return (
     <div>
       <div className="row text-center">
-        <div className="col-sm-12">
+        <div className="col-sm-6 col-sm-offset-3">
           <h2>Costlocker <ExternalLink url="https://new.costlocker.com" /></h2>
           <OAuthLogin
             title={costlockerAuth
