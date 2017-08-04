@@ -236,6 +236,16 @@ const hooks = [
     },
     priority: 10,
   },
+  {
+    event: 'onSuccess',
+    criteria: { to: true },
+    callback: (transition) => {
+      const state = transition.to();
+      // rerender to change active state in menu - stateService.go reloads only <UIView>
+      appState.cursor(['app']).set('currentState', state.name);
+    },
+    priority: 10,
+  },
 ];
 
 export const config = (router) => {
@@ -246,8 +256,6 @@ export const config = (router) => {
       e.preventDefault();
     }
     router.stateService.go(route, params, { location: true });
-    // rerender to change active state in menu - stateService.go realoads only <UIView>
-    appState.cursor(['app']).set('currentState', route);
   };
   isRouteActive = router.stateService.is;
   hooks.forEach(hook => router.transitionService[hook.event](hook.criteria, hook.callback, { priority: hook.priority }));

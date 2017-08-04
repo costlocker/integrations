@@ -1,47 +1,52 @@
 import React from 'react';
 import { UIView } from 'ui-router-react';
-import { Link } from '../ui/Components';
+import { Link } from './Components';
+import { Logo } from './Images';
+
+const User = ({ name, company }) => {
+  return (
+    <div className="user">
+      <strong>{name}</strong>
+      <small>{company}</small>
+    </div>
+  );
+};
 
 const CostlockerUser = ({ user }) => {
-  return (
-    <span>
-      <strong>
-        {user.person.first_name} {user.person.last_name}
-      </strong> ({user.company.name})
-    </span>
-  );
+  return <User name={`${user.person.first_name} ${user.person.last_name}`} company={user.company.name} />;
 };
 
 const BasecampUser = ({ user }) => {
   if (user) {
-    return <span>
-      {user.first_name} {user.last_name} ({user.email_address})
-    </span>;
+    return <User name={`${user.first_name} ${user.last_name}`} company={user.email_address} />;
   } else {
-    return <em>Not logged in Basecamp</em>;
+    return <User name="Login" company="Basecamp" />;
   }
 };
 
-const User = ({ auth }) => {
-  if (!auth.get('costlocker')) {
-    return null;
-  }
+const AnonymousUser = ({ isRouteActive }) => (
+  <div>
+    <Logo app="costlocker" color={isRouteActive('login') ? 'blue' : 'white'} />
+    <User name="Login" company="Costlocker" />
+  </div>
+)
+
+const Users = ({ auth, isRouteActive }) => {
   return <div>
-    <span title="Costlocker user">
-      <CostlockerUser user={auth.get('costlocker')} />
-    </span>
-    <span className="text-muted">&nbsp;/&nbsp;</span>
-    <span title="Basecamp user">
-      <BasecampUser user={auth.get('basecamp')} />
-    </span>
+    <Logo app="costlocker" color={isRouteActive('accounts') ? 'blue' : 'white'} />
+    <CostlockerUser user={auth.get('costlocker')} />
+    <Logo app="basecamp" />
+    <BasecampUser user={auth.get('basecamp')} />
   </div>;
 }
 
-const Navigation = ({ isRouteActive, routes }) => {
+const Navigation = ({ isRouteActive, routes, className }) => {
   return (
-    <ul className="nav navbar-nav">
-      {routes.map(({ route, params, title }) => (
-      <li key={route} className={isRouteActive(route) ? 'active' : null}><Link route={route} params={params} title={title} /></li>
+    <ul className={`nav navbar-nav ${className}`}>
+      {routes.map(({ route, params, title, activeRoute, className }) => (
+      <li key={route} className={isRouteActive(route) || isRouteActive(activeRoute) ? `active ${className}` : className}>
+        <Link route={route} params={params} title={title} />
+      </li>
       ))}
     </ul>
   );
@@ -52,15 +57,6 @@ export default function Layout({ auth, isRouteActive }) {
     <div>
       <nav className="navbar navbar-default">
         <div className="container">
-          <div className="navbar-header">
-            <div className="navbar-brand">
-              <a href="/">
-                <img title="Costlocker" alt="Costlocker" src="https://cdn-images-1.medium.com/max/1200/1*BLdn5GGWwijxJkcr0I0rgg.png" />
-                &nbsp;+&nbsp;
-                <img title="Basecamp" alt="Basecamp" src="https://freeter.io/embedding-web-apps/project-management/basecamp.png" />
-              </a>
-            </div>
-          </div>
           <div>
             {auth.get('costlocker') ? <Navigation isRouteActive={isRouteActive} routes={[
               { route: 'projects', title: 'Projects' },
@@ -69,9 +65,12 @@ export default function Layout({ auth, isRouteActive }) {
               { route: 'settings', title: 'Settings' },
             ]} /> : ''}
           </div>
-          <div className="navbar-right text-right">
-            <Navigation isRouteActive={isRouteActive} routes={[
-              { route: 'accounts', title: <User auth={auth} /> },
+          <div>
+            <Navigation className="navbar-right text-right" isRouteActive={isRouteActive} routes={[
+              { route: 'accounts', activeRoute: 'login', className: 'users', title: auth.get('costlocker')
+                ? <Users auth={auth} isRouteActive={isRouteActive} />
+                : <AnonymousUser isRouteActive={isRouteActive} />
+              },
               { route: 'help', title: <span className="fa fa-question-circle"></span> },
             ]} />
           </div>
