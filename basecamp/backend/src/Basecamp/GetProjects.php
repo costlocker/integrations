@@ -22,11 +22,20 @@ class GetProjects
         $costlockerUser = $this->getUser->getCostlockerUser();
         $account = $costlockerUser->getUser($r->query->get('account'));
         if ($account instanceof BasecampUser) {
-            $client = $this->basecamps->buildClient($account->id);
-            return [
-                'projects' => $client->getProjects(),
-                'companies' => $client->getCompanies(),
-            ];
+            try {
+                $client = $this->basecamps->buildClient($account->id);
+                return [
+                    'isAvailable' => true,
+                    'projects' => $client->getProjects(),
+                    'companies' => $client->getCompanies(),
+                ];
+            } catch (\Exception $e) {
+                return [
+                    'isAvailable' => false,
+                    'projects' => [],
+                    'companies' => [],
+                ];
+            }
         } else {
             return [];
         }

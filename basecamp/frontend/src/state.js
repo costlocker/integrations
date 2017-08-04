@@ -13,6 +13,7 @@ const appState = immstruct({
     projects: null,
   },
   basecamp: {
+    isAccountAvailable: true,
     projects: [],
     companies: [],
   },

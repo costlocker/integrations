@@ -1,4 +1,9 @@
 
+
+.help-block.text-danger {
+    color: $brand-danger !important;
+}
+
 [data-unavailable] {
     opacity: 0.6;
     input {

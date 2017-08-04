@@ -1,8 +1,8 @@
 import React from 'react';
 import Loading from '../ui/Loading';
-import { RadioButtons } from '../ui/Components';
+import { RadioButtons, Link } from '../ui/Components';
 
-const BasecampAccountSelect = ({ title, accounts, syncForm }) => (
+const BasecampAccountSelect = ({ title, accounts, syncForm, isAccountNotAvailable }) => (
   <div className="form-group">
     <label htmlFor="account">{title}</label><br />
     <RadioButtons
@@ -15,6 +15,11 @@ const BasecampAccountSelect = ({ title, accounts, syncForm }) => (
       isActive={type => syncForm.get('account') == type.id}
       onChange={syncForm.set('account')}
     />
+    {isAccountNotAvailable ? (
+      <p className="help-block text-danger">
+        Selected basecamp account is not working. Did your trial expire? Try to <Link route="account" title="reconnect Basecamp account" />
+      </p>
+    ) : null}
   </div>
 );
 
@@ -37,7 +42,7 @@ const BasecampCompaniesSelect = ({ basecampCompanies, isBasecampProjectCreated, 
     </div>;
 };
 
-export default function Sync({ costlockerProjects, basecampProjects, basecampCompanies, basecampAccounts, syncForm }) {
+export default function Sync({ costlockerProjects, basecamp, basecampAccounts, syncForm }) {
   if (!costlockerProjects) {
     return <Loading title="Loading projects" />;
   } else if (!costlockerProjects.length) {
@@ -68,8 +73,8 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampCom
   const optionalSetIfAvailable = (type) => (e) => canBeSynchronizedFromBasecamp ? syncForm.set(type)(e) : null;
 
   const availableBasecampProjects = isExistingProjectEdited
-    ? basecampProjects.filter(p => p.id == editedProject.basecamps[0].id)
-    : basecampProjects;
+    ? basecamp.get('projects').filter(p => p.id == editedProject.basecamps[0].id)
+    : basecamp.get('projects');
 
   let setCostlockerProject = (e) => {
     const projectId = e.target.value;
@@ -77,6 +82,7 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampCom
       set => (set.includes(projectId) ? set.delete(projectId) : set.add(projectId))
     );
   };
+  const canBeSynchronized = selectedCostlockerProjects.size && basecamp.get('isAccountAvailable');
 
   return <div>
     <h1>{isExistingProjectEdited ? 'Edit project' : 'Connect Costlocker project to Basecamp'}</h1>
@@ -97,7 +103,7 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampCom
             &nbsp;<span className="label label-default">{connectedBasecamp.account.identity.email_address}</span>
           </li>
         </ul>
-        <BasecampAccountSelect title='Change a connected Basecamp acccount' accounts={basecampAccounts} syncForm={syncForm} />
+        <BasecampAccountSelect title='Change a connected Basecamp acccount' accounts={basecampAccounts} syncForm={syncForm} isAccountNotAvailable={!basecamp.get('isAccountAvailable')} />
       </div>
       ) : (
       <div>
@@ -139,8 +145,8 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampCom
             </div>
           </div>
         </div>
-        <BasecampAccountSelect title='Choose a Basecamp acccount to export it to' accounts={basecampAccounts} syncForm={syncForm} />
-        <BasecampCompaniesSelect basecampCompanies={basecampCompanies} syncForm={syncForm} isBasecampProjectCreated={isBasecampProjectCreated} />
+        <BasecampAccountSelect title='Choose a Basecamp acccount to export it to' accounts={basecampAccounts} syncForm={syncForm} isAccountNotAvailable={!basecamp.get('isAccountAvailable')} />
+        <BasecampCompaniesSelect basecampCompanies={basecamp.get('companies')} syncForm={syncForm} isBasecampProjectCreated={isBasecampProjectCreated} />
         <div className="row">
           <div className="col-sm-6">
             <div className="form-group">
@@ -274,7 +280,7 @@ export default function Sync({ costlockerProjects, basecampProjects, basecampCom
           }
         </div>
       </div>
-      {selectedCostlockerProjects.size ? (
+      {canBeSynchronized ? (
         <button type="submit" className="btn btn-primary btn-block">Synchronize</button>
       ) : (
         <span className="btn btn-primary btn-block disabled">Synchronize</span>
