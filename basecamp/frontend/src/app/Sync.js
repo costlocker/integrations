@@ -1,22 +1,20 @@
 import React from 'react';
 import Loading from '../ui/Loading';
+import { RadioButtons } from '../ui/Components';
 
 const BasecampAccountSelect = ({ title, accounts, syncForm }) => (
   <div className="form-group">
-    <label htmlFor="account">{title}</label>
-    <select
-      className="form-control" name="account" id="account"
-      value={syncForm.get('account')} onChange={syncForm.set('account')}
-    >
-      {accounts.map(personAccount => {
-        if (!personAccount.isMyAccount && personAccount.account.id != syncForm.get('account')) {
-          return null;
-        }
-        return <option key={personAccount.account.id} value={personAccount.account.id}>
-          {personAccount.account.name} ({personAccount.account.identity.email_address})
-        </option>;
-      })}
-    </select>
+    <label htmlFor="account">{title}</label><br />
+    <RadioButtons
+      items={accounts.map(
+        personAccount => ({
+          id: personAccount.account.id,
+          title: `${personAccount.account.name} (${personAccount.account.identity.email_address})`
+        })
+      )}
+      isActive={type => syncForm.get('account') == type.id}
+      onChange={syncForm.set('account')}
+    />
   </div>
 );
 

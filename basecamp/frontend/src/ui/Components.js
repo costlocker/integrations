@@ -27,4 +27,15 @@ const Link = ({ title, route, params }) => (
   <a href="" onClick={(e) => redirectToRoute(route, params, e)}>{title}</a>
 );
 
-export { Errors, ExternalLink, Button, Link };
+const RadioButtons = ({ items, isActive, onChange, className }) =>
+  <div className={`btn-group ${className}`}>
+    {items.map(type => (
+      <label key={type.id} className={isActive(type) ? 'btn btn-primary active' : 'btn btn-default'}>
+        <input
+          type="radio" name="type" value={type.id} className="hide"
+          checked={isActive(type)} onChange={onChange} /> {type.title}
+      </label>
+    ))}
+  </div>;
+
+export { Errors, ExternalLink, Button, Link, RadioButtons };
