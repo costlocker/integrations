@@ -61,6 +61,16 @@ const loadEvents = (clProject) =>
     .catch(setError)
     .then(events => appState.cursor().set('events', events));
 
+const disconnectBasecamp = (params, onSuccess) => {
+  if (isNotLoggedInBasecamp()) {
+    alert('Login to Basecamp before disconnect');
+    return;
+  }
+  return pushToApi(`/disconnect`, params)
+      .then(onSuccess)
+      .catch((e) => alert('Disconnect has failed'));
+};
+
 appState.on('next-animation-frame', function (newStructure, oldStructure, keyPath) {
   const oldId = oldStructure.getIn(['sync', 'account']);
   const accountId = newStructure.getIn(['sync', 'account']);
@@ -89,11 +99,7 @@ export const states = [
     url: '/projects',
     component: () => <Projects
       allProjects={appState.cursor(['costlocker', 'projects']).deref()}
-      disconnect={(id) =>
-        pushToApi(`/disconnect`, { project: id })
-          .then(() => fetchProjects())
-          .catch((e) => alert('Disconnect has failed'))
-      }
+      disconnect={(id) => disconnectBasecamp({ project: id }, fetchProjects)}
     />,
     resolve: loadCostlockerProjects(),
   },
@@ -113,11 +119,7 @@ export const states = [
       costlockerUser={appState.cursor(['auth', 'costlocker']).deref()}
       accounts={appState.cursor(['auth', 'settings']).deref().accounts.basecamp}
       loginError={props.transition.params().loginError}
-      disconnect={(id) =>
-        pushToApi(`/disconnect`, { user: id })
-          .then(() => fetchUser())
-          .catch((e) => alert('Disconnect has failed'))
-      }
+      disconnect={(id) => disconnectBasecamp({ user: id }, fetchUser)}
       loginUrls={loginUrls} />,
   },
   {
