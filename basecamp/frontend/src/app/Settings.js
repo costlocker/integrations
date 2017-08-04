@@ -12,8 +12,8 @@ export default function Settings({ form, accounts }) {
       <div className="col-sm-12">
         <div className="row">
           <div className="col-sm-6">
-            <h4>Costlocker &rarr; Basecamp</h4>
             <div className="form-group">
+              <h4>Costlocker &rarr; Basecamp</h4>
               <label>What is exported to Basecamp?</label>
               <div>
                 <label className="checkbox-inline">
@@ -93,10 +93,10 @@ export default function Settings({ form, accounts }) {
             ) : null}
           </div>
           <div className="col-sm-6">
-            <h4 title="Available only for Basecamp 3">
-              Basecamp <span className="label label-danger">3</span> &rarr; Costlocker
-            </h4>
             <div className="form-group">
+              <h4 title="Available only for Basecamp 3">
+                Basecamp <span className="label label-danger">3</span> &rarr; Costlocker
+              </h4>
               <label>What is exported to Costlocker?</label>
               <div>
                 <label className="checkbox-inline">

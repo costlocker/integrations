@@ -82,7 +82,9 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
       set => (set.includes(projectId) ? set.delete(projectId) : set.add(projectId))
     );
   };
-  const canBeSynchronized = selectedCostlockerProjects.size && basecamp.get('isAccountAvailable');
+  const isFormValid = selectedCostlockerProjects.size
+    && basecamp.get('isAccountAvailable')
+    && (isBasecampProjectCreated || selectedCostlockerProjects.size === 1);
 
   return <div>
     <h1>{isExistingProjectEdited ? 'Edit project' : 'Connect Costlocker project to Basecamp'}</h1>
@@ -109,23 +111,6 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
       <div>
         <div className="form-group">
           <label htmlFor="costlockerProject">Costlocker project(s)</label>
-          {selectedCostlockerProjects.size ? (
-          <div className="row">
-            <div className="col-sm-12">
-              <div className="btn-toolbar">
-                {selectedCostlockerProjects.map(project => (
-                  <div key={project.id} className="btn-group">
-                    <span className="btn btn-default" onClick={() => setCostlockerProject({ target: { value: project.id } })}>
-                      {project.name} <span className="label label-default">{project.client.name}</span>
-                      &nbsp;<span className="fa fa-times text-danger" />
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <br />
-            </div>
-          </div>
-          ) : null}
           <div className="row">
             <div className="col-sm-12">
               <div className="input-group">
@@ -144,6 +129,28 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
               </div>
             </div>
           </div>
+          {selectedCostlockerProjects.size ? (
+          <div className="row">
+            <div className="col-sm-12">
+              <br />
+              <div className="btn-toolbar">
+                {selectedCostlockerProjects.map(project => (
+                  <div key={project.id} className="btn-group">
+                    <span className="btn btn-primary active" onClick={() => setCostlockerProject({ target: { value: project.id } })}>
+                      <span className="label label-danger">
+                        <span className="fa fa-times" />
+                      </span>
+                      &nbsp;
+                      {project.name}
+                      &nbsp;
+                      <span className="label label-warning">{project.client.name}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          ) : null}
         </div>
         <BasecampAccountSelect title='Choose a Basecamp acccount to export it to' accounts={basecampAccounts} syncForm={syncForm} isAccountNotAvailable={!basecamp.get('isAccountAvailable')} />
         <BasecampCompaniesSelect basecampCompanies={basecamp.get('companies')} syncForm={syncForm} isBasecampProjectCreated={isBasecampProjectCreated} />
@@ -151,27 +158,23 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
           <div className="col-sm-6">
             <div className="form-group">
               <label>How would you like to add this project to the Basecamp</label>
-              <div className="radio">
-                <label>
-                  <input type="radio" name="mode" value="create"
-                    checked={isBasecampProjectCreated} onChange={syncForm.set('mode')} />
-                  Create a new project in Basecamp
-                </label>
-              </div>
-              <div className="radio">
-                <label className={selectedCostlockerProjects.size > 1 ? 'text-danger' : null}>
-                  <input type="radio" name="mode" value="add"
-                    checked={!isBasecampProjectCreated} onChange={syncForm.set('mode')} />
-                  Add to an existing project in Basecamp
-                </label>
-              </div>
+              <RadioButtons
+                items={[
+                  { id: 'create', title: 'Create a new project in Basecamp' },
+                  { id: 'add', title: 'Add to an existing project in Basecamp' }
+                ]}
+                isActive={type => syncForm.get('mode') == type.id}
+                onChange={syncForm.set('mode')}
+              />
             </div>
+          </div>
+          <div className="col-sm-6">
             {!isBasecampProjectCreated &&
             <div className="form-group">
               <label htmlFor="basecampProject">Basecamp project</label>
               {selectedCostlockerProjects.size > 1 ? (
-              <p className="text-muted">
-                Please select only one Costlocker project.<br />
+              <p className="text-danger">
+                Select only one Costlocker project, if you want to update existing Basecamp project.<br />
                 It's not allowed to link multiple Costlocker projects to one Basecamp project.
               </p>
               ) : (
@@ -195,8 +198,8 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
       )}
       <div className="row">
         <div className="col-sm-6">
-          <h4>Costlocker &rarr; Basecamp</h4>
           <div className="form-group">
+            <h4>Costlocker &rarr; Basecamp</h4>
             <label>What is exported to Basecamp?</label>
             <div>
               <label className="checkbox-inline disabled">
@@ -229,10 +232,10 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
           }
         </div>
         <div className="col-sm-6" data-unavailable={canBeSynchronizedFromBasecamp ? null : true}>
-          <h4 title="Available only for Basecamp 3">
-            Basecamp <span className="label label-danger">3</span> &rarr; Costlocker
-          </h4>
           <div className="form-group">
+            <h4 title="Available only for Basecamp 3">
+              Basecamp <span className="label label-danger">3</span> &rarr; Costlocker
+            </h4>
             <label>What is exported to Costlocker?</label>
             <div>
               <label className="checkbox-inline">
@@ -280,7 +283,7 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
           }
         </div>
       </div>
-      {canBeSynchronized ? (
+      {isFormValid ? (
         <button type="submit" className="btn btn-primary btn-block">Synchronize</button>
       ) : (
         <span className="btn btn-primary btn-block disabled">Synchronize</span>
