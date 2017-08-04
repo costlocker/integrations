@@ -92,11 +92,17 @@ export const states = [
   {
     name: 'help',
     url: '/help',
+    data: {
+      title: 'Help',
+    },
     component: () => <Help />,
   },
   {
     name: 'projects',
     url: '/projects',
+    data: {
+      title: 'Projects',
+    },
     component: () => <Projects
       allProjects={appState.cursor(['costlocker', 'projects']).deref()}
       disconnect={(id) => disconnectBasecamp({ project: id }, fetchProjects)}
@@ -106,6 +112,9 @@ export const states = [
   {
     name: 'login',
     url: '/login?loginError',
+    data: {
+      title: 'Login',
+    },
     component: (props) => <Login
       costlockerAuth={appState.cursor(['auth', 'costlocker']).deref()}
       loginUrls={loginUrls}
@@ -114,6 +123,9 @@ export const states = [
   {
     name: 'accounts',
     url: '/accounts?loginError',
+    data: {
+      title: 'Accounts',
+    },
     component: (props) => <Accounts
       basecampUser={appState.cursor(['auth', 'basecamp']).deref()}
       costlockerUser={appState.cursor(['auth', 'costlocker']).deref()}
@@ -125,6 +137,9 @@ export const states = [
   {
     name: 'sync',
     url: '/sync?account&clProject',
+    data: {
+      title: params => params.clProject ? 'Refresh project' : 'Add project',
+    },
     component: (props) => <Sync
       costlockerProjects={appState.cursor(['costlocker', 'projects']).deref()}
       basecampProjects={appState.cursor(['basecamp', 'projects']).deref()}
@@ -170,6 +185,9 @@ export const states = [
   {
     name: 'settings',
     url: '/settings',
+    data: {
+      title: 'Settings',
+    },
     component: (props) => <Settings
       accounts={appState.cursor(['auth', 'settings']).deref().accounts}
       form={{
@@ -189,6 +207,9 @@ export const states = [
   {
     name: 'events',
     url: '/events?clProject',
+    data: {
+      title: params => params.clProject ? 'Project events' : 'Events',
+    },
     component: (props) => <Events
       events={appState.cursor(['events']).deref()}
       refresh={() => loadEvents(props.transition.params().clProject).then(fetchProjects())} // hotfix for reloading projects list
@@ -238,9 +259,13 @@ const hooks = [
   },
   {
     event: 'onSuccess',
-    criteria: { to: true },
+    criteria: { to: state => state.data && state.data.title },
     callback: (transition) => {
+      const params = transition.params();
       const state = transition.to();
+      const stateTitle = state.data.title;
+      const getTitle = typeof stateTitle === 'function' ? stateTitle : () => stateTitle;
+      document.title = `${getTitle(params)} | Costlocker ↔ Basecamp`;
       // rerender to change active state in menu - stateService.go reloads only <UIView>
       appState.cursor(['app']).set('currentState', state.name);
     },
