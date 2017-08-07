@@ -3,6 +3,7 @@ import { Map } from 'immutable';
 
 import { appState, isNotLoggedInCostlocker, isNotLoggedInBasecamp } from './state';
 import { fetchFromApi, pushToApi, loginUrls } from './api';
+import Form from './app/Form';
 import Login from './app/Login';
 import Projects from './app/Projects';
 import Sync from './app/Sync';
@@ -148,21 +149,14 @@ export const states = [
       costlockerProjects={appState.cursor(['costlocker', 'projects']).deref()}
       basecamp={appState.cursor(['basecamp']).deref()}
       basecampAccounts={appState.cursor(['auth', 'settings']).deref().accounts.basecamp}
-      syncForm={{
-        editedProject: props.transition.params().clProject,
-        get: (type) => appState.cursor(['sync', type]).deref(),
-        set: (type) => (e) => appState.cursor(['sync']).set(
-          type,
-          e.target.type === 'checkbox' ? e.target.checked : e.target.value
-        ),
-        updateCostlockerProjects: (updater) => appState.cursor(['sync', 'costlockerProject']).update(updater),
-        submit: (e) => {
-          e.preventDefault();
+      syncForm={new Form({
+        stateKey: 'sync',
+        submit: () =>
           pushToApi(`/sync`, appState.cursor(['sync']).deref())
             .then((r) => redirectToRoute('events'))
-            .catch((e) => alert('Synchronization has failed'));
-        }
-      }}
+            .catch((e) => alert('Synchronization has failed'))
+      })}
+      isExistingProjectEdited={props.transition.params().clProject ? true : false}
     />,
     resolve:
       loadCostlockerProjects(
@@ -193,18 +187,13 @@ export const states = [
     },
     component: (props) => <Settings
       accounts={appState.cursor(['auth', 'settings']).deref().accounts}
-      form={{
-        get: (type) => appState.cursor(['companySettings', type]).deref(),
-        set: (type) => (e) => appState.cursor(['companySettings']).set(
-          type,
-          e.target.type === 'checkbox' ? e.target.checked : e.target.value
-        ),
-        submit: (e) => {
-          e.preventDefault();
+      form={new Form({
+        stateKey: 'companySettings',
+        submit: () =>
           pushToApi(`/settings`, appState.cursor(['companySettings']).deref())
-            .catch((e) => alert('Save has failed'));
-        }
-      }}
+            .then(() => alert('Settings saved'))
+            .catch((e) => alert('Save has failed'))
+      })}
     />,
   },
   {

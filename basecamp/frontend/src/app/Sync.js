@@ -42,7 +42,7 @@ const BasecampCompaniesSelect = ({ basecampCompanies, isBasecampProjectCreated, 
     </div>;
 };
 
-export default function Sync({ costlockerProjects, basecamp, basecampAccounts, syncForm }) {
+export default function Sync({ costlockerProjects, basecamp, basecampAccounts, syncForm, isExistingProjectEdited }) {
   if (!costlockerProjects) {
     return <Loading title="Loading projects" />;
   } else if (!costlockerProjects.length) {
@@ -51,17 +51,16 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
 
   const isBasecampProjectCreated = syncForm.get('mode') === 'create';
 
-  const indexedSelectedProjects = {}, availableCostlockerProjects = [];
+  const indexedSelectedProjects = {}, unmappedCostlockerProjects = [];
   costlockerProjects.forEach(p => {
     if (syncForm.get('costlockerProject').includes(p.id)) {
       indexedSelectedProjects[p.id] = p;
     } else if (!p.basecamps.length) {
-      availableCostlockerProjects.push(p);
+      unmappedCostlockerProjects.push(p);
     }
   });
   const selectedCostlockerProjects = syncForm.get('costlockerProject').map(id => indexedSelectedProjects[id]);
 
-  const isExistingProjectEdited = syncForm.editedProject;
   const editedProject = isExistingProjectEdited ? selectedCostlockerProjects.first() : null;
   const connectedBasecamp = isExistingProjectEdited ? editedProject.basecamps[0] : null;
 
@@ -76,12 +75,6 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
     ? basecamp.get('projects').filter(p => p.id == editedProject.basecamps[0].id)
     : basecamp.get('projects');
 
-  let setCostlockerProject = (e) => {
-    const projectId = e.target.value;
-    syncForm.updateCostlockerProjects(
-      set => (set.includes(projectId) ? set.delete(projectId) : set.add(projectId))
-    );
-  };
   const isFormValid = selectedCostlockerProjects.size
     && basecamp.get('isAccountAvailable')
     && (isBasecampProjectCreated || selectedCostlockerProjects.size === 1);
@@ -117,10 +110,10 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
                 <span className="input-group-addon">Add project</span>
                 <select
                   className="form-control" name="costlockerProject" id="costlockerProject"
-                  onChange={setCostlockerProject}
+                  onChange={syncForm.checkItem('costlockerProject')}
                 >
                   <option></option>
-                  {availableCostlockerProjects.map(project => (
+                  {unmappedCostlockerProjects.map(project => (
                     <option key={project.id} value={project.id}>
                       {project.name} ({project.client.name})
                     </option>
@@ -136,7 +129,7 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
               <div className="btn-toolbar">
                 {selectedCostlockerProjects.map(project => (
                   <div key={project.id} className="btn-group">
-                    <span className="btn btn-primary active" onClick={() => setCostlockerProject({ target: { value: project.id } })}>
+                    <span className="btn btn-primary active" onClick={() => syncForm.checkItem('costlockerProject')({ target: { value: project.id } })}>
                       <span className="label label-danger">
                         <span className="fa fa-times" />
                       </span>
