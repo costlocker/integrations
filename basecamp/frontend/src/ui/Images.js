@@ -16,4 +16,6 @@ const Logo = ({ app, color }) => {
     title={app} alt={app} className="logo" />;
 };
 
-export { Logo };
+const Image = (props) => <img {...props} alt="" />
+
+export { Logo, Image };

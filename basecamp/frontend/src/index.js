@@ -9,6 +9,7 @@ import { states, config, isRouteActive } from './Router';
 import App from './ui/App';
 import Loading from './ui/Loading';
 import ErrorPage from './ui/ErrorPage';
+import DisabledAddon from './ui/DisabledAddon';
 import './ui/index.css'
 
 export const plugins = isDevelopmentMode ? [pushStateLocationPlugin, Visualizer] : [pushStateLocationPlugin];
@@ -17,6 +18,8 @@ const render = () => {
   let content = null;
   if (appState.cursor(['auth', 'isLoading']).deref()) {
     content = <Loading title='Loading Costlocker & Basecamp integration' />
+  } else if (appState.cursor(['isDisabled']).deref()) {
+    content = <DisabledAddon user={appState.cursor(['auth', 'costlocker']).deref()} />;
   } else if (appState.cursor(['error']).deref()) {
     content = <ErrorPage appState={appState} isDevelopmentMode={isDevelopmentMode} />
   } else {

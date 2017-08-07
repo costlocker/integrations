@@ -1,5 +1,6 @@
 import React from 'react';
 import { redirectToRoute } from '../Router';
+import { appHost } from '../config';
 
 const Errors = ({ title, error }) => {
   if (!error) {
@@ -29,6 +30,8 @@ const Link = ({ title, route, params }) => (
   <a href="" onClick={(e) => redirectToRoute(route, params, e)}>{title}</a>
 );
 
+const CostlockerLink = ({ title, path, className }) => <a href={`${appHost}${path}`} className={className}>{title}</a>
+
 const RadioButtons = ({ items, isActive, onChange, className }) =>
   <div className={`btn-group ${className}`}>
     {items.map(type => (
@@ -40,4 +43,4 @@ const RadioButtons = ({ items, isActive, onChange, className }) =>
     ))}
   </div>;
 
-export { Errors, ExternalLink, Button, Link, RadioButtons };
+export { Errors, ExternalLink, Button, Link, CostlockerLink, RadioButtons };

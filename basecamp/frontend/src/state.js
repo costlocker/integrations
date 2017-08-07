@@ -17,6 +17,7 @@ const appState = immstruct({
     projects: [],
     companies: [],
   },
+  isDisabled: false,
   currentState: '', // helper for active menu items
   error: null,
   csrfToken: null,

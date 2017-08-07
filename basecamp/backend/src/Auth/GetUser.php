@@ -23,11 +23,12 @@ class GetUser
         $this->entityManager = $em;
     }
 
-    public function __invoke()
+    public function __invoke($isAddonDisabled)
     {
         $clUser = $this->getCostlockerUser();
         $bcUser = $this->getBasecampUser();
         return new JsonResponse([
+            'isAddonDisabled' => $isAddonDisabled,
             'costlocker' => $clUser->data,
             'basecamp' => $bcUser->data,
             'csrfToken' => $this->session->get('csrfToken'),

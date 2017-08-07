@@ -29,6 +29,7 @@ const fetchUser = () =>
           .setIn(['csrfToken'], user.csrfToken)
           .setIn(['sync', 'account'], user.settings.myAccount)
           .setIn(['companySettings'], Map(user.settings.sync))
+          .setIn(['isDisabled'], user.isAddonDisabled)
       );
     })
     .catch(e => console.log('Anonymous user'));

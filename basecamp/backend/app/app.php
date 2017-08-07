@@ -134,8 +134,8 @@ $app
 
 $app
     ->get('/user', function () use ($app) {
-        $app['client.check']->verifyTokens();
-        return $app['client.user']();
+        $isAddonDisabled = $app['client.check']->verifyTokens();
+        return $app['client.user']($isAddonDisabled);
     });
 
 $app
