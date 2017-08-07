@@ -15,7 +15,7 @@ import { SyncSettings } from './app/SyncSettings';
 export let redirectToRoute = (route) => console.log('app is not ready', route);
 export let isRouteActive = () => false;
 const syncSettings = new SyncSettings(appState);
-const setError = e => appState.cursor().set('error', e);
+const setError = e => appState.cursor(['app']).set('error', e);
 
 const fetchUser = () =>
   fetchFromApi('/user')
@@ -26,10 +26,10 @@ const fetchUser = () =>
           .setIn(['auth', 'costlocker'], user.costlocker)
           .setIn(['auth', 'basecamp'], user.basecamp)
           .setIn(['auth', 'settings'], user.settings)
-          .setIn(['csrfToken'], user.csrfToken)
+          .setIn(['app', 'csrfToken'], user.csrfToken)
           .setIn(['sync', 'account'], user.settings.myAccount)
           .setIn(['companySettings'], Map(user.settings.sync))
-          .setIn(['isDisabled'], user.isAddonDisabled)
+          .setIn(['app', 'isDisabled'], user.isAddonDisabled)
       );
     })
     .catch(e => console.log('Anonymous user'));

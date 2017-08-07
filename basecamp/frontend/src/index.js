@@ -18,9 +18,9 @@ const render = () => {
   let content = null;
   if (appState.cursor(['auth', 'isLoading']).deref()) {
     content = <Loading title='Loading Costlocker & Basecamp integration' />
-  } else if (appState.cursor(['isDisabled']).deref()) {
+  } else if (appState.cursor(['app', 'isDisabled']).deref()) {
     content = <DisabledAddon user={appState.cursor(['auth', 'costlocker']).deref()} />;
-  } else if (appState.cursor(['error']).deref()) {
+  } else if (appState.cursor(['app', 'error']).deref()) {
     content = <ErrorPage appState={appState} isDevelopmentMode={isDevelopmentMode} />
   } else {
     content =

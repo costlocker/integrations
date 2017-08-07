@@ -12,7 +12,7 @@ const buildError = (jsError, currentUser) => ({
 const encodeError = data => btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
 
 export default function ErrorPage({ appState, isDevelopmentMode }) {
-  const jsError = appState.cursor(['error']).deref();
+  const jsError = appState.cursor(['app', 'error']).deref();
   const data = buildError(jsError, appState.cursor(['auth', 'costlocker']).deref());
 
   if (isDevelopmentMode) {
