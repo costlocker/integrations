@@ -22,4 +22,13 @@ class AuthorizationTest extends GivenApi
             ['POST', '/sync'],
         ];
     }
+
+    public function testNotSupportedMethod()
+    {
+        $response = $this->request([
+            'method' => 'GET',
+            'url' => '/settings',
+        ]);
+        assertThat($response->getStatusCode(), is(405));
+    }
 }
