@@ -135,7 +135,9 @@ $app
 $app
     ->get('/user', function () use ($app) {
         $isAddonDisabled = $app['client.check']->verifyTokens();
-        return $app['client.user']($isAddonDisabled);
+        // $app['client.user'] still sees removed costlocker userId
+        $getUser = new Costlocker\Integrations\Auth\GetUser($app['session'], $app['orm.em']);
+        return $getUser($isAddonDisabled);
     });
 
 $app

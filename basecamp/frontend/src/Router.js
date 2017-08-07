@@ -241,8 +241,10 @@ const hooks = [
         return isPrivateState && isNotLoggedInCostlocker();
       }
     },
-    callback: (transition: any) =>
-      transition.router.stateService.target('login', transition.params(), { location: true }),
+    callback: (transition: any) => {
+      transition.abort();
+      redirectToRoute('login');
+    },
     priority: 10,
   },
   {
