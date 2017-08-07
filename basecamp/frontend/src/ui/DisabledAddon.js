@@ -2,6 +2,7 @@ import React from 'react';
 import { CostlockerLink, Link } from './Components';
 import { Image } from './Images';
 import { pushToApi } from '../api';
+import enabledAddon from '../images/enabled-addon.png';
 
 const reloadPage = () => window.location.reload(false);
 
@@ -24,7 +25,7 @@ export default function DisabledAddon({ user }) {
             <div className="panel-body">
               Ask your owner to <CostlockerLink path="/settings/addons" title="enable the addon in Settings" />.
               <br /><br />
-              <Image className="img-responsive" src="https://user-images.githubusercontent.com/7994022/27791571-fd97c17e-5ff5-11e7-9690-05715f1d3742.png" />
+              <Image className="img-responsive" src={enabledAddon} />
             </div>
             <div className="panel-footer">
               <Link

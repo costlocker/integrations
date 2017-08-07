@@ -141,7 +141,7 @@ export default {
   // DisabledAddon.js
   disabledAddon: {
     title: 'Fakturoid addon je vypnutý',
-    ask: 'Požádejte Vašeho ownery, aby',
+    ask: 'Požádejte Vašeho ownera, aby',
     enable: 'povolil addon v nastavení',
     logout: ({ company }) => `Odhlásit a změnit společnost ${company}`,
   },
