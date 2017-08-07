@@ -80,14 +80,17 @@ class Costlocker
     public function registerWebhook(BasecampProject $project)
     {
         $company = $project->costlockerProject->costlockerCompany;
-        if ($company->urlWebhook && $this->existsWebhook($company->urlWebhook)) {
+        $existingWebhook = $this->getExistingWebhook($company->urlWebhook);
+        if ($existingWebhook && $existingWebhook['is_enabled']) {
             return;
         }
 
+        $id = $existingWebhook ? ['uuid' => $existingWebhook['uuid']] : [];
         $response = $this->client->__invoke(
             '/webhooks',
-            [
+            $id + [
                 'url' => $this->webhookUrl,
+                'is_enabled' => true,
                 'events' => [
                     'projects.create',
                     'peoplecosts.change',
@@ -107,8 +110,15 @@ class Costlocker
         );
     }
 
-    private function existsWebhook($webhookUrl)
+    private function getExistingWebhook($webhookUrl)
     {
-        return $this->client->__invoke($webhookUrl)->getStatusCode() == 200;
+        if (!$webhookUrl) {
+            return null;
+        }
+        $response = $this->client->__invoke($webhookUrl);
+        if ($response->getStatusCode() != 200) {
+            return null;
+        }
+        return json_decode($response->getBody(), true)['data'];
     }
 }

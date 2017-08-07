@@ -71,8 +71,8 @@ class EventsToJson
             // disconnect should be successful 99%, so using results is not necessary
             Event::DISCONNECT_BASECAMP => 'Disconnect basecamp account',
             Event::DISCONNECT_PROJECT => 'Disconnect project',
-            Event::REGISTER_COSTLOCKER_WEBHOOK => 'Register costlocker webhook',
-            Event::REGISTER_BASECAMP_WEBHOOK => 'Update basecamp webhook for project',
+            Event::REGISTER_COSTLOCKER_WEBHOOK => 'Enable costlocker webhook',
+            Event::REGISTER_BASECAMP_WEBHOOK => 'Update basecamp webhook',
         ];
         $basecampProject = null;
 
