@@ -117,7 +117,7 @@ $getWebhookUrl = function (Request $r) {
 $app
     ->get('/', function (Request $r) use ($getWebhookUrl) {
         $json = new JsonResponse([
-            'webhookUrl' => $getWebhookUrl($r),
+            'webhookUrl' => "POST {$getWebhookUrl($r)}",
         ]);
         $json->setEncodingOptions(JSON_UNESCAPED_SLASHES);
         return $json;
@@ -245,6 +245,19 @@ $app
     })
     ->before($checkAuthorization('basecamp'))
     ->before($checkCsrf());
+
+$app
+    ->get('/webhooks/handler', function (Request $r) use ($getWebhookUrl) {
+        $json = new JsonResponse([
+            'example' => "POST {$getWebhookUrl($r)} --data '[\"some json\"]'",
+            'supported_webhooks' => [
+                'basecamp3' => 'https://github.com/basecamp/bc3-api/blob/master/sections/webhooks.md#webhooks',
+                'costlocker' => 'http://docs.costlocker2.apiary.io/#reference/0/webhooks/get-webhook-example',
+            ],
+        ]);
+        $json->setEncodingOptions(JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+        return $json;
+    });
 
 $app
     ->post('/webhooks/handler', function (Request $r) use ($pushEvent) {
