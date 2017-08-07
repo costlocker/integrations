@@ -28,6 +28,7 @@ const appState = immstruct({
   },
   webhook: {
     url: '',
+    is_enabled: true,
     events: Set(),
   },
 });

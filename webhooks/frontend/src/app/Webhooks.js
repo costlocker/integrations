@@ -19,6 +19,7 @@ export default function Webhooks({ webhooks }) {
       <thead>
         <tr>
           <th>Webhook</th>
+          <th>Is enabled?</th>
           <th></th>
         </tr>
       </thead>
@@ -28,6 +29,9 @@ export default function Webhooks({ webhooks }) {
             <td>
               {w.url}
               <WebhookEvents webhook={w} />
+            </td>
+            <td>
+              {w.is_enabled ? <span className="fa fa-check text-success" /> : <span className="fa fa-times text-danger" />}
             </td>
             <td className="text-right">
               <Link title="Recent deliveries" route="webhook.deliveries" params={{ uuid: w.uuid }} className="btn btn-success" />
