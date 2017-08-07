@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ExternalLink, Button } from '../ui/Components';
+import { ExternalLink, Link, Button } from '../ui/Components';
 import { Logo } from '../ui/Images';
 import Loading from '../ui/Loading';
 
@@ -50,10 +50,10 @@ export default function Projects({ allProjects, disconnect }) {
                     title={<span><Logo app="basecamp" /> Open project</span>} />
                 </td>
                 <td className="text-right">
-                  <Button route='sync' params={{ clProject: project.id }}
+                  <Link route='sync' params={{ clProject: project.id }}
                     title={<span><i className="fa fa-refresh"></i> Refresh</span>} className="btn btn-sm btn-primary" />
                   &nbsp;&nbsp;
-                  <Button route='events' params={{ clProject: project.id }}
+                  <Link route='events' params={{ clProject: project.id }}
                     title={<span><i className="fa fa-th-list"></i> Events</span>} className="btn btn-sm btn-info" />
                   &nbsp;&nbsp;
                   <Button action={() => disconnect(project.id)}
@@ -71,7 +71,7 @@ export default function Projects({ allProjects, disconnect }) {
     {notConnectedProjectsCount &&
     <div className="row">
       <div className="col-sm-12">
-        <Button route='sync' title={<span>Connect new project ({notConnectedProjectsCount})</span>} className="btn btn-success btn-block" />
+        <Link route='sync' title={<span>Connect new project ({notConnectedProjectsCount})</span>} className="btn btn-success btn-block" />
       </div>
     </div>
     }

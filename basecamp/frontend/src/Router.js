@@ -14,6 +14,7 @@ import Help from './app/Help';
 import { SyncSettings } from './app/SyncSettings';
 
 export let redirectToRoute = (route) => console.log('app is not ready', route);
+export let generateUrl = () => '';
 export let isRouteActive = () => false;
 const syncSettings = new SyncSettings(appState);
 const setError = e => appState.cursor(['app']).set('error', e);
@@ -273,9 +274,16 @@ export const config = (router) => {
   redirectToRoute = (route, params, e) => {
     if (e) {
       e.preventDefault();
+      if (e.metaKey || e.ctrlKey) {
+        const absoluteUrl = router.stateService.href(route, params, { absolute: true })
+          .replace(':3000:3000', ':3000'); // hotfix https://github.com/ui-router/core/issues/70
+        window.open(absoluteUrl, '_blank');
+        return;
+      }
     }
     router.stateService.go(route, params, { location: true });
   };
+  generateUrl = router.stateService.href;
   isRouteActive = router.stateService.is;
   hooks.forEach(hook => router.transitionService[hook.event](hook.criteria, hook.callback, { priority: hook.priority }));
 }

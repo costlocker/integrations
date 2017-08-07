@@ -1,5 +1,5 @@
 import React from 'react';
-import { redirectToRoute } from '../Router';
+import { redirectToRoute, generateUrl } from '../Router';
 import { appHost } from '../config';
 
 const Errors = ({ title, error }) => {
@@ -26,8 +26,8 @@ const Button = ({ title, route, params, action, className }) => {
   return <button onClick={onClick} className={className}>{title}</button>;
 };
 
-const Link = ({ title, route, params }) => (
-  <a href="" onClick={(e) => redirectToRoute(route, params, e)}>{title}</a>
+const Link = ({ title, route, params, className }) => (
+  <a href={generateUrl(route, params)} onClick={(e) => redirectToRoute(route, params, e)} className={className}>{title}</a>
 );
 
 const CostlockerLink = ({ title, path, className }) => <a href={`${appHost}${path}`} className={className}>{title}</a>
