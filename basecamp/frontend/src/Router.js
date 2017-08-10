@@ -40,13 +40,19 @@ if (isNotLoggedInCostlocker()) {
   fetchUser();
 }
 
-const fetchProjects = () =>
-   fetchFromApi('/costlocker')
+const fetchProjects = (customFilter) => {
+  const filter = customFilter ? customFilter : appState.cursor(['costlocker', 'state']).deref();
+  return fetchFromApi(`/costlocker?state=${filter}`)
     .catch(setError)
     .then(projects => {
-      appState.cursor(['costlocker']).set('projects', projects);
+      appState.cursor(['costlocker']).update(
+        state => state
+          .set('projects', projects)
+          .set('isSearching', false)
+      );
       return projects;
     });
+}
 
 const loadCostlockerProjects = (callback) => [
   {
@@ -87,6 +93,15 @@ appState.on('next-animation-frame', function (newStructure, oldStructure, keyPat
           .set('companies', data.companies)
       ));
   }
+
+  const isSearchUpdated = (field, keyPath) =>
+    keyPath.length === 1 &&
+    keyPath[0] === 'costlocker' &&
+    newStructure.getIn(['costlocker', field]) !== oldStructure.getIn(['costlocker', field]);
+
+  if (isSearchUpdated('state', keyPath)) {
+    fetchProjects(newStructure.getIn(['costlocker', 'state']));
+  }
 });
 
 export const states = [
@@ -112,6 +127,10 @@ export const states = [
     component: () => <Projects
       allProjects={appState.cursor(['costlocker', 'projects']).deref()}
       disconnect={(id) => disconnectBasecamp({ project: id }, fetchProjects)}
+      form={new Form({
+        stateKey: 'costlocker',
+        alwaysSet: (s) => s.setIn(['isSearching'], true),
+      })}
     />,
     resolve: loadCostlockerProjects(),
   },

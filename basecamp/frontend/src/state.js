@@ -16,6 +16,8 @@ const appState = immstruct({
     error: null,
   },
   costlocker: {
+    isSearching: false,
+    state: 'running',
     projects: null,
   },
   basecamp: {

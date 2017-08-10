@@ -1,22 +1,37 @@
 import React from 'react';
 
-import { ExternalLink, Link, Button } from '../ui/Components';
+import { ExternalLink, Link, Button, RadioButtons } from '../ui/Components';
 import { Logo } from '../ui/Images';
 import Loading from '../ui/Loading';
 
-export default function Projects({ allProjects, disconnect }) {
+export default function Projects({ allProjects, disconnect, form }) {
   if (!allProjects) {
     return <Loading title="Loading projects" />;
   }
   const projects = allProjects.filter(p => p.basecamps.length);
   const notConnectedProjectsCount = allProjects.length - projects.length;
 
-  return <div>
+  return <div className={form.get('isSearching') ? 'reloading' : null}>
     <div className="row">
       <div className="col-sm-12">
         <h1>Projects</h1>
       </div>
     </div>
+    <form className="form row">
+      <div className="col-sm-12">
+        <div className="form-group">
+          <RadioButtons
+            items={[
+              { id: '', title: 'All' },
+              { id: 'running', title: 'Running' },
+              { id: 'finished', title: 'Finished' },
+            ]}
+            isActive={type => form.get('state') === type.id}
+            onChange={form.get('isSearching') ? () => null : form.set('state')}
+          />
+        </div>
+      </div>
+    </form>
     <div className="row">
       <div className="col-sm-12">
         {projects.length ? (
@@ -64,7 +79,7 @@ export default function Projects({ allProjects, disconnect }) {
           </tbody>
         </table>
         ) : (
-        <p className="text-muted">No project in connected to Basecamp</p>
+        <p className="text-muted">No projects are synchronized</p>
         )}
       </div>
     </div>

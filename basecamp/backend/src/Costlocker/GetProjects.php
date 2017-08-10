@@ -6,6 +6,7 @@ use Costlocker\Integrations\CostlockerClient;
 use Costlocker\Integrations\Basecamp\BasecampAdapter;
 use Costlocker\Integrations\Entities\BasecampProject;
 use Costlocker\Integrations\Database\ProjectsDatabase;
+use Symfony\Component\HttpFoundation\Request;
 
 class GetProjects
 {
@@ -20,10 +21,10 @@ class GetProjects
         $this->database = $db;
     }
 
-    public function __invoke()
+    public function __invoke(Request $r)
     {
         $mappedProjects = $this->database->findAll();
-        $response = $this->client->__invoke('/projects?state=running');
+        $response = $this->client->__invoke("/projects?state={$r->query->get('state')}");
         $projects = [];
         foreach (json_decode($response->getBody(), true)['data'] as $rawProject) {
             $basecamps = [];

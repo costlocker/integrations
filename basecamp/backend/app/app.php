@@ -175,13 +175,13 @@ $app
     ->before($checkAuthorization('costlocker'));
 
 $app
-    ->get('/costlocker', function () use ($app) {
+    ->get('/costlocker', function (Request $r) use ($app) {
         $strategy = new Costlocker\Integrations\Costlocker\GetProjects(
             $app['client.costlocker'],
             $app['client.basecamp'],
             $app['database']
         );
-        $data = $strategy();
+        $data = $strategy($r);
         return new JsonResponse($data);
     })
     ->before($checkAuthorization('costlocker'));
