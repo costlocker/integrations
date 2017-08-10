@@ -1,28 +1,35 @@
 import React from 'react';
 import { UIView } from '@uirouter/react';
 import { Link } from './Components';
+import { Logo } from './Images';
 import Loading from './Loading';
 import { appState } from '../state';
 import { isRouteActive } from '../Router';
 
-const CostlockerUser = ({ user }) => {
+const User = ({ name, company }) => {
   return (
-    <span>
-      <strong>
-        {user.person.first_name} {user.person.last_name}
-      </strong> ({user.company.name})
-    </span>
+    <div className="user">
+      <strong>{name}</strong>
+      <small>{company}</small>
+    </div>
   );
 };
 
-const User = ({ auth }) => {
-  if (!auth.get('costlocker')) {
-    return null;
-  }
+const CostlockerUser = ({ user }) => {
+  return <User name={`${user.person.first_name} ${user.person.last_name}`} company={user.company.name} />;
+};
+
+const AnonymousUser = () => (
+  <div>
+    <Logo app="costlocker" color={isRouteActive('login') ? 'blue' : 'white'} />
+    <User name="Login" company="Costlocker" />
+  </div>
+)
+
+const Users = ({ auth }) => {
   return <div>
-    <span title="Costlocker user">
-      <CostlockerUser user={auth.get('costlocker')} />
-    </span>
+    <Logo app="costlocker" color={isRouteActive('login') ? 'blue' : 'white'} />
+    <CostlockerUser user={auth.get('costlocker')} />
   </div>;
 }
 
@@ -54,13 +61,6 @@ export function App({ auth, footer }) {
     <div>
       <nav className="navbar navbar-default">
         <div className="container">
-          <div className="navbar-header">
-            <div className="navbar-brand">
-              <a href="/">
-                <img title="Costlocker" alt="Costlocker" src="https://cdn-images-1.medium.com/max/1200/1*BLdn5GGWwijxJkcr0I0rgg.png" />
-              </a>
-            </div>
-          </div>
           <div>
             {auth.get('costlocker') ?
               <Navigation routes={[
@@ -71,7 +71,7 @@ export function App({ auth, footer }) {
           </div>
           <div className="navbar-right text-right">
             <Navigation routes={[
-              { route: 'login', title: auth.get('costlocker') ? <User auth={auth} /> : 'Login' },
+              { route: 'login', title: auth.get('costlocker') ? <Users auth={auth} /> : <AnonymousUser /> },
             ]} />
           </div>
         </div>

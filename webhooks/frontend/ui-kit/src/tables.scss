@@ -1,0 +1,31 @@
+
+
+.table-inline {
+    background: transparent !important;
+    margin-bottom: 0;
+    th, td {
+        text-align: center;
+        border: 0 !important;
+        vertical-align: middle;
+        padding: 3px;
+    }
+    thead {
+        opacity: 0.5;
+        font-size: 0.8em;
+    }
+}
+
+.table {
+    &.table-valign {
+        td, th {
+            vertical-align: middle;
+        }
+        .logo {
+            margin: 0 1ex 0 1em;
+            vertical-align: middle;
+        }
+        .first .logo {
+            margin-left: 0;
+        }
+    }
+}
