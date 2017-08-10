@@ -257,21 +257,6 @@ const hooks = [
     priority: 10,
   },
   {
-    event: 'onBefore',
-    criteria: {
-      to: state => {
-        const basecampEndpoints = ['sync'];
-        const isBasecampState = basecampEndpoints.indexOf(state.name) !== -1;
-        return isBasecampState && isNotLoggedInBasecamp();
-      }
-    },
-    callback: (transition: any) => {
-      alert('Login in Basecamp before starting synchronization');
-      return transition.router.stateService.target('accounts', undefined, { location: true });
-    },
-    priority: 10,
-  },
-  {
     event: 'onSuccess',
     criteria: { to: state => state.data && state.data.title },
     callback: (transition) => {

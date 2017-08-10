@@ -5,24 +5,32 @@ import { RadioButtons, Link } from '../ui/Components';
 const BasecampAccountSelect = ({ title, accounts, syncForm, isAccountNotAvailable }) => (
   <div className="form-group">
     <label htmlFor="account">{title}</label><br />
-    <RadioButtons
-      items={accounts
-        .filter(account => account.isMyAccount)
-        .map(
-          personAccount => ({
-            id: personAccount.account.id,
-            title: `${personAccount.account.name} (${personAccount.account.identity.email_address})`
-          })
-        )
-      }
-      isActive={type => syncForm.get('account') == type.id}
-      onChange={syncForm.set('account')}
-    />
-    {isAccountNotAvailable ? (
+    {accounts.length ? (
+      <div>
+        <RadioButtons
+          items={accounts
+            .filter(account => account.isMyAccount)
+            .map(
+              personAccount => ({
+                id: personAccount.account.id,
+                title: `${personAccount.account.name} (${personAccount.account.identity.email_address})`
+              })
+            )
+          }
+          isActive={type => syncForm.get('account') == type.id}
+          onChange={syncForm.set('account')}
+        />
+        {isAccountNotAvailable ? (
+          <p className="help-block text-danger">
+            Selected basecamp account is not working. Did your trial expire? Try to <Link route="accounts" title="reconnect Basecamp account" />
+          </p>
+        ) : null}
+      </div>
+    ) : (
       <p className="help-block text-danger">
-        Selected basecamp account is not working. Did your trial expire? Try to <Link route="accounts" title="reconnect Basecamp account" />
+        You cannot select an account until you are <Link route="accounts" title="logged in Basecamp" />.
       </p>
-    ) : null}
+    )}
   </div>
 );
 
@@ -80,7 +88,8 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
 
   const isFormValid = selectedCostlockerProjects.size
     && basecamp.get('isAccountAvailable')
-    && (isBasecampProjectCreated || selectedCostlockerProjects.size === 1);
+    && (isBasecampProjectCreated || selectedCostlockerProjects.size === 1)
+    && syncForm.get('account');
 
   return <div>
     <h1>{isExistingProjectEdited ? 'Refresh project' : 'Connect Costlocker project to Basecamp'}</h1>
