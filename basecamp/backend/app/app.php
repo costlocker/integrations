@@ -97,6 +97,10 @@ $app['client.check'] = function ($app) {
     );
 };
 
+$app['logout'] = function ($app) {
+    return new Costlocker\Integrations\Auth\LogoutUser($app['session']);
+};
+
 $checkAuthorization = function ($service) use ($app) {
     // prevents 'Cannot override frozen service "guzzle"'
     return function () use ($service, $app) {
@@ -147,6 +151,7 @@ $app
             $app['oauth.costlocker'],
             new Costlocker\Integrations\Database\PersistCostlockerUser($app['orm.em']),
             $app['logger'],
+            $app['logout'],
             getenv('APP_FRONTED_URL')
         );
         return $strategy($r);
@@ -173,6 +178,11 @@ $app
         return $strategy($r);
     })
     ->before($checkAuthorization('costlocker'));
+
+$app
+    ->post('/logout', function () use ($app) {
+        return $app['logout']();
+    });
 
 $app
     ->get('/costlocker', function (Request $r) use ($app) {

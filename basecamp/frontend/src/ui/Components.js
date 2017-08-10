@@ -26,9 +26,16 @@ const Button = ({ title, route, params, action, className }) => {
   return <button onClick={onClick} className={className}>{title}</button>;
 };
 
-const Link = ({ title, route, params, className }) => (
-  <a href={generateUrl(route, params)} onClick={(e) => redirectToRoute(route, params, e)} className={className}>{title}</a>
-);
+const Link = ({ title, route, params, action, className }) => {
+  const onClick = (e) => {
+    if (action) {
+      e.preventDefault();
+      return action();
+    }
+    return redirectToRoute(route, params, e);
+  };
+  return <a href={action ? '#action' : generateUrl(route, params)} onClick={onClick} className={className}>{title}</a>;
+};
 
 const CostlockerLink = ({ title, path, className }) => <a href={`${appHost}${path}`} className={className}>{title}</a>
 
