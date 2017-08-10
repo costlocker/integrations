@@ -1,0 +1,14 @@
+.form-group {
+    margin-top: 2em;
+}
+
+.help-block.text-danger {
+    color: $brand-danger !important;
+}
+
+[data-unavailable] {
+    opacity: 0.6;
+    input {
+        pointer-events: none;
+    }
+}

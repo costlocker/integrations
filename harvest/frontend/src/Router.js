@@ -61,7 +61,7 @@ export const states = [
     url: '/step',
     redirectTo: 'wizard.1',
     component: () => <App
-      auth={appState.cursor(['auth']).deref().toJS()}
+      auth={appState.cursor(['auth']).deref()}
       steps={steps} />,
   },
   {
@@ -166,8 +166,10 @@ const hooks = [
         return isPrivateState && isNotLoggedIn();
       }
     },
-    callback: (transition: any) =>
-      transition.router.stateService.target('wizard', undefined, { location: true }),
+    callback: (transition) => {
+      transition.abort();
+      steps.redirectToRoute('wizard');
+    },
     priority: 10,
   },
   {
@@ -182,8 +184,10 @@ const hooks = [
         return false;
       }
     },
-    callback: (transition: any) =>
-      transition.router.stateService.target(`wizard.${steps.getCurrentStep()}`, undefined, { location: true }),
+    callback: (transition) => {
+      transition.abort();
+      steps.redirectToRoute(`wizard.${steps.getCurrentStep()}`);
+    },
     priority: 8,
   },
 ];

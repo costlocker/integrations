@@ -1,45 +1,51 @@
 import React from 'react';
-import { UIView } from 'ui-router-react';
-import { ExternalLink } from '../ui/Components';
+import { UIView } from '@uirouter/react';
+import { Logo } from './Images';
 
-const AnonymousUser = () => <em>Not logged in</em>;
-
-const HarvestUser = ({ user }) => {
-  if (!user) {
-    return <AnonymousUser />
-  }
+const User = ({ name, company }) => {
   return (
-    <span>
-      <strong>
-        {user.user_name}
-      </strong> ({user.company_name} <ExternalLink url={user.company_url} />)
-    </span>
+    <div className="user">
+      <strong>{name}</strong>
+      <small>{company}</small>
+    </div>
   );
 };
 
 const CostlockerUser = ({ user }) => {
-  if (!user) {
-    return <AnonymousUser />
+  if (user) {
+    return <User name={`${user.person.first_name} ${user.person.last_name}`} company={user.company.name} />;
+  } else {
+    return <User name="Login" company="Costlocker" />;
   }
-  return (
-    <span>
-      <strong>
-        {user.person.first_name} {user.person.last_name}
-      </strong> ({user.company.name})
-    </span>
-  );
 };
 
-const User = ({ auth }) => {
+const HarvestUser = ({ user }) => {
+  if (user) {
+    return <User name={user.user_name} company={user.company_name} />;
+  } else {
+    return <User name="Login" company="Harvest" />;
+  }
+};
+
+const Users = ({ auth }) => {
   return <div>
-    <span title="Costlocker user">
-      <CostlockerUser user={auth.costlocker} />
-    </span>
-    <span className="text-muted">&nbsp;/&nbsp;</span>
-    <span title="Basecamp user">
-      <HarvestUser user={auth.harvest} />
-    </span>
+    <Logo app="costlocker" color='white' />
+    <CostlockerUser user={auth.get('costlocker')} />
+    <Logo app="harvest" />
+    <HarvestUser user={auth.get('harvest')} />
   </div>;
+};
+
+const Navigation = ({ routes }) => {
+  return (
+    <ul className="nav navbar-nav">
+      {routes.map(({ title }) => (
+        <li key={title}>
+          <a onClick={() => null}>{title}</a>
+        </li>
+      ))}
+    </ul>
+  );
 };
 
 export default function App({ auth, steps }) {
@@ -58,21 +64,17 @@ export default function App({ auth, steps }) {
     <div>
       <nav className="navbar navbar-default">
         <div className="container">
-          <div className="navbar-header">
-            <div className="navbar-brand">
-              <a href="/">
-                <img title="Costlocker" alt="Costlocker" src="https://cdn-images-1.medium.com/max/1200/1*BLdn5GGWwijxJkcr0I0rgg.png" />
-                &nbsp;+&nbsp;
-                <img title="Harvest" alt="Harvest" src="https://www.getharvest.com/assets/press/harvest-logo-icon-77a6f855102e2f85a7fbe070575f293346a643c371a49ceff341d2814e270468.png" />
-              </a>
-            </div>
+          <div>
+            <span className="navbar-text">Harvest &rarr; Costlocker</span>
           </div>
-          <div className="navbar-text navbar-right text-right">
-            <User auth={auth} />
+          <div className="navbar-right text-right">
+            <Navigation routes={[
+              { title:<Users auth={auth} /> },
+            ]} />
           </div>
         </div>
       </nav>
-      <nav className="nav-breadcrumbs">
+      <nav className="nav-breadcrumbs-wizard">
         <div className="container">
           <div className="row">
             <div className="col-sm-12">

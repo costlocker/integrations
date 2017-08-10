@@ -1,14 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { UIRouter, UIView, pushStateLocationPlugin } from 'ui-router-react';
-import { Visualizer } from 'ui-router-visualizer';
+import { UIRouter, UIView, pushStateLocationPlugin } from '@uirouter/react';
 
 import { isDevelopmentMode } from './config';
 import { appState } from './state';
 import { states, config } from './Router';
 import './ui/index.css'
 
-export const plugins = isDevelopmentMode ? [pushStateLocationPlugin, Visualizer] : [pushStateLocationPlugin];
+export const plugins = [pushStateLocationPlugin];
 
 const render = () =>
   ReactDOM.render(
