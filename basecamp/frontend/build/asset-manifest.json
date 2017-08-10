@@ -1,6 +1,11 @@
 {
-  "main.css": "static/css/main.b77e2805.css",
-  "main.css.map": "static/css/main.b77e2805.css.map",
-  "main.js": "static/js/main.59228cc6.js",
-  "main.js.map": "static/js/main.59228cc6.js.map"
+  "main.css": "static/css/main.b0d708ee.css",
+  "main.css.map": "static/css/main.b0d708ee.css.map",
+  "main.js": "static/js/main.93e2bd94.js",
+  "main.js.map": "static/js/main.93e2bd94.js.map",
+  "static/media/basecamp.png": "static/media/basecamp.cccf47b4.png",
+  "static/media/basecamp@2x.png": "static/media/basecamp@2x.cccf47b4.png",
+  "static/media/costlocker-blue.png": "static/media/costlocker-blue.c302d074.png",
+  "static/media/costlocker-blue@2x.png": "static/media/costlocker-blue@2x.c302d074.png",
+  "static/media/enabled-addon.png": "static/media/enabled-addon.f985277d.png"
 }
