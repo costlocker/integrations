@@ -1,6 +1,10 @@
 {
-  "main.css": "static/css/main.21e306d2.css",
-  "main.css.map": "static/css/main.21e306d2.css.map",
-  "main.js": "static/js/main.b407e93f.js",
-  "main.js.map": "static/js/main.b407e93f.js.map"
+  "main.css": "static/css/main.a18ef6ae.css",
+  "main.css.map": "static/css/main.a18ef6ae.css.map",
+  "main.js": "static/js/main.396fc77f.js",
+  "main.js.map": "static/js/main.396fc77f.js.map",
+  "static/media/costlocker-blue.png": "static/media/costlocker-blue.c302d074.png",
+  "static/media/costlocker-blue@2x.png": "static/media/costlocker-blue@2x.c302d074.png",
+  "static/media/harvest.png": "static/media/harvest.9d5120d3.png",
+  "static/media/harvest@2x.png": "static/media/harvest@2x.9d5120d3.png"
 }
