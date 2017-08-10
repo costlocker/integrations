@@ -37,7 +37,11 @@ class GetProjects
                 ];
             }
         } else {
-            return [];
+            return [
+                'isAvailable' => false,
+                'projects' => [],
+                'companies' => [],
+            ];
         }
     }
 }

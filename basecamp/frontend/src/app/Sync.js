@@ -6,12 +6,15 @@ const BasecampAccountSelect = ({ title, accounts, syncForm, isAccountNotAvailabl
   <div className="form-group">
     <label htmlFor="account">{title}</label><br />
     <RadioButtons
-      items={accounts.map(
-        personAccount => ({
-          id: personAccount.account.id,
-          title: `${personAccount.account.name} (${personAccount.account.identity.email_address})`
-        })
-      )}
+      items={accounts
+        .filter(account => account.isMyAccount)
+        .map(
+          personAccount => ({
+            id: personAccount.account.id,
+            title: `${personAccount.account.name} (${personAccount.account.identity.email_address})`
+          })
+        )
+      }
       isActive={type => syncForm.get('account') == type.id}
       onChange={syncForm.set('account')}
     />
