@@ -1,11 +1,12 @@
 import React from 'react';
 import Loading from '../ui/Loading';
-import { RadioButtons, Link } from '../ui/Components';
+import { RadioButtons, Link, Errors } from '../ui/Components';
+import { isNotLoggedInBasecamp } from '../state';
 
 const BasecampAccountSelect = ({ title, accounts, syncForm, isAccountNotAvailable }) => (
   <div className="form-group">
     <label htmlFor="account">{title}</label><br />
-    {accounts.length ? (
+    {accounts.length && !isNotLoggedInBasecamp() ? (
       <div>
         <RadioButtons
           items={accounts
@@ -86,14 +87,22 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
     ? basecamp.get('projects').filter(p => p.id == editedProject.basecamps[0].id)
     : basecamp.get('projects');
 
-  const isFormValid = selectedCostlockerProjects.size
-    && basecamp.get('isAccountAvailable')
-    && (isBasecampProjectCreated || selectedCostlockerProjects.size === 1)
-    && syncForm.get('account');
+  const errors =
+    [
+      { hasFailed: !selectedCostlockerProjects.size, error: 'Select at least one costlocker project' },
+      { hasFailed: isNotLoggedInBasecamp(), error: <Link route="accounts" title="Login to Basecamp" /> },
+      { hasFailed: !isNotLoggedInBasecamp() && !syncForm.get('account'), error: 'Select one Basecamp account' },
+      { hasFailed: !isNotLoggedInBasecamp() && !basecamp.get('isAccountAvailable'), error: 'Select valid Basecamp account, or reconnect selected account' },
+      { hasFailed: !isBasecampProjectCreated && selectedCostlockerProjects.size !== 1, error: 'Select one Basecamp project, if you still want to add project to an existing project' },
+    ]
+    .filter(validation => validation.hasFailed)
+    .map(validation => validation.error);
+
+  const isFormValid = errors.length === 0;
 
   return <div>
     <h1>{isExistingProjectEdited ? 'Refresh project' : 'Connect Costlocker project to Basecamp'}</h1>
-    <form className="form" onSubmit={syncForm.submit}>
+    <form className="form" onSubmit={isFormValid ? syncForm.submit : () => null}>
       {editedProject ? (
       <div>
         <ul>
@@ -291,7 +300,14 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
       {isFormValid ? (
         <button type="submit" className="btn btn-primary btn-block">Synchronize</button>
       ) : (
-        <span className="btn btn-primary btn-block disabled">Synchronize</span>
+        <div>
+          <Errors
+            title="Please fix following issues before synchronizing projects"
+            error={<ul>{errors.map(error => <li key={error}>{error}</li>)}</ul>}
+            errorClassName="warning"
+          />
+          <span className="btn btn-primary btn-block disabled">Synchronize</span>
+        </div>
       )}
     </form>
   </div>;

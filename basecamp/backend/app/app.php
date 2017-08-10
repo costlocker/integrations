@@ -241,7 +241,7 @@ $app
         $data = $strategy($r);
         return new JsonResponse($data);
     })
-    ->before($checkAuthorization('basecamp'));
+    ->before($checkAuthorization('costlocker'));
 
 $pushEvent = function ($event, array $data, Request $r) use ($app, $getWebhookUrl) {
     $app['events.pushSyncRequest']($event, $data, $getWebhookUrl($r));

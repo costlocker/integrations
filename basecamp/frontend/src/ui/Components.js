@@ -2,13 +2,15 @@ import React from 'react';
 import { redirectToRoute, generateUrl } from '../Router';
 import { appHost } from '../config';
 
-const Errors = ({ title, error }) => {
+const Errors = ({ title, error, errorClassName }) => {
   if (!error) {
     return null;
   }
-  const decodedUrlError = decodeURIComponent(error).replace(/%20/g, ' '); // hotfix for '%2520' spaces
+  const decodedUrlError = typeof(error) === 'string'
+    ? decodeURIComponent(error).replace(/%20/g, ' ') // hotfix for '%2520' spaces
+    : error;
   return (
-    <div className="alert alert-danger">
+    <div className={`alert alert-${errorClassName || 'danger'}`}>
       <strong>{title}</strong><br />
       {decodedUrlError}
     </div>
