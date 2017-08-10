@@ -73,6 +73,7 @@ class EventsToJson
             Event::DISCONNECT_PROJECT => 'Disconnect project',
             Event::REGISTER_COSTLOCKER_WEBHOOK => 'Enable costlocker webhook',
             Event::REGISTER_BASECAMP_WEBHOOK => 'Update basecamp webhook',
+            Event::IMPORT_PROJECT_FROM_COSTLOCKER => 'Import costlocker project',
         ];
         $basecampProject = null;
 
