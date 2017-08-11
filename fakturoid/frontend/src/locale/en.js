@@ -26,6 +26,7 @@ export default {
     token: 'API token',
     tokenHelp: 'Find your API token here',
     requiredCostlocker: 'At first you have to login to Costlocker',
+    apiAggreement: 'I aggree with access to Fakturoid API',
     loginCostlocker: 'Login to Costlocker',
     loginFakturoid: 'Login to Fakturoid',
     switchAccount: 'Switch account',

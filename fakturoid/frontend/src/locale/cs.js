@@ -26,6 +26,7 @@ export default {
     token: 'API token',
     tokenHelp: 'Přejít na stránku s tokenem',
     requiredCostlocker: 'Nejdříve se musíte přihlásit do Costlockeru',
+    apiAggreement: 'Souhlasím s přístupem k Fakturoid API',
     loginCostlocker: 'Přihlásit se do Costlockeru',
     loginFakturoid: 'Přihlásit se do Fakturoidu',
     switchAccount: 'Změnit účet',
