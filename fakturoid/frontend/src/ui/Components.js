@@ -59,18 +59,42 @@ const RadioButtons = ({ items, isActive, onChange, className }) =>
     ))}
   </div>;
 
-const fixMovingCursorInForm = (props) => {
-  if (props.hasOwnProperty('value')) {
-    const value = props.value;
-    return {
-      ...Object.assign({}, props, {value: undefined}),
-      defaultValue: value,
+class FormElementWithoutJumpingCursor extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isFocused: false,
+      currentValue: props.value,
     };
   }
-  return props;
+  handleChange = (e) => {
+    this.setState({ currentValue: e.target.value });
+    this.props.onChange(e);
+  }
+  handleFocus = (e) => {
+    this.setState({ isFocused: true });
+  }
+  handleBlur = (e) => {
+    this.setState({ isFocused: false });
+  }
+  componentWillReceiveProps(nextProps) {
+    if (!this.state.isFocused){
+      this.setState({ currentValue: nextProps.value });
+    }
+  }
+  render() {
+    const Element = this.props.type ? 'input' : 'textarea';
+    return <Element
+      {...this.props}
+      onChange={this.handleChange}
+      onFocus={this.handleFocus}
+      onBlur={this.handleBlur}
+      value={this.state.currentValue}
+    />;
+  }
 };
 
-const Input = (props) => <input {...fixMovingCursorInForm(props)} />;
-const Textarea = (props) => <textarea {...fixMovingCursorInForm(props)} />;
+const Input = (props) => props.onChange ? <FormElementWithoutJumpingCursor {...props} /> : <input {...props} />;
+const Textarea = (props) => <FormElementWithoutJumpingCursor {...props} />;
 
 export { Errors, ExternalLink, Button, Link, CostlockerLink, FakturoidLink, roundNumber, Number, RadioButtons, Input, Textarea };
