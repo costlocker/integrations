@@ -79,7 +79,8 @@ export default {
     outdatedSubjects: 'Can\'t see a specific client?',
     reloadSubjects: 'Try refreshing the list',
     issuedAt: 'Issued at',
-    due: 'Due',
+    due: 'Due (days count)',
+    dueDay: 'it will be',
     orderNumber: 'Order Number',
     noteBeforeLines: 'Note before invoice lines',
     note: {

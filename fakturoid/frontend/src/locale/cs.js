@@ -79,7 +79,8 @@ export default {
     outdatedSubjects: 'Nevidíte nějaký kontakt?',
     reloadSubjects: 'Zkuste obnovit seznam kontaktů',
     issuedAt: 'Datum vystavení',
-    due: 'Splatnost',
+    due: 'Splatnost (počet dnů)',
+    dueDay: 'vychází na',
     orderNumber: 'Číslo objednávky',
     noteBeforeLines: 'Poznámka před položkami faktury',
     note: {

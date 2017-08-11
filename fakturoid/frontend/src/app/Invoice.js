@@ -248,19 +248,22 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
           />
         </div>
       </div>
-      <div className="col-sm-3">
+      <div className="col-sm-5">
         <div className="form-group">
           <label htmlFor="due">{trans('editor.due')}</label>
-          <Input
-            className="form-control" type="number" id="due" min="1" max="100" step="1"
-            value={form.get('due')} onChange={form.set('due')}
-          />
-        </div>
-      </div>
-      <div className="col-sm-3">
-        <div className="form-group">
-          <label>&nbsp;</label><br />
-          <span className="btn btn-link" disabled>{dueDate.format(`dddd, ${dateFormat}`)}</span>
+          <div className="input-group">
+            <Input
+              className="form-control" type="number" id="due" min="1" max="100" step="1"
+              value={form.get('due')} onChange={form.set('due')}
+            />
+            <span className="input-group-btn">
+              <span className="btn btn-link" disabled>
+                <span className="text-muted">
+                  {trans('editor.dueDay')} {dueDate.format(`dddd, ${dateFormat}`)}
+                </span>
+              </span>
+            </span>
+          </div>
         </div>
       </div>
     </div>
