@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {  trans } from '../i18n';
-import { Errors, ExternalLink, FakturoidLink } from '../ui/Components';
+import { Errors, ExternalLink, FakturoidLink, Input } from '../ui/Components';
 import { ImageTooltip } from '../ui/Images';
 import slug from '../images/slug.png';
 import token from '../images/token.png';
@@ -31,21 +31,21 @@ export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturo
             <form action={loginUrls.fakturoid} method="POST">
               <div className="form-group">
                 <label htmlFor="email">{trans('login.email')}</label>
-                <input type="email" className="form-control" id="email" name="email" placeholder="john@example.com"
+                <Input type="email" className="form-control" id="email" name="email" placeholder="john@example.com"
                   defaultValue={fakturoidAuth ? fakturoidAuth.person.email : null} />
               </div>
               <div className="form-group">
                 <label htmlFor="token">
                   {trans('login.slug')} <ImageTooltip url={slug} />
                 </label>
-                <input type="text" className="form-control" id="slug" name="slug" placeholder="slug"
+                <Input type="text" className="form-control" id="slug" name="slug" placeholder="slug"
                   value={form.get('slug')} onChange={form.set('slug')} />
               </div>
               <div className="form-group">
                 <label htmlFor="token">
                   {trans('login.token')} <ImageTooltip url={token} />
                 </label>
-                <input type="text" className="form-control" id="token" name="token" />
+                <Input type="text" className="form-control" id="token" name="token" />
                 <p className="help-block">
                   <FakturoidLink path="/user" title={trans('login.tokenHelp')} />
                 </p>

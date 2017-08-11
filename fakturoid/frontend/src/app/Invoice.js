@@ -3,7 +3,7 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import { Button, Link, Errors, roundNumber, Number, ExternalLink, FakturoidLink, CostlockerLink, RadioButtons } from '../ui/Components';
+import { Button, Link, Errors, roundNumber, Number, ExternalLink, FakturoidLink, CostlockerLink, RadioButtons, Input, Textarea } from '../ui/Components';
 import { Image, Logo } from '../ui/Images';
 import { PageWithSubnav } from '../ui/App';
 import { isDevelopmentMode } from '../config';
@@ -251,7 +251,7 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
       <div className="col-sm-3">
         <div className="form-group">
           <label htmlFor="due">{trans('editor.due')}</label>
-          <input
+          <Input
             className="form-control" type="number" id="due" min="1" max="100" step="1"
             value={form.get('due')} onChange={form.set('due')}
           />
@@ -269,18 +269,17 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
         <div className="well">
           <div className="form-group">
             <label htmlFor="orderNumber">{trans('editor.orderNumber')}</label>
-            <input
+            <Input
               type="text" className="form-control" name="orderNumber" id="orderNumber"
               value={form.get('orderNumber')} onChange={form.set('orderNumber')}
             />
           </div>
           <div className="form-group">
             <label htmlFor="noteBeforeLines">{trans('editor.noteBeforeLines')}</label>
-            <textarea
+            <Textarea
               className="form-control" name="noteBeforeLines" id="noteBeforeLines" rows="4"
               value={form.get('noteBeforeLines')} onChange={form.set('noteBeforeLines')}
-            >
-            </textarea>
+            />
           </div>
         </div>
         {advancedSettingsLink('up')}
@@ -359,39 +358,39 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
               />
             </div>
             <div className="col-sm-1 first">
-              <input
+              <Input
                 className="form-control text-right" type="number" step="any" required
                 value={line.get('quantity')} onChange={lines.updateFieldInLine('quantity', line)}
               />
             </div>
             <div className="col-sm-1">
-              <input
+              <Input
                 className="form-control" type="text"
                 value={line.get('unit')} onChange={lines.updateFieldInLine('unit', line)}
               />
             </div>
             <div className={lines.hasVat ? "col-sm-5" : "col-sm-6"}>
-              <input
+              <Input
                 className="form-control" type="text" required
                 value={line.get('name')} onChange={lines.updateFieldInLine('name', line)}
               />
             </div>
             {lines.hasVat ? (
               <div className="col-sm-1">
-                <input
+                <Input
                   className="form-control" type="text"
                   value={line.get('vat')} onChange={lines.updateFieldInLine('vat', line)}
                 />
               </div>
             ) : null}
             <div className="col-sm-2 text-right">
-              <input
+              <Input
                 className={cssPrice} type="text" step="any" required
                 value={roundNumber(line.get('unit_amount'))} onChange={lines.updateFieldInLine('unit_amount', line)}
               />
             </div>
             <div className="col-sm-2 text-right">
-              <input
+              <Input
                 className={cssPrice} type="number" step="any" required
                 disabled value={roundNumber(line.get('total_amount'))}
               />
@@ -471,12 +470,11 @@ const InvoiceEditor = ({ fakturoidSubjects, costlocker, form, lines, reloadSubje
     </div>
     <div className="form-group">
       <label htmlFor="note">{trans('editor.note.title')}</label>
-      <textarea
+      <Textarea
         className="form-control" name="note" id="note" rows="4"
         placeholder={trans('editor.note.placeholder')}
         value={form.get('note')} onChange={form.set('note')}
-      >
-      </textarea>
+      />
     </div>
   </form>;
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import moment from 'moment';
-import { ExternalLink, roundNumber, RadioButtons } from '../ui/Components';
+import { ExternalLink, roundNumber, RadioButtons, Input } from '../ui/Components';
 import { Logo } from '../ui/Images';
 import { trans } from '../i18n';
 
@@ -22,7 +22,7 @@ export default function InvoicesList({ invoices, subjects, dateFormat, form, isL
         <div className="form-group">
           <div className="input-group">
             <span className="input-group-addon" id="basic-addon1"><i className="fa fa-search" /></span>
-            <input
+            <Input
               type="text" className="form-control" placeholder={trans('search.query')} id="query"
               value={form.get('query')} onChange={form.set('query')}
             />

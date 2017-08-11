@@ -59,4 +59,7 @@ const RadioButtons = ({ items, isActive, onChange, className }) =>
     ))}
   </div>;
 
-export { Errors, ExternalLink, Button, Link, CostlockerLink, FakturoidLink, roundNumber, Number, RadioButtons };
+const Input = (props) => <input {...props} />;
+const Textarea = (props) => <textarea {...props} />;
+
+export { Errors, ExternalLink, Button, Link, CostlockerLink, FakturoidLink, roundNumber, Number, RadioButtons, Input, Textarea };
