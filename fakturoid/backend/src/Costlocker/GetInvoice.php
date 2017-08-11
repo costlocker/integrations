@@ -173,6 +173,7 @@ class GetInvoice
         if (!$billing) {
             return 0;
         }
-        return $billing['billing']['total_amount'] + floor($metrics['revenue'] - $metrics['billing']);
+        $billedAmount = $billing['item']['billing_id'] ? $billing['billing']['total_amount'] : 0;
+        return $billedAmount + floor($metrics['revenue'] - $metrics['billing']);
     }
 }
