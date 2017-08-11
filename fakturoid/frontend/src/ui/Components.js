@@ -59,7 +59,18 @@ const RadioButtons = ({ items, isActive, onChange, className }) =>
     ))}
   </div>;
 
-const Input = (props) => <input {...props} />;
-const Textarea = (props) => <textarea {...props} />;
+const fixMovingCursorInForm = (props) => {
+  if (props.hasOwnProperty('value')) {
+    const value = props.value;
+    return {
+      ...Object.assign({}, props, {value: undefined}),
+      defaultValue: value,
+    };
+  }
+  return props;
+};
+
+const Input = (props) => <input {...fixMovingCursorInForm(props)} />;
+const Textarea = (props) => <textarea {...fixMovingCursorInForm(props)} />;
 
 export { Errors, ExternalLink, Button, Link, CostlockerLink, FakturoidLink, roundNumber, Number, RadioButtons, Input, Textarea };
