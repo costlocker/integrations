@@ -12,3 +12,11 @@
         }
     }
 }
+
+.modal-open {
+    .input-group {
+        .form-control, .input-group-btn {
+            z-index: 0;
+        }
+    }
+}
