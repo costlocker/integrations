@@ -56,12 +56,22 @@
     background: $breadcrumb-bg;
     margin-bottom: 1em;
     .breadcrumb {
-        margin: 1ex 0;
+        margin: 0;
+        padding: 0;
         li {
-            padding-left: 0.5ex;
+            padding: 1em 0;
+            margin: 0;
+            &.active {
+                font-weight: bold;
+                border-bottom: 3px solid $blue;
+                color: $brand-primary;
+            }
+            &.wizard-step {
+                padding: 1em 1ex;
+            }
         }
         li:before {
-            font-family: 'FontAwesome';
+            padding: 0;
         }
     }
 }

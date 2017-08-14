@@ -55,9 +55,12 @@ export default function App({ auth, steps }) {
     if (steps.isInvalidStep(i)) {
       stepsItems.push(<li key={i} className="text-muted">{title}</li>);
     } else if (i === steps.getCurrentStep()) {
-      stepsItems.push(<li key={i} className="text-primary"><strong>{title}</strong></li>);
+      stepsItems.push(<li key={i} className="active"><strong>{title}</strong></li>);
     } else {
       stepsItems.push(<li key={i}><a href="" onClick={(e) => steps.goToStep(i, e)}>{title}</a></li>);
+    }
+    if (i < steps.titles.length) {
+      stepsItems.push(<li key={`separator-${i}`} className="wizard-step text-muted"><span className="fa fa-angle-right" /></li>)
     }
   });
   return (
@@ -65,7 +68,11 @@ export default function App({ auth, steps }) {
       <nav className="navbar navbar-default">
         <div className="container">
           <div>
-            <span className="navbar-text">Harvest &rarr; Costlocker</span>
+            <ul className="nav navbar-nav">
+              <li className="active">
+                <a onClick={() => null}>Import project</a>
+              </li>
+            </ul>
           </div>
           <div className="navbar-right text-right">
             <Navigation routes={[
