@@ -1,14 +1,23 @@
 version: "2"
 
 services:
-    application:
-        container_name: harvest-costlocker
+    web:
+        container_name: harvest-costlocker-web
         build:
-            context: .
-            dockerfile: ./.docker/Dockerfile
-        # env variables aren't accessible in APACHE/nginx, use backend/.env for cofiguration
+             context: .
+             dockerfile: ./.docker/Dockerfile.nginx
+        working_dir: /app/frontend/build
         ports:
             - "19998:80"
+        links:
+            - fpm
+
+    fpm:
+        container_name: harvest-costlocker-fpm
+        build:
+             context: .
+             dockerfile: ./.docker/Dockerfile.fpm
+        working_dir: /app/backend
         volumes:
             - "./backend/var/sessions:/app/backend/var/sessions"
             - "./backend/var/database:/app/backend/var/database"

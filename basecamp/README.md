@@ -31,20 +31,6 @@ yarn watch-css
 yarn start
 ```
 
-### Apache VirtualHost example
-
-```bash
-# /etc/hosts
-127.0.0.1 basecamp.integrations-costlocker.dev
-
-# /etc/apache2/extra/httpd-vhosts.conf
-<VirtualHost *:80>
-  ServerName basecamp.integrations-costlocker.dev
-  DocumentRoot "/path-to/basecamp/web"
-  RewriteEngine On
-</VirtualHost>
-```
-
 ### Docker
 
 ```bash
@@ -91,4 +77,25 @@ server {
     proxy_cache_bypass $http_upgrade;
   }
 }
+```
+
+### Apache VirtualHost example
+
+Nginx is recommended. Following configuration does not rewrite html requests,
+Only homepage works, not http://basecamp.integrations-costlocker.dev/login).
+
+You would have to use extra web directory with symlinks and `.htaccess`.
+Take a look into [history](https://github.com/costlocker/integrations), if you are interested.
+
+```bash
+# /etc/hosts
+127.0.0.1 basecamp.integrations-costlocker.dev
+
+# /etc/apache2/extra/httpd-vhosts.conf
+<VirtualHost *:80>
+  ServerName harvest.integrations-costlocker.dev
+  DocumentRoot "/path-to/basecamp/frontend/build"
+  RewriteEngine On
+  Alias /api  "/path-to/basecamp/backend/web"
+</VirtualHost>
 ```

@@ -20,14 +20,14 @@ Write your own integrations and let us know about it!
 
 ## Development
 
-### Basecamp, Fakturoid, Harvest
+### Basecamp, Fakturoid, Harvest, Webhooks
 
 Addons have similar structure:
 
 * **backend** - [silex](https://silex.symfony.com/) for api, [doctrine/migrations](https://github.com/doctrine/migrations) for managing Postgres database, [league/oauth2-client](http://oauth2-client.thephpleague.com/), sessions and logs saved in `backend/var/` ([sentry](https://sentry.io/) is supported for logging)
 * **frontend** - [create-react-app](https://github.com/facebookincubator/create-react-app) for app, [ui-router](https://ui-router.github.io/react/) for routing, [immstruct](https://github.com/omniscientjs/immstruct) for state management, [custom bootstrap theme](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md#using-a-custom-theme)
 * **configuration** - in `.env` files
-* **webserver** - [nginx (+php-fpm)](/fakturoid/.docker/nginx.conf), or Apache (backend and frontend is symlinked in directory [`web/`](/harvest/web))
+* **webserver** - [nginx (+php-fpm)](/fakturoid/.docker/nginx.conf)
 
 ### Docker
 

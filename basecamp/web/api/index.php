@@ -1,1 +1,0 @@
-../../backend/web/index.php
