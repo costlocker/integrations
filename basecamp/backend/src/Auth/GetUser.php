@@ -30,11 +30,11 @@ class GetUser
         return new JsonResponse([
             'isAddonDisabled' => $isAddonDisabled,
             'costlocker' => $clUser->data,
-            'basecamp' => $bcUser->data,
+            'basecamp' => $clUser->id ? $bcUser->data : null,
             'csrfToken' => $this->session->get('csrfToken'),
             'settings' => [
                 'sync' => $clUser->costlockerCompany ? $clUser->costlockerCompany->getSettings() : null,
-                'myAccount' => $bcUser->id,
+                'myAccount' => $clUser->id ? $bcUser->id : null,
                 'accounts' => $this->getConnectedUsersAndAccounts($clUser),
             ],
         ]);
