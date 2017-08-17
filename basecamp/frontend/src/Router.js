@@ -83,7 +83,7 @@ const disconnectBasecamp = (params, onSuccess) => {
 appState.on('next-animation-frame', function (newStructure, oldStructure, keyPath) {
   const oldId = oldStructure.getIn(['sync', 'account']);
   const accountId = newStructure.getIn(['sync', 'account']);
-  if (oldId !== accountId && accountId) {
+  if (oldId !== accountId && accountId && !isNotLoggedInCostlocker()) {
     fetchFromApi(`/basecamp?account=${accountId}`)
       .catch(setError)
       .then(data => appState.cursor(['basecamp']).update(
