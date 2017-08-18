@@ -7,8 +7,6 @@ use Costlocker\Integrations\Entities\Event;
 
 class CostlockerProjectToBasecampTest extends GivenSynchronizer
 {
-    protected $eventType = Event::MANUAL_SYNC;
-
     public function setUp()
     {
         parent::setUp();
@@ -26,7 +24,7 @@ class CostlockerProjectToBasecampTest extends GivenSynchronizer
             'mode' => 'add',
             'basecampProject' => $updatedBasecampProject,
         ];
-        $this->givenCostlockerProject('one-person.json');
+        $this->givenCostlockerProjectSync('one-person.json');
         $this->shouldCreateProject()
             ->times($updatedBasecampProject ? 0 : 1)
             ->with('ACME | Website', null, null)
@@ -88,7 +86,7 @@ class CostlockerProjectToBasecampTest extends GivenSynchronizer
         $basecampId = 'irrelevant project';
         $this->request['areTodosEnabled'] = false;
         $this->request['costlockerProject'] = ['first id'];
-        $this->givenCostlockerProject('one-person.json');
+        $this->givenCostlockerProjectSync('one-person.json');
         $this->shouldCreateProject()->once()->andReturn($basecampId);
         $this->shouldNotCreatePeopleOrTodosInBasecamp();
         $this->synchronize();
@@ -115,7 +113,7 @@ class CostlockerProjectToBasecampTest extends GivenSynchronizer
                 ],
             ]
         );
-        $this->givenCostlockerProject('one-person.json');
+        $this->givenCostlockerProjectSync('one-person.json');
         $this->shouldLoadBasecampPeople(
             [
                 'John Doe (john@example.com)' => 'john@example.com',
@@ -190,7 +188,7 @@ class CostlockerProjectToBasecampTest extends GivenSynchronizer
             'isDeletingTodosEnabled' => true,
             'isRevokeAccessEnabled' => true,
         ];
-        $this->givenCostlockerProject('one-person.json');
+        $this->givenCostlockerProjectSync('one-person.json');
         $this->shouldLoadBasecampPeople(
             [
                 'John Doe (john@example.com)' => 'john@example.com',
@@ -266,7 +264,7 @@ class CostlockerProjectToBasecampTest extends GivenSynchronizer
             'isDeletingTodosEnabled' => true,
             'isRevokeAccessEnabled' => true,
         ];
-        $this->givenCostlockerProject('empty-project.json');
+        $this->givenCostlockerProjectSync('empty-project.json');
         $this->shouldLoadBasecampPeople(
             [
                 'John Doe (john@example.com)' => 'john@example.com',
@@ -290,7 +288,7 @@ class CostlockerProjectToBasecampTest extends GivenSynchronizer
     public function testProjectDeletedInBasecampIsNotDeletedInDatabase()
     {
         $this->whenProjectIsMapped('id of deleted project in basecamp');
-        $this->givenCostlockerProject('empty-project.json');
+        $this->givenCostlockerProjectSync('empty-project.json');
         $this->whenProjectExistsInBasecamp()->andThrow(BasecampAccessException::class);
         $this->synchronize(Event::RESULT_FAILURE);
         $this->assertMappingIsNotEmpty();

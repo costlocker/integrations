@@ -32,6 +32,18 @@ abstract class GivenSynchronizer extends \PHPUnit_Framework_TestCase
         $this->eventsLogger = m::mock(EventsLogger::class);
     }
 
+    protected function givenCostlockerWebhookSync($file)
+    {
+        $this->eventType = Event::WEBHOOK_SYNC;
+        $this->givenWebhook($file, []);
+    }
+
+    protected function givenCostlockerProjectSync($file)
+    {
+        $this->eventType = Event::MANUAL_SYNC;
+        $this->givenCostlockerProject($file);
+    }
+
     protected function givenCostlockerProject($file)
     {
         $json = file_get_contents(__DIR__ . "/fixtures/{$file}");
@@ -221,12 +233,16 @@ abstract class GivenSynchronizer extends \PHPUnit_Framework_TestCase
         assertThat($project, anInstanceOf(\Costlocker\Integrations\Entities\BasecampProject::class));
     }
 
-    protected function assertMappingIs(array $expectedMapping)
+    protected function assertMappingIs($expectedMapping)
     {
         $project = $this->database->findByCostlockerId(1);
-        assertThat($project->basecampProject, is($expectedMapping['id']));
-        $this->assertEquals($expectedMapping['activities'], $project->mapping); // prettier diff on failure
-        assertThat($project->mapping, is($expectedMapping['activities']));
+        if (is_array($expectedMapping)) {
+            assertThat($project->basecampProject, is($expectedMapping['id']));
+            $this->assertEquals($expectedMapping['activities'], $project->mapping); // prettier diff on failure
+            assertThat($project->mapping, is($expectedMapping['activities']));
+        } else {
+            $expectedMapping($project->mapping);
+        }
     }
 
     public function tearDown()

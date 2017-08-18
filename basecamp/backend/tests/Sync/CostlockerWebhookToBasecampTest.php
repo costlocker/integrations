@@ -9,11 +9,9 @@ use Costlocker\Integrations\Entities\CostlockerCompany;
 
 class CostlockerWebhookToBasecampTest extends GivenSynchronizer
 {
-    protected $eventType = Event::WEBHOOK_SYNC;
-
     public function testIgnoreUnmappedProject()
     {
-        $this->givenCostlockerWebhook('create-activity-and-persons.json');
+        $this->givenCostlockerWebhookSync('create-activity-and-persons.json');
         $this->shouldNotCreatePeopleOrTodosInBasecamp();
         $this->synchronize(Event::RESULT_FAILURE);
     }
@@ -21,7 +19,7 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
     public function testConvertNewActivityAndTaskToTodolistsAndTodos()
     {
         $basecampId = 'irrelevant project';
-        $this->givenCostlockerWebhook('create-activity-and-persons.json');
+        $this->givenCostlockerWebhookSync('create-activity-and-persons.json');
         $this->whenProjectIsMapped($basecampId);
         $this->shouldLoadBasecampPeople(
             [
@@ -71,7 +69,7 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
     {
         $basecampId = 'irrelevant project';
         $this->request['areTodosEnabled'] = false;
-        $this->givenCostlockerWebhook('create-activity-and-persons.json');
+        $this->givenCostlockerWebhookSync('create-activity-and-persons.json');
         $this->whenProjectIsMapped($basecampId, [], ['areTodosEnabled' => false]);
         $this->whenProjectExistsInBasecamp();
         $this->shouldNotCreatePeopleOrTodosInBasecamp();
@@ -82,7 +80,7 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
     public function testIgnoreUpdatedTaskOrActivity()
     {
         $basecampId = 'irrelevant project';
-        $this->givenCostlockerWebhook('update-person-and-tasks.json');
+        $this->givenCostlockerWebhookSync('update-person-and-tasks.json');
         $this->whenProjectIsMapped($basecampId, [
             1 => [
                 'id' => $basecampId,
@@ -137,7 +135,7 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
     public function testIgnoreChangeInTaskName()
     {
         $basecampId = 'irrelevant project';
-        $this->givenCostlockerWebhook('update-task-name.json');
+        $this->givenCostlockerWebhookSync('update-task-name.json');
         $originalMapping = [
             1 => [
                 'id' => $basecampId,
@@ -173,7 +171,7 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
     public function testDeleteTask()
     {
         $basecampId = 'irrelevant project';
-        $this->givenCostlockerWebhook('delete-task.json');
+        $this->givenCostlockerWebhookSync('delete-task.json');
         $this->whenProjectIsMapped($basecampId, [
             1 => [
                 'id' => $basecampId,
@@ -226,7 +224,7 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
     public function testDeleteActivity()
     {
         $basecampId = 'irrelevant project';
-        $this->givenCostlockerWebhook('delete-activity.json');
+        $this->givenCostlockerWebhookSync('delete-activity.json');
         $this->whenProjectIsMapped($basecampId, [
             1 => [
                 'id' => 'deleted todolist',
@@ -261,7 +259,7 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
 
     public function testIgnoreOtherEvents()
     {
-        $this->givenCostlockerWebhook('unmapped-webhook.json');
+        $this->givenCostlockerWebhookSync('unmapped-webhook.json');
         $this->shouldNotCreatePeopleOrTodosInBasecamp();
         $this->synchronize(null);
     }
@@ -269,7 +267,7 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
     public function testIgnoreWebhookThatIsMappedToNoCompany()
     {
         $this->database->company = null;
-        $this->givenCostlockerWebhook('delete-activity.json');
+        $this->givenCostlockerWebhookSync('delete-activity.json');
         $this->shouldNotCreatePeopleOrTodosInBasecamp();
         $this->shouldLogInvalidWebhook(Event::INVALID_COSTLOCKER_WEBHOOK_UNKNOWN_COMPANY);
         $this->synchronize(null);
@@ -280,7 +278,7 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
         $this->database->company->settings['isCreatingBasecampProjectEnabled'] = true;
         $this->database->company->settings['areTodosEnabled'] = false;
         $basecampId = 'irrelevant project';
-        $this->givenCostlockerWebhook('create-project.json');
+        $this->givenCostlockerWebhookSync('create-project.json');
         $this->givenCostlockerProject('one-person.json');
         $this->shouldCreateProject()->once()->andReturn($basecampId);
         $this->shouldNotCreatePeopleOrTodosInBasecamp();
@@ -307,7 +305,7 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
     {
         $this->database->company->settings['isCreatingBasecampProjectEnabled'] = true;
         $this->database->company = $loadCompany($this->database->company);
-        $this->givenCostlockerWebhook('create-project.json');
+        $this->givenCostlockerWebhookSync('create-project.json');
         $this->shouldCreateProject()->never();
         if (!$this->database->company) {
             $this->shouldLogInvalidWebhook(Event::INVALID_COSTLOCKER_WEBHOOK_UNKNOWN_COMPANY);
@@ -353,7 +351,7 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
     public function testIgnoreWehbhookWithInvalidSignature()
     {
         $this->hasWebhookValidSignature = false;
-        $this->givenCostlockerWebhook('update-person-and-tasks.json');
+        $this->givenCostlockerWebhookSync('update-person-and-tasks.json');
         $this->shouldNotCreatePeopleOrTodosInBasecamp();
         $this->shouldLogInvalidWebhook(Event::INVALID_COSTLOCKER_WEBHOOK_SIGNATURE);
         $this->synchronize(null);
@@ -362,10 +360,5 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
     private function shouldLogInvalidWebhook($expectedEvent)
     {
         $this->eventsLogger->shouldReceive('__invoke')->once()->with($expectedEvent, m::any());
-    }
-
-    protected function givenCostlockerWebhook($file)
-    {
-        parent::givenWebhook($file, []);
     }
 }
