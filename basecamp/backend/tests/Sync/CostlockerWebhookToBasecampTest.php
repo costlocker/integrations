@@ -271,6 +271,7 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
         $this->database->company = null;
         $this->givenCostlockerWebhook('delete-activity.json');
         $this->shouldNotCreatePeopleOrTodosInBasecamp();
+        $this->shouldLogInvalidWebhook(Event::INVALID_COSTLOCKER_WEBHOOK_UNKNOWN_COMPANY);
         $this->synchronize(null);
     }
 
@@ -308,6 +309,9 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
         $this->database->company = $loadCompany($this->database->company);
         $this->givenCostlockerWebhook('create-project.json');
         $this->shouldCreateProject()->never();
+        if (!$this->database->company) {
+            $this->shouldLogInvalidWebhook(Event::INVALID_COSTLOCKER_WEBHOOK_UNKNOWN_COMPANY);
+        }
         $this->synchronize(null);
     }
 
@@ -351,8 +355,13 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
         $this->hasWebhookValidSignature = false;
         $this->givenCostlockerWebhook('update-person-and-tasks.json');
         $this->shouldNotCreatePeopleOrTodosInBasecamp();
-        $this->eventsLogger->shouldReceive('__invoke')->once()->with(Event::INVALID_COSTLOCKER_WEBHOOK, m::any());
+        $this->shouldLogInvalidWebhook(Event::INVALID_COSTLOCKER_WEBHOOK_SIGNATURE);
         $this->synchronize(null);
+    }
+
+    private function shouldLogInvalidWebhook($expectedEvent)
+    {
+        $this->eventsLogger->shouldReceive('__invoke')->once()->with($expectedEvent, m::any());
     }
 
     protected function givenCostlockerWebhook($file)

@@ -71,11 +71,19 @@ class ProcessApiWebhook
     private function processCostlockerWebhooks(array $webhook, array $json)
     {
         if (!$this->webhookVerifier->__invoke($webhook['rawBody'], $webhook['headers'])) {
-            $this->eventsLogger->__invoke(Event::INVALID_COSTLOCKER_WEBHOOK, $webhook);
+            $this->eventsLogger->__invoke(Event::INVALID_COSTLOCKER_WEBHOOK_SIGNATURE, $webhook);
             return [];
         }
 
-        $requests = $this->processCostlockerWebhook($json);
+        $webhookUrl = $json['links']['webhook']['webhook'] ?? '';
+        $company = $this->database->findCompanyByWebhook($webhookUrl);
+
+        if (!$company) {
+            $this->eventsLogger->__invoke(Event::INVALID_COSTLOCKER_WEBHOOK_UNKNOWN_COMPANY, $webhook);
+            return [];
+        }
+
+        $requests = $this->processCostlockerWebhook($company, $json);
         $results = [];
         foreach ($requests as $r) {
             $results[] = $this->synchronizer->__invoke($r);
@@ -83,17 +91,10 @@ class ProcessApiWebhook
         return $results;
     }
 
-    private function processCostlockerWebhook(array $json)
+    private function processCostlockerWebhook(CostlockerCompany $company, array $json)
     {
         $updatedProjects = [];
         $createdProjects = [];
-
-        $webhookUrl = $json['links']['webhook']['webhook'] ?? '';
-        $company = $this->database->findCompanyByWebhook($webhookUrl);
-
-        if (!$company) {
-            return [];
-        }
         
         foreach ($json['data'] as $event) {
             if ($event['event'] == 'peoplecosts.change') {
