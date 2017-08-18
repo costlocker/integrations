@@ -6,6 +6,7 @@ RUN apt-get update \
 RUN curl -sS https://getcomposer.org/installer | \
     php -- --install-dir=/usr/local/bin/ --filename=composer
 COPY ./backend/composer.json ./backend/composer.lock /app/backend/
+RUN (cd /app/backend && composer install --no-scripts --no-autoloader --no-dev)
 ADD ./backend /app/backend
 RUN (cd /app/backend && bin/init prod)
 WORKDIR /app/backend
