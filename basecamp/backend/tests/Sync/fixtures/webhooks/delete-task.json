@@ -18,25 +18,6 @@
                     "id": "1",
                     "items": [
                         {
-                            "action": "upsert",
-                            "item": {
-                                "type": "person",
-                                "activity_id": "1",
-                                "person_id": "1"
-                            },
-                            "hours": {
-                                "budget": 22
-                            },
-                            "activity": {
-                                "name": "Design"
-                            },
-                            "person": {
-                                "email": "john@example.com",
-                                "first_name": "John",
-                                "last_name": "Doe"
-                            }
-                        },
-                        {
                             "action": "delete",
                             "item": {
                                 "type": "task",

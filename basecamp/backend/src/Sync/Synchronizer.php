@@ -94,13 +94,14 @@ class Synchronizer
         $activities = [];
         foreach ($request->projectItems as $item) {
             $action = $item['action'] ?? 'upsert';
-            if (($item['item']['type'] == 'activity' || isset($item['activity']['name'])) &&
+            $isActivity = $item['item']['type'] == 'activity';
+            if (($isActivity || isset($item['activity']['name'])) &&
                 !array_key_exists($item['item']['activity_id'], $activities)
             ) {
                 $activities[$item['item']['activity_id']] = [
                     'id' => $item['item']['activity_id'],
                     'name' => $item['activity']['name'],
-                    'isDeleted' => $action == 'delete',
+                    'isDeleted' => $isActivity ? $action == 'delete' : false,
                     'upsert' => [
                         'tasks' => [],
                         'persons' => [],
@@ -231,8 +232,8 @@ class Synchronizer
             foreach ($activities as $activityId => $activity) {
                 foreach (['tasks', 'persons'] as $type) {
                     foreach (array_keys($activity['delete'][$type]) as $id) {
-                        $this->basecamp->deleteTodo($activityId, $type, $id);
-                        $changelog->deleteTask($activityId, $type, $id);
+                        $deleted = $this->basecamp->getDeletedTodos($activityId, $type, $id);
+                        $this->deleteTodos($activityId, $deleted, $changelog);
                     }
                 }
                 if ($activity['isDeleted']) {
@@ -252,6 +253,16 @@ class Synchronizer
                     $this->basecamp->revokeAccessToPerson($bcPerson);
                     $changelog->revokeAccess($email);
                 }
+            }
+        }
+    }
+
+    private function deleteTodos($activityId, array $deletedTodos, $changelog)
+    {
+        foreach ($deletedTodos as $type => $todos) {
+            foreach ($todos as $personOrTaskId => $bcTodoId) {
+                $this->basecamp->deleteTodo($activityId, $bcTodoId);
+                $changelog->deleteTask($activityId, $type, $personOrTaskId);
             }
         }
     }

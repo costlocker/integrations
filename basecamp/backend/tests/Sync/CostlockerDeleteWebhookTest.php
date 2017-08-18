@@ -42,7 +42,7 @@ class CostlockerDeleteWebhookTest extends GivenSynchronizer
         $this->givenCostlockerWebhookSync('delete-person.json');
         $this->whenProjectIsMapped($basecampId, [
             1 => [
-                'id' => 'deleted todolist',
+                'id' => $basecampId,
                 'tasks' => [
                     971 => [
                         'id' => 'first delete',
@@ -67,10 +67,21 @@ class CostlockerDeleteWebhookTest extends GivenSynchronizer
             ],
             $basecampId
         );
-        $this->givenBasecampTodolists(['deleted todolist' => ['first delete', 'second delete']]);
-        $this->shouldDeleteTodos(['deleted todolist' => ['first delete', 'second delete']]);
+        $this->givenBasecampTodolists([$basecampId => ['first delete', 'second delete']]);
+        $this->shouldDeleteTodos([['first delete', 'second delete']]);
         $this->synchronize();
-        $this->assertNoMappingInDatabase($basecampId);
+        $this->assertMappingIs(
+            [
+                'id' => $basecampId,
+                'activities' => [
+                    1 => [
+                        'id' => $basecampId,
+                        'tasks' => [],
+                        'persons' => [],
+                    ],
+                ],
+            ]
+        );
     }
 
     public function testDeleteTask()
@@ -99,8 +110,7 @@ class CostlockerDeleteWebhookTest extends GivenSynchronizer
         $this->shouldLoadBasecampPeople(
             [
                 'John Doe (john@example.com)' => 'john@example.com',
-            ],
-            $basecampId
+            ]
         );
         $this->givenBasecampTodolists([$basecampId => [$basecampId]]);
         $this->shouldDeleteTodos([[$basecampId]]);

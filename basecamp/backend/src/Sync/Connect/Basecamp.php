@@ -191,32 +191,42 @@ class Basecamp
         }
     }
 
-    public function deleteTodo($activityId, $type, $personOrTaskId)
+    public function getDeletedTodos($activityId, $type, $personOrTaskId)
     {
-        $bcTodolistId = $this->bcProject['activities'][$activityId]['id'];
-        $bcTodoIds = [];
-
         if ($type == 'tasks') {
-            $bcTodoIds[] = $this->bcProject['activities'][$activityId][$type][$personOrTaskId]['id'] ?? null;
+            return [
+                'tasks' => array_filter([
+                    $personOrTaskId =>
+                        $this->bcProject['activities'][$activityId][$type][$personOrTaskId]['id'] ?? null
+                ]),
+                'persons' => [],
+            ];
         } else {
-            $bcTodoIds = [];
-            foreach (['tasks', 'persons'] as $mappedType) {
-                foreach ($this->bcProject['activities'][$activityId][$mappedType] as $task) {
+            $tasks = [
+                'tasks' => [],
+                'persons' => [],
+            ];
+            foreach (array_keys($tasks) as $deletedType) {
+                foreach ($this->bcProject['activities'][$activityId][$deletedType] as $id => $task) {
                     if ($task['person_id'] == $personOrTaskId) {
-                        $bcTodoIds[] = $task['id'];
+                        $tasks[$deletedType][$id] = $task['id'];
                     }
                 }
             }
+            return $tasks;
         }
+    }
+
+    public function deleteTodo($activityId, $bcTodoId)
+    {
+        $bcTodolistId = $this->bcProject['activities'][$activityId]['id'];
 
         $this->getTodolists();
-        foreach ($bcTodoIds as $bcTodoId) {
-            if (isset($this->todolists[$bcTodolistId]) &&
-                array_key_exists($bcTodoId, $this->todolists[$bcTodolistId]->todoitems)
-            ) {
-                $this->client->deleteTodo($this->bcProject['id'], $bcTodoId);
-                unset($this->todolists[$bcTodolistId]->todoitems[$bcTodoId]);
-            }
+        if (isset($this->todolists[$bcTodolistId]) &&
+            array_key_exists($bcTodoId, $this->todolists[$bcTodolistId]->todoitems)
+        ) {
+            $this->client->deleteTodo($this->bcProject['id'], $bcTodoId);
+            unset($this->todolists[$bcTodolistId]->todoitems[$bcTodoId]);
         }
     }
 
