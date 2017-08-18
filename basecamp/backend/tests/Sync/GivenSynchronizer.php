@@ -225,6 +225,7 @@ abstract class GivenSynchronizer extends \PHPUnit_Framework_TestCase
     {
         $project = $this->database->findByCostlockerId(1);
         assertThat($project->basecampProject, is($expectedMapping['id']));
+        $this->assertEquals($expectedMapping['activities'], $project->mapping); // prettier diff on failure
         assertThat($project->mapping, is($expectedMapping['activities']));
     }
 

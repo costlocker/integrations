@@ -165,6 +165,21 @@ class Synchronizer
                     }
                 }
             }
+        } else {
+            foreach ($this->basecamp->getMappedActivities() as $activityId => $activity) {
+                $upsertedPersonsWithTasks = array_map(
+                    function (array $item) {
+                        return $item['person_id'];
+                    },
+                    $activities[$activityId]['upsert']['tasks'] ?? []
+                );
+                foreach ($activity['persons'] as $id => $mappedTodo) {
+                    if (!in_array($id, $upsertedPersonsWithTasks)) {
+                        continue;
+                    }
+                    $activities[$activityId]['delete']['persons'][$id] = $mappedTodo;
+                }
+            }
         }
 
         return [$persons, array_reverse($activities, true)];
