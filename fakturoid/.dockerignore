@@ -4,3 +4,4 @@ frontend/public/
 frontend/src/
 frontend/ui-kit/
 backend/tests/
+backend/vendor/
