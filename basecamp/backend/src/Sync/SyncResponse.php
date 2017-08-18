@@ -11,6 +11,8 @@ class SyncResponse
     /** @var \Costlocker\Integrations\Entities\BasecampProject */
     public $mappedProject;
     /** @var array */
+    public $oldMapping;
+    /** @var array */
     public $newMapping;
 
     /** @var SyncChangelog */
@@ -55,6 +57,10 @@ class SyncResponse
             'request' => get_object_vars($this->request),
             'basecamp' => $this->basecampChangelog->toArray(),
             'costlocker' => $this->costlockerChangelog->toArray(),
+            'mapping' => [
+                'old' => $this->oldMapping,
+                'new' => $this->newMapping,
+            ],
             'webhooks' => [
                 'error' => $this->webhookError,
             ],

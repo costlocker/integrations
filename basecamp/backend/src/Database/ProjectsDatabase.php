@@ -32,6 +32,7 @@ class ProjectsDatabase implements SyncDatabase
         }
         
         $basecampProject = $costlockerProject->upsertProject($result->basecampChangelog->projectId);
+        $result->oldMapping = $basecampProject->mapping;
         $basecampProject->mapping = $result->newMapping;
         if ($result->request->isCompleteProjectSynchronized) {
             $basecampProject->updateSettings($result->getSettings());
