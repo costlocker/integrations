@@ -36,6 +36,23 @@ class CostlockerDeleteWebhookTest extends GivenSynchronizer
         $this->assertNoMappingInDatabase($basecampId);
     }
 
+    public function testSkipAlreadyDeletedActivity()
+    {
+        $basecampId = 'irrelevant project';
+        $this->givenCostlockerWebhookSync('delete-activity.json');
+        $this->whenProjectIsMapped($basecampId, []);
+        $this->shouldLoadBasecampPeople(
+            [
+                'John Doe (john@example.com)' => 'john@example.com',
+                'Peter Nobody (peter@example.com)' => 'peter@example.com',
+            ],
+            $basecampId
+        );
+        $this->givenBasecampTodolists([]);
+        $this->synchronize();
+        $this->assertNoMappingInDatabase($basecampId);
+    }
+
     public function testDeletePerson()
     {
         $basecampId = 'irrelevant project';
