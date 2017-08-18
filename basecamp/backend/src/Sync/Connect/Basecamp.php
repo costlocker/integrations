@@ -194,29 +194,43 @@ class Basecamp
     public function getDeletedTodos($activityId, $type, $personOrTaskId)
     {
         if (!isset($this->bcProject['activities'][$activityId])) {
-            return [];
-        } elseif ($type == 'tasks') {
             return [
-                'tasks' => array_filter([
-                    $personOrTaskId =>
-                        $this->bcProject['activities'][$activityId][$type][$personOrTaskId]['id'] ?? null
-                ]),
-                'persons' => [],
-            ];
-        } else {
-            $tasks = [
+                'shouldAddPersonTask' => false,
                 'tasks' => [],
                 'persons' => [],
             ];
-            foreach (array_keys($tasks) as $deletedType) {
-                foreach ($this->bcProject['activities'][$activityId][$deletedType] as $id => $task) {
-                    if ($task['person_id'] == $personOrTaskId) {
-                        $tasks[$deletedType][$id] = $task['id'];
-                    }
+        }
+
+        if ($type == 'tasks') {
+            $deletedTask = $this->bcProject['activities'][$activityId][$type][$personOrTaskId];
+            $personalTasks = $this->findPersonalTasks($activityId, $deletedTask['person_id']);
+            return [
+                'shouldAddPersonTask' => count($personalTasks['tasks']) == 1,
+                'tasks' => [
+                    $personOrTaskId => $deletedTask['id']
+                ],
+                'persons' => [],
+            ];
+        } else {
+            return $this->findPersonalTasks($activityId, $personOrTaskId);
+        }
+    }
+
+    private function findPersonalTasks($activityId, $personId)
+    {
+        $tasks = [
+            'shouldAddPersonTask' => false,
+            'tasks' => [],
+            'persons' => [],
+        ];
+        foreach (['persons', 'tasks'] as $deletedType) {
+            foreach ($this->bcProject['activities'][$activityId][$deletedType] as $id => $task) {
+                if ($task['person_id'] == $personId) {
+                    $tasks[$deletedType][$id] = $task['id'];
                 }
             }
-            return $tasks;
         }
+        return $tasks;
     }
 
     public function deleteTodo($activityId, $bcTodoId)

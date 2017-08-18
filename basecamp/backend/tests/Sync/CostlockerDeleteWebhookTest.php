@@ -152,4 +152,54 @@ class CostlockerDeleteWebhookTest extends GivenSynchronizer
             ]
         );
     }
+
+    public function testCreatePersonTaskAfterDeletingLastTask()
+    {
+        $basecampId = 'irrelevant project';
+        $this->givenCostlockerWebhookSync('delete-task.json');
+        $this->whenProjectIsMapped($basecampId, [
+            1 => [
+                'id' => $basecampId,
+                'tasks' => [
+                    972 => [
+                        'id' => $basecampId,
+                        'person_id' => 1,
+                        'name' => 'Contact',
+                    ],
+                ],
+                'persons' => [
+                ],
+            ],
+        ]);
+        $this->shouldLoadBasecampPeople(
+            [
+                'John Doe (john@example.com)' => 'john@example.com',
+            ]
+        );
+        $this->givenBasecampTodolists([$basecampId => [$basecampId]]);
+        $this->shouldDeleteTodos([[$basecampId]]);
+        $this->shouldCreateTodo()
+            ->with($basecampId, $basecampId, 'Design', 1)
+            ->andReturn($basecampId);
+        $this->synchronize();
+        $this->assertMappingIs(
+            [
+                'id' => $basecampId,
+                'activities' => [
+                    1 => [
+                        'id' => $basecampId,
+                        'tasks' => [
+                        ],
+                        'persons' => [
+                            1 => [
+                                'id' => $basecampId,
+                                'person_id' => 1,
+                                'name' => 'Design',
+                            ],
+                        ],
+                    ],
+                ],
+            ]
+        );
+    }
 }

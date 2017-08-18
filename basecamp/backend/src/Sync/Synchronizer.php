@@ -231,9 +231,9 @@ class Synchronizer
         if ($request->settings->isDeletingTodosEnabled) {
             foreach ($activities as $activityId => $activity) {
                 foreach (['tasks', 'persons'] as $type) {
-                    foreach (array_keys($activity['delete'][$type]) as $id) {
+                    foreach ($activity['delete'][$type] as $id => $task) {
                         $deleted = $this->basecamp->getDeletedTodos($activityId, $type, $id);
-                        $this->deleteTodos($activityId, $deleted, $changelog);
+                        $this->deleteTodos($activityId, $deleted, $changelog, $activity, $task);
                     }
                 }
                 if ($activity['isDeleted']) {
@@ -257,13 +257,29 @@ class Synchronizer
         }
     }
 
-    private function deleteTodos($activityId, array $deletedTodos, $changelog)
+    private function deleteTodos($activityId, array $deletedTodos, $changelog, $activity, $task)
     {
-        foreach ($deletedTodos as $type => $todos) {
-            foreach ($todos as $personOrTaskId => $bcTodoId) {
+        foreach (['tasks', 'persons'] as $type) {
+            foreach ($deletedTodos[$type] as $personOrTaskId => $bcTodoId) {
                 $this->basecamp->deleteTodo($activityId, $bcTodoId);
                 $changelog->deleteTask($activityId, $type, $personOrTaskId);
             }
+        }
+
+        if ($deletedTodos['shouldAddPersonTask']) {
+            $todo = $this->basecamp->upsertTodo(
+                $this->basecamp->upsertTodolist($activity),
+                [
+                    'task_id' => null,
+                    'person_id' => $task['person_id'],
+                    'name' => $activity['name'],
+                    'email' => $task['email'],
+                ]
+            );
+            if (!$todo['isCreated']) {
+                return;
+            }
+            $changelog->addTask($activityId, 'persons', $task['person_id'], $todo);
         }
     }
 
