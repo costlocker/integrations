@@ -266,7 +266,7 @@ class Synchronizer
             }
         }
 
-        if ($deletedTodos['shouldAddPersonTask']) {
+        if ($deletedTodos['shouldAddPersonTask'] && !$activity['isDeleted']) {
             $todo = $this->basecamp->upsertTodo(
                 $this->basecamp->upsertTodolist($activity),
                 [
