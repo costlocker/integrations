@@ -236,11 +236,7 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
                         'person_id' => 1,
                         'name' => 'Development',
                     ],
-                    6 => [
-                        'id' => 'second delete',
-                        'person_id' => 6,
-                        'name' => 'Development',
-                    ],
+                    // second person was already deleted when last task was deleted in BC
                 ],
             ],
         ]);
@@ -251,8 +247,8 @@ class CostlockerWebhookToBasecampTest extends GivenSynchronizer
             ],
             $basecampId
         );
-        $this->givenBasecampTodolists(['deleted todolist' => ['first delete', 'second delete']]);
-        $this->shouldDeleteTodos(['deleted todolist' => ['first delete', 'second delete']]);
+        $this->givenBasecampTodolists(['deleted todolist' => ['first delete']]);
+        $this->shouldDeleteTodos(['deleted todolist' => ['first delete']]);
         $this->synchronize();
         $this->assertNoMappingInDatabase($basecampId);
     }

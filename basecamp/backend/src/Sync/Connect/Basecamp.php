@@ -194,7 +194,7 @@ class Basecamp
     public function deleteTodo($activityId, $type, $personOrTaskId)
     {
         $bcTodolistId = $this->bcProject['activities'][$activityId]['id'];
-        $bcTodoId = $this->bcProject['activities'][$activityId][$type][$personOrTaskId]['id'];
+        $bcTodoId = $this->bcProject['activities'][$activityId][$type][$personOrTaskId]['id'] ?? null;
 
         $this->getTodolists();
         if (isset($this->todolists[$bcTodolistId]) &&
