@@ -106,10 +106,20 @@ DQL;
     /** @return CostlockerCompany */
     public function findCompanyByWebhook($webhookUrl)
     {
-        if (!$webhookUrl) {
+        $parsedUrl = parse_url($webhookUrl ?: 'http://example.com/');
+        if (!$webhookUrl || is_bool(strpos($parsedUrl['host'], 'costlocker'))) {
             return null;
         }
-        return $this->entityManager->getRepository(CostlockerCompany::class)
-            ->findOneBy(['urlWebhook' => $webhookUrl]);
+        $dql =<<<DQL
+            SELECT c
+            FROM Costlocker\Integrations\Entities\CostlockerCompany c
+            WHERE c.urlWebhook LIKE :path AND c.urlWebhook LIKE :scheme
+DQL;
+        $params = [
+            'scheme' => "{$parsedUrl['scheme']}%",
+            'path' => "%{$parsedUrl['path']}",
+        ];
+        $entities =  $this->entityManager->createQuery($dql)->execute($params);
+        return array_shift($entities);
     }
 }
