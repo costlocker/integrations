@@ -95,7 +95,7 @@ DQL;
             $filter = 'pc.id = :id';
             $filterParams = ['id' => $costlockerProjectId];
         } else {
-            $filter = 'e.event <> :ignoredEvent';
+            $filter = 'e.event <> :ignoredEvent AND p.deletedAt IS NULL';
             $filterParams = ['ignoredEvent' => Event::WEBHOOK_BASECAMP];
         }
         $dql =<<<DQL
