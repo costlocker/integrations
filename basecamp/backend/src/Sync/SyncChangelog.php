@@ -124,6 +124,9 @@ class SyncChangelog
                 'createdCount' => 0,
                 'deletedCount' => 0,
             ],
+            'people' => [
+                'revokedCount' => count($results['delete']['revoked']),
+            ],
         ];
         foreach ($results['activities'] ?? [] as $activity) {
             $stats['activities']['createdCount'] += (bool) ($activity['isCreated'] ?? false);
@@ -144,7 +147,8 @@ class SyncChangelog
             $stats['activities']['createdCount'] +
             $stats['activities']['deletedCount'] +
             $stats['tasks']['createdCount'] +
-            $stats['tasks']['deletedCount'];
+            $stats['tasks']['deletedCount'] +
+            $stats['people']['revokedCount'];
 
         return $totalCounts ? $stats : null;
     }

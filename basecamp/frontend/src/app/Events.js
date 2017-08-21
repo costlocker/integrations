@@ -57,6 +57,7 @@ export default function Events({ events, refresh }) {
                 <th colSpan="2">Project</th>
                 <th colSpan="2">Todolists/activities</th>
                 <th colSpan="2">Todos/tasks</th>
+                <th>People</th>
               </tr>
               <tr>
                 <th>System</th>
@@ -65,6 +66,7 @@ export default function Events({ events, refresh }) {
                 <th>Deleted</th>
                 <th>Created</th>
                 <th>Deleted</th>
+                <th>Revoked</th>
               </tr>
             </thead>
             <tbody>
@@ -77,6 +79,7 @@ export default function Events({ events, refresh }) {
                   <td>{changelog.activities.deletedCount}</td>
                   <td>{changelog.tasks.createdCount}</td>
                   <td>{changelog.tasks.deletedCount}</td>
+                  <td>{changelog.people.revokedCount}</td>
                 </tr>
               })}
             </tbody>
