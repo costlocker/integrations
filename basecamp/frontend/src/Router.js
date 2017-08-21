@@ -229,18 +229,21 @@ export const states = [
     data: {
       title: params => params.clProject ? 'Project events' : 'Events',
     },
-    component: (props) => <Events
-      events={appState.cursor(['events']).deref()}
-      refresh={() => loadEvents(
+    component: (props) => {
+      const loadEventsAndResetProjects = () => loadEvents(
         props.transition.params().clProject,
         app => app.setIn(['costlocker', 'projects'], null) // reset projects so new projects are detected
-      )}
-      undo={(link) => () => {
-        pushToApi(link, {})
-          .then(() => loadEvents(props.transition.params().clProject))
-          .catch((e) => alert('Undo has failed'))
-      }}
-    />,
+      );
+      return <Events
+        events={appState.cursor(['events']).deref()}
+        refresh={loadEventsAndResetProjects}
+        undo={(link) => () => {
+          pushToApi(link, {})
+            .then(loadEventsAndResetProjects)
+            .catch((e) => alert('Undo has failed'))
+        }}
+      />;
+    },
     resolve: [
       {
         token: 'loadEvents',
