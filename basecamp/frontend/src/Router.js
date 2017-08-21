@@ -235,6 +235,11 @@ export const states = [
         props.transition.params().clProject,
         app => app.setIn(['costlocker', 'projects'], null) // reset projects so new projects are detected
       )}
+      undo={(link) => () => {
+        pushToApi(link, {})
+          .then(() => loadEvents(props.transition.params().clProject))
+          .catch((e) => alert('Undo has failed'))
+      }}
     />,
     resolve: [
       {

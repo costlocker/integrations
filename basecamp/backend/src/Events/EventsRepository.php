@@ -87,6 +87,20 @@ DQL;
         return array_shift($entities);
     }
 
+    public function findEvent($eventId)
+    {
+        $dql =<<<DQL
+            SELECT e
+            FROM Costlocker\Integrations\Entities\Event e
+            WHERE e.id = :id
+DQL;
+        $params = [
+            'id' => $eventId
+        ];
+        $entities = $this->entityManager->createQuery($dql)->execute($params);
+        return array_shift($entities);
+    }
+
     public function findLatestEvents($costlockerProjectId)
     {
         $filter = '';

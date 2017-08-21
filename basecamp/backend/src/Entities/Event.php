@@ -28,6 +28,7 @@ class Event
     const RESULT_FAILURE = 0x2;
     const RESULT_NOCHANGE = 0x4;
     const RESULT_PARTIAL_SUCCESS = 0x8;
+    const UNDO_ACTION = 0xF;
 
     /**
      * @ORM\Id
@@ -79,5 +80,10 @@ class Event
         $this->event |= $status;
         $this->data['result'] = $result;
         $this->updatedAt = new \DateTime();
+    }
+
+    public function getDisconnectedProjectId()
+    {
+        return $this->data['result'][0]['id'] ?? null;
     }
 }

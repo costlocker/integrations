@@ -43,7 +43,7 @@ class EventsToJson
                     'project' => [
                         'costlocker' => $basecampProject ? $basecampProject->costlockerProject->id : null,
                     ],
-                    'links' => $this->getLinks($basecampProject),
+                    'links' => $this->getLinks($e, $basecampProject),
                 ];
             },
             $events
@@ -71,6 +71,7 @@ class EventsToJson
             // disconnect should be successful 99%, so using results is not necessary
             Event::DISCONNECT_BASECAMP => 'Disconnect basecamp account',
             Event::DISCONNECT_PROJECT => 'Disconnect project',
+            Event::DISCONNECT_PROJECT | Event::UNDO_ACTION => 'Undo disconnecting project',
             Event::REGISTER_COSTLOCKER_WEBHOOK => 'Enable costlocker webhook',
             Event::REGISTER_BASECAMP_WEBHOOK => 'Update basecamp webhook',
             Event::IMPORT_PROJECT_FROM_COSTLOCKER => 'Import costlocker project',
@@ -83,7 +84,7 @@ class EventsToJson
         } elseif ($e->event == Event::DISCONNECT_BASECAMP) {
             $description .= " {$e->data['basecamp']}";
         } elseif ($e->event == Event::DISCONNECT_PROJECT) {
-            $id = $e->data['result'][0]['id'] ?? null;
+            $id = $e->getDisconnectedProjectId();
             $basecampProject = $this->database->findByInternalId($id);
         } elseif ($e->event == Event::WEBHOOK_BASECAMP) {
             $description .= " '{$e->data['basecampEvent']}' ";
@@ -101,19 +102,22 @@ class EventsToJson
             ($e->event | Event::RESULT_FAILURE) => 'failure',
             ($e->event | Event::RESULT_NOCHANGE) => 'nochange',
             ($e->event | Event::RESULT_PARTIAL_SUCCESS) => 'partial',
+            ($e->event | Event::UNDO_ACTION) => 'success',
         ];
         return $statuses[$e->event] ?? null;
     }
 
-    private function getLinks(BasecampProject $p = null)
+    private function getLinks(Event $e, BasecampProject $p = null)
     {
         if (!$p) {
             return null;
         }
+        $hasUndo = in_array($e->event, [Event::DISCONNECT_PROJECT]);
         return [
             'costlocker' =>
                 getenv('CL_HOST') . "/projects/detail/{$p->costlockerProject->id}/cost-estimate",
             'basecamp' => $this->basecamps->buildBasecampLink($p),
+            'undo' => $hasUndo ? "/events/undo?id={$e->id}" : null,
         ];
     }
 }

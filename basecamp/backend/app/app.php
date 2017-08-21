@@ -204,6 +204,18 @@ $app
     ->before($checkAuthorization('costlocker'));
 
 $app
+    ->post('/events/undo', function (Request $r) use ($app) {
+        $strategy = new Costlocker\Integrations\Events\UndoEvent(
+            $app['database.events'],
+            $app['database'],
+            $app['events.logger']
+        );
+        return $strategy($r->query->get('id'));
+    })
+    ->before($checkAuthorization('costlocker'))
+    ->before($checkCsrf());
+
+$app
     ->post('/settings', function (Request $r) use ($app) {
         $uc = new \Costlocker\Integrations\Database\UpdateSettings($app['orm.em'], $app['client.user']);
         $uc($r->request->all());

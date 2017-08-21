@@ -6,6 +6,7 @@ use Costlocker\Integrations\Auth\GetUser;
 use Doctrine\ORM\EntityManagerInterface;
 use Costlocker\Integrations\Entities\CostlockerCompany;
 use Costlocker\Integrations\Entities\CostlockerProject;
+use Costlocker\Integrations\Entities\BasecampProject;
 use Costlocker\Integrations\Entities\BasecampUser;
 use Costlocker\Integrations\Sync\SyncDatabase;
 use Costlocker\Integrations\Sync\SyncResponse;
@@ -122,5 +123,12 @@ DQL;
         ];
         $entities =  $this->entityManager->createQuery($dql)->execute($params);
         return array_shift($entities);
+    }
+
+    public function undoDisconnect(BasecampProject $p)
+    {
+        $p->deletedAt = null;
+        $this->entityManager->persist($p);
+        $this->entityManager->flush();
     }
 }

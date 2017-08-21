@@ -9,7 +9,7 @@ const ProjectLogo = ({ app, text }) =>
   ? <span><Logo app="costlocker" color="blue" /> {text}</span>
   : <span><Logo app="basecamp" /> {text}</span>
 
-export default function Events({ events, refresh }) {
+export default function Events({ events, refresh, undo }) {
   if (!events) {
     return <Loading title="Loading events" />;
   }
@@ -39,6 +39,9 @@ export default function Events({ events, refresh }) {
                 title={<ProjectLogo app="costlocker" text="Open project" />} />
               <ExternalLink url={event.links.basecamp} className="text-success"
                 title={<ProjectLogo app="basecamp" text="Open project" />} />
+              {event.links.undo ? (
+                <Button action={undo(event.links.undo)} className="btn btn-link" title="Undo" />
+              ) : null}
             </div>
           ) : null}
         </td>
@@ -108,7 +111,7 @@ export default function Events({ events, refresh }) {
               <th>Date</th>
               <th>User</th>
               <th>Event</th>
-              <th>Links</th>
+              <th width="350">Links</th>
             </tr>
           </thead>
           <tbody>
