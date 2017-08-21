@@ -48,18 +48,22 @@ const fetchProjects = (customFilter) => {
       appState.cursor(['costlocker']).update(
         state => state
           .set('projects', projects)
+          .set('state', filter)
           .set('isSearching', false)
       );
       return projects;
     });
 }
 
-const loadCostlockerProjects = (callback) => [
+const loadRunningProjects = (callback) => [
   {
     token: 'loadCostlockerProjects',
     resolveFn: () => {
-      if (!appState.cursor(['costlocker', 'projects']).deref()) {
-        fetchProjects().then(callback ? callback : (r => r));
+      if (
+        !appState.cursor(['costlocker', 'projects']).deref() ||
+        appState.cursor(['costlocker', 'state']).deref() !== 'running'
+      ) {
+        fetchProjects('running').then(callback ? callback : (r => r));
       }
     }
   }
@@ -135,7 +139,7 @@ export const states = [
         alwaysSet: (s) => s.setIn(['isSearching'], true),
       })}
     />,
-    resolve: loadCostlockerProjects(),
+    resolve: loadRunningProjects(),
   },
   {
     name: 'login',
@@ -182,7 +186,7 @@ export const states = [
       isExistingProjectEdited={props.transition.params().clProject ? true : false}
     />,
     resolve:
-      loadCostlockerProjects(
+      loadRunningProjects(
         projects => syncSettings.loadProjectSettings(projects)
       ).concat([
       {

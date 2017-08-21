@@ -74,6 +74,9 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
   const selectedCostlockerProjects = syncForm.get('costlockerProject').map(id => indexedSelectedProjects[id]);
 
   const editedProject = isExistingProjectEdited ? selectedCostlockerProjects.first() : null;
+  if (isExistingProjectEdited && !editedProject) {
+    return <Errors title="Unknown project" error="Selected project not found or is not running" />;
+  }
   const connectedBasecamp = isExistingProjectEdited ? editedProject.basecamps[0] : null;
 
   const selectedBasecampAccounts = basecampAccounts

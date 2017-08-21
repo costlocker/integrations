@@ -18,7 +18,7 @@ export default function Projects({ allProjects, disconnect, form }) {
       </div>
     </div>
     <form className="form row">
-      <div className="col-sm-12">
+      <div className="col-sm-9">
         <div className="form-group">
           <RadioButtons
             items={[
@@ -29,6 +29,13 @@ export default function Projects({ allProjects, disconnect, form }) {
             isActive={type => form.get('state') === type.id}
             onChange={form.get('isSearching') ? () => null : form.set('state')}
           />
+        </div>
+      </div>
+      <div className="col-sm-3">
+        <div className="form-group">
+          {notConnectedProjectsCount &&
+            <Link route='sync' title={<span>Connect running project ({notConnectedProjectsCount})</span>} className="btn btn-success btn-block" />
+          }
         </div>
       </div>
     </form>
@@ -65,8 +72,14 @@ export default function Projects({ allProjects, disconnect, form }) {
                     title={<span><Logo app="basecamp" /> Open project</span>} />
                 </td>
                 <td className="text-right">
-                  <Link route='sync' params={{ clProject: project.id }}
-                    title={<span><i className="fa fa-refresh"></i> Refresh</span>} className="btn btn-sm btn-primary" />
+                  {project.isRunning ? (
+                    <Link route='sync' params={{ clProject: project.id }}
+                      title={<span><i className="fa fa-refresh"></i> Refresh</span>} className="btn btn-sm btn-primary" />
+                  ) : (
+                    <button className="btn btn-sm btn-default" disabled="disabled" title='You can refresh only running projects'>
+                      <span><i className="fa fa-refresh"></i> Refresh</span>
+                    </button>
+                  )}
                   &nbsp;&nbsp;
                   <Link route='events' params={{ clProject: project.id }}
                     title={<span><i className="fa fa-th-list"></i> Events</span>} className="btn btn-sm btn-info" />
@@ -83,12 +96,5 @@ export default function Projects({ allProjects, disconnect, form }) {
         )}
       </div>
     </div>
-    {notConnectedProjectsCount &&
-    <div className="row">
-      <div className="col-sm-12">
-        <Link route='sync' title={<span>Connect new project ({notConnectedProjectsCount})</span>} className="btn btn-success btn-block" />
-      </div>
-    </div>
-    }
   </div>;
 };

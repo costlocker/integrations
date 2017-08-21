@@ -48,6 +48,7 @@ class GetProjects
                 'id' => $rawProject['id'],
                 'name' => $rawProject['name'],
                 'client' => $rawProject['client'],
+                'isRunning' => $rawProject['state'] == 'running',
                 'url' => getenv('CL_HOST') . "/projects/detail/{$rawProject['id']}/cost-estimate",
                 'basecamps' => $basecamps,
                 'basecamp' => reset($basecamps) ?: null,
