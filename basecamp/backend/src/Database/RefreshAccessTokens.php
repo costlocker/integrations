@@ -24,6 +24,9 @@ class RefreshAccessTokens
     public function __invoke($expiresInterval, $isDryRun, $presenter)
     {
         $expiredTokens = $this->findExpired($expiresInterval);
+        if (!$expiredTokens) {
+            return $presenter(['expiration' => $expiresInterval], 'No refreshable tokens');
+        }
         $this->refreshTokens($expiredTokens, $isDryRun, $presenter);
     }
 
