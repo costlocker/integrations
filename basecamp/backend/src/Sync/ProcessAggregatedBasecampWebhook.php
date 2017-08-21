@@ -26,7 +26,7 @@ class ProcessAggregatedBasecampWebhook
         $r->costlockerId = $costlockerId;
         $r->projectItems = []; // costlocker -> basecamp is disabled
         $r->isCompleteProjectSynchronized = false;
-        $r->costlockerUser = $project->costlockerProject->costlockerCompany->defaultCostlockerUser;
+        $r->costlockerUser = $project->basecampUser->costlockerUser;
         $r->account = $project->basecampUser->id;
         $r->settings->loadBasecampSettings($project->settings);
         $r->settings->disableUpdatingBasecamp();

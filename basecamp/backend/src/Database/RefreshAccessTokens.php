@@ -31,7 +31,7 @@ class RefreshAccessTokens
     {
         $sql =<<<SQL
             WITH assignedBasecampAccount AS (
-              SELECT DISTINCT bc_identity_id
+              SELECT bc_identity_id, cl_user_id
               FROM bc_projects
               JOIN bc_cl_users ON bc_cl_users.id = bc_projects.bc_user_id
               WHERE bc_projects.deleted_at IS NULL
@@ -40,11 +40,14 @@ class RefreshAccessTokens
               SELECT cl_user_id
               FROM cl_companies
               WHERE cl_user_id IS NOT NULL
+              UNION
+              SELECT cl_user_id
+              FROM assignedBasecampAccount
             ),
             expiredBasecamp AS (
               SELECT bc_identity_id as group, max(expires_at) as expires_at, max(id) as id
               FROM oauth2_tokens
-              WHERE bc_identity_id IN (SELECT * FROM assignedBasecampAccount)
+              WHERE bc_identity_id IN (SELECT DISTINCT bc_identity_id FROM assignedBasecampAccount)
               GROUP BY bc_identity_id
               HAVING max(expires_at) < NOW() + INTERVAL '{$expiresInterval}'
                  AND max(expires_at) > NOW()
@@ -52,7 +55,8 @@ class RefreshAccessTokens
             expiredCostlocker AS (
               SELECT cl_user_id as group, max(expires_at) as expires_at, max(id) as id
               FROM oauth2_tokens
-              WHERE cl_user_id IN (SELECT * FROM assignedCostlockerUsers) AND bc_identity_id IS NULL
+              WHERE cl_user_id IN (SELECT DISTINCT cl_user_id FROM assignedCostlockerUsers)
+                AND bc_identity_id IS NULL
               GROUP BY cl_user_id
               HAVING max(expires_at) < NOW() + INTERVAL '{$expiresInterval}'
                  AND max(expires_at) > NOW()

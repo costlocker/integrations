@@ -75,7 +75,7 @@ export default function Settings({ form, accounts }) {
               </select>
             </div>
             ) : null}
-            {form.get('isCreatingBasecampProjectEnabled') || form.get('areTasksEnabled') ? (
+            {form.get('isCreatingBasecampProjectEnabled') ? (
             <div className="form-group">
               <label htmlFor="account">Choose a Costlocker user used for accessing Costlocker</label>
               <select
