@@ -65,10 +65,13 @@ const loadCostlockerProjects = (callback) => [
   }
 ];
 
-const loadEvents = (clProject) =>
+const loadEvents = (clProject, updater) =>
   fetchFromApi(clProject ? `/events?project=${clProject}` : '/events')
     .catch(setError)
-    .then(events => appState.cursor().set('events', events));
+    .then(events => appState.cursor().update(app => {
+      const updated = updater ? updater(app) : app;
+      return updated.set('events', events);
+    }));
 
 const disconnectBasecamp = (params, onSuccess) => {
   if (isNotLoggedInBasecamp()) {
@@ -224,9 +227,12 @@ export const states = [
     },
     component: (props) => <Events
       events={appState.cursor(['events']).deref()}
-      refresh={() => loadEvents(props.transition.params().clProject).then(fetchProjects())} // hotfix for reloading projects list
+      refresh={() => loadEvents(
+        props.transition.params().clProject,
+        app => app.setIn(['costlocker', 'projects'], null) // reset projects so new projects are detected
+      )}
     />,
-    resolve: loadCostlockerProjects().concat([
+    resolve: [
       {
         token: 'loadEvents',
         deps: ['$transition$'],
@@ -236,7 +242,7 @@ export const states = [
           return true;
         },
       }
-    ]),
+    ],
   },
 ];
 
