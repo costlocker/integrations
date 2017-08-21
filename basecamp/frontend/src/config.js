@@ -8,4 +8,6 @@ const appHost = isDevelopmentMode && process.env.REACT_APP_CL_HOST ? process.env
 const apiHost = isDevelopmentMode && process.env.REACT_APP_API_HOST ? process.env.REACT_APP_API_HOST : productionHost;
 const apiUrl = `${apiHost}/api`;
 
-export { isDevelopmentMode, apiUrl, appHost }
+const serverTimezoneOffsetInHours = isDevelopmentMode ? 2 : 0;
+
+export { isDevelopmentMode, apiUrl, appHost, serverTimezoneOffsetInHours }

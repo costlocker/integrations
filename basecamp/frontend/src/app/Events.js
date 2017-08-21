@@ -9,7 +9,7 @@ const ProjectLogo = ({ app, text }) =>
   ? <span><Logo app="costlocker" color="blue" /> {text}</span>
   : <span><Logo app="basecamp" /> {text}</span>
 
-export default function Events({ events, refresh, undo }) {
+export default function Events({ events, refresh, undo, dateToMoment }) {
   if (!events) {
     return <Loading title="Loading events" />;
   }
@@ -24,7 +24,7 @@ export default function Events({ events, refresh, undo }) {
     };
     rows.push(
       <tr key={event.id} className={statusToCssClass[event.status]}>
-        <td>{event.date}</td>
+        <td>{dateToMoment(event.date).format('D.M.YYYY HH:mm:ss')}</td>
         <th>
           {event.user
             ? <div title={event.user.person.email}>{event.user.person.first_name} {event.user.person.last_name}</div>

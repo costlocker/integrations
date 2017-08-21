@@ -1,8 +1,10 @@
 import React from 'react';
+import moment from 'moment';
 import { Map } from 'immutable';
 
 import { appState, isNotLoggedInCostlocker, isNotLoggedInBasecamp } from './state';
 import { fetchFromApi, pushToApi, loginUrls } from './api';
+import { serverTimezoneOffsetInHours } from './config';
 import Form from './app/Form';
 import Login from './app/Login';
 import Projects from './app/Projects';
@@ -242,6 +244,7 @@ export const states = [
             .then(loadEventsAndResetProjects)
             .catch((e) => alert('Undo has failed'))
         }}
+        dateToMoment={date => moment(`${date} +0${serverTimezoneOffsetInHours}00`, "YYYY-MM-DD HH:mm Z")}
       />;
     },
     resolve: [
