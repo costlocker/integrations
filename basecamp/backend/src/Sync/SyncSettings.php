@@ -73,6 +73,13 @@ class SyncSettings
         $this->areTodosEnabled = false;
     }
 
+    public function disableWebhookIfUpdatingCostlockerIsDisabled()
+    {
+        if (!$this->areTasksEnabled) {
+            $this->isBasecampWebhookEnabled = false;
+        }
+    }
+
     public function isDeleteDisabledInCostlocker()
     {
         return !$this->isDeletingTodosEnabled && !$this->isRevokeAccessEnabled;

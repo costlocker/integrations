@@ -31,6 +31,7 @@ class ProcessManualRequest
             }
             $request->settings->loadCostlockerSettings($jsonRequest);
             $request->settings->loadBasecampSettings($jsonRequest);
+            $request->settings->disableWebhookIfUpdatingCostlockerIsDisabled();
 
             $results[] = $this->synchronizer->__invoke($request);
         }
