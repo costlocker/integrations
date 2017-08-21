@@ -36,6 +36,7 @@ class ProcessSyncRequest
     private function processEvent(Event $requestEvent)
     {
         $event = new Event();
+        $event->costlockerUser = $requestEvent->costlockerUser;
         $event->event = $requestEvent->data['type'];
         $event->data = [
             'request' => $requestEvent->data,
