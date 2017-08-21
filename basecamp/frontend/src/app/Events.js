@@ -1,8 +1,13 @@
 import React from 'react';
 
-import { Button, Link, ExternalLink } from '../ui/Components';
+import { Button, ExternalLink } from '../ui/Components';
 import { Logo } from '../ui/Images';
 import Loading from '../ui/Loading';
+
+const ProjectLogo = ({ app, text }) =>
+  app === 'costlocker'
+  ? <span><Logo app="costlocker" color="blue" /> {text}</span>
+  : <span><Logo app="basecamp" /> {text}</span>
 
 export default function Events({ events, refresh }) {
   if (!events) {
@@ -31,9 +36,9 @@ export default function Events({ events, refresh }) {
           {event.links ? (
             <div>
               <ExternalLink url={event.links.costlocker} className="text-primary first"
-                title={<span><Logo app="costlocker" color="blue" /> Open project</span>} />
+                title={<ProjectLogo app="costlocker" text="Open project" />} />
               <ExternalLink url={event.links.basecamp} className="text-success"
-                title={<span><Logo app="basecamp" /> Open project</span>} />
+                title={<ProjectLogo app="basecamp" text="Open project" />} />
             </div>
           ) : null}
         </td>
@@ -49,13 +54,12 @@ export default function Events({ events, refresh }) {
           <table className="table table-condensed table-inline">
             <thead>
               <tr>
-                <th rowSpan="2">System</th>
                 <th colSpan="2">Project</th>
                 <th colSpan="2">Todolists/activities</th>
                 <th colSpan="2">Todos/tasks</th>
               </tr>
               <tr>
-                <th>Project ID</th>
+                <th>System</th>
                 <th>Is created?</th>
                 <th>Created</th>
                 <th>Deleted</th>
@@ -67,8 +71,7 @@ export default function Events({ events, refresh }) {
               {event.changelogs.map((changelog, index) => {
                 const key = `${event.id}-${index}`;
                 return <tr key={key}>
-                  <th>{changelog.system}</th>
-                  <td>{changelog.project.id}</td>
+                  <th><ProjectLogo app={changelog.system} text={changelog.system} /></th>
                   <td>{changelog.project.createdCount ? '✓' : '-'}</td>
                   <td>{changelog.activities.createdCount}</td>
                   <td>{changelog.activities.deletedCount}</td>
