@@ -273,7 +273,7 @@ const hooks = [
     },
     callback: (transition: any) => {
       transition.abort();
-      redirectToRoute('login');
+      redirectToRoute('login', transition.params());
     },
     priority: 10,
   },
