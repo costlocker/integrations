@@ -35,9 +35,10 @@ class PersistCostlockerUser
         $this->entityManager->persist($token);
         $this->entityManager->flush();
 
+        $activeBasecampUsers = $user->getActiveUsers();
         return [
             $user->id,
-            count($user->basecampUsers) ? $user->getActiveUsers()->first()->id : null,
+            count($activeBasecampUsers) ? $activeBasecampUsers->first()->id : null,
         ];
     }
 
