@@ -60,8 +60,10 @@ class AuthorizeInCostlocker
                 $resourceOwner = $this->provider->getResourceOwner($accessToken);
                 $costlockerUser = $resourceOwner->toArray()['data'];
                 $costockerRole = $costlockerUser['person']['role'];
-                if (!in_array($costockerRole, ['OWNER', 'ADMIN'])) {
-                    return $this->sendError("Only ADMIN or OWNER can import project, you are {$costockerRole}");
+                $allowedRoles = ['OWNER', 'ADMIN', 'MANAGER'];
+                if (!in_array($costockerRole, $allowedRoles)) {
+                    $rolesCsv = implode(' or ', $allowedRoles);
+                    return $this->sendError("Only {$rolesCsv} can import project, you are {$costockerRole}");
                 }
                 $this->session->remove('costlockerLogin');
                 list($costlockerId, $basecampId) = $this->persistUser->__invoke($costlockerUser, $accessToken);
