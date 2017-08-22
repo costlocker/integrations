@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Link } from '../ui/Components';
+import intercomHelp from '../images/intercom-help.png';
 
 export default function Help() {
   return (
@@ -51,9 +52,7 @@ export default function Help() {
       </div>
       <div className="row">
         <div className="col-sm-12">
-          <img
-             src="https://user-images.githubusercontent.com/7994022/27282066-bc4eac76-54ee-11e7-8aec-8fc756f83f31.png"
-             alt="Interkom" className="pull-right img-thumbnail" width="250px" />
+          <img src={intercomHelp} alt="Interkom" className="pull-right img-thumbnail" width="250px" />
           <h2>Migrating from built-in integration</h2>
           <p>
             Get in touch with us. We'll import selected projects. If you are satisfied with the new version,
