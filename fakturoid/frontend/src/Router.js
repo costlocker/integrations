@@ -249,7 +249,8 @@ const hooks = [
       }
     },
     callback: (transition) => {
-      transition.router.stateService.target('login', transition.params(), { location: true })
+      transition.abort();
+      redirectToRoute('login', transition.params());
     },
     priority: 10,
   },
@@ -266,7 +267,8 @@ const hooks = [
       if (!isNotLoggedInCostlocker()) {
         notify('notify.requiredFakturoid');
       }
-      return transition.router.stateService.target('login', undefined, { location: true });
+      transition.abort();
+      redirectToRoute('login', transition.params());
     },
     priority: 10,
   },

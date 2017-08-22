@@ -1,5 +1,5 @@
 import React from 'react';
-import { UIView } from 'ui-router-react';
+import { UIView } from '@uirouter/react';
 import { Link } from './Components';
 import { Logo } from './Images';
 import { appState } from '../state';
