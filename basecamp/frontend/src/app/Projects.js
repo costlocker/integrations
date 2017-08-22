@@ -33,9 +33,9 @@ export default function Projects({ allProjects, disconnect, form }) {
       </div>
       <div className="col-sm-3">
         <div className="form-group">
-          {notConnectedProjectsCount &&
+          {notConnectedProjectsCount ? (
             <Link route='sync' title={<span>Connect running project ({notConnectedProjectsCount})</span>} className="btn btn-success btn-block" />
-          }
+          ) : null}
         </div>
       </div>
     </form>
