@@ -6,7 +6,7 @@ export default class Session {
 
   getCurrentUser = () => ({
     token: session.getItem('token') || '',
-    host: (isDevelopmentMode ? session.getItem('host') : null) || 'https://new-n1.costlocker.com',
+    host: (isDevelopmentMode ? session.getItem('host') : null) || 'https://new.costlocker.com',
   })
 
   login = ({ host, token }) => {
