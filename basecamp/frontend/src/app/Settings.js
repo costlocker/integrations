@@ -14,17 +14,17 @@ export default function Settings({ form, accounts }) {
           <div className="col-sm-6">
             <div className="form-group">
               <h4>Costlocker &rarr; Basecamp</h4>
-              <label>What is exported to Basecamp?</label>
+              <label>When data is exported to Basecamp</label>
               <div>
                 <label className="checkbox-inline">
                   <input type="checkbox" name="areTodosEnabled"
                     onChange={form.set('areTodosEnabled')} checked={form.get('areTodosEnabled')}
-                    /> Personnel costs are transformed to todolists
+                    /> Transform personnel costs to todo lists
                 </label>
               </div>
             </div>
             <div className="form-group">
-              <label>What should happen when something is deleted in the Costlocker?</label>
+              <label>When something is deleted in Costlocker</label>
               <div>
                 <label className="checkbox-inline">
                   <input type="checkbox" name="deleteTasks"
@@ -34,7 +34,7 @@ export default function Settings({ form, accounts }) {
                 <label className="checkbox-inline">
                   <input type="checkbox" name="revokeAccess"
                     onChange={form.set('isRevokeAccessEnabled')} checked={form.get('isRevokeAccessEnabled')}
-                    /> Revoke Basecamp access to persons without todo
+                    /> Revoke Basecamp access for people with no todos
                 </label>
               </div>
             </div>
@@ -42,7 +42,7 @@ export default function Settings({ form, accounts }) {
               <label>Webhooks</label>
               <div>
                 <label className="checkbox-inline">
-                  <input type="checkbox" disabled defaultChecked /> Allow real-time synchronization from Costlocker
+                  <input type="checkbox" disabled defaultChecked /> Allow real-time synchronization with Costlocker
                 </label>
                 <p className="help-block">
                   Webhook is automatically registered and validated during project synchronization.
@@ -50,18 +50,18 @@ export default function Settings({ form, accounts }) {
               </div>
             </div>
             <div className="form-group">
-              <label>What should happen when a new project is created in the Costlocker?</label>
+              <label>When a new project is created in Costlocker</label>
               <div>
                 <label className="checkbox-inline">
                   <input type="checkbox" name="isCreatingBasecampProjectEnabled"
                     onChange={form.set('isCreatingBasecampProjectEnabled')} checked={form.get('isCreatingBasecampProjectEnabled')}
-                    /> Create project in Basecamp
+                    /> Create a project in Basecamp
                 </label>
               </div>
             </div>
             {form.get('isCreatingBasecampProjectEnabled') ? (
             <div className="form-group">
-              <label htmlFor="account">Choose a Basecamp used for creating a new project</label>
+              <label htmlFor="account">Choose a Basecamp account to create new projects</label>
               <select
                 className="form-control" name="account" id="account"
                 value={form.get('account') ? form.get('account') : ''} onChange={form.set('account')}
@@ -77,7 +77,7 @@ export default function Settings({ form, accounts }) {
             ) : null}
             {form.get('isCreatingBasecampProjectEnabled') ? (
             <div className="form-group">
-              <label htmlFor="account">Choose a Costlocker user used for accessing Costlocker</label>
+              <label htmlFor="account">Choose a Costlocker user to access Costlocker</label>
               <select
                 className="form-control" name="costlockerUser" id="costlockerUser"
                 value={form.get('costlockerUser') ? form.get('costlockerUser') : ''} onChange={form.set('costlockerUser')}
@@ -97,22 +97,22 @@ export default function Settings({ form, accounts }) {
               <h4 title="Available only for Basecamp 3">
                 Basecamp <span className="label label-danger">3</span> &rarr; Costlocker
               </h4>
-              <label>What is exported to Costlocker?</label>
+              <label>When data is exported to Costlocker</label>
               <div>
                 <label className="checkbox-inline">
                   <input type="checkbox" name="areTasksEnabled"
                     onChange={form.set('areTasksEnabled')} checked={form.get('areTasksEnabled')}
-                    /> Todo items are transformed to tasks under activity.
+                    /> Transform todo items to activity tasks
                 </label><br />
                 <label className="checkbox-inline">
                   <input type="checkbox" name="isCreatingActivitiesEnabled"
                     onChange={form.set('isCreatingActivitiesEnabled')} checked={form.get('isCreatingActivitiesEnabled')}
-                    /> New todolists are transformed to an activity (if the activity already exists in Costlocker, no new activity is created).
+                    /> Transform new todo lists to activities (if they exist in Costlocker, new ones are not created)
                 </label>
               </div>
             </div>
             <div className="form-group">
-              <label>What should happen when something is deleted in the Basecamp?</label>
+              <label>When something is deleted in Basecamp</label>
               <div>
                 <label className="checkbox-inline">
                   <input type="checkbox" name="isDeletingTasksEnabled"
@@ -132,7 +132,7 @@ export default function Settings({ form, accounts }) {
                 <label className="checkbox-inline">
                   <input type="checkbox" name="isBasecampWebhookEnabled"
                     onChange={form.set('isBasecampWebhookEnabled')} checked={form.get('isBasecampWebhookEnabled')}
-                    /> Allow real-time synchronization from Basecamp
+                    /> Allow real-time synchronization with Basecamp
                 </label>
                 <p className="help-block">
                   Webhook is automatically registered and validated during project synchronization.
@@ -140,11 +140,11 @@ export default function Settings({ form, accounts }) {
               </div>
             </div>
             <div className="form-group">
-              <label>What should happen when a new project is created in the Basecamp?</label>
+              <label>When a new project is synchronized in Basecamp</label>
               <div>
                 <p className="text-muted">
-                  Basecamp does not notify us when new project is created.<br />
-                  At first you have to import Costlocker project to Basecamp.
+                  Currently, it is not possible to automatically import newly created projects into Costlocker.
+                  It’s required to import Costlocker projects to Basecamp first.
                 </p>
               </div>
             </div>

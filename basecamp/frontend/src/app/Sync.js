@@ -92,7 +92,7 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
 
   const errors =
     [
-      { hasFailed: !selectedCostlockerProjects.size, error: 'Select at least one costlocker project' },
+      { hasFailed: !selectedCostlockerProjects.size, error: 'Select at least one Costlocker project' },
       { hasFailed: isNotLoggedInBasecamp(), error: <Link route="accounts" title="Login to Basecamp" /> },
       { hasFailed: !isNotLoggedInBasecamp() && !syncForm.get('account'), error: 'Select one Basecamp account' },
       { hasFailed: !isNotLoggedInBasecamp() && !basecamp.get('isAccountAvailable'), error: 'Select valid Basecamp account, or reconnect selected account' },
@@ -104,7 +104,7 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
   const isFormValid = errors.length === 0;
 
   return <div>
-    <h1>{isExistingProjectEdited ? 'Refresh project' : 'Connect Costlocker project to Basecamp'}</h1>
+    <h1>{isExistingProjectEdited ? 'Refresh project' : 'Connect a Costlocker project to Basecamp'}</h1>
     <form className="form" onSubmit={isFormValid ? syncForm.submit : () => null}>
       {editedProject ? (
       <div>
@@ -169,12 +169,12 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
           </div>
           ) : null}
         </div>
-        <BasecampAccountSelect title='Choose a Basecamp acccount to export it to' accounts={basecampAccounts} syncForm={syncForm} isAccountNotAvailable={!basecamp.get('isAccountAvailable')} />
+        <BasecampAccountSelect title='Choose a Basecamp account for export' accounts={basecampAccounts} syncForm={syncForm} isAccountNotAvailable={!basecamp.get('isAccountAvailable')} />
         <BasecampCompaniesSelect basecampCompanies={basecamp.get('companies')} syncForm={syncForm} isBasecampProjectCreated={isBasecampProjectCreated} />
         <div className="row">
           <div className="col-sm-6">
             <div className="form-group">
-              <label>How would you like to add this project to the Basecamp</label>
+              <label>How would you like to add this project?</label>
               <RadioButtons
                 items={[
                   { id: 'create', title: 'Create a new project in Basecamp' },
@@ -217,22 +217,22 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
         <div className="col-sm-6">
           <div className="form-group">
             <h4>Costlocker &rarr; Basecamp</h4>
-            <label>What is exported to Basecamp?</label>
+            <label>When data is exported to Basecamp</label>
             <div>
               <label className="checkbox-inline disabled">
                 <input type="checkbox" disabled defaultChecked={true}
-                  /> Project name
+                  /> Copy the project name
               </label>
               <label className="checkbox-inline">
                 <input type="checkbox" name="areTodosEnabled"
                   onChange={syncForm.set('areTodosEnabled')} checked={syncForm.get('areTodosEnabled')}
-                  /> Personnel costs are transformed to todolists
+                  /> Transform personnel costs to todo lists
               </label>
             </div>
           </div>
           {syncForm.get('areTodosEnabled') &&
           <div className="form-group">
-            <label>What should happen when something is deleted in the Costlocker?</label>
+            <label>When something is deleted in Costlocker</label>
             <div>
               <label className="checkbox-inline">
                 <input type="checkbox" name="deleteTasks"
@@ -242,7 +242,7 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
               <label className="checkbox-inline">
                 <input type="checkbox" name="revokeAccess"
                   onChange={syncForm.set('isRevokeAccessEnabled')} checked={syncForm.get('isRevokeAccessEnabled')}
-                  /> Revoke access to persons without todo
+                  /> Revoke access for people with no todos
               </label>
             </div>
           </div>
@@ -253,18 +253,18 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
             <h4 title="Available only for Basecamp 3">
               Basecamp <span className="label label-danger">3</span> &rarr; Costlocker
             </h4>
-            <label>What is exported to Costlocker?</label>
+            <label>When data is exported to Costlocker</label>
             <div>
               <label className="checkbox-inline">
                 <input type="checkbox" name="areTasksEnabled"
                   onChange={optionalSetIfAvailable('areTasksEnabled')} checked={syncForm.get('areTasksEnabled')}
-                  /> Todo items are transformed to tasks under activity.
+                  /> Transform todo items to activity tasks
               </label><br />
               {syncForm.get('areTasksEnabled') &&
               <label className="checkbox-inline">
                 <input type="checkbox" name="isCreatingActivitiesEnabled"
                   onChange={optionalSetIfAvailable('isCreatingActivitiesEnabled')} checked={syncForm.get('isCreatingActivitiesEnabled')}
-                  /> New todolists are transformed to an activity (if the activity already exists in Costlocker, no new activity is created).
+                  /> Transform new todo lists to activities (if they exist in Costlocker, new ones are not created)
               </label>
               }
             </div>
@@ -272,7 +272,7 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
           {syncForm.get('areTasksEnabled') &&
           <div>
             <div className="form-group">
-              <label>What should happen when something is deleted in the Basecamp?</label>
+              <label>When something is deleted in Basecamp</label>
               <div>
                 <label className="checkbox-inline">
                   <input type="checkbox" name="isDeletingTasksEnabled"
@@ -305,7 +305,7 @@ export default function Sync({ costlockerProjects, basecamp, basecampAccounts, s
       ) : (
         <div>
           <Errors
-            title="Please fix following issues before synchronizing projects"
+            title="Please fix the following issues before synchronizing projects"
             error={<ul>{errors.map(error => <li key={error}>{error}</li>)}</ul>}
             errorClassName="warning"
           />
