@@ -2,6 +2,10 @@
     padding-bottom: 2em;
 }
 
+.cover {
+    margin-top: 1em;
+}
+
 .cover .progress {
     border-radius: 0;
 }
@@ -34,7 +38,7 @@
     .navbar-right {
         .users {
             a {
-                padding: 6px 12px 3px 6px;
+                padding: 6px 6px 3px;
                 vertical-align: baseline;
                 position: relative;
             }

@@ -20,6 +20,7 @@ export default {
   },
   // Login.js
   login: {
+    accounts: 'Accounts',
     error: 'Login error',
     email: 'Email address',
     slug: 'Fakturoid slug (subdomain)',

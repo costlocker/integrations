@@ -20,6 +20,7 @@ export default {
   },
   // Login.js
   login: {
+    accounts: 'Uživatelské účty',
     error: 'Chyba během přihlášení',
     email: 'E-mail',
     slug: 'Fakturoid slug (subdoména)',

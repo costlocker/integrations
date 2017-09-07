@@ -9,6 +9,7 @@ import { App } from './ui/App';
 import Loading from './ui/Loading';
 import ErrorPage from './ui/ErrorPage';
 import CurlExample from './app/CurlExample';
+import bootstrapComponentsAdapter from './ui/BootstrapComponents';
 import './ui/index.css'
 
 export const plugins = [pushStateLocationPlugin];
@@ -36,3 +37,4 @@ appState.on('next-animation-frame', function (newStructure, oldStructure, keyPat
 });
 
 render();
+bootstrapComponentsAdapter();

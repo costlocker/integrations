@@ -32,21 +32,44 @@
         }
     }
     .navbar-right {
-        a {
-            padding: 6px 12px 3px 6px;
-            vertical-align: baseline;
-            position: relative;
-        }
-        .user {
-            display: inline-block;
-            text-align: left;
-            strong {
-                display: block;
+        .users {
+            a {
+                padding: 6px 12px 3px 6px;
+                vertical-align: baseline;
+                position: relative;
+            }
+            .user {
+                display: inline-block;
+                text-align: left;
+                strong {
+                    display: block;
+                }
+            }
+            .logo {
+                margin: 0 1em;
+                vertical-align: baseline;
             }
         }
-        .logo {
-            margin: 0 1em;
-            vertical-align: baseline;
+    }
+    @media (max-width: 768px) {
+        .collapse.in .navbar-right {
+            text-align: left;
+            .users {
+                .logo, .user {
+                    display: none;
+                }
+                a {
+                    padding: 10px 15px;
+                }
+            }
+            .help {
+                .fa {
+                    display: none;
+                }
+            }
+            .hide {
+                display: block !important;
+            }
         }
     }
 }

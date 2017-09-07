@@ -28,6 +28,7 @@ const FakturoidUser = ({ user, isLoggedIn }) => {
 
 const AnonymousUser = ({ isRouteActive }) => (
   <div>
+    <span className="hide">Login</span>
     <Logo app="costlocker" color={isRouteActive('login') ? 'blue' : 'white'} />
     <div className="user">
       <strong>Login</strong>
@@ -37,10 +38,8 @@ const AnonymousUser = ({ isRouteActive }) => (
 )
 
 const Users = ({ auth, isRouteActive }) => {
-  if (!auth.get('costlocker')) {
-    return null;
-  }
   return <div>
+    <span className="hide">{trans('login.accounts')}</span>
     <Logo app="costlocker" color={isRouteActive('login') ? 'blue' : 'white'} />
     <CostlockerUser user={auth.get('costlocker')} />
     <Logo app="fakturoid" />
@@ -51,8 +50,8 @@ const Users = ({ auth, isRouteActive }) => {
 const Navigation = ({ isRouteActive, routes }) => {
   return (
     <ul className="nav navbar-nav">
-      {routes.map(({ route, params, title }) => (
-        <li key={route} className={isRouteActive(route) ? 'active' : null}><Link route={route} params={params} title={title} /></li>
+      {routes.map(({ route, params, title, className }) => (
+        <li key={route} className={isRouteActive(route) ? `active ${className}` : className}><Link route={route} params={params} title={title} /></li>
       ))}
     </ul>
   );
@@ -73,20 +72,35 @@ export function App({ auth, isRouteActive }) {
   return (
     <div>
       <nav className="navbar navbar-default">
-        <div className="container">
-          <div>
-            {auth.get('costlocker') ? <Navigation isRouteActive={isRouteActive} routes={[
-              { route: 'invoice', title: trans('page.invoices'), params: { id: null } },
-            ]} /> : ''}
+        <div className="container-fluid">
+          <div className="navbar-header">
+            <button
+              type="button" className="navbar-toggle collapsed" data-toggle="collapse"
+              data-target="#navbar-addon" aria-expanded="false"
+            >
+              <span className="sr-only">Toggle navigation</span>
+              <span className="icon-bar"></span>
+              <span className="icon-bar"></span>
+              <span className="icon-bar"></span>
+            </button>
           </div>
-          <div className="navbar-right text-right">
-            <Navigation isRouteActive={isRouteActive} routes={[
-              {
-                route: 'login', title: auth.get('costlocker')
-                  ? <Users auth={auth} isRouteActive={isRouteActive} />
-                  : <AnonymousUser isRouteActive={isRouteActive} />
-              },
-            ]} />
+          <div className="navbar-collapse collapse" id="navbar-addon">
+            <div className="container">
+              <div>
+                {auth.get('costlocker') ? <Navigation isRouteActive={isRouteActive} routes={[
+                  { route: 'invoice', title: trans('page.invoices'), params: { id: null } },
+                ]} /> : ''}
+              </div>
+              <div className="navbar-right text-right">
+                <Navigation isRouteActive={isRouteActive} routes={[
+                  {
+                    route: 'login', className: 'users', title: auth.get('costlocker')
+                      ? <Users auth={auth} isRouteActive={isRouteActive} />
+                      : <AnonymousUser isRouteActive={isRouteActive} />
+                  },
+                ]} />
+              </div>
+            </div>
           </div>
         </div>
       </nav>

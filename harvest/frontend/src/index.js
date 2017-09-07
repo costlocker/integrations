@@ -5,6 +5,7 @@ import { UIRouter, UIView, pushStateLocationPlugin } from '@uirouter/react';
 import { isDevelopmentMode } from './config';
 import { appState } from './state';
 import { states, config } from './Router';
+import bootstrapComponentsAdapter from './ui/BootstrapComponents';
 import './ui/index.css'
 
 export const plugins = [pushStateLocationPlugin];
@@ -25,3 +26,4 @@ appState.on('next-animation-frame', function (newStructure, oldStructure, keyPat
 });
 
 render();
+bootstrapComponentsAdapter();

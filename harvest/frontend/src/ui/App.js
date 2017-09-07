@@ -29,6 +29,7 @@ const HarvestUser = ({ user }) => {
 
 const Users = ({ auth }) => {
   return <div>
+    <span className="hide">Accounts</span>
     <Logo app="costlocker" color='white' />
     <CostlockerUser user={auth.get('costlocker')} />
     <Logo app="harvest" />
@@ -39,9 +40,9 @@ const Users = ({ auth }) => {
 const Navigation = ({ routes }) => {
   return (
     <ul className="nav navbar-nav">
-      {routes.map(({ title }) => (
+      {routes.map(({ title, className }) => (
         <li key={title}>
-          <a onClick={() => null}>{title}</a>
+          <a onClick={() => null} className={className}>{title}</a>
         </li>
       ))}
     </ul>
@@ -66,18 +67,33 @@ export default function App({ auth, steps }) {
   return (
     <div>
       <nav className="navbar navbar-default">
-        <div className="container">
-          <div>
-            <ul className="nav navbar-nav">
-              <li className="active">
-                <a onClick={() => null}>Import project</a>
-              </li>
-            </ul>
+        <div className="container-fluid">
+          <div className="navbar-header">
+            <button
+              type="button" className="navbar-toggle collapsed" data-toggle="collapse"
+              data-target="#navbar-addon" aria-expanded="false"
+            >
+              <span className="sr-only">Toggle navigation</span>
+              <span className="icon-bar"></span>
+              <span className="icon-bar"></span>
+              <span className="icon-bar"></span>
+            </button>
           </div>
-          <div className="navbar-right text-right">
-            <Navigation routes={[
-              { title:<Users auth={auth} /> },
-            ]} />
+          <div className="navbar-collapse collapse" id="navbar-addon">
+            <div className="container">
+              <div>
+                <ul className="nav navbar-nav">
+                  <li className="active">
+                    <a onClick={() => null}>Import project</a>
+                  </li>
+                </ul>
+              </div>
+              <div className="navbar-right text-right">
+                <Navigation routes={[
+                  { title: <Users auth={auth} />, className: 'users' },
+                ]} />
+              </div>
+            </div>
           </div>
         </div>
       </nav>
