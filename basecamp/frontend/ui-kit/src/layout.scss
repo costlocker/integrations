@@ -51,6 +51,27 @@
             }
         }
     }
+    @media (max-width: 768px) {
+        .collapse.in .navbar-right {
+            text-align: left;
+            .users {
+                .logo, .user {
+                    display: none;
+                }
+                a {
+                    padding: 10px 15px;
+                }
+            }
+            .help {
+                .fa {
+                    display: none;
+                }
+            }
+            .hide {
+                display: block !important;
+            }
+        }
+    }
 }
 
 .nav-breadcrumbs {
