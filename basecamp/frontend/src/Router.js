@@ -172,9 +172,9 @@ export const states = [
     name: 'sync',
     url: '/sync?account&clProject',
     data: {
-      title: params => params.clProject ? 'Refresh project' : 'Add project',
+      title: () => syncSettings.isExistingProjectEdited ? 'Refresh project' : 'Add project',
     },
-    component: (props) => <Sync
+    component: () => <Sync
       costlockerProjects={appState.cursor(['costlocker', 'projects']).deref()}
       basecamp={appState.cursor(['basecamp']).deref()}
       basecampAccounts={appState.cursor(['auth', 'settings']).deref().accounts.basecamp}
@@ -185,7 +185,7 @@ export const states = [
             .then((r) => redirectToRoute('events'))
             .catch((e) => alert('Synchronization has failed'))
       })}
-      isExistingProjectEdited={props.transition.params().clProject ? true : false}
+      isExistingProjectEdited={syncSettings.isExistingProjectEdited}
     />,
     resolve:
       loadRunningProjects(

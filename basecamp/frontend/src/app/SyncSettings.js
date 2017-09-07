@@ -17,6 +17,7 @@ const defaultSyncSettings = {
 class SyncSettings {
   constructor(appState) {
     this.appState = appState;
+    this.isExistingProjectEdited = false;
   }
 
   setProjectId(idProject) {
@@ -25,32 +26,39 @@ class SyncSettings {
 
   loadProjectSettings(allProjects) {
     const projects = allProjects ? allProjects.filter(p => p.id == this.idProject) : [];
-    if (projects.length) {
-      const editedProject = projects[0];
-      const basecampProject = editedProject.basecamps[0];
-      this.appState.cursor(['sync']).update(sync => sync
-        .set('mode', 'edit')
-        .set('costlockerProject', Set([editedProject.id]))
-        .set('basecampProject', basecampProject.id)
-        .set('account', basecampProject.account.id)
-        .set('areTodosEnabled', basecampProject.settings.areTodosEnabled)
-        .set('isDeletingTodosEnabled', basecampProject.settings.isDeletingTodosEnabled)
-        .set('isRevokeAccessEnabled', basecampProject.settings.isRevokeAccessEnabled)
-        .set('areTasksEnabled', basecampProject.settings.areTasksEnabled)
-        .set('isDeletingTasksEnabled', basecampProject.settings.isDeletingTasksEnabled)
-        .set('isCreatingActivitiesEnabled', basecampProject.settings.isCreatingActivitiesEnabled)
-        .set('isDeletingActivitiesEnabled', basecampProject.settings.isDeletingActivitiesEnabled)
-        .set('isBasecampWebhookEnabled', basecampProject.settings.isBasecampWebhookEnabled)
-      )
+    if (!projects.length) {
+      return this.loadCompanySettings();
     }
+
+    const editedProject = projects[0];
+    this.isExistingProjectEdited = editedProject.basecamps.length > 0;
+    if (!this.isExistingProjectEdited) {
+      return this.loadCompanySettings(editedProject.id);
+    }
+
+    const basecampProject = editedProject.basecamps[0];
+    this.appState.cursor(['sync']).update(sync => sync
+      .set('mode', 'edit')
+      .set('costlockerProject', Set([editedProject.id]))
+      .set('basecampProject', basecampProject.id)
+      .set('account', basecampProject.account.id)
+      .set('areTodosEnabled', basecampProject.settings.areTodosEnabled)
+      .set('isDeletingTodosEnabled', basecampProject.settings.isDeletingTodosEnabled)
+      .set('isRevokeAccessEnabled', basecampProject.settings.isRevokeAccessEnabled)
+      .set('areTasksEnabled', basecampProject.settings.areTasksEnabled)
+      .set('isDeletingTasksEnabled', basecampProject.settings.isDeletingTasksEnabled)
+      .set('isCreatingActivitiesEnabled', basecampProject.settings.isCreatingActivitiesEnabled)
+      .set('isDeletingActivitiesEnabled', basecampProject.settings.isDeletingActivitiesEnabled)
+      .set('isBasecampWebhookEnabled', basecampProject.settings.isBasecampWebhookEnabled)
+    )
   }
 
-  loadCompanySettings() {
+  loadCompanySettings(preselectedProject) {
     const companySettings = this.appState.cursor(['companySettings']).deref();
     const myAccount = this.appState.cursor(['auth', 'settings']).myAccount;
     this.appState.cursor(['sync']).update(sync => sync
       .set('mode', 'create')
-      .set('costlockerProject', Set())
+      .set('costlockerProject', Set(preselectedProject ? [preselectedProject] : []))
       .set('basecampProject', '')
       .set('account', myAccount ? myAccount : sync.get('account'))
       .set('areTodosEnabled', companySettings.get('areTodosEnabled'))
@@ -62,6 +70,7 @@ class SyncSettings {
       .set('isDeletingActivitiesEnabled', companySettings.get('isDeletingActivitiesEnabled'))
       .set('isBasecampWebhookEnabled', companySettings.get('isBasecampWebhookEnabled'))
     );
+    this.isExistingProjectEdited = false;
   }
 }
 
