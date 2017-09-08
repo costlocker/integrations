@@ -1,4 +1,14 @@
 {
-  "short_name": "CL Webhooks",
-  "name": "Costlocker Webhooks"
+  "short_name": "Webhooks",
+  "name": "Costlocker Webhooks",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "16x16",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/webhooks",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
 }
