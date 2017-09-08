@@ -1,12 +1,13 @@
 {
   "name": "costlocker-bootstrap",
   "version": "0.1",
-  "main" : "build/index.css",
+  "main": "build/index.css",
   "dependencies": {
-    "bootstrap-sass": "3"
+    "bootstrap-sass": "3",
+    "font-awesome": "^4.7.0"
   },
   "scripts": {
-    "build": "sass src/index.scss build/index.css --sourcemap=none --style compressed",
-    "start": "sass --watch src/index.scss:build/index.css --sourcemap=none"
+    "build": "sass src/index.scss build/index.css --sourcemap=none --style compressed && sass src/inline.scss build/inline.css --sourcemap=none --style compressed",
+    "start": "sass --watch src/index.scss:build/index.css src/inline.scss:build/inline.css --sourcemap=none"
   }
 }

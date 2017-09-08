@@ -1,12 +1,8 @@
 {
-  "main.css": "static/css/main.c5c5e2e2.css",
-  "main.css.map": "static/css/main.c5c5e2e2.css.map",
-  "main.js": "static/js/main.608f086d.js",
-  "main.js.map": "static/js/main.608f086d.js.map",
-  "static/media/basecamp.png": "static/media/basecamp.cccf47b4.png",
-  "static/media/basecamp@2x.png": "static/media/basecamp@2x.cccf47b4.png",
-  "static/media/costlocker-blue.png": "static/media/costlocker-blue.c302d074.png",
-  "static/media/costlocker-blue@2x.png": "static/media/costlocker-blue@2x.c302d074.png",
+  "main.css": "static/css/main.a32c5d1d.css",
+  "main.css.map": "static/css/main.a32c5d1d.css.map",
+  "main.js": "static/js/main.a529166b.js",
+  "main.js.map": "static/js/main.a529166b.js.map",
   "static/media/enabled-addon.png": "static/media/enabled-addon.f985277d.png",
   "static/media/intercom-help.png": "static/media/intercom-help.b5038c46.png"
 }

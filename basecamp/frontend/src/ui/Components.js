@@ -19,7 +19,7 @@ const Errors = ({ title, error, errorClassName }) => {
 
 const ExternalLink = ({ url, title, className }) => (
   <a href={url} className={className} target="_blank" rel="noopener noreferrer">
-    {title ? title : <i className="fa fa-external-link"></i>}
+    {title ? title : <span><i className="fa fa-external-link"></i><span className="sr-only">{url}</span></span>}
   </a>
 );
 
