@@ -23,7 +23,7 @@ export default function CurlExample({ appState }) {
     <div className="col-sm-10">
       <div className="form-group">
         <div className="input-group">
-          <div className="input-group-addon">API</div>
+          <label className="input-group-addon" htmlFor="curl">API</label>
           <input type="text" className="form-control" id="curl"
             value={getCurlCommand(appState)} readOnly />
         </div>
