@@ -8,6 +8,9 @@
     <link rel="manifest" href="/manifest.json" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <style><%= require('fs').readFileSync('ui-kit/build/splash-screen.css') %></style>
+      <%= require('../src/ui/SplashScreen').prerender() %>
+    </div>
   </body>
 </html>

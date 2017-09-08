@@ -1,5 +1,7 @@
 import React from 'react';
 
+const defaultTitle = 'Loading Costlocker webhooks manager';
+
 export default function Loading({ title }) {
   return (
     <div className="container-fluid cover">
@@ -14,7 +16,7 @@ export default function Loading({ title }) {
       </div>
       <div className="row">
         <div className="col-sm-12 text-center">
-          <h1 className="text-muted">{title}&hellip;</h1>
+          <h1 className="text-muted">{title || defaultTitle}&hellip;</h1>
         </div>
       </div>
     </div>

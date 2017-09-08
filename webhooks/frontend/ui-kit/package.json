@@ -7,7 +7,7 @@
     "font-awesome": "^4.7.0"
   },
   "scripts": {
-    "build": "sass src/index.scss build/index.css --sourcemap=none --style compressed",
-    "start": "sass --watch src/index.scss:build/index.css --sourcemap=none"
+    "build": "sass src/index.scss build/index.css --sourcemap=none --style compressed && sass src/splash-screen.scss build/splash-screen.css --sourcemap=none --style compressed",
+    "start": "sass --watch src/index.scss:build/index.css src/splash-screen.scss:build/splash-screen.css --sourcemap=none"
   }
 }

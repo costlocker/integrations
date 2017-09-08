@@ -18,7 +18,7 @@ export const plugins = [pushStateLocationPlugin];
 const render = () => {
   let content = null;
   if (appState.cursor(['auth', 'isLoading']).deref()) {
-    content = <Loading title='Loading Costlocker webhooks manager' />;
+    content = <Loading />;
   } else if (appState.cursor(['app', 'error']).deref()) {
     content = <ErrorPage appState={appState} isDevelopmentMode={isDevelopmentMode} />
   } else {
