@@ -1,0 +1,24 @@
+
+// Core variables and mixins
+@import "./variables";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/variables";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/mixins";
+
+// Reset and dependencies
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/normalize";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/print";
+
+// Core CSS
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/grid";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/scaffolding";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/type";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/progress-bars";
+
+// Components
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/forms";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/navs"; // requires mixin 'form-inline'
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/navbar";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/breadcrumbs";
+
+// navbar/breadcrumbs must be included before
+@import "./layout";
