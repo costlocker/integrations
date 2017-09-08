@@ -1,7 +1,7 @@
 import React from 'react';
 import { trans } from '../i18n';
 
-export default function Loading({ title }) {
+export default function Loading({ title, isTranslated }) {
   return (
     <div className="container-fluid cover">
       <div className="row">
@@ -15,7 +15,7 @@ export default function Loading({ title }) {
       </div>
       <div className="row">
         <div className="col-sm-12 text-center">
-          <h1 className="text-muted">{trans(title)}&hellip;</h1>
+          <h1 className="text-muted">{isTranslated ? title : trans(title)}&hellip;</h1>
         </div>
       </div>
     </div>

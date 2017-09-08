@@ -2,11 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#000000">
     <title>Costlocker &rarr; Fakturoid</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="manifest" href="/manifest.json" />
+    <style><%= require('fs').readFileSync('ui-kit/build/inline.css') %></style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><%= require('../src/ui/SplashScreen').prerender() %></div>
   </body>
 </html>

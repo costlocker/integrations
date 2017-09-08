@@ -9,7 +9,7 @@ export default {
     login: 'Přihlášení'
   },
   loading: {
-    app: 'Načítám Costlocker & Fakturoid addon',
+    app: 'Načítám Costlocker & Fakturoid addon', // copy-pasted in src/ui/SplashScreen.js
     invoice: 'Načítám kontakty z Fakturoidu a billing z Costlockeru',
     createInvoice: 'Vytvářím fakturu',
   },

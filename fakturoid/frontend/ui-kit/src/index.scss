@@ -1,52 +1,19 @@
-$blue: #119ee0;
-
-$body-bg: #fff;
-$breadcrumb-bg: #f2f2f2;
-$highlight-bg: #f7ecb5;
-$highlight-ligth-bg: #fcf8e3;
-$navbar-default-bg: #333;
-$navbar-default-link-color: $breadcrumb-bg;
-$navbar-default-link-hover-color: $blue;
-$navbar-default-link-active-color: $navbar-default-bg;
-$navbar-default-link-active-bg: $breadcrumb-bg;
-$navbar-default-link-hover-bg: $navbar-default-bg;
-$navbar-default-border: $navbar-default-bg;
-$breadcrumb-separator: '';
-$font-size-base: 14px;
-$font-size-h1: floor(($font-size-base * 2.2));
-$font-size-h2: floor(($font-size-base * 1.6));
-$font-size-h3: floor(($font-size-base * 1.2));
-$border-radius-base: 0;
-$border-radius-large: 0;
-$border-radius-small: 0;
-$input-bg: #fafafa;
 
 // Core variables and mixins
+@import "./variables";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/variables";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/mixins";
 
-// Reset and dependencies
-@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/normalize";
-@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/print";
-
 // Core CSS
-@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/scaffolding";
-@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/type";
-@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/grid";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/tables";
-@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/forms";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/buttons";
 
 // Components
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/component-animations";
-@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/navs";
-@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/navbar";
-@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/breadcrumbs";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/labels";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/badges";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/alerts";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/panels";
-@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/progress-bars";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/button-groups";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/input-groups";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/modals";
@@ -55,10 +22,12 @@ $input-bg: #fafafa;
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/utilities";
 
 // custom css
-@import "./layout";
 @import "./datepicker";
 @import "./image-tooltip";
 @import "./modals";
+
+$fa-font-path: "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/";
+@import "../node_modules/font-awesome/scss/font-awesome";
 
 [data-unavailable] {
     opacity: 0.6;

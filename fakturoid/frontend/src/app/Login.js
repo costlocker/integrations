@@ -35,7 +35,7 @@ export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturo
                   defaultValue={fakturoidAuth ? fakturoidAuth.person.email : null} />
               </div>
               <div className="form-group">
-                <label htmlFor="token">
+                <label htmlFor="slug">
                   {trans('login.slug')} <ImageTooltip url={slug} />
                 </label>
                 <Input required type="text" className="form-control" id="slug" name="slug" placeholder="slug"
