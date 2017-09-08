@@ -41,8 +41,8 @@ const Navigation = ({ routes }) => {
   return (
     <ul className="nav navbar-nav">
       {routes.map(({ title, className }) => (
-        <li key={title}>
-          <a onClick={() => null} className={className}>{title}</a>
+        <li key={title} className={className}>
+          <a onClick={() => null}>{title}</a>
         </li>
       ))}
     </ul>

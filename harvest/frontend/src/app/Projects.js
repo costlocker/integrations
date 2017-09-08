@@ -18,12 +18,12 @@ const ProjectsList = ({ projects, goTo }) => {
           <th className="text-center">Status</th>
           <th className="text-center">Is billable?</th>
           <th className="text-center">
-            <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods" target="_blank">
+            <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods" target="_blank" rel="noopener noreferrer">
               Budgeted by
             </a>
           </th>
           <th className="text-center">
-            <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods" target="_blank">
+            <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods" target="_blank" rel="noopener noreferrer">
               Invoiced by
             </a>
           </th>

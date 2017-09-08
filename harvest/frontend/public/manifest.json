@@ -1,0 +1,14 @@
+{
+  "short_name": "Harvest",
+  "name": "Costlocker + Harvest",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "16x16",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

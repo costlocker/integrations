@@ -55,16 +55,16 @@ const PeopleCosts = ({ peopleCosts, project, fixedBudget }) => {
       <div className="row">
         <ul>
           <li>
-            <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods/#setting-up-a-budget" target="_blank">Budget by</a>
+            <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods/#setting-up-a-budget" target="_blank" rel="noopener noreferrer">Budget by</a>
             : <strong>{project.finance.budget_by}</strong>
           </li>
           <li>
-            <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods/#setting-up-an-invoice-method" target="_blank">Invoiced by</a>
+            <a href="http://help.getharvest.com/harvest/projects/setting-up-projects/how-to-add-a-project-invoice-and-budget-methods/#setting-up-an-invoice-method" target="_blank" rel="noopener noreferrer">Invoiced by</a>
             : <strong>{project.finance.bill_by}</strong>
           </li>
           {fixedBudget &&
           <li>
-            <a href="https://www.getharvest.com/blog/2017/05/introducing-fixed-fee-projects/" target="_blank">Fixed fee</a>
+            <a href="https://www.getharvest.com/blog/2017/05/introducing-fixed-fee-projects/" target="_blank" rel="noopener noreferrer">Fixed fee</a>
             : <strong>{fixedBudget}</strong>
           </li>
           }

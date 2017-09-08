@@ -7,6 +7,7 @@ import { appState } from './state';
 import { states, config } from './Router';
 import bootstrapComponentsAdapter from './ui/BootstrapComponents';
 import './ui/index.css'
+import registerServiceWorker from './registerServiceWorker';
 
 export const plugins = [pushStateLocationPlugin];
 
@@ -27,3 +28,4 @@ appState.on('next-animation-frame', function (newStructure, oldStructure, keyPat
 
 render();
 bootstrapComponentsAdapter();
+registerServiceWorker();
