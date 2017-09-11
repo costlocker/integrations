@@ -11,7 +11,7 @@ import ErrorPage from './ui/ErrorPage';
 import DisabledAddon from './ui/DisabledAddon';
 import bootstrapComponentsAdapter from './ui/BootstrapComponents';
 import './ui/index.css'
-import registerServiceWorker from './registerServiceWorker';
+import { unregister } from './registerServiceWorker';
 
 export const plugins = [pushStateLocationPlugin];
 
@@ -41,4 +41,4 @@ appState.on('next-animation-frame', function (newStructure, oldStructure, keyPat
 
 render();
 bootstrapComponentsAdapter();
-registerServiceWorker();
+unregister();
