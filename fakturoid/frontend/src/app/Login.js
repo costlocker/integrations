@@ -16,12 +16,12 @@ export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturo
   } else if (isLoggedInFakturoid && switchForm.get('isFakturoidLoginHidden')) {
     const showForm = () => switchForm.update(state => state.set('isFakturoidLoginHidden'), false);
     fakturoidForm =
-      <button className="btn btn-primary btn-block" onClick={showForm}>
+      <button className="btn btn-primary" onClick={showForm}>
         <span>{trans('login.switchAccount')} <strong>{currentSlug}</strong></span>
       </button>;
   } else {
     fakturoidForm =
-      <form action={loginUrls.fakturoid} method="POST">
+      <form action={loginUrls.fakturoid} method="POST" className="text-left">
         <div className="form-group">
           <label htmlFor="email">{trans('login.email')}</label>
           <Input required type="email" className="form-control" id="email" name="email" placeholder="john@example.com"
@@ -71,7 +71,7 @@ export default function Login({ costlockerAuth, fakturoidAuth, isLoggedInFakturo
               : trans('login.loginCostlocker')}
           </a>
         </div>
-        <div className="col-sm-6">
+        <div className="col-sm-6 text-center">
           <h2>Fakturoid <ExternalLink url={fakturoidUrl} /></h2>
           {fakturoidForm}
         </div>
