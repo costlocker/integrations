@@ -10,6 +10,7 @@ const appState = immstruct({
   },
   app: {
     isDisabled: false,
+    isFakturoidLoginHidden: true,
     csrfToken: null,
     currentState: null, // helper for active menu items
     dateFormat: 'D.M.YYYY',

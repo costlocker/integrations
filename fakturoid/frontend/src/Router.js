@@ -232,9 +232,16 @@ export const states = [
       costlockerAuth={appState.cursor(['auth', 'costlocker']).deref()}
       fakturoidAuth={appState.cursor(['auth', 'fakturoid']).deref()}
       isLoggedInFakturoid={appState.cursor(['auth', 'isLoggedInFakturoid']).deref()}
+      switchForm={new Form('app')}
       loginUrls={loginUrls}
       loginError={props.transition.params().loginError}
       form={new Form('fakturoid')} />,
+    resolve: [
+      {
+        token: 'resetFakturoidForm',
+        resolveFn: () => appState.cursor(['app']).set('isFakturoidLoginHidden', true),
+      },
+    ],
   },
 ];
 
