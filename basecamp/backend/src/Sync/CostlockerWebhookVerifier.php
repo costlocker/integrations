@@ -16,7 +16,7 @@ class CostlockerWebhookVerifier
         $signature = $headers['x-hook-signature'][0] ?? '=';
         list($algo, $hash) = explode('=', $signature, 2);
 
-        if (!in_array($algo, hash_algos(), TRUE)) {
+        if (!in_array($algo, hash_algos(), true)) {
             return false;
         }
 

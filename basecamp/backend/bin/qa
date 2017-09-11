@@ -8,7 +8,7 @@ then
     exit 1
 fi
 
-phpqa --report --tools phpcs:0,phpmd:16,phpcpd:5,phpmetrics,phploc,pdepend \
+phpqa --report --tools phpcs:0,phpmd:15,phpcpd:5,phpmetrics,phploc,pdepend \
     --buildDir var/QA \
     --analyzedDirs ./ \
     --ignoredDirs var,vendor \

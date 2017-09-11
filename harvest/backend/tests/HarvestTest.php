@@ -32,7 +32,7 @@ class HarvestTest extends \Costlocker\Integrations\GivenApi
             $this->provideNonBillableBudget('project-hours', 5 / 1) +
             $this->provideNonBillableBudget('person-hours', 10 / 1) +
             $this->provideNonBillableBudget('task-hours', 8 / 1) +
-            $this->provideNonBillableBudget('no-budget', 5.83) + 
+            $this->provideNonBillableBudget('no-budget', 5.83) +
             $this->provideHoursBudget('project') +
             $this->provideHoursBudget('task') +
             $this->provideHoursBudget('person');
@@ -103,7 +103,7 @@ class HarvestTest extends \Costlocker\Integrations\GivenApi
                     'Marketing' => ['rate' => 100000 / 17.98, 'hours' => 17.98, 'revenue' => 100000],
                 ],
                 200000,
-            ]  
+            ],
         ];
     }
 

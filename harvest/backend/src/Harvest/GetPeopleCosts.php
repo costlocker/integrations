@@ -129,7 +129,7 @@ class GetPeopleCosts
 
     private function isFixedBudget($project)
     {
-        return 
+        return
             $project['billable'] &&
             $project['bill_by'] == 'none' &&
             $project['budget_by'] == 'none';
