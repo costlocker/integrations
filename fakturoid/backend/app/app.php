@@ -9,6 +9,8 @@ use Costlocker\Integrations\Api\ResponseHelper;
 $dotenv = new Dotenv\Dotenv(__DIR__ . '/../');
 $dotenv->load();
 
+\Costlocker\Integrations\Api\CORS::enable(getenv('APP_CORS'));
+
 $app = new Silex\Application();
 $app['debug'] = in_array(getenv('APP_ENV'), ['local', 'test']);
 
