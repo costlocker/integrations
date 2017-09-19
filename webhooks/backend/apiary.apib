@@ -1,0 +1,103 @@
+FORMAT: 1A
+HOST: https://webhooks.integrations.costlocker.com/api
+
+# Costlocker + Webhooks
+
+Internal API for 
+[Webhooks addon](https://gitlab.com/costlocker/integrations/tree/master/webhooks/backend).
+
+## API [/]
+
+### Proxy [POST /]
+
++ Request (application/json)
+
+    + Attributes
+        + method (enum, required)
+            + GET
+            + POST
+        + isDebug (enum, required)
+            + false (boolean) - raw response from costlocker api
+            + true (boolean) - `body` and `headers` (_used in webhook example_)
+        + url (string, required)
+        + headers (object, required)
+            + Authentication (string, required) - http://docs.costlocker.apiary.io/#reference/0/authentication/get-webhooks
+        + body (string, nullable) - body for `POST` request
+
+    + Body
+
+            {
+                "method": "GET",
+                "isDebug": false,
+                "url": "https://new.costlocker.com/api-public/v2/webhooks",
+                "headers": {
+                    "Authorization": "_check_authentication_section_at_docs.costlocker.apiary.io_"
+                },
+                "body": null
+            }
+
++ Response 200 (application/json)
+
+        {
+            "data": "raw response from endpoint for isDebug = false"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "headers": {
+                "X-Hook-Signature":["sha256=16dc079248a08940ce4dba17c8bcf4095c4d4f83fdfa5beaaea5386c0370ccd1"]
+            },
+            "body": {
+                "data": "raw response from endpoint for isDebug = true"
+            }
+        }
+
+### Help [GET]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "proxy url": "POST http://webhooks.integrations.costlocker.com/api/",
+                "proxy request template": {
+                    "method": "GET",
+                    "isDebug": false,
+                    "url": "https://new.costlocker.com/api-public/v2/webhooks",
+                    "headers": {
+                        "Authorization": "..."
+                    },
+                    "body": ""
+                }
+            }
+
+## Log frontend errors [POST /log]
+
+Push [javascript errors](https://developer.mozilla.org/cs/docs/Web/JavaScript/Reference/Global_Objects/Error) to internal log, Sentry, ...
+
++ Request (application/json)
+
+    + Attributes
+        + date (string)
+        + error (string)
+        + stack (array[string])
+        + user
+            + username (enum)
+                + email (string)
+                + anonymous (string)
+
+    + Body
+
+            {
+                "date": "Tue Sep 19 2017 08:15:53 GMT+0200 (CEST)",
+                "error": "Error: Invalid API response",
+                "stack": [
+                    "irrelevant error stak"
+                ],
+                "user": {
+                    "username": "anonymous"
+                }
+            }
+
++ Response 200

@@ -1,0 +1,324 @@
+FORMAT: 1A
+HOST: https://fakturoid.integrations.costlocker.com/api
+
+# Costlocker + Fakturoid
+
+Internal API for 
+[Fakturoid addon](https://gitlab.com/costlocker/integrations/tree/master/fakturoid/backend).
+
+## Auth [/oauth]
+
+1. User is redirected to login
+1. Backend redirects user back to `APP_FRONTED_URL`
+1. Frontend find if user has logged via `/user` endpoint
+
+### Costlocker OAuth2 [GET /oauth/costlocker]
+
+http://docs.costlocker.apiary.io/#reference/0/authentication/oauth-2-request-authorization
+
++ Response 302
+
+        # success
+        APP_FRONTED_URL
+        # failure
+        APP_FRONTED_URL?loginError=access_denined
+
+### Fakturoid Basic Auth [POST /oauth/fakturoid{?slug,email,token}]
+
+http://docs.fakturoid.apiary.io/#introduction/pozadavek
+
++ Parameters
+    + slug (string, required)
+    + email (string, required)
+    + token (string, required)
+
++ Response 302
+
+        # success
+        APP_FRONTED_URL/invoice
+        # failure
+        APP_FRONTED_URL?loginError=access_denined
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in costlocker"
+            ]
+        }
+
+### Refresh Costlocker access token [POST /oauth/refresh]
+
+http://docs.costlocker.apiary.io/#reference/0/authentication/oauth-2-get-access-token
+
++ Request
+
+    + Headers
+    
+            X-CSRF-TOKEN: csrfToken
+
++ Response 200 (application/json)
+
+        {"expiration":"2017-09-26T07:00:26+00:00"}
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in costlocker"
+            ]
+        }
+
++ Response 403
+
+        {
+            "errors": [
+                "Invalid CSRF token"
+            ]
+        }
+
+
+## User [/?user]
+
+### User info [GET /user]
+
++ Response 200 (application/json)
+
+    + Attributes
+        + isAddonDisabled (boolean, required)
+        + costlocker (object, nullable, required)
+        + fakturoid (object, nullable, required)
+        + isLoggedInFakturoid (boolean, required)
+        + csrfToken (string, nullable, required)
+
+    + Body
+
+            {
+                "isAddonDisabled":false,
+                "costlocker":{
+                    "person":{
+                        "email":"carol@example.com",
+                        "first_name":"Carol",
+                        "last_name":"Brooks",
+                        "role":"ADMIN"
+                    },
+                    "company":{
+                        "id":"123456",
+                        "name":"Costlocker",
+                        "addons":[
+                            "fakturoid"
+                        ]
+                    },
+                    "links":{
+                        "tokens":"https:\/\/new.costlocker.com\/api-public\/v2\/me\/tokens"
+                    }
+                },
+                "fakturoid":{
+                    "person":{
+                        "email":"carol@example.com",
+                        "full_name":"Carol Brooks"
+                    },
+                    "account":{
+                        "slug":"acme",
+                        "name":"ACME",
+                        "hasVat":true
+                    }
+                },
+                "isLoggedInFakturoid":true,
+                "csrfToken":"d1c42b2886e87c02a7035d820bc6baae145b9f2e"
+            }
+
+### Logout [GET /logout]
+
++ Response 302
+
+        APP_FRONTED_URL
+
+
+## Invoices [/?invoices]
+
+### Invoice detail [GET /costlocker{?project,billing,amount}]
+
++ Parameters
+    + project: 123 (string)
+    + billing: 123 (string) - id or `NEW` for billing that not exists in Costlocker
+    + amount: 123 (number)
+
++ Response 200 (application/json)
+
+    + Attributes
+        + status (enum)
+            + NO_INVOICE
+            + UNKNOWN
+            + NOT_DRAFT
+            + ALREADY_IMPORTED
+            + READY
+            + NEW
+        + costlocker (object)
+        + fakturoid (object)
+
+    + Body
+
+            {
+                "status":"NEW",
+                "costlocker":{
+                },
+                "fakturoid":{
+                }
+            }
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in costlocker"
+            ]
+        }
+
+### Latest invoices [GET /costlocker{?query,type}]
+
++ Parameters
+    + query (string, required) - fulltext search
+    + type (enum)
+        + '' (all)
+        + invoice
+        + proforma.full
+        + proforma.partial
+
++ Response 200 (application/json)
+
+        [
+            {
+                "id":123456,
+                "date":"2017-09-13 13:45:56",
+                "costlocker":{
+                },
+                "fakturoid":{
+                }
+            }
+        ]
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in costlocker"
+            ]
+        }
+
+### Fakturoid subjects [GET /fakturoid]
+
++ Response 200 (application/json)
+
+        [
+            {
+                "id": 123456,
+                "name": "Another company"
+            }
+        ]
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in fakturoid"
+            ]
+        }
+
+### Download fakturoid subjects [POST /fakturoid?action=downloadSubjects]
+
++ Response 200 (application/json)
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in fakturoid"
+            ]
+        }
+
++ Response 403
+
+        {
+            "errors": [
+                "Invalid CSRF token"
+            ]
+        }
+
+### Create invoice in Fakturoid [POST /fakturoid?action=createInvoice]
+
+Request and response in [/fakturoid/backend/tests/fixtures/invoice-data.json](https://gitlab.com/costlocker/integrations/blob/master/fakturoid/backend/tests/fixtures/invoice-data.json)
+
++ Request 200 (application/json)
+
++ Response 200 (application/json)
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in fakturoid"
+            ]
+        }
+
++ Response 403
+
+        {
+            "errors": [
+                "Invalid CSRF token"
+            ]
+        }
+
+## Other API [/?other]
+
+### Redirect from Costlocker [GET /redirect{?project,billing,amount}]
+
++ Parameters
+    + project: 123 (string)
+    + billing: 123 (string) - id or `NEW` for billing that not exists in Costlocker
+    + amount: 123 (number)
+
++ Response 302
+
+        # logged user is redirected directly to the invoice
+        APP_FRONTED_URL/invoice
+        # unlogged user is redirected to login (after successful fakturoid login is redirected to the invoice)
+        APP_FRONTED_URL/login
+
+### Empty homepage [GET /]
+
++ Response 200 (application/json)
+
+    + Body
+
+            []
+
+## Log frontend errors [POST /log]
+
+Push [javascript errors](https://developer.mozilla.org/cs/docs/Web/JavaScript/Reference/Global_Objects/Error) to internal log, Sentry, ...
+
++ Request (application/json)
+
+    + Attributes
+        + date (string)
+        + error (string)
+        + stack (array[string])
+        + user
+            + username (enum)
+                + email (string)
+                + anonymous (string)
+
+    + Body
+
+            {
+                "date": "Tue Sep 19 2017 08:15:53 GMT+0200 (CEST)",
+                "error": "Error: Invalid API response",
+                "stack": [
+                    "irrelevant error stak"
+                ],
+                "user": {
+                    "username": "anonymous"
+                }
+            }
+
++ Response 200

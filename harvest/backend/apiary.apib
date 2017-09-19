@@ -1,0 +1,178 @@
+FORMAT: 1A
+HOST: https://harvest.integrations.costlocker.com/api
+
+# Costlocker + Harvest
+
+Internal API for 
+[Harvest addon](https://gitlab.com/costlocker/integrations/tree/master/harvest/backend).
+
+## Auth [/oauth]
+
+1. User is redirected to login
+1. Backend redirects user back to `APP_FRONTED_URL`
+1. Frontend find if user has logged via `/user` endpoint
+
+### Costlocker OAuth2 [GET /oauth/costlocker]
+
+http://docs.costlocker.apiary.io/#reference/0/authentication/oauth-2-request-authorization
+
++ Response 302
+
+        # success
+        APP_FRONTED_URL
+        # failure
+        APP_FRONTED_URL?clLoginError=access_denined
+
+### Harvest OAuth2 [GET /oauth/harvest]
+
++ Response 302
+
+        # success
+        APP_FRONTED_URL
+        # failure
+        APP_FRONTED_URL?harvestLoginError=access_denined
+
+## User [/?user]
+
+### User info [GET /user]
+
++ Response 200 (application/json)
+
+    + Attributes
+        + costlocker (object, nullable, required)
+        + harvest (object, nullable, required)
+
+    + Body
+
+                {
+                    "harvest":{
+                        "company_name":"Tester",
+                        "company_url":"https:\/\/example.harvestapp.com",
+                        "company_subdomain":"example",
+                        "user_name":"John Doe",
+                        "user_avatar":"https:\/\/cache.harvestapp.com\/assets\/profile_images\/big_ben.png?1493475457"
+                    },
+                    "costlocker":{
+                        "person":{
+                            "email":"carol@example.com",
+                            "first_name":"Carol",
+                            "last_name":"Brooks",
+                            "role":"ADMIN"
+                        },
+                        "company":{
+                            "id":"928",
+                            "name":"Costlocker",
+                            "addons":[
+                                "fakturoid"
+                            ]
+                        },
+                        "links":{
+                            "tokens":"https:\/\/new.costlocker.com\/api-public\/v2\/me\/tokens"
+                        }
+                    }
+                }
+
+## Import project [/]
+
+Every project from 1st step contains hypermedia links to next steps in wizard.
+
+### 1. Harvest projects [GET /harvest]
+
++ Response 200 (application/json)
+
+    + Attributes (array)
+        + (object)
+            + links (object)
+                + peoplecosts
+                + expenses
+                + harvest
+            + status (enum)
+                + new
+                + imported
+
+    + Body
+
+            [{"id":13788046,"name":"Trello","client":{"id":5554369,"name":"2f","currency":"K\u010d"},"dates":{"date_start":"2017-03-01","date_end":"2017-04-24"},"finance":{"billable":true,"bill_by":"People","budget":360,"budget_by":"project","estimate":360,"estimate_by":"project","hourly_rate":null,"cost_budget":null,"cost_budget_include_expenses":false},"links":{"peoplecosts":"\/harvest?peoplecosts=13788046","expenses":"\/harvest?expenses=13788046\u0026from=20170424\u0026to=20170531","harvest":"https:\/\/example.harvestapp.com\/projects\/13788046"},"status":"new"}]
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in harvest"
+            ]
+        }
+
+### 2. Harvest people costs [GET /harvest{?peoplecosts,fixedBudget}]
+
++ Parameters
+    + peoplecosts (number, required) - harvest project id
+    + fixedBudget (number, optional)
+
++ Response 200 (application/json)
+
+    + Body
+
+            [{"id":13788046,"name":"Trello","client":{"id":5554369,"name":"2f","currency":"K\u010d"},"dates":{"date_start":"2017-03-01","date_end":"2017-04-24"},"finance":{"billable":true,"bill_by":"People","budget":360,"budget_by":"project","estimate":360,"estimate_by":"project","hourly_rate":null,"cost_budget":null,"cost_budget_include_expenses":false},"links":{"peoplecosts":"\/harvest?peoplecosts=13788046","expenses":"\/harvest?expenses=13788046\u0026from=20170424\u0026to=20170531","harvest":"https:\/\/example.harvestapp.com\/projects\/13788046"},"status":"new"}]
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in harvest"
+            ]
+        }
+
+### 3. Harvest expenses [GET /harvest{?expenses,from,to}]
+
++ Parameters
+    + expenses (number, required) - harvest project id
+    + from: 20170910 (string, optional)
+    + to: 20170919 (string, optional)
+
++ Response 200 (application/json)
+
+    + Body
+
+            []
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in harvest"
+            ]
+        }
+
+### 4. Import project to Costlocker [POST /costlocker]
+
++ Request (application/json)
+
++ Response 200 (application/json)
+
+        {
+            "projectUrl": "https://new.costlocker.com/projects/detail/123456/overview"            
+        }
+
++ Response 400
+
+        {
+            "errors": [
+                "Project import has failed"
+            ]
+        }
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in costlocker"
+            ]
+        }
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in harvest"
+            ]
+        }

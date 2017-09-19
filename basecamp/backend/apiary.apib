@@ -1,0 +1,445 @@
+FORMAT: 1A
+HOST: https://basecamp.integrations.costlocker.com/api
+
+# Costlocker + Basecamp
+
+Internal API for 
+[Basecamp addon](https://gitlab.com/costlocker/integrations/tree/master/basecamp/backend).
+
+## Data structures
+
+### Settings (object)
++ isDeletingActivitiesEnabled: false (boolean, required)
++ isDeletingTasksEnabled: false (boolean, required)
++ isBasecampWebhookEnabled: false (boolean, required)
++ isDeletingTodosEnabled: true (boolean, required)
++ areTasksEnabled: true (boolean, required)
++ areTodosEnabled: true (boolean, required)
++ account (number, nullable, required)
++ isRevokeAccessEnabled: false (boolean, required)
++ costlockerUser: john@example.com (string, nullable, required)
++ isCreatingActivitiesEnabled: false (boolean, required)
++ isCreatingBasecampProjectEnabled: false (boolean, required)
+
+## Auth [/oauth]
+
+1. User is redirected to login
+1. Backend redirects user back to `APP_FRONTED_URL`
+1. Frontend find if user has logged via `/user` endpoint
+
+### Costlocker OAuth2 [GET /oauth/costlocker]
+
+http://docs.costlocker.apiary.io/#reference/0/authentication/oauth-2-request-authorization
+
++ Response 302
+
+        # success
+        APP_FRONTED_URL
+        # failure
+        APP_FRONTED_URL?loginError=access_denined
+
+### Basecamp OAuth2 [GET /oauth/basecamp]
+
++ Response 302
+
+        # success
+        APP_FRONTED_URL
+        # failure
+        APP_FRONTED_URL?loginError=access_denined
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in costlocker"
+            ]
+        }
+
+## User [/?user]
+
+### User info [GET /user]
+
++ Response 200 (application/json)
+
+    + Attributes
+        + isAddonDisabled (boolean, required)
+        + costlocker (object, nullable, required)
+        + basecamp (object, nullable, required)
+        + csrfToken (string, nullable, required)
+        + settings (object, nullable, required)
+            + accounts (object, required)
+            + myAccount (number, required)
+            + sync (Settings, required)
+
+    + Body
+
+            {
+                "isAddonDisabled": false,
+                "costlocker": {
+                    "person": {
+                        "email": "john@example.com",
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "role": "OWNER"
+                    },
+                    "company": {
+                        "id": "1",
+                        "name": "ACME",
+                        "addons": [
+                            "basecamp"
+                        ]
+                    },
+                    "links": {
+                        "tokens": "http:\/\/new.costlocker.com\/api-public\/v2\/me\/tokens"
+                    }
+                },
+                "basecamp": {
+                    "id": 96296240,
+                    "email": "john@example.com",
+                    "first_name": "John",
+                    "last_name": "Doe"
+                },
+                "csrfToken": "88831e6955e9563830de5f8cfb2b19d754bc2ebd",
+                "settings": {
+                    "sync": {
+                        "isCreatingBasecampProjectEnabled": false,
+                        "account": null,
+                        "costlockerUser": "john@example.com",
+                        "areTodosEnabled": true,
+                        "isDeletingTodosEnabled": true,
+                        "isRevokeAccessEnabled": false,
+                        "areTasksEnabled": true,
+                        "isDeletingTasksEnabled": false,
+                        "isCreatingActivitiesEnabled": false,
+                        "isDeletingActivitiesEnabled": false,
+                        "isBasecampWebhookEnabled": false
+                    },
+                    "myAccount": null,
+                    "accounts": {
+                        "basecamp": [
+                            {
+                                "isMyAccount": true,
+                                "person": {
+                                    "email": "john@example.com",
+                                    "first_name": "John",
+                                    "last_name": "Doe",
+                                    "role": "OWNER"
+                                },
+                                "account": {
+                                    "id": 2,
+                                    "name": "CL Demo",
+                                    "product": "bc3",
+                                    "urlApp": "https:\/\/3.basecamp.com\/3763761",
+                                    "identity": {
+                                        "id": 15761604,
+                                        "email_address": "john@example.com",
+                                        "first_name": "John",
+                                        "last_name": null
+                                    },
+                                    "canBeSynchronizedFromBasecamp": true
+                                },
+                                "connectedProjectsCount": 0
+                            },
+                            {
+                                "isMyAccount": false,
+                                "person": {
+                                    "email": "jane@example.com",
+                                    "first_name": "Jane",
+                                    "last_name": "Doe",
+                                    "role": "ADMIN"
+                                },
+                                "account": {
+                                    "id": 6,
+                                    "name": "ACME ZD",
+                                    "product": "bc3",
+                                    "urlApp": "https:\/\/3.basecamp.com\/3804245",
+                                    "identity": {
+                                        "id": 16017081,
+                                        "email_address": "jane@example.com",
+                                        "first_name": "Jane",
+                                        "last_name": "Doe"
+                                    },
+                                    "canBeSynchronizedFromBasecamp": true
+                                },
+                                "connectedProjectsCount": 1
+                            }
+                        ],
+                        "costlocker": [
+                            {
+                                "email": "john@example.com",
+                                "first_name": "John",
+                                "last_name": "Doe",
+                                "role": "OWNER"
+                            }
+                        ]
+                    }
+                }
+            }
+
+### Logout [GET /logout]
+
++ Response 302
+
+        APP_FRONTED_URL
+
+## Synchronizer [/?sync]
+
+### Costlocker projects [GET /costlocker{?state}]
+
+http://docs.costlocker.apiary.io/#reference/0/projects/get-projects
+
++ Parameters
+    + state (enum, optional)
+        + running
+        + finished
+
++ Response 200 (application/json)
+
+    + Body
+
+            []
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in costlocker"
+            ]
+        }
+
+### Basecamp projects and companies [GET /basecamp{?account}]
+
+Companies available only for [Basecamp Classic](https://github.com/basecamp/basecamp-classic-api).
+
++ Parameters
+    + account (number, required)
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "isAvailable": true,
+                "projects": [
+                    {
+                        "id": 4974346,
+                        "name": "Apiary HQ"
+                    }
+                ],
+                "companies": []
+            }
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in costlocker"
+            ]
+        }
+
+### Synchronize Costlocker projects to Basecamp [POST /sync]
+
++ Request (application/json)
+
+    + Attributes (Settings)
+        + costlockerProject: 123 (array[number], required)
+        + basecampProject (number, nullable, required)
+        + basecampClassicCompanyId (number, nullable, required)
+        + mode (enum, required)
+            + create - Create a new project in Basecamp
+            + add - Add to an existing project in Basecamp
+
++ Response 200
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in basecamp"
+            ]
+        }
+
++ Response 403
+
+        {
+            "errors": [
+                "Invalid CSRF token"
+            ]
+        }
+
+### Disconnect project or user [POST /disconnect{?project,user}]
+
++ Parameters
+    + project (number, required)
+    + user (number, required)
+
++ Response 200
+
++ Response 400
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in basecamp"
+            ]
+        }
+
++ Response 403
+
+        {
+            "errors": [
+                "Invalid CSRF token"
+            ]
+        }
+
+### Update company settings [POST /settings]
+
++ Request (application/json)
+
+    + Attribute (Settings)
+
++ Response 200 (application/json)
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in costlocker"
+            ]
+        }
+
++ Response 403
+
+        {
+            "errors": [
+                "Invalid CSRF token"
+            ]
+        }
+
+### Events [GET /events{?project}]
+
++ Parameters
+    + project (number, optional)
+
++ Response 200 (application/json)
+
+    + Body
+
+            []
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in costlocker"
+            ]
+        }
+
+### Undo event [GET /events/undo{?id}]
+
++ Parameters
+    + id: 123 (number, optional)
+
++ Response 200 (application/json)
+
++ Response 400
+
+        {
+            "errors": [
+                "Undo is not available for the event 123",
+                "Project cannot be revertedr"
+            ]
+        }
+
++ Response 401
+
+        {
+            "errors": [
+                "Unauthorized in costlocker"
+            ]
+        }
+
++ Response 403
+
+        {
+            "errors": [
+                "Invalid CSRF token"
+            ]
+        }
+
+## Wehooks handler [/webhooks/handler]
+
+### Push webhook to queue [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            user-agent: Basecamp3 Webhook
+            x-hook-signature: costlocker_webhook_signature
+
+    + Body
+
+            {
+                "webhook from": {
+                    "basecamp3": "https://github.com/basecamp/bc3-api/blob/master/sections/webhooks.md#webhooks",
+                    "costlocker": "http://docs.costlocker2.apiary.io/#reference/0/webhooks/get-webhook-example"
+                }
+            }
+
++ Response 200 (application/json)
+
+### Example [GET]
+
++ Response 200 (application/json)
+
+        {
+            "example": "POST https://basecamp.integrations.costlocker.com/api/webhooks/handler --data '[\"some json\"]'",
+            "supported_webhooks": {
+                "basecamp3": "https://github.com/basecamp/bc3-api/blob/master/sections/webhooks.md#webhooks",
+                "costlocker": "http://docs.costlocker2.apiary.io/#reference/0/webhooks/get-webhook-example"
+            }
+        }
+
+## Other API [/?other]
+
+### Help [GET]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "webhookUrl":"POST https://basecamp.integrations.costlocker.com/api/webhooks/handler"
+            }
+
+## Log frontend errors [POST /log]
+
+Push [javascript errors](https://developer.mozilla.org/cs/docs/Web/JavaScript/Reference/Global_Objects/Error) to internal log, Sentry, ...
+
++ Request (application/json)
+
+    + Attributes
+        + date (string)
+        + error (string)
+        + stack (array[string])
+        + user
+            + username (enum)
+                + email (string)
+                + anonymous (string)
+
+    + Body
+
+            {
+                "date": "Tue Sep 19 2017 08:15:53 GMT+0200 (CEST)",
+                "error": "Error: Invalid API response",
+                "stack": [
+                    "irrelevant error stak"
+                ],
+                "user": {
+                    "username": "anonymous"
+                }
+            }
+
++ Response 200
