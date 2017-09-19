@@ -100,7 +100,7 @@ $app['client.check'] = function ($app) {
 };
 
 $app['logout'] = function ($app) {
-    return new Costlocker\Integrations\Auth\LogoutUser($app['session']);
+    return new Costlocker\Integrations\Auth\LogoutUser($app['session'], getenv('APP_FRONTED_URL'));
 };
 
 $checkAuthorization = function ($service) use ($app) {
