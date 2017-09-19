@@ -1,4 +1,10 @@
 
+# DEPRECATED. MOVED TO [GITLAB.COM](https://gitlab.com/costlocker/integrations)
+
+This repository has been deprecated in favor of [https://gitlab.com/costlocker/integrations](https://gitlab.com/costlocker/integrations).
+
+------
+
 # Costlocker integrations
 
 ## https://integrations.costlocker.com/
