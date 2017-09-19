@@ -3,6 +3,7 @@
 namespace Costlocker\Integrations\Auth;
 
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class LogoutUser
 {
